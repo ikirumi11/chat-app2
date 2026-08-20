@@ -2,1261 +2,776 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Chat</title>
 
 <style>
-
-*{
-    box-sizing:border-box;
+* {
+    box-sizing: border-box;
 }
 
 html,
-body{
-    margin:0;
-    padding:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    font-family:Inter,Arial,sans-serif;
-    background:#101114;
-    color:#eee;
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #111;
+    color: #eee;
 }
 
-body{
-    transition:
-        background .25s ease,
-        color .25s ease;
+body {
+    display: flex;
 }
 
-/* ==============================
+/* ================================
    APP
-============================== */
+================================ */
 
-.app{
-    width:100%;
-    height:100%;
-    display:flex;
-    flex-direction:column;
+#app {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #111;
 }
 
-/* ==============================
-   TOP BAR
-============================== */
+/* ================================
+   HEADER
+================================ */
 
-.topbar{
-    height:64px;
-    min-height:64px;
+.header {
+    height: 64px;
+    flex-shrink: 0;
 
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+    display: flex;
+    align-items: center;
 
-    padding:0 18px;
+    padding: 0 18px;
 
-    background:#17181d;
-    border-bottom:1px solid #292b32;
-
-    z-index:20;
+    background: #181818;
+    border-bottom: 1px solid #292929;
 }
 
-.brand{
-    display:flex;
-    align-items:center;
-    gap:12px;
+.logo {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: .5px;
 }
 
-.logo{
-    width:36px;
-    height:36px;
+.channel {
+    margin-left: 20px;
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    padding: 7px 12px;
 
-    border-radius:10px;
+    border-radius: 7px;
 
-    background:#252832;
+    background: #222;
+    color: #aaa;
 
-    font-size:18px;
+    font-size: 14px;
 }
 
-.title{
-    font-weight:700;
-    font-size:17px;
+.status {
+    margin-left: auto;
+
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    font-size: 12px;
+    color: #777;
 }
 
-.subtitle{
-    color:#777c87;
-    font-size:12px;
-    margin-top:2px;
+.status-dot {
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #555;
 }
 
-.topButtons{
-    display:flex;
-    gap:7px;
+.status-dot.online {
+    background: #55c878;
 }
 
-.iconButton{
-    width:40px;
-    height:40px;
+/* ================================
+   MESSAGES
+================================ */
 
-    border:0;
-    border-radius:10px;
+#messages {
+    flex: 1;
 
-    background:#22242b;
-    color:#ddd;
+    overflow-y: auto;
+    overflow-x: hidden;
 
-    cursor:pointer;
+    padding: 18px;
 
-    font-size:18px;
-
-    transition:
-        background .18s ease,
-        transform .18s ease;
+    scroll-behavior: auto;
 }
 
-.iconButton:hover{
-    background:#2d3039;
+#messages::-webkit-scrollbar {
+    width: 8px;
 }
 
-.iconButton:active{
-    transform:scale(.94);
+#messages::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-/* ==============================
-   MAIN
-============================== */
-
-.main{
-    flex:1;
-    min-height:0;
-
-    display:flex;
+#messages::-webkit-scrollbar-thumb {
+    background: #303030;
+    border-radius: 10px;
 }
 
-/* ==============================
-   CHANNEL SIDEBAR
-============================== */
+.message {
+    width: 100%;
 
-.sidebar{
-    width:230px;
-    min-width:230px;
+    display: flex;
+    gap: 12px;
 
-    background:#15161a;
-    border-right:1px solid #292b32;
+    padding: 10px 8px;
 
-    padding:18px 12px;
+    border-radius: 8px;
+
+    /* IMPORTANT:
+       No animation.
+       No opacity transition.
+       No fade effect.
+    */
 }
 
-.channelTitle{
-    color:#737783;
-    font-size:11px;
-    font-weight:700;
-
-    text-transform:uppercase;
-    letter-spacing:.08em;
-
-    padding:0 10px 10px;
+.message:hover {
+    background: #181818;
 }
 
-.channel{
-    width:100%;
+.avatar {
+    width: 38px;
+    height: 38px;
 
-    display:flex;
-    align-items:center;
+    flex-shrink: 0;
 
-    gap:9px;
+    border-radius: 50%;
 
-    padding:11px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    border-radius:9px;
+    background: #292929;
 
-    color:#aaaeba;
+    color: #bbb;
 
-    cursor:pointer;
-
-    font-size:14px;
+    font-weight: bold;
+    font-size: 14px;
 }
 
-.channel.active{
-    background:#252831;
-    color:#fff;
+.message-content {
+    min-width: 0;
+    flex: 1;
 }
 
-.channelIcon{
-    color:#747985;
-    font-size:18px;
+.message-top {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+
+    margin-bottom: 3px;
 }
 
-.channel.active .channelIcon{
-    color:#aaa;
+.username {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ddd;
 }
 
-/* ==============================
-   CHAT
-============================== */
-
-.chat{
-    flex:1;
-    min-width:0;
-    min-height:0;
-
-    display:flex;
-    flex-direction:column;
+.time {
+    font-size: 11px;
+    color: #555;
 }
 
-.messages{
-    flex:1;
-    min-height:0;
+.message-text {
+    white-space: pre-wrap;
+    word-break: break-word;
 
-    overflow-y:auto;
-    overflow-x:hidden;
+    font-size: 14px;
+    line-height: 1.45;
 
-    padding:20px 22px 12px;
-
-    scroll-behavior:smooth;
+    color: #ccc;
 }
 
-.messages::-webkit-scrollbar{
-    width:8px;
+/* ================================
+   IMAGES
+================================ */
+
+.chat-image {
+    display: block;
+
+    max-width: min(500px, 80vw);
+    max-height: 500px;
+
+    margin-top: 9px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    object-fit: contain;
+
+    background: #080808;
+
+    /* NO TRANSITION */
+    transition: none;
 }
 
-.messages::-webkit-scrollbar-thumb{
-    background:#30333b;
-    border-radius:10px;
+.chat-image:hover {
+    opacity: .9;
 }
 
-/* ==============================
-   MESSAGE
-============================== */
-
-.message{
-    display:flex;
-
-    gap:11px;
-
-    padding:8px 10px;
-    margin-bottom:2px;
-
-    border-radius:9px;
-
-    transition:
-        background .15s ease;
-}
-
-.message:hover{
-    background:rgba(255,255,255,.025);
-}
-
-.avatar{
-    width:38px;
-    height:38px;
-
-    min-width:38px;
-
-    border-radius:50%;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    background:#282b33;
-
-    color:#d8d8dc;
-
-    font-weight:700;
-    font-size:14px;
-}
-
-.messageContent{
-    min-width:0;
-    flex:1;
-}
-
-.messageHeader{
-    display:flex;
-    align-items:baseline;
-
-    gap:8px;
-
-    min-height:20px;
-}
-
-.username{
-    font-size:14px;
-    font-weight:700;
-}
-
-.time{
-    color:#666b75;
-    font-size:10px;
-}
-
-.messageText{
-    margin-top:2px;
-
-    font-size:14px;
-    line-height:1.5;
-
-    color:#d5d7dc;
-
-    white-space:pre-wrap;
-    overflow-wrap:anywhere;
-}
-
-.messageImage{
-    display:block;
-
-    max-width:min(420px,80vw);
-    max-height:420px;
-
-    margin-top:8px;
-
-    border-radius:10px;
-
-    object-fit:contain;
-
-    cursor:pointer;
-
-    background:#0b0c0e;
-
-    border:1px solid #292c33;
-
-    transition:
-        transform .18s ease,
-        opacity .18s ease;
-}
-
-.messageImage:hover{
-    opacity:.9;
-    transform:scale(1.01);
-}
-
-/* ==============================
+/* ================================
    EMPTY
-============================== */
+================================ */
 
-.empty{
-    height:100%;
+#empty {
+    width: 100%;
+    height: 100%;
 
-    display:flex;
-    flex-direction:column;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    align-items:center;
-    justify-content:center;
+    color: #555;
 
-    color:#656a74;
-
-    text-align:center;
+    font-size: 14px;
 }
 
-.emptyIcon{
-    font-size:40px;
-    margin-bottom:10px;
+/* ================================
+   INPUT AREA
+================================ */
+
+.input-area {
+    flex-shrink: 0;
+
+    padding: 12px 16px 16px;
+
+    background: #151515;
+
+    border-top: 1px solid #292929;
 }
 
-.emptyTitle{
-    color:#b9bcc4;
-    font-size:16px;
-    font-weight:700;
+.input-row {
+    display: flex;
+    gap: 8px;
+
+    max-width: 1100px;
+    margin: auto;
 }
 
-.emptyText{
-    margin-top:5px;
-    font-size:13px;
-}
-
-/* ==============================
+/* ================================
    INPUT
-============================== */
+================================ */
 
-.inputArea{
-    padding:12px 18px 16px;
+#messageInput {
+    flex: 1;
 
-    background:#101114;
+    min-width: 0;
+
+    height: 46px;
+
+    padding: 0 14px;
+
+    border: 1px solid #303030;
+    border-radius: 9px;
+
+    outline: none;
+
+    background: #202020;
+    color: #eee;
+
+    font-size: 14px;
 }
 
-.inputBox{
-    display:flex;
-    align-items:flex-end;
-
-    gap:8px;
-
-    padding:8px;
-
-    background:#1a1c21;
-
-    border:1px solid #292c34;
-
-    border-radius:13px;
-
-    transition:border .2s ease;
+#messageInput:focus {
+    border-color: #4b4b4b;
 }
 
-.inputBox:focus-within{
-    border-color:#414550;
+#messageInput::placeholder {
+    color: #666;
 }
 
-.input{
-    flex:1;
+/* ================================
+   BUTTONS
+================================ */
 
-    min-width:0;
+button {
+    border: none;
+    outline: none;
 
-    max-height:150px;
+    cursor: pointer;
 
-    resize:none;
-
-    border:0;
-    outline:0;
-
-    background:transparent;
-
-    color:#eee;
-
-    font-family:inherit;
-    font-size:14px;
-
-    line-height:1.45;
-
-    padding:8px;
+    font-family: inherit;
 }
 
-.input::placeholder{
-    color:#666b75;
+#imageButton {
+    width: 46px;
+    height: 46px;
+
+    border-radius: 9px;
+
+    background: #252525;
+    color: #ccc;
+
+    font-size: 20px;
 }
 
-.attach{
-    width:40px;
-    height:40px;
-
-    border:0;
-    border-radius:9px;
-
-    background:transparent;
-    color:#8b909b;
-
-    cursor:pointer;
-
-    font-size:19px;
+#imageButton:hover {
+    background: #303030;
 }
 
-.attach:hover{
-    background:#252830;
-    color:#ddd;
+#sendButton {
+    height: 46px;
+
+    padding: 0 19px;
+
+    border-radius: 9px;
+
+    background: #eee;
+    color: #111;
+
+    font-weight: 700;
 }
 
-.send{
-    width:42px;
-    height:40px;
-
-    border:0;
-    border-radius:9px;
-
-    background:#30333b;
-    color:#eee;
-
-    cursor:pointer;
-
-    font-size:16px;
-
-    transition:
-        background .18s ease,
-        transform .18s ease;
+#sendButton:hover {
+    background: #fff;
 }
 
-.send:hover{
-    background:#3b3f49;
+#sendButton:disabled {
+    opacity: .4;
+    cursor: default;
 }
 
-.send:active{
-    transform:scale(.94);
+/* ================================
+   SELECTED IMAGE
+================================ */
+
+#selectedImage {
+    display: none;
+
+    max-width: 1100px;
+
+    margin: 0 auto 8px;
+
+    padding: 8px 10px;
+
+    border-radius: 8px;
+
+    background: #202020;
+
+    color: #aaa;
+
+    font-size: 12px;
 }
 
-.send:disabled{
-    opacity:.45;
-    cursor:not-allowed;
+#selectedImage.visible {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-/* ==============================
-   IMAGE PREVIEW
-============================== */
+#removeImage {
+    margin-left: auto;
 
-.preview{
-    display:none;
+    background: transparent;
+    color: #888;
 
-    margin-bottom:8px;
-
-    padding:8px;
-
-    border-radius:10px;
-
-    background:#1b1d22;
-    border:1px solid #292c33;
+    font-size: 18px;
 }
 
-.preview.show{
-    display:flex;
-    align-items:center;
-    gap:10px;
+#removeImage:hover {
+    color: #fff;
 }
 
-.preview img{
-    width:70px;
-    height:70px;
+/* ================================
+   USERNAME
+================================ */
 
-    object-fit:cover;
+#usernameBox {
+    max-width: 1100px;
+    margin: 0 auto 8px;
 
-    border-radius:7px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.previewInfo{
-    flex:1;
-    min-width:0;
+#usernameInput {
+    width: 180px;
+    height: 30px;
+
+    padding: 0 9px;
+
+    border: 1px solid #2c2c2c;
+    border-radius: 6px;
+
+    outline: none;
+
+    background: #1d1d1d;
+    color: #ddd;
+
+    font-size: 12px;
 }
 
-.previewName{
-    color:#ddd;
-    font-size:13px;
-
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+#usernameInput::placeholder {
+    color: #555;
 }
 
-.previewSize{
-    color:#737783;
-    font-size:11px;
-    margin-top:3px;
+.username-label {
+    font-size: 11px;
+    color: #555;
 }
 
-.removeImage{
-    width:32px;
-    height:32px;
+/* ================================
+   FULLSCREEN IMAGE
+================================ */
 
-    border:0;
-    border-radius:7px;
+#imageViewer {
+    position: fixed;
 
-    background:#292b32;
-    color:#aaa;
+    inset: 0;
 
-    cursor:pointer;
+    z-index: 9999;
+
+    display: none;
+
+    background: rgba(0, 0, 0, .96);
 }
 
-/* ==============================
-   SETTINGS
-============================== */
-
-.overlay{
-    position:fixed;
-    inset:0;
-
-    background:rgba(0,0,0,.62);
-
-    display:none;
-
-    align-items:center;
-    justify-content:center;
-
-    z-index:100;
-
-    backdrop-filter:blur(5px);
+#imageViewer.open {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.overlay.show{
-    display:flex;
+#fullscreenImage {
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 100px);
+
+    object-fit: contain;
+
+    user-select: none;
 }
 
-.settings{
-    width:min(480px,92vw);
-    max-height:85vh;
+#backButton {
+    position: fixed;
 
-    overflow:auto;
+    top: 18px;
+    left: 18px;
 
-    background:#191b20;
+    z-index: 10000;
 
-    border:1px solid #30333b;
+    height: 42px;
 
-    border-radius:15px;
+    padding: 0 16px;
 
-    box-shadow:0 20px 70px rgba(0,0,0,.5);
+    border-radius: 8px;
 
-    padding:20px;
+    background: #222;
+    color: #eee;
+
+    border: 1px solid #333;
+
+    font-size: 14px;
 }
 
-.settingsHeader{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-
-    margin-bottom:18px;
+#backButton:hover {
+    background: #303030;
 }
 
-.settingsTitle{
-    font-size:19px;
-    font-weight:700;
+#imageName {
+    position: fixed;
+
+    bottom: 18px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    max-width: 80vw;
+
+    color: #777;
+
+    font-size: 12px;
 }
 
-.close{
-    width:36px;
-    height:36px;
+/* ================================
+   ERROR
+================================ */
 
-    border:0;
-    border-radius:8px;
+#errorBox {
+    position: fixed;
 
-    background:#262930;
-    color:#bbb;
+    left: 50%;
+    bottom: 90px;
 
-    cursor:pointer;
+    transform: translateX(-50%);
+
+    z-index: 5000;
+
+    display: none;
+
+    max-width: 90vw;
+
+    padding: 11px 15px;
+
+    border-radius: 8px;
+
+    background: #291818;
+    border: 1px solid #4b2727;
+
+    color: #e88;
+
+    font-size: 12px;
 }
 
-.settingSection{
-    margin-top:18px;
+#errorBox.show {
+    display: block;
 }
 
-.settingLabel{
-    color:#858a95;
-
-    font-size:11px;
-    font-weight:700;
-
-    text-transform:uppercase;
-
-    letter-spacing:.08em;
-
-    margin-bottom:9px;
-}
-
-.themes{
-    display:grid;
-
-    grid-template-columns:
-        repeat(2,minmax(0,1fr));
-
-    gap:8px;
-}
-
-.theme{
-    padding:11px;
-
-    border:1px solid #30333b;
-
-    background:#22242a;
-
-    color:#bbb;
-
-    border-radius:9px;
-
-    cursor:pointer;
-
-    text-align:left;
-
-    transition:.18s ease;
-}
-
-.theme:hover{
-    background:#2a2d34;
-}
-
-.theme.active{
-    border-color:#777;
-    color:#fff;
-}
-
-.themeDot{
-    display:inline-block;
-
-    width:10px;
-    height:10px;
-
-    border-radius:50%;
-
-    margin-right:7px;
-
-    background:#777;
-}
-
-/* ==============================
-   FULLSCREEN IMAGE VIEWER
-============================== */
-
-.imageViewer{
-    position:fixed;
-    inset:0;
-
-    background:#050506;
-
-    z-index:300;
-
-    display:none;
-
-    flex-direction:column;
-}
-
-.imageViewer.show{
-    display:flex;
-}
-
-.viewerTop{
-    height:60px;
-    min-height:60px;
-
-    display:flex;
-    align-items:center;
-
-    padding:0 15px;
-
-    background:rgba(12,13,15,.96);
-
-    border-bottom:1px solid #25272d;
-}
-
-.backButton{
-    height:40px;
-
-    padding:0 15px;
-
-    border:0;
-    border-radius:9px;
-
-    background:#24262c;
-
-    color:#eee;
-
-    cursor:pointer;
-
-    font-size:14px;
-}
-
-.backButton:hover{
-    background:#30333b;
-}
-
-.viewerTitle{
-    margin-left:12px;
-
-    color:#aaa;
-
-    font-size:13px;
-}
-
-.viewerContent{
-    flex:1;
-    min-height:0;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    padding:20px;
-}
-
-.viewerContent img{
-    max-width:100%;
-    max-height:100%;
-
-    object-fit:contain;
-
-    user-select:none;
-}
-
-/* ==============================
-   STATUS
-============================== */
-
-.status{
-    position:fixed;
-
-    left:50%;
-    bottom:80px;
-
-    transform:
-        translate(-50%,10px);
-
-    opacity:0;
-
-    pointer-events:none;
-
-    padding:9px 14px;
-
-    border-radius:9px;
-
-    background:#25272d;
-
-    border:1px solid #353840;
-
-    color:#ddd;
-
-    font-size:12px;
-
-    transition:
-        opacity .2s ease,
-        transform .2s ease;
-
-    z-index:500;
-}
-
-.status.show{
-    opacity:1;
-
-    transform:
-        translate(-50%,0);
-}
-
-/* ==============================
+/* ================================
    MOBILE
-============================== */
+================================ */
 
-@media(max-width:700px){
+@media (max-width: 600px) {
 
-    .sidebar{
-        display:none;
+    .header {
+        height: 56px;
+        padding: 0 12px;
     }
 
-    .messages{
-        padding:15px 8px 8px;
+    .logo {
+        font-size: 17px;
     }
 
-    .message{
-        padding:8px 5px;
+    .channel {
+        margin-left: 10px;
+        font-size: 12px;
     }
 
-    .inputArea{
-        padding:
-            8px
-            8px
-            calc(8px + env(safe-area-inset-bottom));
+    .status {
+        display: none;
     }
 
-    .messageImage{
-        max-width:85vw;
-        max-height:350px;
+    #messages {
+        padding: 10px;
     }
 
-    .themes{
-        grid-template-columns:1fr;
+    .message {
+        padding: 8px 3px;
     }
 
+    .avatar {
+        width: 32px;
+        height: 32px;
+    }
+
+    .chat-image {
+        max-width: 85vw;
+        max-height: 400px;
+    }
+
+    .input-area {
+        padding: 8px;
+    }
+
+    #usernameInput {
+        width: 140px;
+    }
+
+    #sendButton {
+        padding: 0 14px;
+    }
 }
-
-/* ==============================
-   THEMES
-============================== */
-
-body.theme-midnight{
-    background:#0e1013;
-}
-
-body.theme-slate{
-    background:#11161b;
-}
-
-body.theme-carbon{
-    background:#0c0c0d;
-}
-
-body.theme-purple{
-    background:#120f17;
-}
-
-body.theme-blue{
-    background:#0d131b;
-}
-
-body.theme-red{
-    background:#160f10;
-}
-
-body.theme-green{
-    background:#0d1511;
-}
-
-body.theme-ocean{
-    background:#0b1417;
-}
-
-body.theme-amoled{
-    background:#000;
-}
-
-body.theme-coffee{
-    background:#15110e;
-}
-
-body.theme-gray{
-    background:#151515;
-}
-
 </style>
 </head>
 
-<body class="theme-midnight">
+<body>
 
-<div class="app">
+<div id="app">
 
-    <!-- TOP BAR -->
+    <!-- HEADER -->
 
-    <header class="topbar">
+    <header class="header">
 
-        <div class="brand">
-
-            <div class="logo">💬</div>
-
-            <div>
-
-                <div class="title">
-                    Chat
-                </div>
-
-                <div class="subtitle">
-                    Simple community chat
-                </div>
-
-            </div>
-
+        <div class="logo">
+            Chat
         </div>
 
+        <div class="channel">
+            # general
+        </div>
 
-        <div class="topButtons">
+        <div class="status">
 
-            <button
-                class="iconButton"
-                id="settingsButton"
-                title="Settings">
-                ⚙
-            </button>
+            <div
+                id="statusDot"
+                class="status-dot">
+            </div>
+
+            <span id="statusText">
+                Connecting...
+            </span>
 
         </div>
 
     </header>
 
 
-    <!-- MAIN -->
+    <!-- MESSAGES -->
 
-    <main class="main">
+    <main id="messages">
 
-        <!-- CHANNELS -->
-
-        <aside class="sidebar">
-
-            <div class="channelTitle">
-                Channels
-            </div>
-
-            <div
-                class="channel active">
-
-                <span class="channelIcon">
-                    #
-                </span>
-
-                <span>
-                    general
-                </span>
-
-            </div>
-
-        </aside>
-
-
-        <!-- CHAT -->
-
-        <section class="chat">
-
-            <div
-                id="messages"
-                class="messages">
-
-                <div
-                    class="empty"
-                    id="empty">
-
-                    <div class="emptyIcon">
-                        💬
-                    </div>
-
-                    <div class="emptyTitle">
-                        Welcome to #general
-                    </div>
-
-                    <div class="emptyText">
-                        No messages yet.
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- INPUT -->
-
-            <div class="inputArea">
-
-                <div
-                    id="preview"
-                    class="preview">
-
-                    <img
-                        id="previewImage"
-                        src=""
-                        alt="Preview">
-
-                    <div class="previewInfo">
-
-                        <div
-                            id="previewName"
-                            class="previewName">
-                            Image
-                        </div>
-
-                        <div
-                            id="previewSize"
-                            class="previewSize">
-                            Preparing...
-                        </div>
-
-                    </div>
-
-                    <button
-                        class="removeImage"
-                        id="removeImage">
-                        ×
-                    </button>
-
-                </div>
-
-
-                <div class="inputBox">
-
-                    <button
-                        class="attach"
-                        id="attachButton"
-                        title="Send image">
-                        ＋
-                    </button>
-
-                    <input
-                        id="fileInput"
-                        type="file"
-                        accept="image/*"
-                        hidden>
-
-
-                    <textarea
-                        id="messageInput"
-                        class="input"
-                        rows="1"
-                        maxlength="2000"
-                        placeholder="Message #general"></textarea>
-
-
-                    <button
-                        id="sendButton"
-                        class="send"
-                        title="Send">
-                        ➤
-                    </button>
-
-                </div>
-
-            </div>
-
-        </section>
+        <div id="empty">
+            No messages yet.
+        </div>
 
     </main>
 
-</div>
+
+    <!-- INPUT -->
+
+    <section class="input-area">
+
+        <div id="usernameBox">
+
+            <span class="username-label">
+                NAME
+            </span>
+
+            <input
+                id="usernameInput"
+                maxlength="24"
+                placeholder="Username"
+                autocomplete="off"
+            >
+
+        </div>
 
 
-<!-- SETTINGS -->
+        <div
+            id="selectedImage">
 
-<div
-    id="settingsOverlay"
-    class="overlay">
-
-    <div class="settings">
-
-        <div class="settingsHeader">
-
-            <div class="settingsTitle">
-                Settings
-            </div>
+            <span id="selectedImageName">
+                Image selected
+            </span>
 
             <button
-                id="closeSettings"
-                class="close">
+                id="removeImage"
+                type="button">
                 ×
             </button>
 
         </div>
 
 
-        <div class="settingSection">
+        <div class="input-row">
 
-            <div class="settingLabel">
-                Theme
-            </div>
+            <button
+                id="imageButton"
+                type="button"
+                title="Choose image">
+                +
+            </button>
 
-            <div class="themes">
+            <input
+                id="fileInput"
+                type="file"
+                accept="image/*"
+                hidden
+            >
 
-                <button
-                    class="theme active"
-                    data-theme="midnight">
-                    <span class="themeDot"></span>
-                    Midnight
-                </button>
+            <input
+                id="messageInput"
+                type="text"
+                maxlength="2000"
+                placeholder="Message #general"
+                autocomplete="off"
+            >
 
-                <button
-                    class="theme"
-                    data-theme="slate">
-                    <span class="themeDot"></span>
-                    Slate
-                </button>
-
-                <button
-                    class="theme"
-                    data-theme="carbon">
-                    <span class="themeDot"></span>
-                    Carbon
-                </button>
-
-                <button
-                    class="theme"
-                    data-theme="purple">
-                    <span class="themeDot"></span>
-                    Purple
-                </button>
-
-                <button
-                    class="theme"
-                    data-theme="blue">
-                    <span class="themeDot"></span>
-                    Blue
-                </button>
-
-                <button
-                    class="theme"
-                    data-theme="red">
-                    <span class="themeDot"></span>
-                    Red
-                </button>
-
-                <button
-                    class="theme"
-                    data-theme="green">
-                    <span class="themeDot"></span>
-                    Green
-                </button>
-
-                <button
-                    class="theme"
-                    data-theme="ocean">
-                    <span class="themeDot"></span>
-                    Ocean
-                </button>
-
-                <button
-                    class="theme"
-                    data-theme="amoled">
-                    <span class="themeDot"></span>
-                    AMOLED
-                </button>
-
-                <button
-                    class="theme"
-                    data-theme="coffee">
-                    <span class="themeDot"></span>
-                    Coffee
-                </button>
-
-                <button
-                    class="theme"
-                    data-theme="gray">
-                    <span class="themeDot"></span>
-                    Gray
-                </button>
-
-            </div>
+            <button
+                id="sendButton"
+                type="button">
+                Send
+            </button>
 
         </div>
 
-    </div>
+    </section>
 
 </div>
 
 
-<!-- FULLSCREEN IMAGE -->
+<!-- FULLSCREEN IMAGE VIEWER -->
 
-<div
-    id="imageViewer"
-    class="imageViewer">
+<div id="imageViewer">
 
-    <div class="viewerTop">
+    <button
+        id="backButton"
+        type="button">
+        ← Back
+    </button>
 
-        <button
-            id="backImage"
-            class="backButton">
-            ← Back
-        </button>
+    <img
+        id="fullscreenImage"
+        alt="Full size image"
+    >
 
-        <div class="viewerTitle">
-            Image
-        </div>
-
-    </div>
-
-    <div class="viewerContent">
-
-        <img
-            id="fullscreenImage"
-            src=""
-            alt="Fullscreen image">
-
-    </div>
+    <div id="imageName"></div>
 
 </div>
 
 
-<!-- STATUS -->
+<!-- ERROR -->
 
-<div
-    id="status"
-    class="status">
-</div>
+<div id="errorBox"></div>
 
 
-<script type="module">
+<script>
 
-/* =====================================================
+/* =========================================================
    SETTINGS
-===================================================== */
+========================================================= */
 
-const API =
+const API_URL =
     "/api/messages";
 
 const CHANNEL =
     "general";
 
+const MAX_IMAGE_SIZE =
+    1500;
 
-/* =====================================================
+const REFRESH_TIME =
+    3000;
+
+
+/* =========================================================
    ELEMENTS
-===================================================== */
+========================================================= */
 
-const messagesEl =
+const messagesElement =
     document.getElementById(
         "messages"
     );
 
-const emptyEl =
-    document.getElementById(
-        "empty"
-    );
-
-const input =
+const messageInput =
     document.getElementById(
         "messageInput"
+    );
+
+const usernameInput =
+    document.getElementById(
+        "usernameInput"
     );
 
 const sendButton =
@@ -1264,9 +779,9 @@ const sendButton =
         "sendButton"
     );
 
-const attachButton =
+const imageButton =
     document.getElementById(
-        "attachButton"
+        "imageButton"
     );
 
 const fileInput =
@@ -1274,24 +789,14 @@ const fileInput =
         "fileInput"
     );
 
-const preview =
+const selectedImage =
     document.getElementById(
-        "preview"
+        "selectedImage"
     );
 
-const previewImage =
+const selectedImageName =
     document.getElementById(
-        "previewImage"
-    );
-
-const previewName =
-    document.getElementById(
-        "previewName"
-    );
-
-const previewSize =
-    document.getElementById(
-        "previewSize"
+        "selectedImageName"
     );
 
 const removeImage =
@@ -1299,24 +804,19 @@ const removeImage =
         "removeImage"
     );
 
-const statusEl =
+const statusText =
     document.getElementById(
-        "status"
+        "statusText"
     );
 
-const settingsButton =
+const statusDot =
     document.getElementById(
-        "settingsButton"
+        "statusDot"
     );
 
-const settingsOverlay =
+const errorBox =
     document.getElementById(
-        "settingsOverlay"
-    );
-
-const closeSettings =
-    document.getElementById(
-        "closeSettings"
+        "errorBox"
     );
 
 const imageViewer =
@@ -1329,184 +829,384 @@ const fullscreenImage =
         "fullscreenImage"
     );
 
-const backImage =
+const backButton =
     document.getElementById(
-        "backImage"
+        "backButton"
+    );
+
+const imageName =
+    document.getElementById(
+        "imageName"
     );
 
 
-/* =====================================================
-   USERNAME
-===================================================== */
-
-let username =
-    localStorage.getItem(
-        "chat_username"
-    );
-
-if(!username){
-
-    username =
-        prompt(
-            "Choose a username:"
-        );
-
-    if(!username){
-
-        username =
-            "User";
-
-    }
-
-    username =
-        username
-        .trim()
-        .substring(0,24);
-
-    localStorage.setItem(
-        "chat_username",
-        username
-    );
-
-}
-
-
-/* =====================================================
+/* =========================================================
    STATE
-===================================================== */
+========================================================= */
 
-let selectedImage =
+let selectedImageBase64 =
     null;
 
-let selectedImageName =
+let selectedImageFileName =
     "";
 
 let messagesCache =
     new Map();
 
-let firstLoad =
-    true;
-
 let loading =
     false;
 
 
-/* =====================================================
-   STATUS
-===================================================== */
+/* =========================================================
+   USERNAME
+========================================================= */
 
-let statusTimer;
-
-function showStatus(text){
-
-    clearTimeout(
-        statusTimer
+const savedUsername =
+    localStorage.getItem(
+        "chat_username"
     );
 
-    statusEl.textContent =
-        text;
+if (savedUsername) {
 
-    statusEl.classList.add(
+    usernameInput.value =
+        savedUsername;
+
+}
+
+
+usernameInput.addEventListener(
+    "input",
+    () => {
+
+        localStorage.setItem(
+            "chat_username",
+            usernameInput.value
+        );
+
+    }
+);
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+function showError(message) {
+
+    errorBox.textContent =
+        message;
+
+    errorBox.classList.add(
         "show"
     );
 
-    statusTimer =
+    clearTimeout(
+        showError.timer
+    );
+
+    showError.timer =
         setTimeout(
             () => {
 
-                statusEl.classList.remove(
+                errorBox.classList.remove(
                     "show"
                 );
 
             },
-            3000
+            6000
         );
 
 }
 
 
-/* =====================================================
-   FORMAT TIME
-===================================================== */
+/* =========================================================
+   STATUS
+========================================================= */
 
-function formatTime(value){
+function setOnline() {
 
-    const date =
-        new Date(value);
+    statusDot.classList.add(
+        "online"
+    );
 
-    if(
-        Number.isNaN(
-            date.getTime()
-        )
-    ){
+    statusText.textContent =
+        "Connected";
 
-        return "";
+}
+
+
+function setOffline() {
+
+    statusDot.classList.remove(
+        "online"
+    );
+
+    statusText.textContent =
+        "Connection error";
+
+}
+
+
+/* =========================================================
+   IMAGE SELECT
+========================================================= */
+
+imageButton.addEventListener(
+    "click",
+    () => {
+
+        fileInput.click();
 
     }
+);
 
-    return date.toLocaleTimeString(
-        [],
-        {
-            hour:"2-digit",
-            minute:"2-digit"
+
+fileInput.addEventListener(
+    "change",
+    async () => {
+
+        const file =
+            fileInput.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        if (
+            !file.type.startsWith(
+                "image/"
+            )
+        ) {
+
+            showError(
+                "Please choose an image file."
+            );
+
+            return;
+        }
+
+        try {
+
+            selectedImageBase64 =
+                await resizeImage(
+                    file,
+                    MAX_IMAGE_SIZE
+                );
+
+            selectedImageFileName =
+                file.name;
+
+            selectedImageName.textContent =
+                file.name +
+                " selected";
+
+            selectedImage.classList.add(
+                "visible"
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            showError(
+                "Could not process the image."
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   REMOVE IMAGE
+========================================================= */
+
+removeImage.addEventListener(
+    "click",
+    () => {
+
+        clearSelectedImage();
+
+    }
+);
+
+
+function clearSelectedImage() {
+
+    selectedImageBase64 =
+        null;
+
+    selectedImageFileName =
+        "";
+
+    fileInput.value =
+        "";
+
+    selectedImage.classList.remove(
+        "visible"
+    );
+
+}
+
+
+/* =========================================================
+   RESIZE IMAGE
+========================================================= */
+
+function resizeImage(
+    file,
+    maxSize
+) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const reader =
+                new FileReader();
+
+            reader.onload =
+                () => {
+
+                    const img =
+                        new Image();
+
+                    img.onload =
+                        () => {
+
+                            let width =
+                                img.naturalWidth;
+
+                            let height =
+                                img.naturalHeight;
+
+
+                            /*
+                             * Keep the original
+                             * aspect ratio.
+                             */
+
+                            if (
+                                width >
+                                    maxSize ||
+                                height >
+                                    maxSize
+                            ) {
+
+                                const scale =
+                                    Math.min(
+                                        maxSize /
+                                            width,
+                                        maxSize /
+                                            height
+                                    );
+
+                                width =
+                                    Math.round(
+                                        width *
+                                        scale
+                                    );
+
+                                height =
+                                    Math.round(
+                                        height *
+                                        scale
+                                    );
+
+                            }
+
+
+                            const canvas =
+                                document.createElement(
+                                    "canvas"
+                                );
+
+                            canvas.width =
+                                width;
+
+                            canvas.height =
+                                height;
+
+
+                            const context =
+                                canvas.getContext(
+                                    "2d"
+                                );
+
+
+                            context.drawImage(
+                                img,
+                                0,
+                                0,
+                                width,
+                                height
+                            );
+
+
+                            /*
+                             * JPEG keeps Base64
+                             * much smaller.
+                             */
+
+                            const result =
+                                canvas.toDataURL(
+                                    "image/jpeg",
+                                    0.82
+                                );
+
+
+                            resolve(result);
+
+                        };
+
+
+                    img.onerror =
+                        () => {
+
+                            reject(
+                                new Error(
+                                    "Image could not be loaded."
+                                )
+                            );
+
+                        };
+
+
+                    img.src =
+                        reader.result;
+
+                };
+
+
+            reader.onerror =
+                () => {
+
+                    reject(
+                        new Error(
+                            "Could not read image."
+                        )
+                    );
+
+                };
+
+
+            reader.readAsDataURL(
+                file
+            );
+
         }
     );
 
 }
 
 
-/* =====================================================
-   ESCAPE TEXT
-===================================================== */
-
-function escapeHTML(text){
-
-    return String(text)
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-        .replaceAll(
-            "'",
-            "&#039;"
-        );
-
-}
-
-
-/* =====================================================
-   AVATAR
-===================================================== */
-
-function avatarLetter(name){
-
-    return (
-        String(name || "U")
-        .trim()
-        .charAt(0)
-        .toUpperCase()
-    ) || "U";
-
-}
-
-
-/* =====================================================
+/* =========================================================
    CREATE MESSAGE ELEMENT
-===================================================== */
+========================================================= */
 
-function createMessageElement(msg){
+function createMessageElement(
+    msg
+) {
 
     const wrapper =
         document.createElement(
@@ -1515,6 +1215,20 @@ function createMessageElement(msg){
 
     wrapper.className =
         "message";
+
+    /*
+     * Stable ID.
+     * This lets us update only messages
+     * that actually changed.
+     */
+
+    wrapper.dataset.id =
+        String(
+            msg.id
+        );
+
+
+    /* AVATAR */
 
     const avatar =
         document.createElement(
@@ -1525,10 +1239,12 @@ function createMessageElement(msg){
         "avatar";
 
     avatar.textContent =
-        avatarLetter(
+        getInitial(
             msg.username
         );
 
+
+    /* CONTENT */
 
     const content =
         document.createElement(
@@ -1536,29 +1252,31 @@ function createMessageElement(msg){
         );
 
     content.className =
-        "messageContent";
+        "message-content";
 
 
-    const header =
+    /* TOP */
+
+    const top =
         document.createElement(
             "div"
         );
 
-    header.className =
-        "messageHeader";
+    top.className =
+        "message-top";
 
 
-    const name =
+    const username =
         document.createElement(
             "span"
         );
 
-    name.className =
+    username.className =
         "username";
 
-    name.textContent =
+    username.textContent =
         msg.username ||
-        "User";
+        "Unknown";
 
 
     const time =
@@ -1575,21 +1293,26 @@ function createMessageElement(msg){
         );
 
 
-    header.appendChild(
-        name
+    top.appendChild(
+        username
     );
 
-    header.appendChild(
+    top.appendChild(
         time
     );
 
 
     content.appendChild(
-        header
+        top
     );
 
 
-    if(msg.message){
+    /* TEXT */
+
+    if (
+        msg.message &&
+        String(msg.message).trim()
+    ) {
 
         const text =
             document.createElement(
@@ -1597,7 +1320,7 @@ function createMessageElement(msg){
             );
 
         text.className =
-            "messageText";
+            "message-text";
 
         text.textContent =
             msg.message;
@@ -1609,7 +1332,13 @@ function createMessageElement(msg){
     }
 
 
-    if(msg.image){
+    /* IMAGE */
+
+    if (
+        msg.image &&
+        typeof msg.image ===
+            "string"
+    ) {
 
         const image =
             document.createElement(
@@ -1617,20 +1346,19 @@ function createMessageElement(msg){
             );
 
         image.className =
-            "messageImage";
+            "chat-image";
 
         image.src =
             msg.image;
 
         image.alt =
-            "Image sent by " +
-            (
-                msg.username ||
-                "User"
-            );
+            "Image";
 
         image.loading =
             "lazy";
+
+        image.decoding =
+            "async";
 
 
         image.addEventListener(
@@ -1638,7 +1366,8 @@ function createMessageElement(msg){
             () => {
 
                 openImage(
-                    msg.image
+                    msg.image,
+                    msg.username
                 );
 
             }
@@ -1666,163 +1395,289 @@ function createMessageElement(msg){
 }
 
 
-/* =====================================================
-   RENDER WITHOUT FLICKER
-===================================================== */
+/* =========================================================
+   INITIAL
+========================================================= */
 
-function renderMessages(data){
+function getInitial(
+    name
+) {
 
-    if(!Array.isArray(data)){
+    const value =
+        String(
+            name ||
+            "?"
+        ).trim();
+
+    return value
+        ? value
+            .charAt(0)
+            .toUpperCase()
+        : "?";
+
+}
+
+
+/* =========================================================
+   TIME
+========================================================= */
+
+function formatTime(
+    value
+) {
+
+    if (!value) {
+        return "";
+    }
+
+    const date =
+        new Date(
+            value
+        );
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "";
+
+    }
+
+    return date.toLocaleTimeString(
+        [],
+        {
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+
+}
+
+
+/* =========================================================
+   RENDER MESSAGES
+========================================================= */
+
+function renderMessages(
+    incoming
+) {
+
+    if (
+        !Array.isArray(
+            incoming
+        )
+    ) {
+
         return;
+
     }
 
 
-    const wasAtBottom =
-        messagesEl.scrollHeight -
-        messagesEl.scrollTop -
-        messagesEl.clientHeight
-        < 80;
+    /*
+     * Remember whether the user was
+     * already near the bottom.
+     */
+
+    const wasNearBottom =
+        messagesElement.scrollHeight -
+        messagesElement.scrollTop -
+        messagesElement.clientHeight <
+        120;
 
 
-    const newIds =
-        new Set();
-
-
-    for(
-        const msg of data
-    ){
-
-        const id =
-            String(
-                msg.id ??
-                (
-                    String(
-                        msg.created_at
-                    ) +
-                    "|" +
-                    String(
-                        msg.username
-                    ) +
-                    "|" +
-                    String(
-                        msg.message
-                    )
-                )
-            );
-
-
-        newIds.add(
-            id
+    const empty =
+        document.getElementById(
+            "empty"
         );
 
 
-        if(
-            !messagesCache.has(
-                id
-            )
-        ){
+    if (incoming.length === 0) {
 
-            messagesCache.set(
-                id,
-                msg
-            );
+        if (!empty) {
 
-
-            const element =
-                createMessageElement(
-                    msg
+            const emptyElement =
+                document.createElement(
+                    "div"
                 );
 
-            element.dataset.id =
-                id;
+            emptyElement.id =
+                "empty";
 
+            emptyElement.textContent =
+                "No messages yet.";
 
-            messagesEl.appendChild(
-                element
+            messagesElement.appendChild(
+                emptyElement
             );
 
         }
 
+        return;
+
     }
 
 
-    for(
-        const [id] of messagesCache
-    ){
+    if (empty) {
 
-        if(
-            !newIds.has(id)
-        ){
+        empty.remove();
+
+    }
+
+
+    /*
+     * IMPORTANT:
+     *
+     * We do NOT clear innerHTML.
+     *
+     * We do NOT fade messages.
+     *
+     * We do NOT rebuild the entire list.
+     *
+     * We only add/update/remove what
+     * actually changed.
+     */
+
+
+    const incomingIds =
+        new Set();
+
+
+    for (
+        const msg of incoming
+    ) {
+
+        const id =
+            String(
+                msg.id
+            );
+
+        incomingIds.add(
+            id
+        );
+
+
+        const old =
+            messagesCache.get(
+                id
+            );
+
+
+        /*
+         * Existing message:
+         * leave its DOM alone.
+         */
+
+        if (old) {
+
+            continue;
+
+        }
+
+
+        /*
+         * New message.
+         */
+
+        const element =
+            createMessageElement(
+                msg
+            );
+
+        messagesElement.appendChild(
+            element
+        );
+
+        messagesCache.set(
+            id,
+            msg
+        );
+
+    }
+
+
+    /*
+     * Remove messages that no longer
+     * exist on the server.
+     */
+
+    for (
+        const [
+            id
+        ] of messagesCache
+    ) {
+
+        if (
+            !incomingIds.has(
+                id
+            )
+        ) {
+
+            const element =
+                messagesElement.querySelector(
+                    `[data-id="${CSS.escape(id)}"]`
+                );
+
+            if (element) {
+                element.remove();
+            }
 
             messagesCache.delete(
                 id
             );
 
-            const old =
-                messagesEl.querySelector(
-                    `[data-id="${CSS.escape(id)}"]`
-                );
-
-            if(old){
-
-                old.remove();
-
-            }
-
         }
 
     }
 
 
-    emptyEl.style.display =
-        data.length
-            ? "none"
-            : "flex";
+    /*
+     * Only scroll automatically if
+     * already near the bottom.
+     */
 
+    if (wasNearBottom) {
 
-    if(
-        firstLoad ||
-        wasAtBottom
-    ){
-
-        messagesEl.scrollTop =
-            messagesEl.scrollHeight;
+        messagesElement.scrollTop =
+            messagesElement.scrollHeight;
 
     }
-
-
-    firstLoad =
-        false;
 
 }
 
 
-/* =====================================================
+/* =========================================================
    LOAD MESSAGES
-===================================================== */
+========================================================= */
 
-async function loadMessages(){
+async function loadMessages() {
 
-    if(loading){
+    if (loading) {
         return;
     }
 
     loading =
         true;
 
-    try{
+
+    try {
 
         const response =
             await fetch(
-                API +
+                API_URL +
                 "?channel=" +
                 encodeURIComponent(
                     CHANNEL
                 ),
                 {
-                    method:"GET",
-                    cache:"no-store",
-                    headers:{
+                    method:
+                        "GET",
+
+                    cache:
+                        "no-store",
+
+                    headers: {
                         "Accept":
                             "application/json"
                     }
@@ -1830,41 +1685,88 @@ async function loadMessages(){
             );
 
 
-        const data =
-            await response.json();
+        const text =
+            await response.text();
 
 
-        if(!response.ok){
+        let data;
+
+
+        try {
+
+            data =
+                JSON.parse(
+                    text
+                );
+
+        } catch {
+
+            throw new Error(
+                "Server returned invalid JSON."
+            );
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "HTTP " +
+                response.status +
+                ": " +
+                (
+                    data.error ||
+                    "Server error"
+                )
+            );
+
+        }
+
+
+        if (
+            data.success !== true
+        ) {
 
             throw new Error(
                 data.error ||
-                "HTTP " +
-                response.status
+                "API request failed."
             );
 
         }
 
 
+        setOnline();
+
         renderMessages(
-            data.messages || []
+            data.messages
         );
 
 
-    }catch(error){
+    } catch (error) {
 
         console.error(
+            "LOAD ERROR:",
             error
         );
 
-        if(firstLoad){
+        setOffline();
 
-            showStatus(
-                "Failed to load messages"
+        /*
+         * Don't erase existing messages
+         * when a refresh fails.
+         */
+
+        if (
+            messagesCache.size === 0
+        ) {
+
+            showError(
+                error.message
             );
 
         }
 
-    }finally{
+    } finally {
 
         loading =
             false;
@@ -1874,30 +1776,59 @@ async function loadMessages(){
 }
 
 
-/* =====================================================
+/* =========================================================
    SEND MESSAGE
-===================================================== */
+========================================================= */
 
-async function sendMessage(){
+async function sendMessage() {
 
-    if(
+    if (
         sendButton.disabled
-    ){
+    ) {
 
         return;
 
     }
 
 
-    const text =
-        input.value
-        .trim();
+    const username =
+        usernameInput.value
+            .trim()
+            .substring(
+                0,
+                24
+            );
+
+    const message =
+        messageInput.value
+            .trim()
+            .substring(
+                0,
+                2000
+            );
 
 
-    if(
-        !text &&
-        !selectedImage
-    ){
+    if (!username) {
+
+        showError(
+            "Enter a username first."
+        );
+
+        usernameInput.focus();
+
+        return;
+
+    }
+
+
+    if (
+        !message &&
+        !selectedImageBase64
+    ) {
+
+        showError(
+            "Type a message or choose an image."
+        );
 
         return;
 
@@ -1907,484 +1838,183 @@ async function sendMessage(){
     sendButton.disabled =
         true;
 
+    sendButton.textContent =
+        "Sending...";
 
-    try{
+
+    try {
+
+        const payload = {
+
+            username:
+                username,
+
+            channel:
+                CHANNEL,
+
+            message:
+                message,
+
+            image:
+                selectedImageBase64
+
+        };
+
 
         const response =
             await fetch(
-                API,
+                API_URL,
                 {
 
                     method:
                         "POST",
 
-                    headers:{
+                    headers: {
+
                         "Content-Type":
                             "application/json",
 
                         "Accept":
                             "application/json"
+
                     },
 
                     body:
-                        JSON.stringify({
-
-                            username:
-                                username,
-
-                            channel:
-                                CHANNEL,
-
-                            message:
-                                text,
-
-                            image:
-                                selectedImage
-
-                        })
+                        JSON.stringify(
+                            payload
+                        )
 
                 }
             );
 
 
-        const data =
-            await response.json();
+        const text =
+            await response.text();
 
 
-        if(!response.ok){
+        let data;
+
+
+        try {
+
+            data =
+                JSON.parse(
+                    text
+                );
+
+        } catch {
 
             throw new Error(
-                data.error ||
-                "HTTP " +
-                response.status
+                "Server returned invalid JSON."
             );
 
         }
 
 
-        input.value =
-            "";
+        if (!response.ok) {
 
-        input.style.height =
-            "auto";
-
-
-        clearImage();
+            let errorMessage =
+                data.error ||
+                "Failed to send message.";
 
 
-        if(
-            data.message
-        ){
+            if (data.fix) {
 
-            const msg =
-                data.message;
-
-            const id =
-                String(
-                    msg.id ??
-                    (
-                        String(
-                            msg.created_at
-                        ) +
-                        "|" +
-                        String(
-                            msg.username
-                        ) +
-                        "|" +
-                        String(
-                            msg.message
-                        )
-                    )
-                );
-
-
-            if(
-                !messagesCache.has(id)
-            ){
-
-                messagesCache.set(
-                    id,
-                    msg
-                );
-
-                emptyEl.style.display =
-                    "none";
-
-
-                const element =
-                    createMessageElement(
-                        msg
-                    );
-
-                element.dataset.id =
-                    id;
-
-                messagesEl.appendChild(
-                    element
-                );
-
-                messagesEl.scrollTop =
-                    messagesEl.scrollHeight;
+                errorMessage +=
+                    "\n\n" +
+                    data.fix;
 
             }
+
+
+            throw new Error(
+                errorMessage
+            );
 
         }
 
 
-    }catch(error){
+        if (
+            data.success !== true
+        ) {
+
+            throw new Error(
+                data.error ||
+                "Message was not accepted."
+            );
+
+        }
+
+
+        /*
+         * Clear input only after
+         * successful sending.
+         */
+
+        messageInput.value =
+            "";
+
+        clearSelectedImage();
+
+
+        setOnline();
+
+
+        /*
+         * Fetch immediately so the new
+         * message appears.
+         */
+
+        await loadMessages();
+
+
+    } catch (error) {
 
         console.error(
+            "SEND ERROR:",
             error
         );
 
-        showStatus(
-            error.message ||
-            "Failed to send message"
+        showError(
+            error.message
         );
 
-    }finally{
+    } finally {
 
         sendButton.disabled =
             false;
 
-        input.focus();
+        sendButton.textContent =
+            "Send";
 
     }
 
 }
 
 
-/* =====================================================
-   IMAGE RESIZE
-===================================================== */
-
-function resizeImage(
-    file
-){
-
-    return new Promise(
-        (
-            resolve,
-            reject
-        ) => {
-
-            const reader =
-                new FileReader();
-
-
-            reader.onload =
-                () => {
-
-                    const image =
-                        new Image();
-
-
-                    image.onload =
-                        () => {
-
-                            const max =
-                                1500;
-
-
-                            let width =
-                                image.naturalWidth;
-
-                            let height =
-                                image.naturalHeight;
-
-
-                            if(
-                                width >
-                                max ||
-                                height >
-                                max
-                            ){
-
-                                const scale =
-                                    Math.min(
-                                        max /
-                                        width,
-
-                                        max /
-                                        height
-                                    );
-
-
-                                width =
-                                    Math.round(
-                                        width *
-                                        scale
-                                    );
-
-                                height =
-                                    Math.round(
-                                        height *
-                                        scale
-                                    );
-
-                            }
-
-
-                            const canvas =
-                                document.createElement(
-                                    "canvas"
-                                );
-
-
-                            canvas.width =
-                                width;
-
-                            canvas.height =
-                                height;
-
-
-                            const ctx =
-                                canvas.getContext(
-                                    "2d"
-                                );
-
-
-                            ctx.drawImage(
-                                image,
-                                0,
-                                0,
-                                width,
-                                height
-                            );
-
-
-                            /*
-                             * JPEG keeps Base64
-                             * much smaller than
-                             * the original image.
-                             */
-
-                            const base64 =
-                                canvas.toDataURL(
-                                    "image/jpeg",
-                                    0.82
-                                );
-
-
-                            resolve({
-                                base64:
-                                    base64,
-
-                                width:
-                                    width,
-
-                                height:
-                                    height
-                            });
-
-                        };
-
-
-                    image.onerror =
-                        () => {
-
-                            reject(
-                                new Error(
-                                    "Could not read image."
-                                )
-                            );
-
-                        };
-
-
-                    image.src =
-                        reader.result;
-
-                };
-
-
-            reader.onerror =
-                () => {
-
-                    reject(
-                        new Error(
-                            "Could not read file."
-                        )
-                    );
-
-                };
-
-
-            reader.readAsDataURL(
-                file
-            );
-
-        }
-    );
-
-}
-
-
-/* =====================================================
-   SELECT IMAGE
-===================================================== */
-
-fileInput.addEventListener(
-    "change",
-    async () => {
-
-        const file =
-            fileInput.files?.[0];
-
-
-        if(!file){
-            return;
-        }
-
-
-        if(
-            !file.type.startsWith(
-                "image/"
-            )
-        ){
-
-            showStatus(
-                "Please choose an image."
-            );
-
-            return;
-
-        }
-
-
-        try{
-
-            showStatus(
-                "Preparing image..."
-            );
-
-
-            const result =
-                await resizeImage(
-                    file
-                );
-
-
-            selectedImage =
-                result.base64;
-
-            selectedImageName =
-                file.name;
-
-
-            previewImage.src =
-                selectedImage;
-
-
-            previewName.textContent =
-                file.name;
-
-
-            previewSize.textContent =
-                result.width +
-                " × " +
-                result.height +
-                " • optimized";
-
-
-            preview.classList.add(
-                "show"
-            );
-
-
-        }catch(error){
-
-            console.error(
-                error
-            );
-
-            showStatus(
-                "Could not prepare image."
-            );
-
-        }
-
-
-        fileInput.value =
-            "";
-
-    }
-);
-
-
-/* =====================================================
-   CLEAR IMAGE
-===================================================== */
-
-function clearImage(){
-
-    selectedImage =
-        null;
-
-    selectedImageName =
-        "";
-
-    previewImage.src =
-        "";
-
-    preview.classList.remove(
-        "show"
-    );
-
-}
-
-
-removeImage.addEventListener(
+/* =========================================================
+   SEND BUTTON
+========================================================= */
+
+sendButton.addEventListener(
     "click",
-    clearImage
+    sendMessage
 );
 
 
-attachButton.addEventListener(
-    "click",
-    () => {
-
-        fileInput.click();
-
-    }
-);
-
-
-/* =====================================================
-   INPUT AUTO RESIZE
-===================================================== */
-
-input.addEventListener(
-    "input",
-    () => {
-
-        input.style.height =
-            "auto";
-
-        input.style.height =
-            Math.min(
-                input.scrollHeight,
-                150
-            ) +
-            "px";
-
-    }
-);
-
-
-/* =====================================================
+/* =========================================================
    ENTER TO SEND
-===================================================== */
+========================================================= */
 
-input.addEventListener(
+messageInput.addEventListener(
     "keydown",
     event => {
 
-        if(
+        if (
             event.key ===
-            "Enter" &&
+                "Enter" &&
             !event.shiftKey
-        ){
+        ) {
 
             event.preventDefault();
 
@@ -2396,149 +2026,25 @@ input.addEventListener(
 );
 
 
-/* =====================================================
-   SEND BUTTON
-===================================================== */
-
-sendButton.addEventListener(
-    "click",
-    sendMessage
-);
-
-
-/* =====================================================
-   SETTINGS
-===================================================== */
-
-settingsButton.addEventListener(
-    "click",
-    () => {
-
-        settingsOverlay.classList.add(
-            "show"
-        );
-
-    }
-);
-
-
-closeSettings.addEventListener(
-    "click",
-    () => {
-
-        settingsOverlay.classList.remove(
-            "show"
-        );
-
-    }
-);
-
-
-settingsOverlay.addEventListener(
-    "click",
-    event => {
-
-        if(
-            event.target ===
-            settingsOverlay
-        ){
-
-            settingsOverlay.classList.remove(
-                "show"
-            );
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   THEMES
-===================================================== */
-
-const themeButtons =
-    document.querySelectorAll(
-        ".theme"
-    );
-
-
-function setTheme(
-    theme
-){
-
-    document.body.className =
-        "theme-" +
-        theme;
-
-
-    localStorage.setItem(
-        "chat_theme",
-        theme
-    );
-
-
-    themeButtons.forEach(
-        button => {
-
-            button.classList.toggle(
-                "active",
-                button.dataset.theme ===
-                theme
-            );
-
-        }
-    );
-
-}
-
-
-themeButtons.forEach(
-    button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                setTheme(
-                    button.dataset.theme
-                );
-
-            }
-        );
-
-    }
-);
-
-
-const savedTheme =
-    localStorage.getItem(
-        "chat_theme"
-    );
-
-
-if(savedTheme){
-
-    setTheme(
-        savedTheme
-    );
-
-}
-
-
-/* =====================================================
+/* =========================================================
    FULLSCREEN IMAGE
-===================================================== */
+========================================================= */
 
 function openImage(
-    src
-){
+    src,
+    name
+) {
 
     fullscreenImage.src =
         src;
 
+    imageName.textContent =
+        name
+            ? "Sent by " + name
+            : "";
+
     imageViewer.classList.add(
-        "show"
+        "open"
     );
 
     document.body.style.overflow =
@@ -2547,59 +2053,46 @@ function openImage(
 }
 
 
-function closeImage(){
+/* =========================================================
+   CLOSE FULLSCREEN
+========================================================= */
+
+function closeImage() {
 
     imageViewer.classList.remove(
-        "show"
+        "open"
     );
 
     fullscreenImage.src =
         "";
 
     document.body.style.overflow =
-        "";
+        "hidden";
 
 }
 
 
-backImage.addEventListener(
+backButton.addEventListener(
     "click",
     closeImage
 );
 
 
-/* ESC CLOSES IMAGE */
+/*
+ * Clicking the dark background also
+ * closes the image.
+ */
 
-document.addEventListener(
-    "keydown",
+imageViewer.addEventListener(
+    "click",
     event => {
 
-        if(
-            event.key ===
-            "Escape"
-        ){
+        if (
+            event.target ===
+            imageViewer
+        ) {
 
-            if(
-                imageViewer.classList.contains(
-                    "show"
-                )
-            ){
-
-                closeImage();
-
-            }
-
-            else if(
-                settingsOverlay.classList.contains(
-                    "show"
-                )
-            ){
-
-                settingsOverlay.classList.remove(
-                    "show"
-                );
-
-            }
+            closeImage();
 
         }
 
@@ -2607,24 +2100,48 @@ document.addEventListener(
 );
 
 
-/* =====================================================
+/*
+ * ESC closes fullscreen.
+ */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key ===
+                "Escape" &&
+            imageViewer.classList.contains(
+                "open"
+            )
+        ) {
+
+            closeImage();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
    START
-===================================================== */
+========================================================= */
 
 loadMessages();
 
 
 /*
- * Poll the API without rebuilding
- * existing messages.
+ * Refresh messages without rebuilding
+ * the existing DOM.
  *
- * This prevents the text from
- * flashing/reloading.
+ * Existing messages therefore stay
+ * completely instant and visible.
  */
 
 setInterval(
     loadMessages,
-    2000
+    REFRESH_TIME
 );
 
 </script>
