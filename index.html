@@ -286,6 +286,18 @@ button{
     cursor:not-allowed;
 }
 
+.game-btn.boss{
+    background:#4a1a2a;
+    border-color:#8a3a5a;
+    color:#ff8aaa;
+    font-size:18px;
+    padding:15px 25px;
+}
+
+.game-btn.boss:hover:not(:disabled){
+    background:#5a2a3a;
+}
+
 /* PLAYERS */
 
 .players-list{
@@ -325,449 +337,208 @@ button{
 
 .ttt{
     display:grid;
-    grid-template-columns:repeat(3,70px);
-    gap:7px;
+    gap:5px;
     justify-content:center;
-    margin:18px auto;
+    margin:15px auto;
 }
 
 .ttt button{
-    width:70px;
-    height:70px;
-    border-radius:10px;
+    border-radius:8px;
     border:1px solid var(--border);
     background:#11151b;
     color:white;
-    font-size:29px;
+    font-size:28px;
     font-weight:900;
+    transition:0.15s;
 }
 
-.ttt button:hover{
+.ttt button:hover:not(:disabled){
     background:#222831;
 }
 
-/* CONNECT FOUR */
+/* 4 IN A ROW */
 
-.connect-board{
+.four-row-board{
     display:grid;
-    grid-template-columns:repeat(7,42px);
-    gap:5px;
-    padding:10px;
-    width:max-content;
-    max-width:100%;
-    overflow:auto;
-    margin:15px auto;
+    gap:4px;
+    padding:8px;
+    margin:10px auto;
     background:#11161d;
     border:1px solid var(--border);
     border-radius:12px;
 }
 
-.connect-cell{
-    width:42px;
-    height:42px;
+.four-row-cell{
     border-radius:50%;
     background:#252b33;
     border:1px solid #343b45;
-}
-
-.connect-cell.red{
-    background:#d65353;
-}
-
-.connect-cell.yellow{
-    background:#e0c454;
-}
-
-/* DICE */
-
-.dice-area{
-    text-align:center;
-    padding:15px;
-}
-
-.dice{
-    width:100px;
-    height:100px;
-    margin:15px auto;
-    display:grid;
-    place-items:center;
-    border-radius:18px;
-    background:#e9ebee;
-    color:#111;
-    font-size:52px;
-    font-weight:900;
-    border:2px solid #fff;
-}
-
-/* HIGHER LOWER */
-
-.card-number{
-    width:150px;
-    height:190px;
-    margin:20px auto;
-    display:grid;
-    place-items:center;
-    border-radius:16px;
-    background:#e8eaed;
-    color:#111;
-    font-size:54px;
-    font-weight:900;
-}
-
-/* RPS */
-
-.rps-buttons{
-    display:flex;
-    justify-content:center;
-    flex-wrap:wrap;
-    gap:9px;
-    margin:18px 0;
-}
-
-.rps-btn{
-    width:90px;
-    height:65px;
-    border-radius:12px;
-    border:1px solid var(--border);
-    background:#151a20;
-    color:white;
-    font-size:25px;
-}
-
-/* MASTERMIND */
-
-.mastermind-row{
-    display:flex;
-    gap:8px;
-    justify-content:center;
-    margin:8px 0;
-    align-items:center;
-}
-
-.mastermind-peg{
-    width:40px;
-    height:40px;
-    border-radius:50%;
-    border:2px solid var(--border);
-    background:#1a1f26;
-    cursor:pointer;
     transition:0.15s;
 }
 
-.mastermind-peg:hover{
-    transform:scale(1.05);
+.four-row-cell.red{
+    background:#d65353;
 }
 
-.mastermind-peg.colored{
-    border-color:#555;
+.four-row-cell.yellow{
+    background:#e0c454;
 }
 
-.mastermind-feedback{
-    display:flex;
-    gap:4px;
-    margin-left:10px;
+.four-row-cell:hover:not(.taken){
+    opacity:0.7;
+    cursor:pointer;
 }
 
-.mastermind-feedback-peg{
-    width:16px;
-    height:16px;
-    border-radius:50%;
-    background:#1a1f26;
-    border:1px solid var(--border);
+/* REACTION TIME */
+
+.reaction-area{
+    text-align:center;
+    padding:20px;
 }
 
-.mastermind-feedback-peg.black{
-    background:#222;
-    border-color:#555;
-}
-
-.mastermind-feedback-peg.white{
-    background:#ddd;
-    border-color:#999;
-}
-
-/* MEMORY MATCH */
-
-.memory-grid{
-    display:grid;
-    gap:8px;
-    justify-content:center;
+.reaction-box{
+    width:200px;
+    height:200px;
     margin:15px auto;
-    max-width:100%;
-}
-
-.memory-card{
-    width:70px;
-    height:70px;
-    border-radius:10px;
-    border:2px solid var(--border);
-    background:#1a1f26;
+    border-radius:20px;
+    border:3px solid var(--border);
     display:grid;
     place-items:center;
-    font-size:30px;
-    cursor:pointer;
+    font-size:24px;
+    font-weight:700;
     transition:0.2s;
-    color:transparent;
-    user-select:none;
+    cursor:pointer;
+    background:#1a1f26;
+    color:var(--muted);
 }
 
-.memory-card.flipped{
-    background:#2a303a;
-    color:white;
+.reaction-box.waiting{
+    background:#1a1f26;
+    color:var(--muted);
 }
 
-.memory-card.matched{
+.reaction-box.ready{
     background:#1a3a2a;
     border-color:#2a6a4a;
     color:#7affb0;
-    cursor:default;
 }
 
-.memory-card:hover:not(.flipped):not(.matched){
-    transform:scale(1.05);
+.reaction-box.go{
+    background:#3a1a1a;
+    border-color:#6a2a2a;
+    color:#ff7a7a;
 }
 
-/* HANGMAN */
+.reaction-box.done{
+    background:#2a2a4a;
+    border-color:#4a4a7a;
+    color:#aaaaff;
+}
 
-.hangman-word{
-    font-size:28px;
-    letter-spacing:8px;
+/* BOSS BATTLE */
+
+.boss-area{
     text-align:center;
-    margin:15px 0;
+    padding:10px;
+}
+
+.boss-health-bar{
+    width:100%;
+    max-width:500px;
+    height:30px;
+    margin:10px auto;
+    background:#1a1a1a;
+    border-radius:15px;
+    border:2px solid #333;
+    overflow:hidden;
+    position:relative;
+}
+
+.boss-health-fill{
+    height:100%;
+    background:linear-gradient(90deg,#ff3333,#ff6a33);
+    border-radius:15px;
+    transition:width 0.3s ease;
+    width:100%;
+}
+
+.boss-health-text{
+    position:absolute;
+    inset:0;
+    display:grid;
+    place-items:center;
     font-weight:700;
+    font-size:14px;
+    color:white;
+    text-shadow:0 0 10px rgba(0,0,0,0.8);
+}
+
+.boss-stats{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    flex-wrap:wrap;
+    margin:10px 0;
+    color:#9da5b0;
+    font-size:14px;
+}
+
+.boss-stats strong{
     color:white;
 }
 
-.hangman-letters{
+.boss-upgrades{
     display:flex;
     flex-wrap:wrap;
-    gap:6px;
+    gap:10px;
     justify-content:center;
-    max-width:500px;
-    margin:10px auto;
+    margin:10px 0;
 }
 
-.hangman-letter-btn{
-    width:40px;
-    height:40px;
-    border-radius:8px;
+.boss-upgrade-btn{
+    padding:8px 16px;
+    border-radius:10px;
     border:1px solid var(--border);
     background:#1a1f26;
     color:white;
-    font-weight:700;
-    font-size:16px;
+    font-size:12px;
+    transition:0.15s;
 }
 
-.hangman-letter-btn:disabled{
+.boss-upgrade-btn:hover:not(:disabled){
+    background:#2a303a;
+    transform:scale(1.05);
+}
+
+.boss-upgrade-btn:disabled{
     opacity:0.3;
     cursor:not-allowed;
 }
 
-.hangman-letter-btn:hover:not(:disabled){
-    background:#2a303a;
+.boss-upgrade-btn .cost{
+    color:#ffcc44;
+    font-weight:700;
 }
 
-.hangman-body{
-    text-align:center;
-    font-size:42px;
+.boss-damage-display{
+    font-size:32px;
+    font-weight:900;
+    color:#ff6a33;
+    margin:5px 0;
+}
+
+.boss-monster-name{
+    font-size:28px;
+    font-weight:900;
+    color:#ff4466;
+    text-shadow:0 0 20px rgba(255,68,102,0.3);
+}
+
+.boss-turn-indicator{
     margin:10px 0;
-    font-family:monospace;
-    white-space:pre;
-}
-
-/* DOTS AND BOXES */
-
-.dots-board{
-    display:grid;
-    gap:0;
-    margin:15px auto;
-    max-width:100%;
-    overflow:auto;
-}
-
-.dots-cell{
-    display:grid;
-    place-items:center;
-    position:relative;
-}
-
-.dots-dot{
-    width:12px;
-    height:12px;
-    border-radius:50%;
-    background:var(--text);
-}
-
-.dots-line{
-    position:absolute;
-    cursor:pointer;
-    transition:0.2s;
-}
-
-.dots-line:hover{
-    filter:brightness(1.3);
-}
-
-.dots-line.horizontal{
-    width:40px;
-    height:4px;
-    background:var(--border);
-    left:6px;
-    top:50%;
-    transform:translateY(-50%);
-}
-
-.dots-line.vertical{
-    width:4px;
-    height:40px;
-    background:var(--border);
-    top:6px;
-    left:50%;
-    transform:translateX(-50%);
-}
-
-.dots-line.claimed{
-    background:#4a7a4a;
-}
-
-.dots-line.claimed.player1{
-    background:#d65353;
-}
-
-.dots-line.claimed.player2{
-    background:#e0c454;
-}
-
-.dots-box{
-    position:absolute;
-    inset:4px;
-    border-radius:4px;
-    pointer-events:none;
-    opacity:0.3;
-}
-
-.dots-box.claimed.player1{
-    background:#d65353;
-}
-
-.dots-box.claimed.player2{
-    background:#e0c454;
-}
-
-/* OTHELLO */
-
-.othello-board{
-    display:grid;
-    gap:2px;
-    margin:15px auto;
-    background:#1a6a3a;
-    padding:8px;
-    border-radius:12px;
-    max-width:100%;
-    overflow:auto;
-}
-
-.othello-cell{
-    width:50px;
-    height:50px;
-    border-radius:50%;
-    background:#1a6a3a;
-    display:grid;
-    place-items:center;
-    cursor:pointer;
-}
-
-.othello-cell.disc{
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    background:#222;
-    border:2px solid #333;
-}
-
-.othello-cell.disc.white{
-    background:#f0f0f0;
-    border-color:#ddd;
-}
-
-.othello-cell.disc.black{
-    background:#111;
-    border-color:#333;
-}
-
-.othello-cell.valid-move{
-    cursor:pointer;
-}
-
-.othello-cell.valid-move::after{
-    content:'';
-    width:20px;
-    height:20px;
-    border-radius:50%;
-    background:rgba(255,255,255,0.2);
-}
-
-/* CHECKERS */
-
-.checkers-board{
-    display:grid;
-    gap:0;
-    margin:15px auto;
-    border:4px solid #8B6B4A;
-    border-radius:8px;
-    max-width:100%;
-    overflow:auto;
-}
-
-.checkers-cell{
-    width:60px;
-    height:60px;
-    display:grid;
-    place-items:center;
-}
-
-.checkers-cell.light{
-    background:#f0d9b5;
-}
-
-.checkers-cell.dark{
-    background:#b58863;
-}
-
-.checkers-piece{
-    width:44px;
-    height:44px;
-    border-radius:50%;
-    cursor:pointer;
-    transition:0.15s;
-    border:2px solid rgba(255,255,255,0.2);
-}
-
-.checkers-piece:hover{
-    transform:scale(1.05);
-}
-
-.checkers-piece.black{
-    background:#1a1a1a;
-    border-color:#444;
-}
-
-.checkers-piece.red{
-    background:#cc3333;
-    border-color:#ff6666;
-}
-
-.checkers-piece.king{
-    border:3px solid #ffd700;
-}
-
-.checkers-piece.selected{
-    transform:scale(1.1);
-    box-shadow:0 0 20px rgba(255,255,255,0.3);
-}
-
-.checkers-cell.valid-move{
-    background:rgba(0,255,0,0.3);
+    padding:10px;
+    border-radius:10px;
+    background:#151a20;
+    border:1px solid var(--border);
 }
 
 /* COMPOSER */
@@ -976,6 +747,12 @@ textarea{
     margin-top:4px;
 }
 
+.game-choice .game-options{
+    font-size:10px;
+    color:#6a7a8a;
+    margin-top:3px;
+}
+
 /* DANGER */
 
 .danger-zone{
@@ -1021,41 +798,52 @@ textarea{
     margin-bottom:5px;
 }
 
-/* GAME OPTIONS */
+/* TYPE SENTENCE */
 
-.game-options{
-    background:#0d1015;
-    border-radius:10px;
-    padding:12px;
-    margin:10px 0;
+.type-area{
+    text-align:center;
+    padding:15px;
 }
 
-.game-options-row{
-    display:flex;
-    gap:12px;
-    flex-wrap:wrap;
-    align-items:center;
-    margin:5px 0;
-}
-
-.game-options-row label{
-    color:#aab2bd;
-    font-size:12px;
-    min-width:60px;
-}
-
-.game-options-row select,
-.game-options-row input[type=number]{
-    background:#1a1f26;
-    border:1px solid var(--border);
-    border-radius:6px;
+.type-sentence{
+    font-size:24px;
+    font-weight:700;
     color:white;
-    padding:5px 10px;
-    font-size:12px;
+    padding:20px;
+    background:#1a1f26;
+    border-radius:12px;
+    border:1px solid var(--border);
+    margin:10px auto;
+    max-width:600px;
+    word-break:break-word;
 }
 
-.game-options-row input[type=number]{
-    width:60px;
+.type-input{
+    width:100%;
+    max-width:500px;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#101419;
+    color:white;
+    font-size:18px;
+    text-align:center;
+}
+
+.type-input:focus{
+    outline:2px solid var(--accent);
+}
+
+.type-stats{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    margin:10px 0;
+    color:#9da5b0;
+}
+
+.type-stats strong{
+    color:white;
 }
 
 @media(max-width:600px){
@@ -1080,57 +868,23 @@ textarea{
         grid-template-columns:1fr;
     }
 
-    .ttt{
-        grid-template-columns:repeat(3,55px);
+    .ttt button{
+        font-size:20px;
     }
 
-    .ttt button{
-        width:55px;
-        height:55px;
+    .reaction-box{
+        width:150px;
+        height:150px;
+        font-size:18px;
+    }
+
+    .boss-monster-name{
         font-size:22px;
     }
 
-    .connect-board{
-        grid-template-columns:repeat(7,32px);
-    }
-
-    .connect-cell{
-        width:32px;
-        height:32px;
-    }
-
-    .memory-card{
-        width:55px;
-        height:55px;
-        font-size:24px;
-    }
-
-    .checkers-cell{
-        width:45px;
-        height:45px;
-    }
-
-    .checkers-piece{
-        width:34px;
-        height:34px;
-    }
-
-    .othello-cell{
-        width:38px;
-        height:38px;
-    }
-
-    .othello-cell.disc{
-        width:32px;
-        height:32px;
-    }
-
-    .dots-line.horizontal{
-        width:30px;
-    }
-
-    .dots-line.vertical{
-        height:30px;
+    .type-sentence{
+        font-size:18px;
+        padding:15px;
     }
 }
 </style>
@@ -1221,77 +975,35 @@ Choose a game to create a lobby. Others can join before you start.
 
 <div class="game-grid">
 
-<!-- Classics -->
 <button class="game-choice" data-game="ttt">
     <strong>⭕ Tic-Tac-Toe</strong>
-    <span>Classic 3x3</span>
+    <span>Classic 3x3, 4x4, 5x5 or 6x6</span>
     <div class="game-players">2 players</div>
+    <div class="game-options">Board size: 3-6</div>
 </button>
 
-<button class="game-choice" data-game="connect4">
-    <strong>🔴 Connect Four</strong>
-    <span>Drop discs, get 4 in a row</span>
-    <div class="game-players">2-4 players</div>
+<button class="game-choice" data-game="fourrow">
+    <strong>🔴 4 in a Row</strong>
+    <span>Connect 4 discs to win</span>
+    <div class="game-players">2 players</div>
+    <div class="game-options">7x6 or 8x7 board</div>
 </button>
 
-<button class="game-choice" data-game="rps">
-    <strong>✊ Rock Paper Scissors</strong>
-    <span>Classic showdown</span>
+<button class="game-choice" data-game="reaction">
+    <strong>⚡ Reaction Time</strong>
+    <span>Click when the screen turns green</span>
     <div class="game-players">2-6 players</div>
 </button>
 
-<!-- New Games -->
-<button class="game-choice" data-game="mastermind">
-    <strong>🎯 Mastermind</strong>
-    <span>Break the secret code</span>
+<button class="game-choice" data-game="type">
+    <strong>⌨️ Type Sentence</strong>
+    <span>Type the sentence as fast as you can</span>
     <div class="game-players">2-6 players</div>
 </button>
 
-<button class="game-choice" data-game="memory">
-    <strong>🧠 Memory Match</strong>
-    <span>Find matching pairs</span>
-    <div class="game-players">2-6 players</div>
-</button>
-
-<button class="game-choice" data-game="hangman">
-    <strong>🪢 Hangman</strong>
-    <span>Guess the word</span>
-    <div class="game-players">2-6 players</div>
-</button>
-
-<button class="game-choice" data-game="dots">
-    <strong>📦 Dots and Boxes</strong>
-    <span>Claim boxes by drawing lines</span>
-    <div class="game-players">2-6 players</div>
-</button>
-
-<button class="game-choice" data-game="othello">
-    <strong>⬛ Othello</strong>
-    <span>Flip discs to dominate</span>
-    <div class="game-players">2-4 players</div>
-</button>
-
-<button class="game-choice" data-game="checkers">
-    <strong>🔴 Checkers</strong>
-    <span>Jump and capture</span>
-    <div class="game-players">2-4 players</div>
-</button>
-
-<button class="game-choice" data-game="gomoku">
-    <strong>⚫ Gomoku</strong>
-    <span>Five in a row</span>
-    <div class="game-players">2-4 players</div>
-</button>
-
-<button class="game-choice" data-game="sos">
-    <strong>📝 SOS</strong>
-    <span>Build SOS chains</span>
-    <div class="game-players">2-6 players</div>
-</button>
-
-<button class="game-choice" data-game="ttt_tournament">
-    <strong>🏆 Tic-Tac-Toe Tournament</strong>
-    <span>Round-robin matches</span>
+<button class="game-choice" data-game="boss">
+    <strong>👹 Boss Battle</strong>
+    <span>Upgrade weapons, defeat the monster!</span>
     <div class="game-players">2-6 players</div>
 </button>
 
@@ -1877,92 +1589,40 @@ let seenGameIds=new Set();
 
 const GAME_TYPES={
 
-    // Classics
     ttt:{
         name:"Tic-Tac-Toe",
         icon:"⭕",
         min:2,
         max:2,
-        desc:"Classic 3x3"
+        desc:"Board size 3-6"
     },
-    connect4:{
-        name:"Connect Four",
+    fourrow:{
+        name:"4 in a Row",
         icon:"🔴",
         min:2,
-        max:4,
-        desc:"Drop discs, get 4 in a row"
+        max:2,
+        desc:"Connect 4 discs"
     },
-    rps:{
-        name:"Rock Paper Scissors",
-        icon:"✊",
+    reaction:{
+        name:"Reaction Time",
+        icon:"⚡",
         min:2,
         max:6,
-        desc:"Classic showdown"
+        desc:"Fastest click wins"
     },
-    
-    // New games
-    mastermind:{
-        name:"Mastermind",
-        icon:"🎯",
+    type:{
+        name:"Type Sentence",
+        icon:"⌨️",
         min:2,
         max:6,
-        desc:"Break the secret code"
+        desc:"Type the sentence fast"
     },
-    memory:{
-        name:"Memory Match",
-        icon:"🧠",
+    boss:{
+        name:"Boss Battle",
+        icon:"👹",
         min:2,
         max:6,
-        desc:"Find matching pairs"
-    },
-    hangman:{
-        name:"Hangman",
-        icon:"🪢",
-        min:2,
-        max:6,
-        desc:"Guess the word"
-    },
-    dots:{
-        name:"Dots and Boxes",
-        icon:"📦",
-        min:2,
-        max:6,
-        desc:"Claim boxes by drawing lines"
-    },
-    othello:{
-        name:"Othello",
-        icon:"⬛",
-        min:2,
-        max:4,
-        desc:"Flip discs to dominate"
-    },
-    checkers:{
-        name:"Checkers",
-        icon:"🔴",
-        min:2,
-        max:4,
-        desc:"Jump and capture"
-    },
-    gomoku:{
-        name:"Gomoku",
-        icon:"⚫",
-        min:2,
-        max:4,
-        desc:"Five in a row"
-    },
-    sos:{
-        name:"SOS",
-        icon:"📝",
-        min:2,
-        max:6,
-        desc:"Build SOS chains"
-    },
-    ttt_tournament:{
-        name:"Tic-Tac-Toe Tournament",
-        icon:"🏆",
-        min:2,
-        max:6,
-        desc:"Round-robin matches"
+        desc:"Defeat the boss together!"
     }
 };
 
@@ -2983,15 +2643,20 @@ async function createGame(gameType){
         createdAt:
             Date.now(),
 
-        board:
-            createInitialBoard(
-                gameType
-            ),
+        board:[],
 
         winner:null,
 
         data:{}
     };
+
+    // Game-specific options
+    if (gameType === "ttt") {
+        game.data.boardSize = 3;
+    }
+    if (gameType === "fourrow") {
+        game.data.boardSize = "7x6";
+    }
 
     try{
 
@@ -3012,50 +2677,6 @@ async function createGame(gameType){
             error.message
         );
     }
-}
-
-
-/* =====================================================
-   INITIAL BOARDS
-===================================================== */
-
-function createInitialBoard(type){
-
-    if(type==="ttt" || type==="ttt_tournament"){
-        return Array(9).fill("");
-    }
-    if(type==="connect4"){
-        return Array(42).fill("");
-    }
-    if(type==="mastermind"){
-        return [];
-    }
-    if(type==="memory"){
-        return [];
-    }
-    if(type==="hangman"){
-        return [];
-    }
-    if(type==="dots"){
-        return [];
-    }
-    if(type==="othello"){
-        return Array(64).fill("");
-    }
-    if(type==="checkers"){
-        return Array(64).fill("");
-    }
-    if(type==="gomoku"){
-        return Array(225).fill("");
-    }
-    if(type==="sos"){
-        return Array(100).fill("");
-    }
-    if(type==="rps"){
-        return [];
-    }
-
-    return [];
 }
 
 
@@ -3237,18 +2858,11 @@ function createGameElement(game){
 
 function getGameDescription(game){
     const descs = {
-        ttt: "Take turns placing X and O. Get three in a row to win.",
-        connect4: "Drop discs into columns. First to get 4 in a row wins!",
-        rps: "Rock beats scissors, scissors beats paper, paper beats rock.",
-        mastermind: "Break the secret code. Get feedback on each guess.",
-        memory: "Flip cards and find matching pairs. Most pairs wins.",
-        hangman: "Guess letters to reveal the secret word. Don't hang the man!",
-        dots: "Draw lines between dots. Complete a box to claim it!",
-        othello: "Place discs to flip opponent's pieces. Most discs wins.",
-        checkers: "Move diagonally and jump to capture. King me!",
-        gomoku: "Place stones on the grid. First to get 5 in a row wins.",
-        sos: "Draw S or O to spell SOS. Score points and go again!",
-        ttt_tournament: "Round-robin Tic-Tac-Toe matches. Most points wins!"
+        ttt: "Take turns placing X and O. Get 3, 4, 5, or 6 in a row to win!",
+        fourrow: "Drop discs into columns. First to get 4 in a row wins!",
+        reaction: "Click when the screen turns green. Fastest wins!",
+        type: "Type the sentence as fast as you can. Fastest wins!",
+        boss: "Work together to defeat the boss! Upgrade your weapons for more damage."
     };
     return descs[game.gameType] || "Game in progress.";
 }
@@ -3263,17 +2877,10 @@ function createGameBoard(game){
     
     const boards = {
         ttt: createTTT,
-        ttt_tournament: createTTT,
-        connect4: createConnect4,
-        rps: createRPS,
-        mastermind: createMastermind,
-        memory: createMemory,
-        hangman: createHangman,
-        dots: createDots,
-        othello: createOthello,
-        checkers: createCheckers,
-        gomoku: createGomoku,
-        sos: createSOS
+        fourrow: createFourRow,
+        reaction: createReaction,
+        type: createTypeSentence,
+        boss: createBossBattle
     };
     
     return boards[game.gameType] ? boards[game.gameType](game) : null;
@@ -3281,27 +2888,48 @@ function createGameBoard(game){
 
 
 /* =====================================================
-   TIC TAC TOE
+   TIC TAC TOE (3x3, 4x4, 5x5, 6x6)
 ===================================================== */
 
 function createTTT(game){
+    const size = game.data.boardSize || 3;
+    const total = size * size;
+    const winCount = game.data.winCount || size;
+    
+    if (!game.data.board || game.data.board.length !== total) {
+        game.data.board = Array(total).fill("");
+        game.data.winCount = size;
+    }
+
     const board = document.createElement("div");
     board.className = "ttt";
+    board.style.gridTemplateColumns = `repeat(${size}, ${size <= 3 ? 80 : size <= 4 ? 70 : size <= 5 ? 60 : 50}px)`;
+    board.style.gridTemplateRows = `repeat(${size}, ${size <= 3 ? 80 : size <= 4 ? 70 : size <= 5 ? 60 : 50}px)`;
 
     const mine = game.players.some(p => p.deviceId === deviceId);
     const current = game.players[game.turnIndex % game.players.length];
     const myTurn = mine && current && current.deviceId === deviceId;
 
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < total; i++) {
         const button = document.createElement("button");
-        button.textContent = game.board[i] || "";
-        button.disabled = !myTurn || !!game.board[i] || !!game.winner;
+        button.textContent = game.data.board[i] || "";
+        button.style.fontSize = size <= 3 ? "32px" : size <= 4 ? "28px" : size <= 5 ? "24px" : "20px";
+        button.disabled = !myTurn || !!game.data.board[i] || !!game.winner;
         button.onclick = async () => {
             const copy = JSON.parse(JSON.stringify(game));
-            copy.board[i] = game.turnIndex % 2 === 0 ? "X" : "O";
-            const result = checkTTT(copy.board);
-            if (result) { copy.winner = result; copy.status = "finished"; }
-            else { copy.turnIndex++; }
+            const idx = copy.turnIndex % copy.players.length;
+            const symbol = idx === 0 ? "X" : "O";
+            copy.data.board[i] = symbol;
+            
+            if (checkTTTWin(copy.data.board, size, i, symbol)) {
+                copy.winner = current.username;
+                copy.status = "finished";
+            } else if (copy.data.board.every(c => c)) {
+                copy.winner = "draw";
+                copy.status = "finished";
+            } else {
+                copy.turnIndex++;
+            }
             await publishGameAndCleanup(game, copy);
         };
         board.appendChild(button);
@@ -3309,75 +2937,113 @@ function createTTT(game){
     return board;
 }
 
-function checkTTT(board){
-    const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-    for (const [a,b,c] of wins) {
-        if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
+function checkTTTWin(board, size, pos, symbol){
+    const row = Math.floor(pos / size);
+    const col = pos % size;
+    const winCount = size; // Need full line for Tic-Tac-Toe
+    
+    const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+    for (const [dr, dc] of dirs) {
+        let count = 1;
+        for (const dir of [-1,1]) {
+            let r = row + dr * dir, c = col + dc * dir;
+            while (r >= 0 && r < size && c >= 0 && c < size && board[r * size + c] === symbol) {
+                count++;
+                r += dr * dir;
+                c += dc * dir;
+            }
+        }
+        if (count >= winCount) return true;
     }
-    if (board.every(Boolean)) return "draw";
-    return null;
+    return false;
 }
 
 
 /* =====================================================
-   CONNECT FOUR
+   4 IN A ROW
 ===================================================== */
 
-function createConnect4(game){
+function createFourRow(game){
+    const boardSize = game.data.boardSize || "7x6";
+    const [cols, rows] = boardSize.split('x').map(Number);
+    const total = cols * rows;
+    
+    if (!game.data.board || game.data.board.length !== total) {
+        game.data.board = Array(total).fill("");
+    }
+
     const board = document.createElement("div");
-    board.className = "connect-board";
+    board.className = "four-row-board";
+    board.style.gridTemplateColumns = `repeat(${cols}, ${cols <= 7 ? 42 : 38}px)`;
+    board.style.gridTemplateRows = `repeat(${rows}, ${cols <= 7 ? 42 : 38}px)`;
 
     const mine = game.players.some(p => p.deviceId === deviceId);
     const current = game.players[game.turnIndex % game.players.length];
     const myTurn = mine && current && current.deviceId === deviceId;
-    
-    const playerColors = game.data.playerColors || {};
-    const myColor = playerColors[deviceId] || (game.turnIndex % 2 === 0 ? "R" : "Y");
 
-    for (let row = 0; row < 6; row++) {
-        for (let col = 0; col < 7; col++) {
-            const index = row * 7 + col;
-            const cell = document.createElement("button");
-            cell.className = "connect-cell";
-            if (game.board[index] === "R") cell.classList.add("red");
-            if (game.board[index] === "Y") cell.classList.add("yellow");
-            cell.disabled = !myTurn;
-            cell.onclick = async () => {
-                const copy = JSON.parse(JSON.stringify(game));
-                const piece = copy.turnIndex % 2 === 0 ? "R" : "Y";
-                let placed = -1;
-                for (let r = 5; r >= 0; r--) {
-                    const idx = r * 7 + col;
-                    if (!copy.board[idx]) { copy.board[idx] = piece; placed = idx; break; }
-                }
-                if (placed === -1) return;
-                if (checkConnectWin(copy.board, placed)) {
-                    copy.winner = current.username;
-                    copy.status = "finished";
-                } else if (copy.board.every(Boolean)) {
-                    copy.winner = "draw";
-                    copy.status = "finished";
-                } else {
-                    copy.turnIndex++;
-                }
-                await publishGameAndCleanup(game, copy);
-            };
+    // Determine player colors
+    const playerColors = game.data.playerColors || {};
+    if (Object.keys(playerColors).length === 0) {
+        game.players.forEach((p, idx) => {
+            playerColors[p.deviceId] = idx === 0 ? "red" : "yellow";
+        });
+        game.data.playerColors = playerColors;
+    }
+    const myColor = playerColors[deviceId];
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const index = row * cols + col;
+            const cell = document.createElement("div");
+            cell.className = "four-row-cell";
+            if (game.data.board[index] === "red") cell.classList.add("red");
+            if (game.data.board[index] === "yellow") cell.classList.add("yellow");
+            if (game.data.board[index]) cell.classList.add("taken");
+            
+            if (!game.data.board[index] && myTurn && !game.winner) {
+                cell.onclick = async () => {
+                    // Find lowest empty cell in this column
+                    let placed = -1;
+                    for (let r = rows - 1; r >= 0; r--) {
+                        const idx = r * cols + col;
+                        if (!game.data.board[idx]) {
+                            placed = idx;
+                            break;
+                        }
+                    }
+                    if (placed === -1) return;
+                    
+                    const copy = JSON.parse(JSON.stringify(game));
+                    const color = copy.turnIndex % 2 === 0 ? "red" : "yellow";
+                    copy.data.board[placed] = color;
+                    
+                    if (checkFourRowWin(copy.data.board, cols, rows, placed, color)) {
+                        copy.winner = current.username;
+                        copy.status = "finished";
+                    } else if (copy.data.board.every(c => c)) {
+                        copy.winner = "draw";
+                        copy.status = "finished";
+                    } else {
+                        copy.turnIndex++;
+                    }
+                    await publishGameAndCleanup(game, copy);
+                };
+            }
             board.appendChild(cell);
         }
     }
     return board;
 }
 
-function checkConnectWin(board, index){
-    const row = Math.floor(index / 7);
-    const col = index % 7;
-    const value = board[index];
+function checkFourRowWin(board, cols, rows, pos, color){
+    const row = Math.floor(pos / cols);
+    const col = pos % cols;
     const dirs = [[1,0],[0,1],[1,1],[1,-1]];
-    for (const [dr,dc] of dirs) {
+    for (const [dr, dc] of dirs) {
         let count = 1;
         for (const dir of [-1,1]) {
             let r = row + dr * dir, c = col + dc * dir;
-            while (r >= 0 && r < 6 && c >= 0 && c < 7 && board[r * 7 + c] === value) {
+            while (r >= 0 && r < rows && c >= 0 && c < cols && board[r * cols + c] === color) {
                 count++;
                 r += dr * dir;
                 c += dc * dir;
@@ -3390,1166 +3056,400 @@ function checkConnectWin(board, index){
 
 
 /* =====================================================
-   ROCK PAPER SCISSORS
+   REACTION TIME
 ===================================================== */
 
-function createRPS(game){
+function createReaction(game){
     const area = document.createElement("div");
+    area.className = "reaction-area";
+
     const mine = game.players.some(p => p.deviceId === deviceId);
     const current = game.players[game.turnIndex % game.players.length];
     const myTurn = mine && current && current.deviceId === deviceId;
 
-    const buttons = document.createElement("div");
-    buttons.className = "rps-buttons";
+    const state = game.data.state || "waiting";
+    const startTime = game.data.startTime || 0;
+    const results = game.data.results || {};
 
-    const choices = [["rock","✊"],["paper","✋"],["scissors","✌️"]];
-    choices.forEach(([choice, icon]) => {
-        const btn = document.createElement("button");
-        btn.className = "rps-btn";
-        btn.textContent = icon;
-        btn.title = choice;
-        btn.disabled = !myTurn;
-        btn.onclick = async () => {
-            const copy = JSON.parse(JSON.stringify(game));
-            const options = ["rock","paper","scissors"];
-            const computer = options[Math.floor(Math.random() * options.length)];
-            let result;
-            if (choice === computer) result = "Draw";
-            else if ((choice === "rock" && computer === "scissors") ||
-                     (choice === "paper" && computer === "rock") ||
-                     (choice === "scissors" && computer === "paper")) {
-                result = current.username + " wins!";
-            } else {
-                result = "Computer wins.";
-            }
-            copy.data.lastResult = current.username + " chose " + choice + ". Computer chose " + computer + ". " + result;
-            copy.turnIndex++;
-            if (copy.turnIndex >= copy.players.length * 3) {
-                copy.winner = current.username;
-                copy.status = "finished";
-            }
-            await publishGameAndCleanup(game, copy);
-        };
-        buttons.appendChild(btn);
-    });
-    area.appendChild(buttons);
+    const box = document.createElement("div");
+    box.className = "reaction-box " + state;
 
-    if (game.data.lastResult) {
-        const result = document.createElement("div");
-        result.className = "turn-banner";
-        result.style.textAlign = "center";
-        result.textContent = game.data.lastResult;
-        area.appendChild(result);
+    if (state === "waiting") {
+        box.textContent = "⏳ Waiting for " + (myTurn ? "you" : current.username) + "...";
+        if (myTurn) {
+            box.onclick = async () => {
+                const copy = JSON.parse(JSON.stringify(game));
+                copy.data.state = "ready";
+                copy.data.startTime = Date.now() + 1000 + Math.random() * 3000;
+                await publishGameAndCleanup(game, copy);
+            };
+        }
+    } else if (state === "ready") {
+        const remaining = Math.max(0, (startTime - Date.now()) / 1000);
+        box.textContent = "🟢 Get ready... " + remaining.toFixed(1) + "s";
+        // Auto transition to go
+        if (remaining < 0.5 && myTurn) {
+            setTimeout(async () => {
+                const copy = JSON.parse(JSON.stringify(game));
+                copy.data.state = "go";
+                copy.data.goTime = Date.now();
+                await publishGameAndCleanup(game, copy);
+            }, Math.max(0, startTime - Date.now() + 100));
+        }
+    } else if (state === "go") {
+        box.textContent = "🟢 CLICK NOW!";
+        box.style.cursor = "pointer";
+        if (myTurn) {
+            box.onclick = async () => {
+                const reactionTime = Date.now() - game.data.goTime;
+                const copy = JSON.parse(JSON.stringify(game));
+                copy.data.results = copy.data.results || {};
+                copy.data.results[deviceId] = reactionTime;
+                copy.turnIndex++;
+                if (copy.turnIndex >= copy.players.length) {
+                    // All done - find winner
+                    let winner = null;
+                    let best = Infinity;
+                    for (const [id, time] of Object.entries(copy.data.results)) {
+                        if (time < best) {
+                            best = time;
+                            winner = copy.players.find(p => p.deviceId === id)?.username;
+                        }
+                    }
+                    copy.winner = winner + " (" + best + "ms)";
+                    copy.status = "finished";
+                } else {
+                    copy.data.state = "waiting";
+                }
+                await publishGameAndCleanup(game, copy);
+            };
+        } else {
+            box.textContent = "🟢 Waiting for " + current.username + "...";
+        }
+    } else if (state === "done") {
+        box.textContent = "✅ Done!";
+        box.classList.add("done");
     }
+
+    area.appendChild(box);
+
+    // Show results
+    if (Object.keys(results).length > 0) {
+        const resultsDiv = document.createElement("div");
+        resultsDiv.style.cssText = "color:#9da5b0;margin-top:10px;";
+        const sorted = Object.entries(results).sort((a,b) => a[1] - b[1]);
+        resultsDiv.innerHTML = sorted.map(([id, time]) => {
+            const name = game.players.find(p => p.deviceId === id)?.username || "Unknown";
+            return `<div>${escapeHtml(name)}: ${time}ms</div>`;
+        }).join("");
+        area.appendChild(resultsDiv);
+    }
+
     return area;
 }
 
 
 /* =====================================================
-   MASTERMIND
+   TYPE SENTENCE
 ===================================================== */
 
-function createMastermind(game){
+function createTypeSentence(game){
     const area = document.createElement("div");
-    area.style.textAlign = "center";
+    area.className = "type-area";
 
-    const colors = ["red","blue","green","yellow","purple","orange","pink","white"];
-    const pegColors = {
-        red: "#cc3333",
-        blue: "#3366cc",
-        green: "#33aa33",
-        yellow: "#ddcc33",
-        purple: "#8833aa",
-        orange: "#dd8833",
-        pink: "#dd66aa",
-        white: "#eeeeee"
-    };
-
-    // If code setter hasn't chosen a code yet
-    if (!game.data.code && game.data.codeSetter === deviceId) {
-        const codeTitle = document.createElement("div");
-        codeTitle.className = "turn-banner";
-        codeTitle.textContent = "👑 Set the secret code (4 colors)";
-        area.appendChild(codeTitle);
-
-        const row = document.createElement("div");
-        row.className = "mastermind-row";
-        const code = [];
-
-        for (let i = 0; i < 4; i++) {
-            const peg = document.createElement("div");
-            peg.className = "mastermind-peg";
-            let colorIndex = 0;
-            peg.onclick = () => {
-                colorIndex = (colorIndex + 1) % colors.length;
-                peg.style.background = pegColors[colors[colorIndex]];
-                peg.dataset.color = colors[colorIndex];
-                peg.classList.add("colored");
-                code[i] = colors[colorIndex];
-                if (code.length === 4 && code.every(c => c)) {
-                    confirmBtn.disabled = false;
-                }
-            };
-            row.appendChild(peg);
-        }
-        area.appendChild(row);
-
-        const confirmBtn = document.createElement("button");
-        confirmBtn.className = "game-btn primary";
-        confirmBtn.textContent = "Set Code";
-        confirmBtn.disabled = true;
-        confirmBtn.onclick = async () => {
-            const copy = JSON.parse(JSON.stringify(game));
-            copy.data.code = code;
-            copy.data.codeSetter = game.data.codeSetter;
-            copy.turnIndex = 0;
-            await publishGameAndCleanup(game, copy);
-        };
-        area.appendChild(confirmBtn);
-        return area;
-    }
-
-    // Guessing phase
-    if (!game.data.code) {
-        const waiting = document.createElement("div");
-        waiting.className = "turn-banner";
-        waiting.textContent = "Waiting for code setter...";
-        area.appendChild(waiting);
-        return area;
-    }
+    const sentences = [
+        "The quick brown fox jumps over the lazy dog.",
+        "Pack my box with five dozen liquor jugs.",
+        "How vexingly quick daft zebras jump.",
+        "The five boxing wizards jump quickly.",
+        "Jazz and swing fans like fast music.",
+        "Crazy Fredericka bought many very exquisite opal jewels.",
+        "We promptly judged antique ivory buckles for the next prize.",
+        "A quacking duck flew over the busy highway.",
+        "The amazing spider web sparkled in the morning dew.",
+        "Bright vixens jump; dozy fowl quack."
+    ];
 
     const mine = game.players.some(p => p.deviceId === deviceId);
     const current = game.players[game.turnIndex % game.players.length];
     const myTurn = mine && current && current.deviceId === deviceId;
-    const isCodeSetter = game.data.codeSetter === deviceId;
 
-    // Show previous guesses
-    if (game.data.guesses) {
-        for (const guess of game.data.guesses) {
-            const row = document.createElement("div");
-            row.className = "mastermind-row";
-            for (const c of guess.colors) {
-                const peg = document.createElement("div");
-                peg.className = "mastermind-peg colored";
-                peg.style.background = pegColors[c] || "#333";
-                row.appendChild(peg);
-            }
-            const feedback = document.createElement("div");
-            feedback.className = "mastermind-feedback";
-            for (let i = 0; i < guess.black; i++) {
-                const f = document.createElement("div");
-                f.className = "mastermind-feedback-peg black";
-                feedback.appendChild(f);
-            }
-            for (let i = 0; i < guess.white; i++) {
-                const f = document.createElement("div");
-                f.className = "mastermind-feedback-peg white";
-                feedback.appendChild(f);
-            }
-            row.appendChild(feedback);
-            area.appendChild(row);
-        }
+    if (!game.data.sentence) {
+        game.data.sentence = sentences[Math.floor(Math.random() * sentences.length)];
+        game.data.startTime = 0;
+        game.data.results = {};
+        game.data.done = false;
     }
+
+    const sentence = game.data.sentence;
+    const results = game.data.results || {};
+
+    // Show sentence
+    const sentDisplay = document.createElement("div");
+    sentDisplay.className = "type-sentence";
+    sentDisplay.textContent = sentence;
+    area.appendChild(sentDisplay);
 
     if (game.winner) {
         const win = document.createElement("div");
         win.className = "turn-banner";
-        win.textContent = "🎉 " + game.winner + " won!";
+        win.textContent = "🏆 Winner: " + game.winner;
         area.appendChild(win);
         return area;
     }
 
-    if (!myTurn || isCodeSetter) {
+    if (!myTurn && !game.data.done) {
         const waiting = document.createElement("div");
         waiting.className = "turn-banner";
-        waiting.textContent = isCodeSetter ? "The code setter spectates this round." : "Waiting for " + current.username + "...";
+        waiting.textContent = "Waiting for " + current.username + "...";
         area.appendChild(waiting);
         return area;
     }
 
-    // Guess input
-    const guessTitle = document.createElement("div");
-    guessTitle.className = "turn-banner";
-    guessTitle.textContent = "🔍 Enter your guess (4 colors)";
-    area.appendChild(guessTitle);
-
-    const row = document.createElement("div");
-    row.className = "mastermind-row";
-    const guess = [];
-
-    for (let i = 0; i < 4; i++) {
-        const peg = document.createElement("div");
-        peg.className = "mastermind-peg";
-        let colorIndex = 0;
-        peg.onclick = () => {
-            colorIndex = (colorIndex + 1) % colors.length;
-            peg.style.background = pegColors[colors[colorIndex]];
-            peg.dataset.color = colors[colorIndex];
-            peg.classList.add("colored");
-            guess[i] = colors[colorIndex];
-            if (guess.length === 4 && guess.every(c => c)) {
-                submitBtn.disabled = false;
-            }
-        };
-        row.appendChild(peg);
+    if (game.data.done) {
+        const done = document.createElement("div");
+        done.className = "turn-banner";
+        done.textContent = "All players finished!";
+        area.appendChild(done);
+        return area;
     }
-    area.appendChild(row);
 
-    const submitBtn = document.createElement("button");
-    submitBtn.className = "game-btn primary";
-    submitBtn.textContent = "Submit Guess";
-    submitBtn.disabled = true;
-    submitBtn.onclick = async () => {
-        const copy = JSON.parse(JSON.stringify(game));
-        const code = copy.data.code;
-        let black = 0, white = 0;
-        const codeCopy = [...code];
-        const guessCopy = [...guess];
-        
-        for (let i = 0; i < 4; i++) {
-            if (guessCopy[i] === codeCopy[i]) {
-                black++;
-                codeCopy[i] = null;
-                guessCopy[i] = null;
-            }
+    // Input for typing
+    const input = document.createElement("input");
+    input.className = "type-input";
+    input.placeholder = "Type the sentence here...";
+    input.autofocus = true;
+
+    // Start timer on first input
+    let started = false;
+
+    input.oninput = async () => {
+        if (!started && input.value.length > 0) {
+            started = true;
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.startTime = Date.now();
+            await publishGameAndCleanup(game, copy);
         }
-        for (let i = 0; i < 4; i++) {
-            if (guessCopy[i] !== null) {
-                const idx = codeCopy.indexOf(guessCopy[i]);
-                if (idx !== -1) {
-                    white++;
-                    codeCopy[idx] = null;
-                }
-            }
-        }
-        
-        copy.data.guesses = copy.data.guesses || [];
-        copy.data.guesses.push({ colors: guess, black, white });
-        
-        if (black === 4) {
-            copy.winner = current.username;
-            copy.status = "finished";
-        } else {
+
+        if (input.value === sentence) {
+            const time = Date.now() - game.data.startTime;
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.results = copy.data.results || {};
+            copy.data.results[deviceId] = time;
             copy.turnIndex++;
-            if (copy.turnIndex >= copy.players.length * 3) {
-                copy.winner = "No one cracked the code!";
-                copy.status = "finished";
-            }
-            // Rotate code setter
-            copy.data.codeSetter = copy.players[copy.turnIndex % copy.players.length].deviceId;
-            copy.data.code = null;
-        }
-        await publishGameAndCleanup(game, copy);
-    };
-    area.appendChild(submitBtn);
-
-    return area;
-}
-
-
-/* =====================================================
-   MEMORY MATCH
-===================================================== */
-
-function createMemory(game){
-    const area = document.createElement("div");
-    const emojis = ["🍎","🍊","🍋","🍇","🍉","🍓","🍑","🍒","🥝","🍍","🥭","🍌","🍈","🫐","🍐","🥥"];
-    
-    const gridSize = game.data.gridSize || 4;
-    const totalCards = gridSize * gridSize;
-    const pairs = totalCards / 2;
-    const usedEmojis = emojis.slice(0, pairs);
-    let cards = [...usedEmojis, ...usedEmojis];
-    
-    // Shuffle if first time
-    if (!game.data.cards) {
-        for (let i = cards.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [cards[i], cards[j]] = [cards[j], cards[i]];
-        }
-        game.data.cards = cards;
-        game.data.flipped = [];
-        game.data.matched = [];
-    }
-
-    const grid = document.createElement("div");
-    grid.className = "memory-grid";
-    grid.style.gridTemplateColumns = `repeat(${gridSize}, 70px)`;
-
-    const mine = game.players.some(p => p.deviceId === deviceId);
-    const current = game.players[game.turnIndex % game.players.length];
-    const myTurn = mine && current && current.deviceId === deviceId;
-
-    const flipped = game.data.flipped || [];
-    const matched = game.data.matched || [];
-
-    for (let i = 0; i < game.data.cards.length; i++) {
-        const card = document.createElement("div");
-        card.className = "memory-card";
-        if (matched.includes(i)) {
-            card.classList.add("matched");
-            card.textContent = game.data.cards[i];
-        } else if (flipped.includes(i)) {
-            card.classList.add("flipped");
-            card.textContent = game.data.cards[i];
-        }
-        
-        if (!matched.includes(i) && myTurn && !flipped.includes(i) && flipped.length < 2) {
-            card.onclick = async () => {
-                const copy = JSON.parse(JSON.stringify(game));
-                const flips = copy.data.flipped || [];
-                if (flips.includes(i) || flips.length >= 2) return;
-                flips.push(i);
-                copy.data.flipped = flips;
-                
-                if (flips.length === 2) {
-                    const cardsData = copy.data.cards;
-                    if (cardsData[flips[0]] === cardsData[flips[1]]) {
-                        copy.data.matched = (copy.data.matched || []).concat(flips);
-                        copy.data.flipped = [];
-                        // Check win
-                        if (copy.data.matched.length === copy.data.cards.length) {
-                            copy.winner = current.username;
-                            copy.status = "finished";
-                        }
-                    } else {
-                        // Wrong match, next player
-                        copy.turnIndex++;
-                        // Reset after delay
-                        setTimeout(async () => {
-                            const resetCopy = JSON.parse(JSON.stringify(copy));
-                            resetCopy.data.flipped = [];
-                            await publishGameAndCleanup(game, resetCopy);
-                        }, 800);
-                        await publishGameAndCleanup(game, copy);
-                        return;
+            
+            if (copy.turnIndex >= copy.players.length) {
+                copy.data.done = true;
+                let winner = null;
+                let best = Infinity;
+                for (const [id, t] of Object.entries(copy.data.results)) {
+                    if (t < best) {
+                        best = t;
+                        winner = copy.players.find(p => p.deviceId === id)?.username;
                     }
                 }
-                await publishGameAndCleanup(game, copy);
-            };
+                copy.winner = winner + " (" + (best/1000).toFixed(2) + "s)";
+                copy.status = "finished";
+            }
+            await publishGameAndCleanup(game, copy);
         }
-        grid.appendChild(card);
-    }
-    area.appendChild(grid);
+    };
 
-    // Score display
-    const scoreDiv = document.createElement("div");
-    scoreDiv.style.cssText = "text-align:center;margin-top:10px;color:#9da5b0;";
-    const scores = game.data.scores || {};
-    scoreDiv.textContent = game.players.map(p => 
-        escapeHtml(p.username) + ": " + (scores[p.deviceId] || 0)
-    ).join(" · ");
-    area.appendChild(scoreDiv);
+    area.appendChild(input);
+
+    // Stats
+    const stats = document.createElement("div");
+    stats.className = "type-stats";
+    const completed = Object.keys(results).length;
+    stats.innerHTML = `
+        <div>Completed: <strong>${completed}/${game.players.length}</strong></div>
+        <div>Your time: <strong>${results[deviceId] ? (results[deviceId]/1000).toFixed(2) + 's' : '—'}</strong></div>
+    `;
+    area.appendChild(stats);
 
     return area;
 }
 
 
 /* =====================================================
-   HANGMAN
+   BOSS BATTLE
 ===================================================== */
 
-function createHangman(game){
+function createBossBattle(game){
     const area = document.createElement("div");
-    area.style.textAlign = "center";
+    area.className = "boss-area";
 
-    const bodyParts = ["","O","O\n|","O\n/|","O\n/|\\","O\n/|\\\n/","O\n/|\\\n/ \\"];
+    const BOSS_MAX_HEALTH = 100000000; // 100 million
 
-    if (!game.data.word && game.data.wordSetter === deviceId) {
-        // Word setter
-        const title = document.createElement("div");
-        title.className = "turn-banner";
-        title.textContent = "📝 Set the secret word";
-        area.appendChild(title);
-
-        const input = document.createElement("input");
-        input.type = "text";
-        input.maxLength = 10;
-        input.placeholder = "Enter word...";
-        input.style.cssText = "padding:10px;border-radius:8px;border:1px solid var(--border);background:#1a1f26;color:white;width:200px;";
-        area.appendChild(input);
-
-        const setBtn = document.createElement("button");
-        setBtn.className = "game-btn primary";
-        setBtn.textContent = "Set Word";
-        setBtn.onclick = async () => {
-            const word = input.value.trim().toUpperCase();
-            if (word.length < 3) return;
-            const copy = JSON.parse(JSON.stringify(game));
-            copy.data.word = word;
-            copy.data.guessed = [];
-            copy.data.wrong = 0;
-            copy.turnIndex = 0;
-            await publishGameAndCleanup(game, copy);
-        };
-        area.appendChild(setBtn);
-        return area;
+    // Initialize boss data
+    if (!game.data.bossHealth) {
+        game.data.bossHealth = BOSS_MAX_HEALTH;
+        game.data.maxHealth = BOSS_MAX_HEALTH;
+        game.data.damage = 1;
+        game.data.upgrades = {};
+        game.data.totalDamageDealt = {};
+        game.data.bossDefeated = false;
     }
 
-    if (!game.data.word) {
-        const waiting = document.createElement("div");
-        waiting.className = "turn-banner";
-        waiting.textContent = "Waiting for word setter...";
-        area.appendChild(waiting);
-        return area;
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const health = game.data.bossHealth;
+    const maxHealth = game.data.maxHealth;
+    const damage = game.data.damage || 1;
+    const upgrades = game.data.upgrades || {};
+    const totalDamage = game.data.totalDamageDealt || {};
+    const playerDamage = totalDamage[deviceId] || 0;
+
+    // Monster name
+    const monsterName = document.createElement("div");
+    monsterName.className = "boss-monster-name";
+    const names = ["Cthulhu", "Mega Dragon", "Shadow Lord", "Void Beast", "Eldritch Horror", "Demon King"];
+    if (!game.data.monsterName) {
+        game.data.monsterName = names[Math.floor(Math.random() * names.length)];
     }
+    monsterName.textContent = "👹 " + game.data.monsterName;
+    area.appendChild(monsterName);
 
-    const word = game.data.word;
-    const guessed = game.data.guessed || [];
-    const wrong = game.data.wrong || 0;
-    const maxWrong = game.data.maxWrong || 6;
+    // Health bar
+    const healthBar = document.createElement("div");
+    healthBar.className = "boss-health-bar";
+    
+    const healthFill = document.createElement("div");
+    healthFill.className = "boss-health-fill";
+    const percent = Math.max(0, (health / maxHealth) * 100);
+    healthFill.style.width = percent + "%";
+    healthBar.appendChild(healthFill);
 
-    // Hangman display
-    const body = document.createElement("div");
-    body.className = "hangman-body";
-    body.textContent = bodyParts[Math.min(wrong, bodyParts.length - 1)] || "";
-    area.appendChild(body);
+    const healthText = document.createElement("div");
+    healthText.className = "boss-health-text";
+    healthText.textContent = Math.floor(health).toLocaleString() + " / " + maxHealth.toLocaleString() + " HP";
+    healthBar.appendChild(healthText);
+    area.appendChild(healthBar);
 
-    // Word display
-    const wordDisplay = document.createElement("div");
-    wordDisplay.className = "hangman-word";
-    wordDisplay.textContent = word.split("").map(l => guessed.includes(l) ? l : "_").join(" ");
-    area.appendChild(wordDisplay);
+    // Stats
+    const stats = document.createElement("div");
+    stats.className = "boss-stats";
+    stats.innerHTML = `
+        <div>⚔️ Damage: <strong>${damage.toLocaleString()}</strong></div>
+        <div>💪 Your damage: <strong>${playerDamage.toLocaleString()}</strong></div>
+        <div>👥 Players: <strong>${game.players.length}</strong></div>
+    `;
+    area.appendChild(stats);
 
-    // Check win/lose
-    const allGuessed = word.split("").every(l => guessed.includes(l));
-    if (allGuessed) {
+    if (game.data.bossDefeated) {
         const win = document.createElement("div");
         win.className = "turn-banner";
-        win.textContent = "🎉 " + game.players[game.turnIndex % game.players.length].username + " guessed it!";
+        win.style.cssText = "background:#1a3a2a;border-color:#2a6a4a;color:#7affb0;font-size:20px;padding:20px;";
+        win.innerHTML = "🎉 BOSS DEFEATED! 🎉<br><span style='font-size:14px;color:#9da5b0;'>The " + game.data.monsterName + " has been slain!</span>";
         area.appendChild(win);
         return area;
     }
-    if (wrong >= maxWrong) {
-        const lose = document.createElement("div");
-        lose.className = "turn-banner";
-        lose.textContent = "💀 Game over! The word was: " + word;
-        area.appendChild(lose);
-        return area;
-    }
 
-    const mine = game.players.some(p => p.deviceId === deviceId);
-    const current = game.players[game.turnIndex % game.players.length];
-    const myTurn = mine && current && current.deviceId === deviceId;
-    const isWordSetter = game.data.wordSetter === deviceId;
-
-    if (!myTurn || isWordSetter) {
-        const waiting = document.createElement("div");
-        waiting.className = "turn-banner";
-        waiting.textContent = isWordSetter ? "Word setter spectates." : "Waiting for " + current.username + "...";
-        area.appendChild(waiting);
-        return area;
-    }
-
-    // Letter buttons
-    const letters = document.createElement("div");
-    letters.className = "hangman-letters";
-    for (let i = 65; i <= 90; i++) {
-        const l = String.fromCharCode(i);
-        const btn = document.createElement("button");
-        btn.className = "hangman-letter-btn";
-        btn.textContent = l;
-        btn.disabled = guessed.includes(l) || !myTurn;
-        btn.onclick = async () => {
-            const copy = JSON.parse(JSON.stringify(game));
-            copy.data.guessed = (copy.data.guessed || []).concat(l);
-            if (!copy.data.word.includes(l)) {
-                copy.data.wrong = (copy.data.wrong || 0) + 1;
-            }
-            copy.turnIndex++;
-            // Check win
-            const allG = copy.data.word.split("").every(letter => copy.data.guessed.includes(letter));
-            if (allG) {
-                copy.winner = current.username;
-                copy.status = "finished";
-            } else if (copy.data.wrong >= maxWrong) {
-                copy.winner = "The word was: " + copy.data.word;
-                copy.status = "finished";
-            }
-            await publishGameAndCleanup(game, copy);
-        };
-        letters.appendChild(btn);
-    }
-    area.appendChild(letters);
-
-    return area;
-}
-
-
-/* =====================================================
-   DOTS AND BOXES
-===================================================== */
-
-function createDots(game){
-    const area = document.createElement("div");
-    const gridSize = game.data.gridSize || 4;
-    const size = gridSize;
-
-    const board = document.createElement("div");
-    board.className = "dots-board";
-    board.style.gridTemplateColumns = `repeat(${size * 2 - 1}, 40px)`;
-    board.style.gridTemplateRows = `repeat(${size * 2 - 1}, 40px)`;
-
-    const mine = game.players.some(p => p.deviceId === deviceId);
-    const current = game.players[game.turnIndex % game.players.length];
-    const myTurn = mine && current && current.deviceId === deviceId;
-
-    const lines = game.data.lines || {};
-    const boxes = game.data.boxes || {};
-
-    for (let row = 0; row < size * 2 - 1; row++) {
-        for (let col = 0; col < size * 2 - 1; col++) {
-            const cell = document.createElement("div");
-            cell.className = "dots-cell";
-            cell.style.width = "40px";
-            cell.style.height = "40px";
-
-            const isDot = row % 2 === 0 && col % 2 === 0;
-            const isHorizontal = row % 2 === 0 && col % 2 === 1;
-            const isVertical = row % 2 === 1 && col % 2 === 0;
-
-            if (isDot) {
-                const dot = document.createElement("div");
-                dot.className = "dots-dot";
-                cell.appendChild(dot);
-            } else if (isHorizontal) {
-                const key = `h_${row/2}_${Math.floor(col/2)}`;
-                const line = document.createElement("div");
-                line.className = "dots-line horizontal";
-                if (lines[key]) {
-                    line.style.background = lines[key] === 1 ? "#d65353" : "#e0c454";
-                    line.style.cursor = "default";
-                } else if (myTurn && !game.winner) {
-                    line.onclick = async () => {
-                        const copy = JSON.parse(JSON.stringify(game));
-                        copy.data.lines = copy.data.lines || {};
-                        copy.data.lines[key] = copy.turnIndex % 2 === 0 ? 1 : 2;
-                        // Check for completed boxes
-                        const completed = checkDotsBoxes(copy.data.lines, size);
-                        let scored = false;
-                        for (const box of completed) {
-                            if (!copy.data.boxes[box]) {
-                                copy.data.boxes[box] = copy.turnIndex % 2 === 0 ? 1 : 2;
-                                scored = true;
-                            }
-                        }
-                        if (!scored) {
-                            copy.turnIndex++;
-                        }
-                        if (Object.keys(copy.data.boxes).length === (size-1)*(size-1)) {
-                            // Count boxes
-                            const scores = {};
-                            for (const [box, player] of Object.entries(copy.data.boxes)) {
-                                scores[player] = (scores[player] || 0) + 1;
-                            }
-                            let winner = null, max = -1;
-                            for (const [player, count] of Object.entries(scores)) {
-                                if (count > max) { max = count; winner = copy.players[player-1]?.username; }
-                            }
-                            copy.winner = winner || "draw";
-                            copy.status = "finished";
-                        }
-                        await publishGameAndCleanup(game, copy);
-                    };
-                }
-                cell.appendChild(line);
-            } else if (isVertical) {
-                const key = `v_${Math.floor(row/2)}_${col/2}`;
-                const line = document.createElement("div");
-                line.className = "dots-line vertical";
-                if (lines[key]) {
-                    line.style.background = lines[key] === 1 ? "#d65353" : "#e0c454";
-                    line.style.cursor = "default";
-                } else if (myTurn && !game.winner) {
-                    line.onclick = async () => {
-                        const copy = JSON.parse(JSON.stringify(game));
-                        copy.data.lines = copy.data.lines || {};
-                        copy.data.lines[key] = copy.turnIndex % 2 === 0 ? 1 : 2;
-                        const completed = checkDotsBoxes(copy.data.lines, size);
-                        let scored = false;
-                        for (const box of completed) {
-                            if (!copy.data.boxes[box]) {
-                                copy.data.boxes[box] = copy.turnIndex % 2 === 0 ? 1 : 2;
-                                scored = true;
-                            }
-                        }
-                        if (!scored) copy.turnIndex++;
-                        if (Object.keys(copy.data.boxes).length === (size-1)*(size-1)) {
-                            const scores = {};
-                            for (const [box, player] of Object.entries(copy.data.boxes)) {
-                                scores[player] = (scores[player] || 0) + 1;
-                            }
-                            let winner = null, max = -1;
-                            for (const [player, count] of Object.entries(scores)) {
-                                if (count > max) { max = count; winner = copy.players[player-1]?.username; }
-                            }
-                            copy.winner = winner || "draw";
-                            copy.status = "finished";
-                        }
-                        await publishGameAndCleanup(game, copy);
-                    };
-                }
-                cell.appendChild(line);
-            }
-
-            // Show claimed boxes
-            if (row % 2 === 1 && col % 2 === 1) {
-                const boxKey = `${Math.floor(row/2)}_${Math.floor(col/2)}`;
-                if (boxes[boxKey]) {
-                    const box = document.createElement("div");
-                    box.className = "dots-box claimed player" + boxes[boxKey];
-                    cell.appendChild(box);
+    // Attack button
+    const attackBtn = document.createElement("button");
+    attackBtn.className = "game-btn boss";
+    attackBtn.textContent = "⚔️ ATTACK!";
+    attackBtn.onclick = async () => {
+        const copy = JSON.parse(JSON.stringify(game));
+        const dmg = copy.data.damage || 1;
+        copy.data.bossHealth = Math.max(0, copy.data.bossHealth - dmg);
+        copy.data.totalDamageDealt = copy.data.totalDamageDealt || {};
+        copy.data.totalDamageDealt[deviceId] = (copy.data.totalDamageDealt[deviceId] || 0) + dmg;
+        
+        // Check if boss is defeated
+        if (copy.data.bossHealth <= 0) {
+            copy.data.bossDefeated = true;
+            copy.data.bossHealth = 0;
+            // Find MVP
+            let mvp = null;
+            let maxDmg = -1;
+            for (const [id, d] of Object.entries(copy.data.totalDamageDealt)) {
+                if (d > maxDmg) {
+                    maxDmg = d;
+                    mvp = copy.players.find(p => p.deviceId === id)?.username;
                 }
             }
-
-            board.appendChild(cell);
+            copy.winner = "🏆 MVP: " + (mvp || "Everyone!") + " 🏆";
+            copy.status = "finished";
         }
-    }
-    area.appendChild(board);
-
-    // Score
-    const scoreDiv = document.createElement("div");
-    scoreDiv.style.cssText = "text-align:center;margin-top:10px;color:#9da5b0;";
-    const scores = {};
-    for (const [box, player] of Object.entries(boxes)) {
-        scores[player] = (scores[player] || 0) + 1;
-    }
-    scoreDiv.textContent = game.players.map(p => 
-        escapeHtml(p.username) + ": " + (scores[game.players.indexOf(p) + 1] || 0)
-    ).join(" · ");
-    area.appendChild(scoreDiv);
-
-    return area;
-}
-
-function checkDotsBoxes(lines, size){
-    const completed = [];
-    for (let r = 0; r < size - 1; r++) {
-        for (let c = 0; c < size - 1; c++) {
-            const top = `h_${r}_${c}`;
-            const bottom = `h_${r+1}_${c}`;
-            const left = `v_${r}_${c}`;
-            const right = `v_${r}_${c+1}`;
-            if (lines[top] && lines[bottom] && lines[left] && lines[right]) {
-                completed.push(`${r}_${c}`);
-            }
+        
+        // Random chance to drop upgrade points
+        if (Math.random() < 0.15 && !copy.data.bossDefeated) {
+            copy.data.upgrades = copy.data.upgrades || {};
+            copy.data.upgrades[deviceId] = (copy.data.upgrades[deviceId] || 0) + 1;
         }
-    }
-    return completed;
-}
+        
+        await publishGameAndCleanup(game, copy);
+    };
+    area.appendChild(attackBtn);
 
+    // Damage display
+    const dmgDisplay = document.createElement("div");
+    dmgDisplay.className = "boss-damage-display";
+    dmgDisplay.textContent = "⚔️ " + damage.toLocaleString() + " damage per hit";
+    area.appendChild(dmgDisplay);
 
-/* =====================================================
-   OTHELLO (Reversi)
-===================================================== */
-
-function createOthello(game){
-    const area = document.createElement("div");
-    const size = game.data.boardSize || 8;
-    const board = document.createElement("div");
-    board.className = "othello-board";
-    board.style.gridTemplateColumns = `repeat(${size}, 50px)`;
-    board.style.gridTemplateRows = `repeat(${size}, 50px)`;
-
-    const mine = game.players.some(p => p.deviceId === deviceId);
-    const current = game.players[game.turnIndex % game.players.length];
-    const myTurn = mine && current && current.deviceId === deviceId;
-
-    // Initialize board if empty
-    if (!game.data.board) {
-        game.data.board = Array(size * size).fill("");
-        const mid = size / 2;
-        game.data.board[(mid-1)*size + (mid-1)] = "white";
-        game.data.board[(mid-1)*size + mid] = "black";
-        game.data.board[mid*size + (mid-1)] = "black";
-        game.data.board[mid*size + mid] = "white";
-        game.data.currentPlayer = "black";
-    }
-
-    const boardData = game.data.board;
-    const currentPlayer = game.data.currentPlayer || "black";
-    const validMoves = getOthelloMoves(boardData, size, currentPlayer);
-
-    for (let i = 0; i < boardData.length; i++) {
-        const cell = document.createElement("div");
-        cell.className = "othello-cell";
-        const disc = boardData[i];
-        if (disc) {
-            const d = document.createElement("div");
-            d.className = "othello-cell disc " + disc;
-            cell.appendChild(d);
-        } else if (validMoves.includes(i) && myTurn && !game.winner) {
-            cell.classList.add("valid-move");
-            cell.onclick = async () => {
-                const copy = JSON.parse(JSON.stringify(game));
-                const newBoard = [...copy.data.board];
-                const flipped = othelloFlip(newBoard, size, i, currentPlayer);
-                if (flipped.length > 0) {
-                    newBoard[i] = currentPlayer;
-                    for (const idx of flipped) newBoard[idx] = currentPlayer;
-                    copy.data.board = newBoard;
-                    const next = currentPlayer === "black" ? "white" : "black";
-                    // Check if next player has moves
-                    const nextMoves = getOthelloMoves(newBoard, size, next);
-                    if (nextMoves.length > 0) {
-                        copy.data.currentPlayer = next;
-                    } else {
-                        // Skip turn
-                        const skipNext = currentPlayer === "black" ? "white" : "black";
-                        const skipMoves = getOthelloMoves(newBoard, size, skipNext);
-                        if (skipMoves.length > 0) {
-                            copy.data.currentPlayer = skipNext;
-                        } else {
-                            // Game over
-                            const count = countOthello(newBoard);
-                            copy.winner = count.black > count.white ? "Black" : count.white > count.black ? "White" : "draw";
-                            copy.status = "finished";
-                        }
-                    }
-                    copy.turnIndex++;
-                    await publishGameAndCleanup(game, copy);
-                }
-            };
-        }
-        board.appendChild(cell);
-    }
-    area.appendChild(board);
-
-    // Score
-    const scoreDiv = document.createElement("div");
-    scoreDiv.style.cssText = "text-align:center;margin-top:10px;color:#9da5b0;";
-    const count = countOthello(boardData);
-    scoreDiv.textContent = "⚫ Black: " + count.black + "  ⚪ White: " + count.white;
-    area.appendChild(scoreDiv);
-
-    return area;
-}
-
-function getOthelloMoves(board, size, player){
-    const opponent = player === "black" ? "white" : "black";
-    const moves = [];
-    const dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+    // Upgrades
+    const upgradesDiv = document.createElement("div");
+    upgradesDiv.className = "boss-upgrades";
     
-    for (let i = 0; i < board.length; i++) {
-        if (board[i]) continue;
-        const row = Math.floor(i / size);
-        const col = i % size;
-        for (const [dr, dc] of dirs) {
-            let r = row + dr, c = col + dc;
-            let found = false;
-            while (r >= 0 && r < size && c >= 0 && c < size) {
-                const idx = r * size + c;
-                if (!board[idx]) break;
-                if (board[idx] === player) { found = true; break; }
-                r += dr; c += dc;
-            }
-            if (found) { moves.push(i); break; }
-        }
-    }
-    return moves;
-}
-
-function othelloFlip(board, size, pos, player){
-    const opponent = player === "black" ? "white" : "black";
-    const row = Math.floor(pos / size);
-    const col = pos % size;
-    const dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
-    const flipped = [];
+    const upgradeCosts = {
+        damage: 5,
+        crit: 10,
+        multi: 20
+    };
     
-    for (const [dr, dc] of dirs) {
-        let r = row + dr, c = col + dc;
-        const toFlip = [];
-        while (r >= 0 && r < size && c >= 0 && c < size) {
-            const idx = r * size + c;
-            if (!board[idx]) break;
-            if (board[idx] === player) {
-                flipped.push(...toFlip);
-                break;
-            }
-            toFlip.push(idx);
-            r += dr; c += dc;
-        }
-    }
-    return flipped;
-}
+    const upgradePoints = upgrades[deviceId] || 0;
+    
+    const upgradeInfo = document.createElement("div");
+    upgradeInfo.style.cssText = "width:100%;text-align:center;color:#9da5b0;font-size:12px;margin-bottom:5px;";
+    upgradeInfo.textContent = "🔧 Upgrade points: " + upgradePoints;
+    upgradesDiv.appendChild(upgradeInfo);
 
-function countOthello(board){
-    let black = 0, white = 0;
-    for (const cell of board) {
-        if (cell === "black") black++;
-        else if (cell === "white") white++;
-    }
-    return { black, white };
-}
+    // Damage upgrade
+    const dmgUpgrade = document.createElement("button");
+    dmgUpgrade.className = "boss-upgrade-btn";
+    dmgUpgrade.innerHTML = `⚔️ +10% Damage <span class="cost">(${upgradeCosts.damage} pts)</span>`;
+    dmgUpgrade.disabled = upgradePoints < upgradeCosts.damage;
+    dmgUpgrade.onclick = async () => {
+        const copy = JSON.parse(JSON.stringify(game));
+        copy.data.upgrades = copy.data.upgrades || {};
+        copy.data.upgrades[deviceId] = (copy.data.upgrades[deviceId] || 0) - upgradeCosts.damage;
+        copy.data.damage = Math.floor((copy.data.damage || 1) * 1.1);
+        await publishGameAndCleanup(game, copy);
+    };
+    upgradesDiv.appendChild(dmgUpgrade);
 
+    // Crit upgrade
+    const critUpgrade = document.createElement("button");
+    critUpgrade.className = "boss-upgrade-btn";
+    critUpgrade.innerHTML = `💥 +5% Crit Chance <span class="cost">(${upgradeCosts.crit} pts)</span>`;
+    critUpgrade.disabled = upgradePoints < upgradeCosts.crit;
+    critUpgrade.onclick = async () => {
+        const copy = JSON.parse(JSON.stringify(game));
+        copy.data.upgrades = copy.data.upgrades || {};
+        copy.data.upgrades[deviceId] = (copy.data.upgrades[deviceId] || 0) - upgradeCosts.crit;
+        copy.data.critChance = (copy.data.critChance || 0) + 0.05;
+        await publishGameAndCleanup(game, copy);
+    };
+    upgradesDiv.appendChild(critUpgrade);
 
-/* =====================================================
-   CHECKERS
-===================================================== */
+    // Multi-hit upgrade
+    const multiUpgrade = document.createElement("button");
+    multiUpgrade.className = "boss-upgrade-btn";
+    multiUpgrade.innerHTML = `🌀 +1 Multi-hit <span class="cost">(${upgradeCosts.multi} pts)</span>`;
+    multiUpgrade.disabled = upgradePoints < upgradeCosts.multi;
+    multiUpgrade.onclick = async () => {
+        const copy = JSON.parse(JSON.stringify(game));
+        copy.data.upgrades = copy.data.upgrades || {};
+        copy.data.upgrades[deviceId] = (copy.data.upgrades[deviceId] || 0) - upgradeCosts.multi;
+        copy.data.multiHit = (copy.data.multiHit || 1) + 1;
+        await publishGameAndCleanup(game, copy);
+    };
+    upgradesDiv.appendChild(multiUpgrade);
 
-function createCheckers(game){
-    const area = document.createElement("div");
-    const size = game.data.boardSize || 8;
-    const board = document.createElement("div");
-    board.className = "checkers-board";
-    board.style.gridTemplateColumns = `repeat(${size}, 60px)`;
-    board.style.gridTemplateRows = `repeat(${size}, 60px)`;
-
-    const mine = game.players.some(p => p.deviceId === deviceId);
-    const current = game.players[game.turnIndex % game.players.length];
-    const myTurn = mine && current && current.deviceId === deviceId;
-
-    // Initialize board
-    if (!game.data.board) {
-        const b = Array(size * size).fill("");
-        for (let r = 0; r < size; r++) {
-            for (let c = 0; c < size; c++) {
-                if ((r + c) % 2 === 1) {
-                    if (r < size/2 - 1) b[r*size + c] = "black";
-                    else if (r > size/2) b[r*size + c] = "red";
-                }
-            }
-        }
-        game.data.board = b;
-        game.data.currentPlayer = "black";
-        game.data.selected = null;
-        game.data.validMoves = [];
-    }
-
-    const boardData = game.data.board;
-    const currentPlayer = game.data.currentPlayer || "black";
-    const selected = game.data.selected;
-    const validMoves = game.data.validMoves || [];
-
-    const playerColor = game.players.findIndex(p => p.deviceId === deviceId) % 2 === 0 ? "black" : "red";
-
-    for (let i = 0; i < boardData.length; i++) {
-        const row = Math.floor(i / size);
-        const col = i % size;
-        const cell = document.createElement("div");
-        cell.className = "checkers-cell " + ((row + col) % 2 === 0 ? "light" : "dark");
-        
-        const piece = boardData[i];
-        if (piece) {
-            const p = document.createElement("div");
-            p.className = "checkers-piece " + piece;
-            if (piece.includes("king")) p.classList.add("king");
-            if (selected === i) p.classList.add("selected");
-            
-            // Check if it's this player's piece and it's their turn
-            const isMyPiece = piece.includes(playerColor);
-            if (isMyPiece && myTurn && !game.winner) {
-                p.style.cursor = "pointer";
-                p.onclick = async () => {
-                    const copy = JSON.parse(JSON.stringify(game));
-                    // Clear previous selection
-                    const moves = getCheckersMoves(copy.data.board, size, i, currentPlayer);
-                    copy.data.selected = i;
-                    copy.data.validMoves = moves;
-                    await publishGameAndCleanup(game, copy);
-                };
-            }
-            cell.appendChild(p);
-        }
-        
-        // Valid move highlighting
-        if (validMoves.includes(i)) {
-            cell.classList.add("valid-move");
-            if (myTurn && !game.winner) {
-                cell.onclick = async () => {
-                    const copy = JSON.parse(JSON.stringify(game));
-                    const from = copy.data.selected;
-                    const to = i;
-                    const pieceType = copy.data.board[from];
-                    copy.data.board[to] = pieceType;
-                    copy.data.board[from] = "";
-                    
-                    // Check for jump
-                    const dr = Math.floor(to / size) - Math.floor(from / size);
-                    const dc = (to % size) - (from % size);
-                    if (Math.abs(dr) === 2) {
-                        const jumped = (from + to) / 2;
-                        copy.data.board[jumped] = "";
-                    }
-                    
-                    // King me
-                    const toRow = Math.floor(to / size);
-                    if ((pieceType === "black" && toRow === size - 1) || 
-                        (pieceType === "red" && toRow === 0)) {
-                        copy.data.board[to] = pieceType + "-king";
-                    }
-                    
-                    copy.data.selected = null;
-                    copy.data.validMoves = [];
-                    
-                    // Check win
-                    const pieces = { black: 0, red: 0 };
-                    for (const p of copy.data.board) {
-                        if (p.includes("black")) pieces.black++;
-                        else if (p.includes("red")) pieces.red++;
-                    }
-                    if (pieces.black === 0) {
-                        copy.winner = "Red wins!";
-                        copy.status = "finished";
-                    } else if (pieces.red === 0) {
-                        copy.winner = "Black wins!";
-                        copy.status = "finished";
-                    } else {
-                        copy.turnIndex++;
-                        copy.data.currentPlayer = currentPlayer === "black" ? "red" : "black";
-                    }
-                    await publishGameAndCleanup(game, copy);
-                };
-            }
-        }
-        
-        board.appendChild(cell);
-    }
-    area.appendChild(board);
-
-    // Turn indicator
-    const turn = document.createElement("div");
-    turn.className = "turn-banner";
-    turn.style.textAlign = "center";
-    turn.textContent = "⚫ " + (currentPlayer === "black" ? "Black" : "Red") + "'s turn";
-    area.appendChild(turn);
+    area.appendChild(upgradesDiv);
 
     return area;
-}
-
-function getCheckersMoves(board, size, pos, player){
-    const row = Math.floor(pos / size);
-    const col = pos % size;
-    const piece = board[pos];
-    const moves = [];
-    const dirs = player === "black" ? [[1,-1],[1,1]] : [[-1,-1],[-1,1]];
-    const isKing = piece.includes("king");
-    if (isKing) dirs.push([-1,-1],[-1,1],[1,-1],[1,1]);
-    
-    for (const [dr, dc] of dirs) {
-        let r = row + dr, c = col + dc;
-        if (r < 0 || r >= size || c < 0 || c >= size) continue;
-        let idx = r * size + c;
-        if (!board[idx]) {
-            moves.push(idx);
-        } else if (!board[idx].includes(player)) {
-            // Jump
-            r += dr; c += dc;
-            if (r >= 0 && r < size && c >= 0 && c < size) {
-                idx = r * size + c;
-                if (!board[idx]) moves.push(idx);
-            }
-        }
-    }
-    return moves;
-}
-
-
-/* =====================================================
-   GOMOKU (Five in a Row)
-===================================================== */
-
-function createGomoku(game){
-    const area = document.createElement("div");
-    const size = game.data.boardSize || 15;
-    const board = document.createElement("div");
-    board.className = "othello-board";
-    board.style.gridTemplateColumns = `repeat(${size}, 36px)`;
-    board.style.gridTemplateRows = `repeat(${size}, 36px)`;
-    board.style.background = "#d4b896";
-    board.style.padding = "4px";
-
-    const mine = game.players.some(p => p.deviceId === deviceId);
-    const current = game.players[game.turnIndex % game.players.length];
-    const myTurn = mine && current && current.deviceId === deviceId;
-
-    if (!game.data.board) {
-        game.data.board = Array(size * size).fill("");
-        game.data.currentPlayer = "black";
-    }
-
-    const boardData = game.data.board;
-
-    for (let i = 0; i < boardData.length; i++) {
-        const cell = document.createElement("div");
-        cell.className = "othello-cell";
-        cell.style.background = "#d4b896";
-        cell.style.width = "36px";
-        cell.style.height = "36px";
-        
-        const disc = boardData[i];
-        if (disc) {
-            const d = document.createElement("div");
-            d.className = "othello-cell disc " + disc;
-            d.style.width = "30px";
-            d.style.height = "30px";
-            cell.appendChild(d);
-        } else if (myTurn && !game.winner) {
-            cell.style.cursor = "pointer";
-            cell.onclick = async () => {
-                const copy = JSON.parse(JSON.stringify(game));
-                const playerColor = copy.turnIndex % 2 === 0 ? "black" : "white";
-                copy.data.board[i] = playerColor;
-                
-                if (checkGomokuWin(copy.data.board, size, i, playerColor)) {
-                    copy.winner = current.username;
-                    copy.status = "finished";
-                } else {
-                    copy.turnIndex++;
-                }
-                await publishGameAndCleanup(game, copy);
-            };
-        }
-        board.appendChild(cell);
-    }
-    area.appendChild(board);
-
-    // Turn indicator
-    const turn = document.createElement("div");
-    turn.className = "turn-banner";
-    turn.style.textAlign = "center";
-    turn.textContent = (game.turnIndex % 2 === 0 ? "⚫ Black" : "⚪ White") + "'s turn";
-    area.appendChild(turn);
-
-    return area;
-}
-
-function checkGomokuWin(board, size, pos, player){
-    const row = Math.floor(pos / size);
-    const col = pos % size;
-    const dirs = [[1,0],[0,1],[1,1],[1,-1]];
-    for (const [dr, dc] of dirs) {
-        let count = 1;
-        for (const dir of [-1,1]) {
-            let r = row + dr * dir, c = col + dc * dir;
-            while (r >= 0 && r < size && c >= 0 && c < size && board[r * size + c] === player) {
-                count++;
-                r += dr * dir;
-                c += dc * dir;
-            }
-        }
-        if (count >= 5) return true;
-    }
-    return false;
-}
-
-
-/* =====================================================
-   SOS
-===================================================== */
-
-function createSOS(game){
-    const area = document.createElement("div");
-    const size = game.data.gridSize || 5;
-    const board = document.createElement("div");
-    board.className = "othello-board";
-    board.style.gridTemplateColumns = `repeat(${size}, 50px)`;
-    board.style.gridTemplateRows = `repeat(${size}, 50px)`;
-    board.style.background = "#1a2a3a";
-    board.style.padding = "4px";
-
-    const mine = game.players.some(p => p.deviceId === deviceId);
-    const current = game.players[game.turnIndex % game.players.length];
-    const myTurn = mine && current && current.deviceId === deviceId;
-
-    if (!game.data.board) {
-        game.data.board = Array(size * size).fill("");
-        game.data.scores = {};
-        game.data.currentPlayer = 0;
-    }
-
-    const boardData = game.data.board;
-
-    for (let i = 0; i < boardData.length; i++) {
-        const cell = document.createElement("div");
-        cell.className = "othello-cell";
-        cell.style.background = "#1a2a3a";
-        cell.style.width = "50px";
-        cell.style.height = "50px";
-        cell.style.border = "1px solid #2a3a4a";
-        cell.style.borderRadius = "0";
-        cell.style.fontSize = "24px";
-        cell.style.fontWeight = "bold";
-        cell.style.color = "white";
-        
-        if (boardData[i]) {
-            cell.textContent = boardData[i];
-        } else if (myTurn && !game.winner) {
-            cell.style.cursor = "pointer";
-            cell.onclick = async () => {
-                const copy = JSON.parse(JSON.stringify(game));
-                // Let player choose S or O
-                const choice = confirm("Place S or O?") ? "S" : "O";
-                copy.data.board[i] = choice;
-                
-                // Check for SOS
-                const sosCount = countSOS(copy.data.board, size, i);
-                if (sosCount > 0) {
-                    copy.data.scores = copy.data.scores || {};
-                    copy.data.scores[current.deviceId] = (copy.data.scores[current.deviceId] || 0) + sosCount;
-                    // Player goes again
-                } else {
-                    copy.turnIndex++;
-                }
-                
-                // Check if board full
-                if (copy.data.board.every(c => c)) {
-                    let winner = null, max = -1;
-                    for (const [id, score] of Object.entries(copy.data.scores || {})) {
-                        if (score > max) { max = score; winner = copy.players.find(p => p.deviceId === id)?.username; }
-                    }
-                    copy.winner = winner || "draw";
-                    copy.status = "finished";
-                }
-                await publishGameAndCleanup(game, copy);
-            };
-        }
-        board.appendChild(cell);
-    }
-    area.appendChild(board);
-
-    // Scores
-    const scoreDiv = document.createElement("div");
-    scoreDiv.style.cssText = "text-align:center;margin-top:10px;color:#9da5b0;";
-    const scores = game.data.scores || {};
-    scoreDiv.textContent = game.players.map(p => 
-        escapeHtml(p.username) + ": " + (scores[p.deviceId] || 0)
-    ).join(" · ");
-    area.appendChild(scoreDiv);
-
-    return area;
-}
-
-function countSOS(board, size, pos){
-    const row = Math.floor(pos / size);
-    const col = pos % size;
-    const letter = board[pos];
-    let count = 0;
-    const dirs = [[1,0],[0,1],[1,1],[1,-1]];
-    
-    for (const [dr, dc] of dirs) {
-        // Check S-O-S in both directions
-        for (const start of [-2, -1, 0, 1]) {
-            const r1 = row + dr * start;
-            const c1 = col + dc * start;
-            const r2 = row + dr * (start + 1);
-            const c2 = col + dc * (start + 1);
-            const r3 = row + dr * (start + 2);
-            const c3 = col + dc * (start + 2);
-            
-            if (r1 >= 0 && r1 < size && c1 >= 0 && c1 < size &&
-                r2 >= 0 && r2 < size && c2 >= 0 && c2 < size &&
-                r3 >= 0 && r3 < size && c3 >= 0 && c3 < size) {
-                const letters = [board[r1*size + c1], board[r2*size + c2], board[r3*size + c3]];
-                if (letters.every(l => l)) {
-                    if (letters[0] === "S" && letters[1] === "O" && letters[2] === "S") {
-                        count++;
-                    }
-                }
-            }
-        }
-    }
-    return count;
 }
 
 
@@ -4602,62 +3502,51 @@ async function startGame(game){
     copy.turnIndex = 0;
     
     // Initialize game-specific data
-    if (copy.gameType === "mastermind") {
-        copy.data.codeSetter = copy.players[0].deviceId;
-        copy.data.code = null;
-        copy.data.guesses = [];
+    if (copy.gameType === "ttt") {
+        if (!copy.data.boardSize) copy.data.boardSize = 3;
+        copy.data.board = Array(copy.data.boardSize * copy.data.boardSize).fill("");
     }
-    if (copy.gameType === "hangman") {
-        copy.data.wordSetter = copy.players[0].deviceId;
-        copy.data.word = null;
-        copy.data.guessed = [];
-        copy.data.wrong = 0;
-        copy.data.maxWrong = 6;
-    }
-    if (copy.gameType === "memory") {
-        const emojis = ["🍎","🍊","🍋","🍇","🍉","🍓","🍑","🍒","🥝","🍍","🥭","🍌","🍈","🫐","🍐","🥥"];
-        const gridSize = copy.data.gridSize || 4;
-        const pairs = (gridSize * gridSize) / 2;
-        let cards = [...emojis.slice(0, pairs), ...emojis.slice(0, pairs)];
-        for (let i = cards.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [cards[i], cards[j]] = [cards[j], cards[i]];
-        }
-        copy.data.cards = cards;
-        copy.data.flipped = [];
-        copy.data.matched = [];
-        copy.data.scores = {};
-    }
-    if (copy.gameType === "dots") {
-        copy.data.lines = {};
-        copy.data.boxes = {};
-        copy.data.gridSize = copy.data.gridSize || 4;
-    }
-    if (copy.gameType === "othello") {
-        copy.data.board = null; // Will be initialized on render
-        copy.data.boardSize = copy.data.boardSize || 8;
-    }
-    if (copy.gameType === "checkers") {
-        copy.data.board = null;
-        copy.data.boardSize = copy.data.boardSize || 8;
-        copy.data.currentPlayer = "black";
-        copy.data.selected = null;
-        copy.data.validMoves = [];
-    }
-    if (copy.gameType === "gomoku") {
-        copy.data.board = null;
-        copy.data.boardSize = copy.data.boardSize || 15;
-    }
-    if (copy.gameType === "sos") {
-        copy.data.board = null;
-        copy.data.gridSize = copy.data.gridSize || 5;
-        copy.data.scores = {};
-    }
-    if (copy.gameType === "connect4") {
+    if (copy.gameType === "fourrow") {
+        if (!copy.data.boardSize) copy.data.boardSize = "7x6";
+        const [cols, rows] = copy.data.boardSize.split('x').map(Number);
+        copy.data.board = Array(cols * rows).fill("");
         copy.data.playerColors = {};
         copy.players.forEach((p, idx) => {
-            copy.data.playerColors[p.deviceId] = idx % 2 === 0 ? "R" : "Y";
+            copy.data.playerColors[p.deviceId] = idx === 0 ? "red" : "yellow";
         });
+    }
+    if (copy.gameType === "reaction") {
+        copy.data.state = "waiting";
+        copy.data.startTime = 0;
+        copy.data.results = {};
+        copy.data.goTime = 0;
+    }
+    if (copy.gameType === "type") {
+        const sentences = [
+            "The quick brown fox jumps over the lazy dog.",
+            "Pack my box with five dozen liquor jugs.",
+            "How vexingly quick daft zebras jump.",
+            "The five boxing wizards jump quickly.",
+            "Jazz and swing fans like fast music.",
+            "Crazy Fredericka bought many very exquisite opal jewels.",
+            "We promptly judged antique ivory buckles for the next prize."
+        ];
+        copy.data.sentence = sentences[Math.floor(Math.random() * sentences.length)];
+        copy.data.startTime = 0;
+        copy.data.results = {};
+        copy.data.done = false;
+    }
+    if (copy.gameType === "boss") {
+        copy.data.bossHealth = 100000000;
+        copy.data.maxHealth = 100000000;
+        copy.data.damage = 1;
+        copy.data.upgrades = {};
+        copy.data.totalDamageDealt = {};
+        copy.data.bossDefeated = false;
+        copy.data.critChance = 0;
+        copy.data.multiHit = 1;
+        const names = ["Cthulhu", "Mega Dragon", "Shadow Lord", "Void Beast", "Eldritch Horror", "Demon King"];
+        copy.data.monsterName = names[Math.floor(Math.random() * names.length)];
     }
     
     await publishGameAndCleanup(game, copy);
