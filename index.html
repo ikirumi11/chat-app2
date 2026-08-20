@@ -22,7 +22,6 @@
     --text-size:16px;
     --word-spacing:0px;
     --line-spacing:1.45;
-    --message-gap:17px;
 }
 
 html,body{
@@ -89,6 +88,11 @@ button{
     font-weight:400;
 }
 
+.header-buttons{
+    display:flex;
+    gap:7px;
+}
+
 .icon-btn{
     width:39px;
     height:39px;
@@ -113,11 +117,7 @@ button{
 .message{
     display:flex;
     gap:11px;
-    margin-bottom:var(--message-gap);
-}
-
-.message.compact{
-    margin-bottom:7px;
+    margin-bottom:17px;
 }
 
 .avatar{
@@ -160,16 +160,6 @@ button{
     font-size:var(--text-size);
     word-spacing:var(--word-spacing);
     line-height:var(--line-spacing);
-}
-
-.message-link{
-    color:#8eb9ff;
-    text-decoration:underline;
-    cursor:pointer;
-}
-
-.message-link:hover{
-    filter:brightness(1.25);
 }
 
 .message-image{
@@ -230,20 +220,11 @@ textarea{
     font-size:20px;
 }
 
-.attach-btn:hover{
-    background:#242932;
-}
-
 .send-btn{
     padding:0 18px;
     background:var(--accent);
     color:#111;
     font-weight:700;
-}
-
-.send-btn:disabled{
-    opacity:.5;
-    cursor:not-allowed;
 }
 
 /* OVERLAYS */
@@ -254,7 +235,7 @@ textarea{
     display:none;
     align-items:center;
     justify-content:center;
-    background:rgba(0,0,0,.72);
+    background:rgba(0,0,0,.78);
     z-index:100;
 }
 
@@ -263,7 +244,7 @@ textarea{
 }
 
 .panel{
-    width:min(560px,calc(100vw - 25px));
+    width:min(700px,calc(100vw - 25px));
     max-height:calc(100vh - 25px);
     overflow-y:auto;
     background:var(--panel);
@@ -288,6 +269,241 @@ textarea{
     padding:18px;
 }
 
+/* ACTIVITIES */
+
+.activities-panel{
+    width:min(900px,calc(100vw - 20px));
+}
+
+.game-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:10px;
+}
+
+.game-card{
+    padding:16px;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    border-radius:12px;
+}
+
+.game-card h3{
+    margin:0 0 7px;
+}
+
+.game-card p{
+    color:var(--muted);
+    font-size:13px;
+    min-height:38px;
+}
+
+.primary-btn,
+.secondary-btn,
+.danger-btn{
+    border-radius:9px;
+    padding:10px 14px;
+    border:1px solid var(--border);
+}
+
+.primary-btn{
+    background:var(--accent);
+    color:#111;
+    font-weight:700;
+}
+
+.secondary-btn{
+    background:#20252c;
+    color:white;
+}
+
+.danger-btn{
+    background:#241719;
+    color:#ff8585;
+    border-color:#743333;
+}
+
+/* GAME */
+
+.game-panel{
+    width:min(850px,calc(100vw - 20px));
+}
+
+.game-info{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-bottom:15px;
+}
+
+.info-box{
+    padding:11px;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    border-radius:9px;
+}
+
+.info-box small{
+    display:block;
+    color:var(--muted);
+    margin-bottom:3px;
+}
+
+.info-box strong{
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.players{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:15px;
+}
+
+.player{
+    padding:6px 9px;
+    background:#20252c;
+    border:1px solid var(--border);
+    border-radius:7px;
+    font-size:13px;
+}
+
+.player.host{
+    border-color:#777;
+}
+
+.player.turn{
+    box-shadow:0 0 0 1px #fff;
+}
+
+.game-area{
+    min-height:260px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:15px;
+    background:#0b0d10;
+    border:1px solid var(--border);
+    border-radius:12px;
+}
+
+.game-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+}
+
+.game-status{
+    text-align:center;
+    margin-bottom:12px;
+    color:#c8ced7;
+}
+
+/* TIC TAC TOE */
+
+.ttt{
+    display:grid;
+    grid-template-columns:repeat(3,80px);
+    gap:7px;
+}
+
+.ttt-cell{
+    width:80px;
+    height:80px;
+    border:1px solid var(--border);
+    background:#181c22;
+    color:white;
+    border-radius:9px;
+    font-size:32px;
+    font-weight:700;
+}
+
+/* CONNECT 4 */
+
+.connect4{
+    display:grid;
+    grid-template-columns:repeat(7,45px);
+    gap:5px;
+    padding:10px;
+    background:#151a21;
+    border-radius:12px;
+}
+
+.c4-cell{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    background:#252b33;
+    border:1px solid #333b46;
+}
+
+.c4-cell.red{
+    background:#e95d5d;
+}
+
+.c4-cell.yellow{
+    background:#e7c95d;
+}
+
+/* DICE */
+
+.dice-box{
+    text-align:center;
+}
+
+.dice-number{
+    font-size:80px;
+    font-weight:800;
+}
+
+/* CARD */
+
+.card-box{
+    width:120px;
+    height:170px;
+    display:grid;
+    place-items:center;
+    background:white;
+    color:#111;
+    border-radius:12px;
+    font-size:45px;
+    font-weight:800;
+}
+
+/* BOARD */
+
+.board{
+    display:grid;
+    grid-template-columns:repeat(10,45px);
+    gap:3px;
+}
+
+.board-cell{
+    width:45px;
+    height:45px;
+    background:#20252c;
+    border:1px solid #303640;
+    display:grid;
+    place-items:center;
+    font-size:12px;
+    position:relative;
+}
+
+.board-token{
+    width:25px;
+    height:25px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    background:#ddd;
+    color:#111;
+    font-size:11px;
+    font-weight:700;
+}
+
 /* SETTINGS */
 
 .category{
@@ -308,10 +524,6 @@ textarea{
     justify-content:space-between;
     font-weight:700;
     text-align:left;
-}
-
-.category-title span:last-child{
-    color:var(--muted);
 }
 
 .category-body{
@@ -345,174 +557,15 @@ textarea{
     color:white;
 }
 
-.setting input[type="range"]{
-    padding:0;
-}
-
-.setting-value{
-    color:var(--muted);
-    font-size:12px;
-    margin-top:5px;
-}
-
-.save-btn,
-.test-btn{
+.save-btn{
     width:100%;
     margin-top:8px;
     padding:12px;
     border:0;
     border-radius:9px;
-    font-weight:700;
-}
-
-.save-btn{
     background:var(--accent);
     color:#111;
-}
-
-.test-btn{
-    background:#242b34;
-    border:1px solid var(--border);
-    color:white;
-}
-
-.test-btn:hover{
-    filter:brightness(1.15);
-}
-
-/* DANGER */
-
-.danger-zone{
-    margin-top:20px;
-    padding-top:20px;
-    border-top:1px solid #402529;
-}
-
-.danger-title{
-    color:var(--danger);
     font-weight:700;
-    margin-bottom:7px;
-}
-
-.danger-zone p{
-    color:var(--muted);
-    line-height:1.45;
-}
-
-.danger-btn{
-    width:100%;
-    padding:12px;
-    border-radius:9px;
-    border:1px solid #743333;
-    background:#241719;
-    color:#ff8585;
-}
-
-/* CONTEXT */
-
-.context-menu{
-    position:fixed;
-    display:none;
-    width:160px;
-    padding:5px;
-    z-index:200;
-    background:var(--panel2);
-    border:1px solid var(--border);
-    border-radius:9px;
-    box-shadow:0 15px 40px #0009;
-}
-
-.context-menu.show{
-    display:block;
-}
-
-.context-menu button{
-    width:100%;
-    padding:9px 10px;
-    text-align:left;
-    border:0;
-    border-radius:6px;
-    background:transparent;
-    color:var(--text);
-}
-
-.context-menu button:hover{
-    background:#252b33;
-}
-
-.delete-option{
-    color:#ff7777!important;
-}
-
-/* IMAGE VIEWER */
-
-.image-viewer{
-    position:fixed;
-    inset:0;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    background:#000f;
-    z-index:300;
-}
-
-.image-viewer.show{
-    display:flex;
-}
-
-.full-image{
-    max-width:95vw;
-    max-height:90vh;
-    object-fit:contain;
-}
-
-.back-image{
-    position:absolute;
-    top:18px;
-    left:18px;
-    padding:10px 16px;
-    border-radius:9px;
-    border:1px solid #3a4049;
-    background:#171b21;
-    color:white;
-}
-
-/* DIALOG */
-
-.dialog{
-    width:min(450px,calc(100vw - 30px));
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:14px;
-    padding:20px;
-}
-
-.dialog h2{
-    margin-top:0;
-}
-
-.dialog p{
-    color:#aab2bd;
-    line-height:1.5;
-}
-
-.dialog-buttons{
-    display:flex;
-    gap:8px;
-    justify-content:flex-end;
-}
-
-.dialog-buttons button{
-    padding:10px 16px;
-    border-radius:8px;
-    border:1px solid var(--border);
-    background:#20252c;
-    color:white;
-}
-
-.dialog-buttons .danger{
-    background:#6b2929;
-    border-color:#813434;
 }
 
 /* EMPTY */
@@ -534,7 +587,7 @@ textarea{
 @media(max-width:600px){
 
     .header{
-        padding:0 11px;
+        padding:0 10px;
     }
 
     .messages{
@@ -545,10 +598,26 @@ textarea{
         display:none;
     }
 
-    .message-content{
-        max-width:calc(100vw - 70px);
+    .game-info{
+        grid-template-columns:1fr;
     }
 
+    .ttt{
+        grid-template-columns:repeat(3,65px);
+    }
+
+    .ttt-cell{
+        width:65px;
+        height:65px;
+    }
+
+    .connect4{
+        transform:scale(.8);
+    }
+
+    .board{
+        transform:scale(.7);
+    }
 }
 </style>
 </head>
@@ -559,56 +628,242 @@ textarea{
 
 <header class="header">
 
-<div class="logo">
-<div class="logo-icon">💬</div>
-<span>Chat</span>
-<span class="channel"># general</span>
-</div>
+    <div class="logo">
+        <div class="logo-icon">💬</div>
+        <span>Chat</span>
+        <span class="channel"># general</span>
+    </div>
 
-<button class="icon-btn" id="settingsBtn">⚙</button>
+    <div class="header-buttons">
+
+        <button
+            class="icon-btn"
+            id="activitiesBtn"
+            title="Activities"
+        >🎮</button>
+
+        <button
+            class="icon-btn"
+            id="settingsBtn"
+            title="Settings"
+        >⚙</button>
+
+    </div>
 
 </header>
 
-<main class="messages" id="messages"></main>
+<main
+    class="messages"
+    id="messages"
+></main>
 
 <div class="composer">
 
-<div class="composer-box">
+    <div class="composer-box">
 
-<input
-type="file"
-id="imageInput"
-accept="image/*"
-hidden
+        <textarea
+            id="messageInput"
+            rows="1"
+            placeholder="Message #general"
+        ></textarea>
+
+        <button
+            class="send-btn"
+            id="sendBtn"
+        >Send</button>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<!-- ACTIVITIES -->
+
+<div
+    class="overlay"
+    id="activitiesOverlay"
 >
 
-<button
-class="attach-btn"
-id="attachBtn"
-title="Choose image"
->＋</button>
+<div class="panel activities-panel">
 
-<textarea
-id="messageInput"
-rows="1"
-placeholder="Message #general"
-></textarea>
+<div class="panel-header">
 
-<button
-class="send-btn"
-id="sendBtn"
->Send</button>
+    <h2>🎮 Activities</h2>
 
+    <button
+        class="icon-btn"
+        id="closeActivities"
+    >×</button>
+
+</div>
+
+<div class="panel-body">
+
+<p style="color:var(--muted)">
+Choose a game. Players must press <b>Join</b> before the host starts.
+Anyone joining after the game starts becomes a spectator.
+</p>
+
+<div class="game-list">
+
+<div class="game-card">
+<h3>❌⭕ Tic-Tac-Toe</h3>
+<p>Classic 3 × 3 two-player game.</p>
+<button class="primary-btn create-game" data-game="tictactoe">
+Create
+</button>
+</div>
+
+<div class="game-card">
+<h3>🎲 Dice Battle</h3>
+<p>Everyone rolls once. Highest roll wins.</p>
+<button class="primary-btn create-game" data-game="dice">
+Create
+</button>
+</div>
+
+<div class="game-card">
+<h3>🟡 Connect 4</h3>
+<p>Drop pieces and connect four.</p>
+<button class="primary-btn create-game" data-game="connect4">
+Create
+</button>
+</div>
+
+<div class="game-card">
+<h3>🃏 Higher Card</h3>
+<p>Everyone draws a card. Highest card wins.</p>
+<button class="primary-btn create-game" data-game="cards">
+Create
+</button>
+</div>
+
+<div class="game-card">
+<h3>🏁 Board Race</h3>
+<p>Roll and race to the finish.</p>
+<button class="primary-btn create-game" data-game="boardrace">
+Create
+</button>
 </div>
 
 </div>
 
+<div style="margin-top:20px">
+
+<h3>Active games</h3>
+
+<div id="activeGames">
+Loading...
+</div>
+
+</div>
+
+</div>
+</div>
+</div>
+
+
+<!-- GAME -->
+
+<div
+    class="overlay"
+    id="gameOverlay"
+>
+
+<div class="panel game-panel">
+
+<div class="panel-header">
+
+    <h2 id="gameTitle">Game</h2>
+
+    <button
+        class="icon-btn"
+        id="closeGame"
+    >×</button>
+
+</div>
+
+<div class="panel-body">
+
+<div class="game-info">
+
+<div class="info-box">
+<small>Host</small>
+<strong id="gameHost">-</strong>
+</div>
+
+<div class="info-box">
+<small>Turn</small>
+<strong id="gameTurn">-</strong>
+</div>
+
+<div class="info-box">
+<small>Status</small>
+<strong id="gameStatus">Waiting</strong>
+</div>
+
+</div>
+
+<div class="players" id="gamePlayers"></div>
+
+<div class="game-status" id="gameMessage"></div>
+
+<div
+    class="game-area"
+    id="gameArea"
+>
+</div>
+
+<div class="game-actions">
+
+<button
+    class="primary-btn"
+    id="joinGameBtn"
+>
+Join Game
+</button>
+
+<button
+    class="primary-btn"
+    id="startGameBtn"
+>
+Start Game
+</button>
+
+<button
+    class="secondary-btn"
+    id="gameActionBtn"
+>
+Action
+</button>
+
+<button
+    class="danger-btn"
+    id="leaveGameBtn"
+>
+Leave
+</button>
+
+</div>
+
+<p
+    id="spectatorText"
+    style="color:var(--muted);font-size:13px"
+></p>
+
+</div>
+</div>
 </div>
 
 
 <!-- SETTINGS -->
 
-<div class="overlay" id="settingsOverlay">
+<div
+    class="overlay"
+    id="settingsOverlay"
+>
 
 <div class="panel">
 
@@ -616,14 +871,14 @@ id="sendBtn"
 
 <h2>Settings</h2>
 
-<button class="icon-btn" id="closeSettings">×</button>
+<button
+    class="icon-btn"
+    id="closeSettings"
+>×</button>
 
 </div>
 
 <div class="panel-body">
-
-
-<!-- PROFILE -->
 
 <div class="category open">
 
@@ -635,20 +890,31 @@ id="sendBtn"
 <div class="category-body">
 
 <div class="setting">
+
 <label>Your name</label>
-<input id="usernameInput" maxlength="24" placeholder="Enter your name">
+
+<input
+    id="usernameInput"
+    maxlength="24"
+    placeholder="Enter your name"
+>
+
 </div>
 
 <div class="setting">
+
 <label>Device ID</label>
-<input id="deviceIdInput" readonly>
+
+<input
+    id="deviceIdInput"
+    readonly
+>
+
 </div>
 
 </div>
 </div>
 
-
-<!-- TEXT -->
 
 <div class="category">
 
@@ -661,36 +927,22 @@ id="sendBtn"
 
 <div class="setting">
 <label>Text size</label>
-<input id="textSize" type="range" min="12" max="28" step="1">
-<div class="setting-value" id="textSizeValue"></div>
+<input id="textSize" type="range" min="12" max="24">
 </div>
 
 <div class="setting">
 <label>Word spacing</label>
-<input id="wordSpacing" type="range" min="0" max="12" step="1">
-<div class="setting-value" id="wordSpacingValue"></div>
+<input id="wordSpacing" type="range" min="0" max="12">
 </div>
 
 <div class="setting">
 <label>Line spacing</label>
 <input id="lineSpacing" type="range" min="1" max="2" step=".05">
-<div class="setting-value" id="lineSpacingValue"></div>
-</div>
-
-<div class="setting">
-<label>Message density</label>
-<select id="messageDensity">
-<option value="normal">Normal</option>
-<option value="compact">Compact</option>
-<option value="spacious">Spacious</option>
-</select>
 </div>
 
 </div>
 </div>
 
-
-<!-- CHAT -->
 
 <div class="category">
 
@@ -702,8 +954,11 @@ id="sendBtn"
 <div class="category-body">
 
 <div class="setting">
+
 <label>Refresh rate</label>
+
 <select id="refreshRate">
+
 <option value="10000">10 seconds</option>
 <option value="5000">5 seconds</option>
 <option value="3000">3 seconds</option>
@@ -711,39 +966,68 @@ id="sendBtn"
 <option value="1000">1 second</option>
 <option value="500">0.5 seconds</option>
 <option value="100">0.1 seconds</option>
+
 </select>
+
+</div>
+
+</div>
+</div>
+
+
+<div class="category">
+
+<button class="category-title">
+<span>🎮 Activities</span>
+<span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+
+<label>Activity refresh rate</label>
+
+<select id="gameRefreshRate">
+
+<option value="100">0.1 seconds</option>
+<option value="250">0.25 seconds</option>
+<option value="500">0.5 seconds</option>
+<option value="1000">1 second</option>
+<option value="2000">2 seconds</option>
+</select>
+
 </div>
 
 <div class="setting">
-<label>Show timestamps</label>
-<select id="showTimestamps">
+
+<label>Show spectators</label>
+
+<select id="showSpectators">
+
 <option value="true">On</option>
 <option value="false">Off</option>
+
 </select>
+
 </div>
 
 <div class="setting">
-<label>Timestamp format</label>
-<select id="timestampFormat">
-<option value="short">12:34</option>
-<option value="seconds">12:34:56</option>
-<option value="full">Date + time</option>
-</select>
-</div>
 
-<div class="setting">
-<label>Auto-scroll</label>
-<select id="autoScroll">
+<label>Automatically open active game</label>
+
+<select id="autoOpenGame">
+
 <option value="true">On</option>
 <option value="false">Off</option>
+
 </select>
+
 </div>
 
 </div>
 </div>
 
-
-<!-- APPEARANCE -->
 
 <div class="category">
 
@@ -755,13 +1039,13 @@ id="sendBtn"
 <div class="category-body">
 
 <div class="setting">
+
 <label>Theme</label>
 
 <select id="themeSelect">
 
 <option value="dark">Dark</option>
 <option value="midnight">Midnight</option>
-<option value="slate">Slate</option>
 <option value="black">Pure Black</option>
 <option value="blue">Dark Blue</option>
 <option value="purple">Dark Purple</option>
@@ -770,333 +1054,68 @@ id="sendBtn"
 <option value="gray">Classic Gray</option>
 <option value="light">Light</option>
 <option value="oled">OLED</option>
-<option value="carbon">Carbon</option>
-<option value="steel">Steel</option>
-<option value="terminal">Terminal</option>
-<option value="brown">Dark Brown</option>
 
 </select>
+
 </div>
 
 <div class="setting">
+
 <label>Corner roundness</label>
-<input id="cornerRadius" type="range" min="0" max="25">
-<div class="setting-value" id="cornerRadiusValue"></div>
+
+<input
+    id="cornerRadius"
+    type="range"
+    min="0"
+    max="25"
+>
+
 </div>
 
 <div class="setting">
+
 <label>UI scale</label>
-<input id="uiScale" type="range" min=".8" max="1.2" step=".05">
-<div class="setting-value" id="uiScaleValue"></div>
-</div>
-
-</div>
-</div>
-
-
-<!-- NOTIFICATIONS -->
-
-<div class="category">
-
-<button class="category-title">
-<span>🔔 Notifications</span>
-<span>⌄</span>
-</button>
-
-<div class="category-body">
-
-<div class="setting">
-<label>Desktop notifications</label>
-<select id="desktopNotifications">
-<option value="false">Off</option>
-<option value="true">On</option>
-</select>
-</div>
-
-<div class="setting">
-<label>Notify only when chat is hidden</label>
-<select id="hiddenOnly">
-<option value="true">On</option>
-<option value="false">Off</option>
-</select>
-</div>
-
-<div class="setting">
-<label>Notification sound</label>
-<select id="notificationSound">
-
-<option value="false">Off</option>
-<option value="true">On</option>
-
-</select>
-</div>
-
-<div class="setting">
-<label>Sound theme</label>
-
-<select id="soundTheme">
-
-<option value="classic">1 — Classic</option>
-<option value="soft">2 — Soft</option>
-<option value="digital">3 — Digital</option>
-<option value="pop">4 — Pop</option>
-<option value="bell">5 — Bell</option>
-<option value="chime">6 — Chime</option>
-<option value="retro">7 — Retro</option>
-<option value="computer">8 — Computer</option>
-<option value="alert">9 — Alert</option>
-<option value="warning">10 — Warning</option>
-<option value="alarm">11 — Nuclear Alarm</option>
-<option value="opera">12 — Opera</option>
-<option value="synth">13 — Synth</option>
-<option value="pulse">14 — Pulse</option>
-<option value="space">15 — Space</option>
-
-</select>
-</div>
-
-<div class="setting">
-<label>Sound duration</label>
 
 <input
-id="soundDuration"
-type="range"
-min="100"
-max="5000"
-step="100"
+    id="uiScale"
+    type="range"
+    min=".8"
+    max="1.2"
+    step=".05"
 >
 
-<div
-class="setting-value"
-id="soundDurationValue"
-></div>
-
 </div>
 
-<div class="setting">
-<label>Sound volume</label>
-
-<input
-id="soundVolume"
-type="range"
-min="0"
-max="100"
-step="1"
->
-
-<div
-class="setting-value"
-id="soundVolumeValue"
-></div>
-
+</div>
 </div>
 
-<div class="setting">
-<label>Notification preview</label>
-
-<select id="notificationPreview">
-<option value="full">Show message</option>
-<option value="name">Name only</option>
-<option value="generic">New message</option>
-</select>
-</div>
 
 <button
-class="test-btn"
-id="testNotification"
+    class="save-btn"
+    id="saveSettings"
 >
-🔔 Test Windows notification
-</button>
-
-</div>
-</div>
-
-
-<!-- LINKS -->
-
-<div class="category">
-
-<button class="category-title">
-<span>🔗 Links & Media</span>
-<span>⌄</span>
-</button>
-
-<div class="category-body">
-
-<div class="setting">
-<label>Clickable links</label>
-
-<select id="clickableLinks">
-<option value="true">On</option>
-<option value="false">Off</option>
-</select>
-</div>
-
-<div class="setting">
-<label>Automatic image links</label>
-
-<select id="imageLinks">
-<option value="true">On</option>
-<option value="false">Off</option>
-</select>
-</div>
-
-<div class="setting">
-<label>Open links in new tab</label>
-
-<select id="newTabLinks">
-<option value="true">On</option>
-<option value="false">Off</option>
-</select>
-</div>
-
-</div>
-</div>
-
-
-<!-- BEHAVIOR -->
-
-<div class="category">
-
-<button class="category-title">
-<span>⚙️ Behavior</span>
-<span>⌄</span>
-</button>
-
-<div class="category-body">
-
-<div class="setting">
-<label>Enter to send</label>
-
-<select id="enterToSend">
-<option value="true">On</option>
-<option value="false">Off</option>
-</select>
-</div>
-
-<div class="setting">
-<label>Confirm before deleting</label>
-
-<select id="confirmDelete">
-<option value="true">On</option>
-<option value="false">Off</option>
-</select>
-</div>
-
-<div class="setting">
-<label>Keep composer text after failed send</label>
-
-<select id="keepText">
-<option value="true">On</option>
-<option value="false">Off</option>
-</select>
-</div>
-
-</div>
-</div>
-
-
-<button class="save-btn" id="saveSettings">
 Save settings
 </button>
 
-
-<!-- DANGER -->
-
-<div class="danger-zone">
-
-<div class="danger-title">
-⚠ Danger Zone
 </div>
-
-<p>
-Remove every message from the chat permanently.
-This affects everyone using the chat.
-</p>
-
-<button class="danger-btn" id="removeEverything">
-Remove everything
-</button>
-
-</div>
-
-</div>
-</div>
-</div>
-
-
-<!-- CONTEXT MENU -->
-
-<div class="context-menu" id="contextMenu">
-
-<button id="editMessage">Edit</button>
-
-<button
-class="delete-option"
-id="deleteMessage"
->
-Delete
-</button>
-
-</div>
-
-
-<!-- IMAGE VIEWER -->
-
-<div class="image-viewer" id="imageViewer">
-
-<button
-class="back-image"
-id="backImage"
->
-← Back
-</button>
-
-<img
-class="full-image"
-id="fullImage"
-alt="Full image"
->
-
-</div>
-
-
-<!-- DIALOG -->
-
-<div class="overlay" id="dialogOverlay">
-
-<div class="dialog">
-
-<h2 id="dialogTitle">Confirm</h2>
-
-<p id="dialogText"></p>
-
-<div class="dialog-buttons">
-
-<button id="dialogCancel">
-Cancel
-</button>
-
-<button
-class="danger"
-id="dialogConfirm"
->
-Yes
-</button>
-
-</div>
-
 </div>
 </div>
 
 
 <script>
 
+/* =========================================================
+   CONFIG
+========================================================= */
+
 const API_URL="/api/messages";
+const GAMES_API="/api/games";
 const CHANNEL="general";
 
 
-/* DEVICE */
+/* =========================================================
+   DEVICE
+========================================================= */
 
 let deviceId=localStorage.getItem("chat_device_id");
 
@@ -1109,2649 +1128,2081 @@ if(!deviceId){
         "chat_device_id",
         deviceId
     );
-
 }
 
 
-/* SETTINGS */
+/* =========================================================
+   SETTINGS
+========================================================= */
 
 const defaults={
 
-username:"",
+    username:"",
+    theme:"dark",
 
-theme:"dark",
+    refreshRate:500,
 
-refreshRate:500,
+    textSize:16,
+    wordSpacing:0,
+    lineSpacing:1.45,
 
-showTimestamps:true,
+    cornerRadius:12,
+    uiScale:1,
 
-timestampFormat:"short",
-
-autoScroll:true,
-
-textSize:16,
-
-wordSpacing:0,
-
-lineSpacing:1.45,
-
-messageDensity:"normal",
-
-cornerRadius:12,
-
-uiScale:1,
-
-desktopNotifications:false,
-
-hiddenOnly:true,
-
-notificationSound:true,
-
-soundTheme:"classic",
-
-soundDuration:1000,
-
-soundVolume:70,
-
-notificationPreview:"full",
-
-clickableLinks:true,
-
-imageLinks:true,
-
-newTabLinks:true,
-
-enterToSend:true,
-
-confirmDelete:true,
-
-keepText:true
-
+    gameRefreshRate:500,
+    showSpectators:true,
+    autoOpenGame:true
 };
 
+const settings={};
 
-function getSetting(key){
+Object.keys(defaults).forEach(key=>{
 
-const value=
-localStorage.getItem(
-"chat_"+key
-);
+    const stored=
+        localStorage.getItem(
+            "chat_"+key
+        );
 
-if(value===null){
+    if(stored===null){
 
-return defaults[key];
+        settings[key]=
+            defaults[key];
 
-}
+    }else if(
+        stored==="true" ||
+        stored==="false"
+    ){
 
-if(
-value==="true"||
-value==="false"
-){
+        settings[key]=
+            stored==="true";
 
-return value==="true";
+    }else{
 
-}
+        const number=Number(stored);
 
-const number=Number(value);
+        settings[key]=
+            Number.isNaN(number)
+            ?stored
+            :number;
+    }
 
-return Number.isNaN(number)
-?value
-:number;
-
-}
-
-
-let settings={};
-
-Object.keys(defaults).forEach(
-key=>{
-settings[key]=getSetting(key);
 });
 
 
-/* ELEMENTS */
+/* =========================================================
+   ELEMENTS
+========================================================= */
 
 const messagesEl=
-document.getElementById("messages");
+    document.getElementById("messages");
 
 const messageInput=
-document.getElementById("messageInput");
+    document.getElementById("messageInput");
 
 const sendBtn=
-document.getElementById("sendBtn");
+    document.getElementById("sendBtn");
 
-const imageInput=
-document.getElementById("imageInput");
+const activitiesBtn=
+    document.getElementById("activitiesBtn");
 
-const attachBtn=
-document.getElementById("attachBtn");
+const activitiesOverlay=
+    document.getElementById("activitiesOverlay");
+
+const closeActivities=
+    document.getElementById("closeActivities");
+
+const activeGames=
+    document.getElementById("activeGames");
+
+const gameOverlay=
+    document.getElementById("gameOverlay");
+
+const closeGame=
+    document.getElementById("closeGame");
+
+const gameTitle=
+    document.getElementById("gameTitle");
+
+const gameHost=
+    document.getElementById("gameHost");
+
+const gameTurn=
+    document.getElementById("gameTurn");
+
+const gameStatus=
+    document.getElementById("gameStatus");
+
+const gamePlayers=
+    document.getElementById("gamePlayers");
+
+const gameMessage=
+    document.getElementById("gameMessage");
+
+const gameArea=
+    document.getElementById("gameArea");
+
+const joinGameBtn=
+    document.getElementById("joinGameBtn");
+
+const startGameBtn=
+    document.getElementById("startGameBtn");
+
+const gameActionBtn=
+    document.getElementById("gameActionBtn");
+
+const leaveGameBtn=
+    document.getElementById("leaveGameBtn");
+
+const spectatorText=
+    document.getElementById("spectatorText");
+
+
+/* SETTINGS ELEMENTS */
 
 const settingsBtn=
-document.getElementById("settingsBtn");
+    document.getElementById("settingsBtn");
 
 const settingsOverlay=
-document.getElementById("settingsOverlay");
+    document.getElementById("settingsOverlay");
 
 const closeSettings=
-document.getElementById("closeSettings");
+    document.getElementById("closeSettings");
 
 const saveSettings=
-document.getElementById("saveSettings");
+    document.getElementById("saveSettings");
 
 const usernameInput=
-document.getElementById("usernameInput");
+    document.getElementById("usernameInput");
 
 const deviceIdInput=
-document.getElementById("deviceIdInput");
-
-const themeSelect=
-document.getElementById("themeSelect");
+    document.getElementById("deviceIdInput");
 
 const refreshRate=
-document.getElementById("refreshRate");
-
-const showTimestamps=
-document.getElementById("showTimestamps");
-
-const timestampFormat=
-document.getElementById("timestampFormat");
-
-const autoScroll=
-document.getElementById("autoScroll");
+    document.getElementById("refreshRate");
 
 const textSize=
-document.getElementById("textSize");
+    document.getElementById("textSize");
 
 const wordSpacing=
-document.getElementById("wordSpacing");
+    document.getElementById("wordSpacing");
 
 const lineSpacing=
-document.getElementById("lineSpacing");
+    document.getElementById("lineSpacing");
 
-const messageDensity=
-document.getElementById("messageDensity");
+const themeSelect=
+    document.getElementById("themeSelect");
 
 const cornerRadius=
-document.getElementById("cornerRadius");
+    document.getElementById("cornerRadius");
 
 const uiScale=
-document.getElementById("uiScale");
+    document.getElementById("uiScale");
 
-const desktopNotifications=
-document.getElementById("desktopNotifications");
+const gameRefreshRate=
+    document.getElementById("gameRefreshRate");
 
-const hiddenOnly=
-document.getElementById("hiddenOnly");
+const showSpectators=
+    document.getElementById("showSpectators");
 
-const notificationSound=
-document.getElementById("notificationSound");
-
-const soundTheme=
-document.getElementById("soundTheme");
-
-const soundDuration=
-document.getElementById("soundDuration");
-
-const soundVolume=
-document.getElementById("soundVolume");
-
-const notificationPreview=
-document.getElementById("notificationPreview");
-
-const clickableLinks=
-document.getElementById("clickableLinks");
-
-const imageLinks=
-document.getElementById("imageLinks");
-
-const newTabLinks=
-document.getElementById("newTabLinks");
-
-const enterToSend=
-document.getElementById("enterToSend");
-
-const confirmDelete=
-document.getElementById("confirmDelete");
-
-const keepText=
-document.getElementById("keepText");
-
-const testNotification=
-document.getElementById("testNotification");
-
-const contextMenu=
-document.getElementById("contextMenu");
-
-const editMessageBtn=
-document.getElementById("editMessage");
-
-const deleteMessageBtn=
-document.getElementById("deleteMessage");
-
-const imageViewer=
-document.getElementById("imageViewer");
-
-const fullImage=
-document.getElementById("fullImage");
-
-const backImage=
-document.getElementById("backImage");
-
-const dialogOverlay=
-document.getElementById("dialogOverlay");
-
-const dialogTitle=
-document.getElementById("dialogTitle");
-
-const dialogText=
-document.getElementById("dialogText");
-
-const dialogCancel=
-document.getElementById("dialogCancel");
-
-const dialogConfirm=
-document.getElementById("dialogConfirm");
-
-const removeEverything=
-document.getElementById("removeEverything");
+const autoOpenGame=
+    document.getElementById("autoOpenGame");
 
 
-const textSizeValue=
-document.getElementById("textSizeValue");
-
-const wordSpacingValue=
-document.getElementById("wordSpacingValue");
-
-const lineSpacingValue=
-document.getElementById("lineSpacingValue");
-
-const cornerRadiusValue=
-document.getElementById("cornerRadiusValue");
-
-const uiScaleValue=
-document.getElementById("uiScaleValue");
-
-const soundDurationValue=
-document.getElementById("soundDurationValue");
-
-const soundVolumeValue=
-document.getElementById("soundVolumeValue");
-
-
-let selectedFile=null;
-let selectedMessage=null;
 let currentMessages=[];
-let confirmCallback=null;
-let refreshTimer=null;
-let audioContext=null;
+let currentGame=null;
+let messageTimer=null;
+let gameTimer=null;
 
 
-/* APPLY SETTINGS */
+/* =========================================================
+   SETTINGS
+========================================================= */
 
 function applySettings(){
 
-document.documentElement.style.setProperty(
-"--text-size",
-settings.textSize+"px"
-);
+    document.documentElement.style.setProperty(
+        "--text-size",
+        settings.textSize+"px"
+    );
 
-document.documentElement.style.setProperty(
-"--word-spacing",
-settings.wordSpacing+"px"
-);
+    document.documentElement.style.setProperty(
+        "--word-spacing",
+        settings.wordSpacing+"px"
+    );
 
-document.documentElement.style.setProperty(
-"--line-spacing",
-settings.lineSpacing
-);
+    document.documentElement.style.setProperty(
+        "--line-spacing",
+        settings.lineSpacing
+    );
 
-document.documentElement.style.setProperty(
-"--radius",
-settings.cornerRadius+"px"
-);
+    document.documentElement.style.setProperty(
+        "--radius",
+        settings.cornerRadius+"px"
+    );
 
-document.documentElement.style.setProperty(
-"--ui-scale",
-settings.uiScale
-);
+    document.documentElement.style.setProperty(
+        "--ui-scale",
+        settings.uiScale
+    );
 
-let gap=17;
+    applyTheme(settings.theme);
 
-if(settings.messageDensity==="compact")
-gap=7;
+    startMessageTimer();
+    startGameTimer();
 
-if(settings.messageDensity==="spacious")
-gap=28;
-
-document.documentElement.style.setProperty(
-"--message-gap",
-gap+"px"
-);
-
-applyTheme(settings.theme);
-
-renderMessages();
-
-startRefreshTimer();
-
+    renderMessages();
 }
 
-
-/* THEMES */
 
 function applyTheme(name){
 
-const themes={
+    const themes={
 
-dark:["#0b0d10","#111419"],
+        dark:["#0b0d10","#111419"],
+        midnight:["#080b14","#101522"],
+        black:["#000","#090909"],
+        blue:["#091018","#101c29"],
+        purple:["#100b17","#191021"],
+        green:["#09120d","#101b15"],
+        red:["#140b0b","#1e1111"],
+        gray:["#151515","#202020"],
+        light:["#eeeeee","#fff"],
+        oled:["#000","#000"]
 
-midnight:["#080b14","#101522"],
+    };
 
-slate:["#101418","#171d22"],
+    const theme=
+        themes[name]||themes.dark;
 
-black:["#000","#090909"],
+    document.documentElement.style.setProperty(
+        "--bg",
+        theme[0]
+    );
 
-blue:["#091018","#101c29"],
+    document.documentElement.style.setProperty(
+        "--panel",
+        theme[1]
+    );
 
-purple:["#100b17","#191021"],
-
-green:["#09120d","#101b15"],
-
-red:["#140b0b","#1e1111"],
-
-gray:["#151515","#202020"],
-
-light:["#eeeeee","#fff"],
-
-oled:["#000","#000"],
-
-carbon:["#0d0d0d","#161616"],
-
-steel:["#101214","#1b1e21"],
-
-terminal:["#030903","#071007"],
-
-brown:["#120e0b","#1d1611"]
-
-};
-
-const t=themes[name]||themes.dark;
-
-document.documentElement.style.setProperty(
-"--bg",t[0]
-);
-
-document.documentElement.style.setProperty(
-"--panel",t[1]
-);
-
-document.body.style.background=t[0];
-
+    document.body.style.background=
+        theme[0];
 }
 
-
-/* SETTINGS UI */
 
 function loadSettingsUI(){
 
-usernameInput.value=settings.username;
+    usernameInput.value=
+        settings.username;
 
-deviceIdInput.value=deviceId;
+    deviceIdInput.value=
+        deviceId;
 
-themeSelect.value=settings.theme;
+    refreshRate.value=
+        settings.refreshRate;
 
-refreshRate.value=settings.refreshRate;
+    textSize.value=
+        settings.textSize;
 
-showTimestamps.value=
-String(settings.showTimestamps);
+    wordSpacing.value=
+        settings.wordSpacing;
 
-timestampFormat.value=
-settings.timestampFormat;
+    lineSpacing.value=
+        settings.lineSpacing;
 
-autoScroll.value=
-String(settings.autoScroll);
+    themeSelect.value=
+        settings.theme;
 
-textSize.value=settings.textSize;
+    cornerRadius.value=
+        settings.cornerRadius;
 
-wordSpacing.value=settings.wordSpacing;
+    uiScale.value=
+        settings.uiScale;
 
-lineSpacing.value=settings.lineSpacing;
+    gameRefreshRate.value=
+        settings.gameRefreshRate;
 
-messageDensity.value=
-settings.messageDensity;
+    showSpectators.value=
+        String(settings.showSpectators);
 
-cornerRadius.value=
-settings.cornerRadius;
-
-uiScale.value=
-settings.uiScale;
-
-desktopNotifications.value=
-String(settings.desktopNotifications);
-
-hiddenOnly.value=
-String(settings.hiddenOnly);
-
-notificationSound.value=
-String(settings.notificationSound);
-
-soundTheme.value=
-settings.soundTheme;
-
-soundDuration.value=
-settings.soundDuration;
-
-soundVolume.value=
-settings.soundVolume;
-
-notificationPreview.value=
-settings.notificationPreview;
-
-clickableLinks.value=
-String(settings.clickableLinks);
-
-imageLinks.value=
-String(settings.imageLinks);
-
-newTabLinks.value=
-String(settings.newTabLinks);
-
-enterToSend.value=
-String(settings.enterToSend);
-
-confirmDelete.value=
-String(settings.confirmDelete);
-
-keepText.value=
-String(settings.keepText);
-
-updateRangeLabels();
-
+    autoOpenGame.value=
+        String(settings.autoOpenGame);
 }
 
-
-function updateRangeLabels(){
-
-textSizeValue.textContent=
-settings.textSize+"px";
-
-wordSpacingValue.textContent=
-settings.wordSpacing+"px";
-
-lineSpacingValue.textContent=
-settings.lineSpacing;
-
-cornerRadiusValue.textContent=
-settings.cornerRadius+"px";
-
-uiScaleValue.textContent=
-Math.round(settings.uiScale*100)+"%";
-
-soundDurationValue.textContent=
-(settings.soundDuration/1000)
-.toFixed(1)+" seconds";
-
-soundVolumeValue.textContent=
-settings.soundVolume+"%";
-
-}
-
-
-/* SETTINGS */
 
 settingsBtn.onclick=()=>{
 
-loadSettingsUI();
+    loadSettingsUI();
 
-settingsOverlay.classList.add("show");
-
+    settingsOverlay.classList.add("show");
 };
 
 
 closeSettings.onclick=()=>{
 
-settingsOverlay.classList.remove("show");
+    settingsOverlay.classList.remove("show");
 
 };
 
 
-saveSettings.onclick=async()=>{
+saveSettings.onclick=()=>{
 
-settings.username=
-usernameInput.value
-.trim()
-.substring(0,24);
+    settings.username=
+        usernameInput.value
+        .trim()
+        .substring(0,24);
 
-settings.theme=
-themeSelect.value;
+    settings.refreshRate=
+        Number(refreshRate.value);
 
-settings.refreshRate=
-Number(refreshRate.value);
+    settings.textSize=
+        Number(textSize.value);
 
-settings.showTimestamps=
-showTimestamps.value==="true";
+    settings.wordSpacing=
+        Number(wordSpacing.value);
 
-settings.timestampFormat=
-timestampFormat.value;
+    settings.lineSpacing=
+        Number(lineSpacing.value);
 
-settings.autoScroll=
-autoScroll.value==="true";
+    settings.theme=
+        themeSelect.value;
 
-settings.textSize=
-Number(textSize.value);
+    settings.cornerRadius=
+        Number(cornerRadius.value);
 
-settings.wordSpacing=
-Number(wordSpacing.value);
+    settings.uiScale=
+        Number(uiScale.value);
 
-settings.lineSpacing=
-Number(lineSpacing.value);
+    settings.gameRefreshRate=
+        Number(gameRefreshRate.value);
 
-settings.messageDensity=
-messageDensity.value;
+    settings.showSpectators=
+        showSpectators.value==="true";
 
-settings.cornerRadius=
-Number(cornerRadius.value);
-
-settings.uiScale=
-Number(uiScale.value);
-
-settings.desktopNotifications=
-desktopNotifications.value==="true";
-
-settings.hiddenOnly=
-hiddenOnly.value==="true";
-
-settings.notificationSound=
-notificationSound.value==="true";
-
-settings.soundTheme=
-soundTheme.value;
-
-settings.soundDuration=
-Number(soundDuration.value);
-
-settings.soundVolume=
-Number(soundVolume.value);
-
-settings.notificationPreview=
-notificationPreview.value;
-
-settings.clickableLinks=
-clickableLinks.value==="true";
-
-settings.imageLinks=
-imageLinks.value==="true";
-
-settings.newTabLinks=
-newTabLinks.value==="true";
-
-settings.enterToSend=
-enterToSend.value==="true";
-
-settings.confirmDelete=
-confirmDelete.value==="true";
-
-settings.keepText=
-keepText.value==="true";
+    settings.autoOpenGame=
+        autoOpenGame.value==="true";
 
 
-Object.keys(settings).forEach(key=>{
+    Object.keys(settings).forEach(key=>{
 
-localStorage.setItem(
-"chat_"+key,
-settings[key]
-);
+        localStorage.setItem(
+            "chat_"+key,
+            settings[key]
+        );
+
+    });
+
+
+    applySettings();
+
+    settingsOverlay.classList.remove("show");
+};
+
+
+/* =========================================================
+   ACCORDIONS
+========================================================= */
+
+document
+.querySelectorAll(".category-title")
+.forEach(button=>{
+
+    button.onclick=()=>{
+
+        button
+        .parentElement
+        .classList
+        .toggle("open");
+
+    };
 
 });
 
 
-applySettings();
+/* =========================================================
+   MESSAGES
+========================================================= */
 
-settingsOverlay.classList.remove("show");
+async function loadMessages(){
 
+    try{
 
-if(settings.desktopNotifications){
+        const response=
+            await fetch(
+                API_URL+
+                "?channel="+
+                encodeURIComponent(CHANNEL)
+            );
 
-await requestNotificationPermission();
+        const data=
+            await response.json();
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error||
+                "Failed to load messages."
+            );
+        }
+
+        currentMessages=
+            Array.isArray(data.messages)
+            ?data.messages
+            :[];
+
+        renderMessages();
+
+    }catch(error){
+
+        console.error(
+            "Messages:",
+            error
+        );
+
+    }
 
 }
 
-};
+
+function renderMessages(){
+
+    if(!currentMessages.length){
+
+        messagesEl.innerHTML=`
+        <div class="empty">
+            <div>
+                <strong>No messages yet</strong>
+                Be the first to send something.
+            </div>
+        </div>`;
+
+        return;
+    }
 
 
-/* ACCORDIONS */
-
-document.querySelectorAll(".category-title")
-.forEach(btn=>{
-
-btn.onclick=()=>{
-
-btn.parentElement.classList.toggle("open");
-
-};
-
-});
+    const fragment=
+        document.createDocumentFragment();
 
 
-/* RANGE PREVIEWS */
+    currentMessages.forEach(message=>{
 
-textSize.oninput=()=>{
-textSizeValue.textContent=
-textSize.value+"px";
-};
+        const item=
+            document.createElement("div");
 
-wordSpacing.oninput=()=>{
-wordSpacingValue.textContent=
-wordSpacing.value+"px";
-};
-
-lineSpacing.oninput=()=>{
-lineSpacingValue.textContent=
-lineSpacing.value;
-};
-
-cornerRadius.oninput=()=>{
-cornerRadiusValue.textContent=
-cornerRadius.value+"px";
-};
-
-uiScale.oninput=()=>{
-uiScaleValue.textContent=
-Math.round(uiScale.value*100)+"%";
-};
-
-soundDuration.oninput=()=>{
-soundDurationValue.textContent=
-(Number(soundDuration.value)/1000)
-.toFixed(1)+" seconds";
-};
-
-soundVolume.oninput=()=>{
-soundVolumeValue.textContent=
-soundVolume.value+"%";
-};
+        item.className=
+            "message";
 
 
-/* TEXTAREA */
+        const avatar=
+            document.createElement("div");
+
+        avatar.className=
+            "avatar";
+
+        avatar.textContent=
+            (message.username||"?")
+            .charAt(0)
+            .toUpperCase();
+
+
+        const content=
+            document.createElement("div");
+
+        content.className=
+            "message-content";
+
+
+        const top=
+            document.createElement("div");
+
+        top.className=
+            "message-top";
+
+
+        const name=
+            document.createElement("span");
+
+        name.className=
+            "username";
+
+        name.textContent=
+            message.username||"User";
+
+
+        top.appendChild(name);
+
+
+        const time=
+            document.createElement("span");
+
+        time.className=
+            "time";
+
+        time.textContent=
+            formatTime(
+                message.created_at
+            );
+
+        top.appendChild(time);
+
+
+        content.appendChild(top);
+
+
+        if(message.message){
+
+            const text=
+                document.createElement("div");
+
+            text.className=
+                "message-text";
+
+            text.textContent=
+                message.message;
+
+            content.appendChild(text);
+
+        }
+
+
+        item.appendChild(avatar);
+        item.appendChild(content);
+
+        fragment.appendChild(item);
+
+    });
+
+
+    messagesEl.replaceChildren(
+        fragment
+    );
+
+}
+
+
+function formatTime(date){
+
+    if(!date)return "";
+
+    return new Date(date)
+    .toLocaleTimeString(
+        [],
+        {
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
+}
+
+
+/* =========================================================
+   SEND MESSAGE
+========================================================= */
+
+sendBtn.onclick=
+    sendMessage;
+
 
 messageInput.addEventListener(
-"input",
-()=>{
+    "keydown",
+    event=>{
 
-messageInput.style.height="auto";
+        if(
+            event.key==="Enter" &&
+            !event.shiftKey
+        ){
 
-messageInput.style.height=
-Math.min(
-messageInput.scrollHeight,
-150
-)+"px";
+            event.preventDefault();
 
-});
+            sendMessage();
 
+        }
 
-/* IMAGE */
-
-attachBtn.onclick=()=>{
-imageInput.click();
-};
-
-imageInput.onchange=()=>{
-
-selectedFile=
-imageInput.files[0]||null;
-
-attachBtn.textContent=
-selectedFile?"✓":"＋";
-
-};
-
-
-/* IMAGE RESIZE */
-
-function resizeImage(file){
-
-return new Promise(
-(resolve,reject)=>{
-
-const reader=new FileReader();
-
-reader.onload=()=>{
-
-const img=new Image();
-
-img.onload=()=>{
-
-let width=img.width;
-let height=img.height;
-
-const max=1500;
-
-if(width>max||height>max){
-
-const scale=Math.min(
-max/width,
-max/height
+    }
 );
-
-width=Math.round(width*scale);
-height=Math.round(height*scale);
-
-}
-
-const canvas=
-document.createElement("canvas");
-
-canvas.width=width;
-canvas.height=height;
-
-const ctx=
-canvas.getContext("2d");
-
-ctx.drawImage(
-img,
-0,
-0,
-width,
-height
-);
-
-resolve(
-canvas.toDataURL(
-"image/jpeg",
-.78
-)
-);
-
-};
-
-img.onerror=reject;
-
-img.src=reader.result;
-
-};
-
-reader.onerror=reject;
-
-reader.readAsDataURL(file);
-
-});
-
-}
-
-
-/* SEND */
-
-sendBtn.onclick=sendMessage;
-
-messageInput.addEventListener(
-"keydown",
-event=>{
-
-if(
-event.key==="Enter" &&
-!event.shiftKey &&
-settings.enterToSend
-){
-
-event.preventDefault();
-
-sendMessage();
-
-}
-
-});
 
 
 async function sendMessage(){
 
-const text=
-messageInput.value.trim();
+    const text=
+        messageInput.value.trim();
 
-if(!settings.username){
+    if(!text)return;
 
-settingsBtn.click();
+    if(!settings.username){
 
-usernameInput.focus();
+        settingsBtn.click();
 
-alert(
-"Set your name in Settings first."
-);
+        alert(
+            "Set your name in Settings first."
+        );
 
-return;
+        return;
 
-}
+    }
 
-if(!text&&!selectedFile)
-return;
 
-sendBtn.disabled=true;
+    sendBtn.disabled=true;
 
-try{
 
-let image=null;
+    try{
 
-if(selectedFile){
+        const response=
+            await fetch(
+                API_URL,
+                {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body:JSON.stringify({
 
-image=
-await resizeImage(selectedFile);
+                        username:
+                            settings.username,
 
-}
+                        channel:
+                            CHANNEL,
 
-const response=
-await fetch(API_URL,{
+                        message:
+                            text,
 
-method:"POST",
+                        device_id:
+                            deviceId
 
-headers:{
-"Content-Type":"application/json"
-},
+                    })
+                }
+            );
 
-body:JSON.stringify({
 
-username:settings.username,
+        const data=
+            await response.json();
 
-channel:CHANNEL,
 
-message:text,
+        if(!response.ok){
 
-image:image,
+            throw new Error(
+                data.error||
+                "Failed to send."
+            );
 
-device_id:deviceId
+        }
 
-})
 
-});
+        messageInput.value="";
 
-const data=
-await response.json();
+        await loadMessages();
 
-if(!response.ok){
+    }catch(error){
 
-throw new Error(
-data.error||
-"Failed to send message."
-);
+        alert(
+            "Failed to send:\n\n"+
+            error.message
+        );
 
-}
+    }finally{
 
-messageInput.value="";
+        sendBtn.disabled=false;
 
-messageInput.style.height="auto";
-
-selectedFile=null;
-
-imageInput.value="";
-
-attachBtn.textContent="＋";
-
-await loadMessages();
-
-}catch(error){
-
-if(!settings.keepText){
-
-messageInput.value="";
-
-}
-
-alert(
-"Failed to send:\n\n"+
-error.message
-);
-
-}finally{
-
-sendBtn.disabled=false;
-
-}
+    }
 
 }
 
 
-/* LOAD */
+/* =========================================================
+   ACTIVITIES
+========================================================= */
 
-async function loadMessages(){
+activitiesBtn.onclick=async()=>{
 
-try{
+    activitiesOverlay.classList.add("show");
 
-const response=
-await fetch(
-API_URL+
-"?channel="+
-encodeURIComponent(CHANNEL)
-);
-
-const data=
-await response.json();
-
-if(!response.ok){
-
-throw new Error(
-data.error||
-"Failed to load messages."
-);
-
-}
-
-const oldMessages=
-currentMessages;
-
-currentMessages=
-Array.isArray(data.messages)
-?data.messages
-:[];
-
-
-/*
-Detect newly received messages.
-*/
-
-if(oldMessages.length){
-
-const oldIds=
-new Set(
-oldMessages.map(m=>String(m.id))
-);
-
-const newMessages=
-currentMessages.filter(
-m=>!oldIds.has(String(m.id))
-);
-
-for(const message of newMessages){
-
-handleIncomingNotification(message);
-
-}
-
-}
-
-renderMessages();
-
-}catch(error){
-
-messagesEl.innerHTML=`
-
-<div class="empty">
-
-<div>
-
-<strong>
-Unable to load messages
-</strong>
-
-${escapeHtml(error.message)}
-
-</div>
-
-</div>
-
-`;
-
-}
-
-}
-
-
-/* NOTIFICATION PERMISSION */
-
-async function requestNotificationPermission(){
-
-if(!("Notification" in window)){
-
-alert(
-"Your browser does not support desktop notifications."
-);
-
-return false;
-
-}
-
-if(Notification.permission==="granted")
-return true;
-
-if(Notification.permission==="denied"){
-
-alert(
-"Notifications are blocked in your browser. Allow notifications for this site in browser settings."
-);
-
-return false;
-
-}
-
-const permission=
-await Notification.requestPermission();
-
-return permission==="granted";
-
-}
-
-
-/* NOTIFICATION */
-
-let lastNotificationId=null;
-
-function handleIncomingNotification(message){
-
-if(!message)
-return;
-
-if(
-String(message.device_id)===
-String(deviceId)
-)
-return;
-
-if(
-settings.hiddenOnly &&
-document.visibilityState!=="hidden"
-)
-return;
-
-if(
-settings.desktopNotifications
-){
-
-showWindowsNotification(message);
-
-}
-
-if(
-settings.notificationSound
-){
-
-if(document.visibilityState==="hidden"){
-
-playNotificationSound(
-settings.soundTheme,
-settings.soundDuration,
-settings.soundVolume
-);
-
-}
-
-}
-
-}
-
-
-/* WINDOWS NOTIFICATION */
-
-async function showWindowsNotification(message){
-
-const allowed=
-await requestNotificationPermission();
-
-if(!allowed)
-return;
-
-let body="New message";
-
-if(settings.notificationPreview==="name"){
-
-body=
-(message.username||"Someone")+
-" sent a message";
-
-}
-
-else if(
-settings.notificationPreview==="full"
-){
-
-body=
-(message.message||
-(message.image?"📷 Image":"New message"))
-.substring(0,180);
-
-}
-
-const title=
-(message.username||"Chat")+
-" • #"+CHANNEL;
-
-
-/*
-Browser notifications behave like Windows
-notifications on supported Windows browsers.
-*/
-
-try{
-
-const notification=
-new Notification(
-title,
-{
-body:body,
-tag:"chat-"+message.id,
-renotify:true,
-silent:true
-}
-);
-
-notification.onclick=()=>{
-
-window.focus();
-
-notification.close();
-
-};
-
-}catch(error){
-
-console.warn(
-"Notification failed:",
-error
-);
-
-}
-
-}
-
-
-/* TEST NOTIFICATION */
-
-testNotification.onclick=async()=>{
-
-const allowed=
-await requestNotificationPermission();
-
-if(!allowed)
-return;
-
-const testMessage={
-
-id:"test-"+Date.now(),
-
-username:settings.username||
-"Chat",
-
-message:
-"This is a Windows notification test."
-
-};
-
-showWindowsNotification(
-testMessage
-);
-
-if(settings.notificationSound){
-
-playNotificationSound(
-settings.soundTheme,
-settings.soundDuration,
-settings.soundVolume
-);
-
-}
+    await loadActiveGames();
 
 };
 
 
-/* AUDIO */
+closeActivities.onclick=()=>{
 
-function getAudioContext(){
-
-if(!audioContext){
-
-audioContext=
-new (
-window.AudioContext||
-window.webkitAudioContext
-)();
-
-}
-
-if(
-audioContext.state==="suspended"
-){
-
-audioContext.resume();
-
-}
-
-return audioContext;
-
-}
-
-
-/*
-These sounds are synthesized locally.
-No external audio files are needed.
-*/
-
-function playTone(
-ctx,
-frequency,
-start,
-duration,
-volume,
-type="sine"
-){
-
-const oscillator=
-ctx.createOscillator();
-
-const gain=
-ctx.createGain();
-
-oscillator.type=type;
-
-oscillator.frequency
-.setValueAtTime(
-frequency,
-start
-);
-
-gain.gain.setValueAtTime(
-0,
-start
-);
-
-gain.gain.linearRampToValueAtTime(
-volume,
-start+.015
-);
-
-gain.gain.exponentialRampToValueAtTime(
-.001,
-start+duration
-);
-
-oscillator.connect(gain);
-
-gain.connect(ctx.destination);
-
-oscillator.start(start);
-
-oscillator.stop(
-start+duration+.03
-);
-
-}
-
-
-/* 15 SOUND THEMES */
-
-function playNotificationSound(
-theme,
-duration,
-volume
-){
-
-const ctx=
-getAudioContext();
-
-const now=
-ctx.currentTime;
-
-const maxDuration=
-Math.max(
-.1,
-duration/1000
-);
-
-const master=
-Math.max(
-0,
-Math.min(1,volume/100)
-)*.25;
-
-
-/* 1 CLASSIC */
-
-if(theme==="classic"){
-
-playTone(
-ctx,
-880,
-now,
-Math.min(.18,maxDuration),
-master
-);
-
-playTone(
-ctx,
-1175,
-now+.19,
-Math.min(.22,maxDuration-.19),
-master
-);
-
-return;
-
-}
-
-
-/* 2 SOFT */
-
-if(theme==="soft"){
-
-playTone(
-ctx,
-523.25,
-now,
-Math.min(.35,maxDuration),
-master*.65
-);
-
-playTone(
-ctx,
-659.25,
-now+.25,
-Math.min(.45,maxDuration-.25),
-master*.65
-);
-
-return;
-
-}
-
-
-/* 3 DIGITAL */
-
-if(theme==="digital"){
-
-playTone(
-ctx,
-1000,
-now,
-.07,
-master,
-"square"
-);
-
-playTone(
-ctx,
-1500,
-now+.09,
-.09,
-master,
-"square"
-);
-
-return;
-
-}
-
-
-/* 4 POP */
-
-if(theme==="pop"){
-
-playTone(
-ctx,
-660,
-now,
-.12,
-master,
-"sine"
-);
-
-playTone(
-ctx,
-880,
-now+.12,
-.16,
-master,
-"sine"
-);
-
-return;
-
-}
-
-
-/* 5 BELL */
-
-if(theme==="bell"){
-
-playTone(
-ctx,
-784,
-now,
-.7,
-master*.7
-);
-
-playTone(
-ctx,
-1174,
-now,
-.9,
-master*.45
-);
-
-return;
-
-}
-
-
-/* 6 CHIME */
-
-if(theme==="chime"){
-
-const notes=[
-523.25,
-659.25,
-783.99
-];
-
-notes.forEach(
-(f,i)=>{
-
-playTone(
-ctx,
-f,
-now+i*.18,
-Math.min(
-.7,
-maxDuration-i*.18
-),
-master*.6
-);
-
-});
-
-return;
-
-}
-
-
-/* 7 RETRO */
-
-if(theme==="retro"){
-
-playTone(
-ctx,
-440,
-now,
-.1,
-master,
-"square"
-);
-
-playTone(
-ctx,
-660,
-now+.12,
-.1,
-master,
-"square"
-);
-
-playTone(
-ctx,
-880,
-now+.24,
-.13,
-master,
-"square"
-);
-
-return;
-
-}
-
-
-/* 8 COMPUTER */
-
-if(theme==="computer"){
-
-playTone(
-ctx,
-600,
-now,
-.06,
-master,
-"square"
-);
-
-playTone(
-ctx,
-900,
-now+.08,
-.06,
-master,
-"square"
-);
-
-playTone(
-ctx,
-1200,
-now+.16,
-.08,
-master,
-"square"
-);
-
-return;
-
-}
-
-
-/* 9 ALERT */
-
-if(theme==="alert"){
-
-playTone(
-ctx,
-740,
-now,
-.18,
-master,
-"sawtooth"
-);
-
-playTone(
-ctx,
-540,
-now+.2,
-.18,
-master,
-"sawtooth"
-);
-
-return;
-
-}
-
-
-/* 10 WARNING */
-
-if(theme==="warning"){
-
-playTone(
-ctx,
-500,
-now,
-.3,
-master,
-"sawtooth"
-);
-
-playTone(
-ctx,
-500,
-now+.35,
-.3,
-master,
-"sawtooth"
-);
-
-return;
-
-}
-
-
-/* 11 NUCLEAR ALARM */
-
-if(theme==="alarm"){
-
-const cycles=
-Math.max(
-1,
-Math.ceil(maxDuration/.8)
-);
-
-for(let i=0;i<cycles;i++){
-
-const t=
-now+i*.8;
-
-playTone(
-ctx,
-420,
-t,
-.35,
-master,
-"sawtooth"
-);
-
-playTone(
-ctx,
-820,
-t+.35,
-.35,
-master,
-"sawtooth"
-);
-
-}
-
-return;
-
-}
-
-
-/* 12 OPERA */
-
-if(theme==="opera"){
-
-/*
-A synthetic vocal-like sequence.
-It is an original melody, not a recording.
-*/
-
-const notes=[
-261.63,
-329.63,
-392,
-329.63,
-293.66,
-349.23,
-440,
-392,
-329.63,
-392,
-523.25
-];
-
-const noteLength=
-Math.min(
-.28,
-maxDuration/notes.length
-);
-
-notes.forEach(
-(f,i)=>{
-
-const t=
-now+i*noteLength;
-
-playTone(
-ctx,
-f,
-t,
-Math.max(
-.08,
-noteLength*.9
-),
-master*.55,
-"sine"
-);
-
-});
-
-return;
-
-}
-
-
-/* 13 SYNTH */
-
-if(theme==="synth"){
-
-const notes=[
-220,
-330,
-440,
-660
-];
-
-notes.forEach(
-(f,i)=>{
-
-playTone(
-ctx,
-f,
-now+i*.12,
-.2,
-master,
-"triangle"
-);
-
-});
-
-return;
-
-}
-
-
-/* 14 PULSE */
-
-if(theme==="pulse"){
-
-for(
-let i=0;
-i<4;
-i++
-){
-
-playTone(
-ctx,
-700,
-now+i*.16,
-.07,
-master,
-"square"
-);
-
-}
-
-return;
-
-}
-
-
-/* 15 SPACE */
-
-if(theme==="space"){
-
-playTone(
-ctx,
-180,
-now,
-.5,
-master*.5,
-"sine"
-);
-
-playTone(
-ctx,
-270,
-now+.2,
-.7,
-master*.4,
-"triangle"
-);
-
-playTone(
-ctx,
-540,
-now+.4,
-.8,
-master*.3,
-"sine"
-);
-
-}
-
-}
-
-
-/* RENDER */
-
-function renderMessages(){
-
-const wasBottom=
-messagesEl.scrollHeight-
-messagesEl.scrollTop-
-messagesEl.clientHeight<100;
-
-if(!currentMessages.length){
-
-messagesEl.innerHTML=`
-
-<div class="empty">
-
-<div>
-
-<strong>No messages yet</strong>
-
-Be the first to send something.
-
-</div>
-
-</div>
-
-`;
-
-return;
-
-}
-
-const fragment=
-document.createDocumentFragment();
-
-currentMessages.forEach(
-message=>{
-
-const item=
-document.createElement("div");
-
-item.className="message";
-
-if(settings.messageDensity==="compact")
-item.classList.add("compact");
-
-item.dataset.id=
-message.id;
-
-const avatar=
-document.createElement("div");
-
-avatar.className="avatar";
-
-avatar.textContent=
-(message.username||"?")
-.charAt(0)
-.toUpperCase();
-
-const content=
-document.createElement("div");
-
-content.className=
-"message-content";
-
-const top=
-document.createElement("div");
-
-top.className=
-"message-top";
-
-const name=
-document.createElement("span");
-
-name.className=
-"username";
-
-name.textContent=
-message.username||"User";
-
-top.appendChild(name);
-
-
-if(settings.showTimestamps){
-
-const time=
-document.createElement("span");
-
-time.className="time";
-
-time.textContent=
-formatTime(
-message.created_at
-);
-
-top.appendChild(time);
-
-}
-
-
-if(message.edited){
-
-const edited=
-document.createElement("span");
-
-edited.className="edited";
-
-edited.textContent=
-"(edited)";
-
-top.appendChild(edited);
-
-}
-
-content.appendChild(top);
-
-
-/* TEXT + LINKS */
-
-if(message.message){
-
-const text=
-createMessageContent(
-message.message
-);
-
-content.appendChild(text);
-
-}
-
-
-/* STORED IMAGE */
-
-if(message.image){
-
-const img=
-document.createElement("img");
-
-img.className=
-"message-image";
-
-img.src=
-message.image;
-
-img.alt="Image";
-
-img.onclick=()=>{
-openImage(message.image);
-};
-
-content.appendChild(img);
-
-}
-
-
-item.appendChild(avatar);
-
-item.appendChild(content);
-
-
-/* ONLY OWNER CONTEXT MENU */
-
-if(
-message.device_id &&
-message.device_id===deviceId
-){
-
-item.addEventListener(
-"contextmenu",
-event=>{
-
-event.preventDefault();
-
-showContextMenu(
-event.clientX,
-event.clientY,
-message
-);
-
-});
-
-}
-
-fragment.appendChild(item);
-
-});
-
-messagesEl.replaceChildren(fragment);
-
-if(
-wasBottom &&
-settings.autoScroll
-){
-
-messagesEl.scrollTop=
-messagesEl.scrollHeight;
-
-}
-
-}
-
-
-/* LINK PARSER */
-
-function createMessageContent(text){
-
-const container=
-document.createElement("div");
-
-container.className=
-"message-text";
-
-if(!settings.clickableLinks){
-
-container.textContent=text;
-
-return container;
-
-}
-
-const urlRegex=
-/(https?:\/\/[^\s<]+)/gi;
-
-let last=0;
-
-let match;
-
-while(
-(match=urlRegex.exec(text))!==null
-){
-
-const before=
-text.slice(
-last,
-match.index
-);
-
-if(before){
-
-container.appendChild(
-document.createTextNode(before)
-);
-
-}
-
-let url=
-match[0];
-
-let punctuation="";
-
-/*
-Remove common punctuation from the URL.
-*/
-
-while(
-/[.,!?;:)\]}]$/.test(url)
-){
-
-punctuation=
-url.slice(-1)+
-punctuation;
-
-url=url.slice(0,-1);
-
-}
-
-const isImage=
-settings.imageLinks &&
-isImageUrl(url);
-
-if(isImage){
-
-const img=
-document.createElement("img");
-
-img.className=
-"message-image";
-
-img.src=url;
-
-img.alt="Linked image";
-
-img.loading="lazy";
-
-img.onclick=()=>{
-openImage(url);
-};
-
-container.appendChild(img);
-
-}else{
-
-const link=
-document.createElement("a");
-
-link.className=
-"message-link";
-
-link.href=url;
-
-link.textContent=url;
-
-link.rel=
-"noopener noreferrer";
-
-if(settings.newTabLinks){
-
-link.target="_blank";
-
-}
-
-container.appendChild(link);
-
-}
-
-if(punctuation){
-
-container.appendChild(
-document.createTextNode(
-punctuation
-)
-);
-
-}
-
-last=
-match.index+
-match[0].length;
-
-}
-
-const after=
-text.slice(last);
-
-if(after){
-
-container.appendChild(
-document.createTextNode(after)
-);
-
-}
-
-return container;
-
-}
-
-
-function isImageUrl(url){
-
-return /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?.*)?$/i
-.test(url);
-
-}
-
-
-/* CONTEXT MENU */
-
-function showContextMenu(
-x,
-y,
-message
-){
-
-selectedMessage=message;
-
-contextMenu.style.left=
-Math.min(
-x,
-window.innerWidth-170
-)+"px";
-
-contextMenu.style.top=
-Math.min(
-y,
-window.innerHeight-100
-)+"px";
-
-contextMenu.classList.add("show");
-
-}
-
-
-document.addEventListener(
-"click",
-()=>{
-contextMenu.classList.remove("show");
-}
-);
-
-
-/* EDIT */
-
-editMessageBtn.onclick=
-async event=>{
-
-event.stopPropagation();
-
-contextMenu.classList.remove("show");
-
-if(!selectedMessage)
-return;
-
-const newText=
-prompt(
-"Edit message:",
-selectedMessage.message||""
-);
-
-if(newText===null)
-return;
-
-try{
-
-const response=
-await fetch(
-API_URL,
-{
-
-method:"PATCH",
-
-headers:{
-"Content-Type":
-"application/json"
-},
-
-body:JSON.stringify({
-
-id:selectedMessage.id,
-
-device_id:deviceId,
-
-message:newText.trim()
-
-})
-
-});
-
-const data=
-await response.json();
-
-if(!response.ok){
-
-throw new Error(
-data.error||
-"Failed to edit message."
-);
-
-}
-
-await loadMessages();
-
-}catch(error){
-
-alert(
-"Failed to edit:\n\n"+
-error.message
-);
-
-}
+    activitiesOverlay.classList.remove("show");
 
 };
 
 
-/* DELETE */
+document
+.querySelectorAll(".create-game")
+.forEach(button=>{
 
-deleteMessageBtn.onclick=
-event=>{
+    button.onclick=async()=>{
 
-event.stopPropagation();
+        const type=
+            button.dataset.game;
 
-contextMenu.classList.remove(
-"show"
-);
+        await createGame(type);
 
-if(!selectedMessage)
-return;
-
-if(settings.confirmDelete){
-
-openConfirm(
-"Delete message?",
-"This message will be permanently removed.",
-deleteSelectedMessage
-);
-
-}else{
-
-deleteSelectedMessage();
-
-}
-
-};
-
-
-async function deleteSelectedMessage(){
-
-if(!selectedMessage)
-return;
-
-try{
-
-const response=
-await fetch(
-API_URL,
-{
-
-method:"DELETE",
-
-headers:{
-"Content-Type":
-"application/json"
-},
-
-body:JSON.stringify({
-
-id:selectedMessage.id,
-
-device_id:deviceId
-
-})
+    };
 
 });
 
-const data=
-await response.json();
 
-if(!response.ok){
+/* =========================================================
+   GAME API
+========================================================= */
 
-throw new Error(
-data.error||
-"Failed to delete message."
-);
-
-}
-
-selectedMessage=null;
-
-await loadMessages();
-
-}catch(error){
-
-alert(
-"Failed to delete:\n\n"+
-error.message
-);
-
-}
-
-}
-
-
-/* IMAGE VIEWER */
-
-function openImage(src){
-
-fullImage.src=src;
-
-imageViewer.classList.add(
-"show"
-);
-
-}
-
-
-function closeImage(){
-
-imageViewer.classList.remove(
-"show"
-);
-
-fullImage.src="";
-
-}
-
-
-backImage.onclick=closeImage;
-
-
-imageViewer.onclick=event=>{
-
-if(event.target===imageViewer){
-
-closeImage();
-
-}
-
-};
-
-
-document.addEventListener(
-"keydown",
-event=>{
-
-if(
-event.key==="Escape" &&
-imageViewer.classList.contains("show")
+async function gameRequest(
+    method,
+    body=null,
+    query=""
 ){
 
-closeImage();
+    const options={
+        method,
+        headers:{
+            "Content-Type":
+                "application/json"
+        }
+    };
+
+    if(body){
+
+        options.body=
+            JSON.stringify(body);
+
+    }
+
+
+    const response=
+        await fetch(
+            GAMES_API+
+            query,
+            options
+        );
+
+
+    let data={};
+
+    try{
+
+        data=
+            await response.json();
+
+    }catch{
+
+        data={};
+
+    }
+
+
+    if(!response.ok){
+
+        throw new Error(
+            data.error||
+            "Game server error."
+        );
+
+    }
+
+
+    return data;
+}
+
+
+/* =========================================================
+   CREATE GAME
+========================================================= */
+
+async function createGame(type){
+
+    if(!settings.username){
+
+        settingsBtn.click();
+
+        alert(
+            "Set your name first."
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const data=
+            await gameRequest(
+                "POST",
+                {
+
+                    action:"create",
+
+                    game_type:
+                        type,
+
+                    channel:
+                        CHANNEL,
+
+                    host:{
+                        id:deviceId,
+                        username:
+                            settings.username
+                    }
+
+                }
+            );
+
+
+        if(data.game){
+
+            openGame(
+                data.game
+            );
+
+        }
+
+        await loadActiveGames();
+
+    }catch(error){
+
+        alert(
+            "Could not create game:\n\n"+
+            error.message
+        );
+
+    }
 
 }
 
-});
+
+/* =========================================================
+   ACTIVE GAMES
+========================================================= */
+
+async function loadActiveGames(){
+
+    try{
+
+        const data=
+            await gameRequest(
+                "GET",
+                null,
+                "?channel="+
+                encodeURIComponent(CHANNEL)
+            );
 
 
-/* CONFIRM */
+        const games=
+            Array.isArray(data.games)
+            ?data.games
+            :[];
 
-function openConfirm(
-title,
-text,
-callback
-){
 
-dialogTitle.textContent=
-title;
+        if(!games.length){
 
-dialogText.textContent=
-text;
+            activeGames.innerHTML=
+                `<span style="color:var(--muted)">
+                    No active games.
+                </span>`;
 
-confirmCallback=
-callback;
+            return;
 
-dialogOverlay.classList.add(
-"show"
-);
+        }
+
+
+        activeGames.innerHTML="";
+
+
+        games.forEach(game=>{
+
+            const card=
+                document.createElement("div");
+
+            card.className=
+                "game-card";
+
+            const title=
+                getGameName(
+                    game.game_type
+                );
+
+
+            card.innerHTML=`
+
+                <h3>
+                    ${escapeHtml(title)}
+                </h3>
+
+                <p>
+                    Host:
+                    ${escapeHtml(
+                        game.host_username||"?"
+                    )}
+                    <br>
+                    Players:
+                    ${
+                        Array.isArray(game.players)
+                        ?game.players.length
+                        :0
+                    }
+                    ${
+                        game.started
+                        ?" · Started"
+                        :" · Waiting"
+                    }
+                </p>
+
+                <button class="primary-btn">
+                    Open
+                </button>
+
+            `;
+
+
+            card
+            .querySelector("button")
+            .onclick=()=>{
+
+                openGame(game);
+
+            };
+
+
+            activeGames.appendChild(card);
+
+        });
+
+
+    }catch(error){
+
+        activeGames.innerHTML=
+            `<span style="color:#ff7777">
+                ${escapeHtml(error.message)}
+            </span>`;
+
+    }
 
 }
 
 
-dialogCancel.onclick=()=>{
+/* =========================================================
+   OPEN GAME
+========================================================= */
 
-dialogOverlay.classList.remove(
-"show"
-);
+function openGame(game){
 
-confirmCallback=null;
+    currentGame=
+        game;
+
+
+    gameOverlay.classList.add(
+        "show"
+    );
+
+
+    renderGame();
+
+    startGameTimer();
+
+}
+
+
+closeGame.onclick=()=>{
+
+    gameOverlay.classList.remove(
+        "show"
+    );
+
+    currentGame=null;
 
 };
 
 
-dialogConfirm.onclick=
-async()=>{
+/* =========================================================
+   GAME INFORMATION
+========================================================= */
 
-const callback=
-confirmCallback;
+function getGameName(type){
 
-dialogOverlay.classList.remove(
-"show"
-);
+    const names={
 
-confirmCallback=null;
+        tictactoe:
+            "❌⭕ Tic-Tac-Toe",
 
-if(callback){
+        dice:
+            "🎲 Dice Battle",
 
-await callback();
+        connect4:
+            "🟡 Connect 4",
+
+        cards:
+            "🃏 Higher Card",
+
+        boardrace:
+            "🏁 Board Race"
+
+    };
+
+    return names[type]||"Game";
 
 }
+
+
+/* =========================================================
+   RENDER GAME
+========================================================= */
+
+function renderGame(){
+
+    if(!currentGame)return;
+
+
+    gameTitle.textContent=
+        getGameName(
+            currentGame.game_type
+        );
+
+
+    gameHost.textContent=
+        currentGame.host_username||
+        currentGame.host?.username||
+        "Unknown";
+
+
+    gameStatus.textContent=
+        currentGame.started
+        ?"Started"
+        :"Waiting for players";
+
+
+    renderPlayers();
+
+    renderGameBoard();
+
+    updateGameButtons();
+
+}
+
+
+/* =========================================================
+   PLAYERS
+========================================================= */
+
+function renderPlayers(){
+
+    gamePlayers.innerHTML="";
+
+
+    const players=
+        Array.isArray(
+            currentGame.players
+        )
+        ?currentGame.players
+        :[];
+
+
+    players.forEach(player=>{
+
+        const div=
+            document.createElement("div");
+
+        div.className=
+            "player";
+
+
+        if(
+            player.id===
+            currentGame.host_id
+        ){
+
+            div.classList.add(
+                "host"
+            );
+
+        }
+
+
+        if(
+            player.id===
+            currentGame.turn_player_id
+        ){
+
+            div.classList.add(
+                "turn"
+            );
+
+        }
+
+
+        div.textContent=
+            player.username||
+            "Player";
+
+
+        if(
+            player.id===
+            currentGame.host_id
+        ){
+
+            div.textContent+=
+                " 👑";
+
+        }
+
+
+        if(
+            player.id===
+            currentGame.turn_player_id
+        ){
+
+            div.textContent+=
+                " ← turn";
+
+        }
+
+
+        gamePlayers.appendChild(
+            div
+        );
+
+    });
+
+
+    const turnPlayer=
+        players.find(
+            player=>
+                player.id===
+                currentGame.turn_player_id
+        );
+
+
+    gameTurn.textContent=
+        turnPlayer
+        ?turnPlayer.username
+        :"—";
+
+
+    if(
+        currentGame.started &&
+        !players.some(
+            p=>p.id===deviceId
+        )
+    ){
+
+        spectatorText.textContent=
+            "You are a spectator. " +
+            "You joined after the game started.";
+
+    }else if(
+        !currentGame.started
+    ){
+
+        spectatorText.textContent=
+            "Press Join before the host starts.";
+
+    }else{
+
+        spectatorText.textContent=
+            "You are a player.";
+
+    }
+
+}
+
+
+/* =========================================================
+   JOIN
+========================================================= */
+
+joinGameBtn.onclick=
+    async()=>{
+
+        if(!currentGame)return;
+
+
+        if(currentGame.started){
+
+            alert(
+                "This game has already started. " +
+                "You can watch, but you cannot join as a player."
+            );
+
+            return;
+
+        }
+
+
+        if(!settings.username){
+
+            settingsBtn.click();
+
+            alert(
+                "Set your name first."
+            );
+
+            return;
+
+        }
+
+
+        try{
+
+            const data=
+                await gameRequest(
+                    "PATCH",
+                    {
+
+                        action:"join",
+
+                        game_id:
+                            currentGame.id,
+
+                        player:{
+                            id:deviceId,
+
+                            username:
+                                settings.username
+                        }
+
+                    }
+                );
+
+
+            if(data.game){
+
+                currentGame=
+                    data.game;
+
+                renderGame();
+
+            }
+
+
+        }catch(error){
+
+            alert(
+                "Could not join:\n\n"+
+                error.message
+            );
+
+        }
+
+    };
+
+
+/* =========================================================
+   START
+========================================================= */
+
+startGameBtn.onclick=
+    async()=>{
+
+        if(!currentGame)return;
+
+
+        if(
+            currentGame.host_id!==
+            deviceId
+        ){
+
+            alert(
+                "Only the host can start the game."
+            );
+
+            return;
+
+        }
+
+
+        if(currentGame.started){
+
+            return;
+
+        }
+
+
+        try{
+
+            const data=
+                await gameRequest(
+                    "PATCH",
+                    {
+
+                        action:"start",
+
+                        game_id:
+                            currentGame.id
+
+                    }
+                );
+
+
+            if(data.game){
+
+                currentGame=
+                    data.game;
+
+                renderGame();
+
+            }
+
+        }catch(error){
+
+            alert(
+                "Could not start:\n\n"+
+                error.message
+            );
+
+        }
+
+    };
+
+
+/* =========================================================
+   LEAVE
+========================================================= */
+
+leaveGameBtn.onclick=
+    async()=>{
+
+        if(!currentGame)return;
+
+
+        try{
+
+            const data=
+                await gameRequest(
+                    "PATCH",
+                    {
+
+                        action:"leave",
+
+                        game_id:
+                            currentGame.id,
+
+                        player_id:
+                            deviceId
+
+                    }
+                );
+
+
+            if(data.game){
+
+                currentGame=
+                    data.game;
+
+                renderGame();
+
+            }else{
+
+                gameOverlay.classList.remove(
+                    "show"
+                );
+
+                currentGame=null;
+
+            }
+
+        }catch(error){
+
+            alert(
+                "Could not leave:\n\n"+
+                error.message
+            );
+
+        }
+
+    };
+
+
+/* =========================================================
+   BUTTON STATE
+========================================================= */
+
+function updateGameButtons(){
+
+    if(!currentGame)return;
+
+
+    const players=
+        Array.isArray(
+            currentGame.players
+        )
+        ?currentGame.players
+        :[];
+
+
+    const isPlayer=
+        players.some(
+            p=>p.id===deviceId
+        );
+
+
+    const isHost=
+        currentGame.host_id===
+        deviceId;
+
+
+    joinGameBtn.style.display=
+        !currentGame.started &&
+        !isPlayer
+        ?"block"
+        :"none";
+
+
+    startGameBtn.style.display=
+        !currentGame.started &&
+        isHost
+        ?"block"
+        :"none";
+
+
+    leaveGameBtn.style.display=
+        !currentGame.started &&
+        isPlayer
+        ?"block"
+        :"none";
+
+
+    gameActionBtn.style.display=
+        currentGame.started &&
+        isPlayer
+        ?"block"
+        :"none";
+
+
+    if(
+        currentGame.started &&
+        !isPlayer
+    ){
+
+        gameMessage.textContent=
+            "Spectating — wait for the players.";
+
+    }
+
+}
+
+
+/* =========================================================
+   GAME BOARD
+========================================================= */
+
+function renderGameBoard(){
+
+    if(!currentGame)return;
+
+
+    const state=
+        currentGame.state||
+        {};
+
+
+    gameArea.innerHTML="";
+
+
+    switch(
+        currentGame.game_type
+    ){
+
+        case "tictactoe":
+            renderTicTacToe(state);
+            break;
+
+        case "dice":
+            renderDice(state);
+            break;
+
+        case "connect4":
+            renderConnect4(state);
+            break;
+
+        case "cards":
+            renderCards(state);
+            break;
+
+        case "boardrace":
+            renderBoardRace(state);
+            break;
+
+    }
+
+}
+
+
+/* =========================================================
+   TIC TAC TOE
+========================================================= */
+
+function renderTicTacToe(state){
+
+    const board=
+        Array.isArray(state.board)
+        ?state.board
+        :Array(9).fill(null);
+
+
+    const boardEl=
+        document.createElement("div");
+
+    boardEl.className=
+        "ttt";
+
+
+    board.forEach(
+        (value,index)=>{
+
+            const button=
+                document.createElement("button");
+
+            button.className=
+                "ttt-cell";
+
+            button.textContent=
+                value||"";
+
+
+            button.onclick=()=>{
+
+                gameMove({
+                    move_type:
+                        "place",
+
+                    index:index
+
+                });
+
+            };
+
+
+            boardEl.appendChild(
+                button
+            );
+
+        }
+    );
+
+
+    gameArea.appendChild(
+        boardEl
+    );
+
+
+    gameMessage.textContent=
+        state.winner
+        ?`Winner: ${state.winner}`
+        :"Place your mark.";
+
+}
+
+
+/* =========================================================
+   DICE
+========================================================= */
+
+function renderDice(state){
+
+    const box=
+        document.createElement("div");
+
+    box.className=
+        "dice-box";
+
+
+    const number=
+        document.createElement("div");
+
+    number.className=
+        "dice-number";
+
+    number.textContent=
+        state.lastRoll||
+        "🎲";
+
+
+    const info=
+        document.createElement("div");
+
+    info.style.color=
+        "var(--muted)";
+
+    info.textContent=
+        state.winner
+        ?`Winner: ${state.winner}`
+        :"Roll when it is your turn.";
+
+
+    box.appendChild(number);
+    box.appendChild(info);
+
+    gameArea.appendChild(box);
+
+
+    gameActionBtn.textContent=
+        "🎲 Roll Dice";
+
+}
+
+
+/* =========================================================
+   CONNECT 4
+========================================================= */
+
+function renderConnect4(state){
+
+    const board=
+        Array.isArray(state.board)
+        ?state.board
+        :Array(42).fill(null);
+
+
+    const boardEl=
+        document.createElement("div");
+
+    boardEl.className=
+        "connect4";
+
+
+    board.forEach(
+        (value,index)=>{
+
+            const cell=
+                document.createElement("button");
+
+            cell.className=
+                "c4-cell";
+
+
+            if(value==="R"){
+                cell.classList.add("red");
+            }
+
+            if(value==="Y"){
+                cell.classList.add("yellow");
+            }
+
+
+            cell.onclick=()=>{
+
+                const column=
+                    index%7;
+
+                gameMove({
+
+                    move_type:
+                        "column",
+
+                    column:
+                        column
+
+                });
+
+            };
+
+
+            boardEl.appendChild(
+                cell
+            );
+
+        }
+    );
+
+
+    gameArea.appendChild(
+        boardEl
+    );
+
+
+    gameMessage.textContent=
+        state.winner
+        ?`Winner: ${state.winner}`
+        :"Choose a column.";
+
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+function renderCards(state){
+
+    const box=
+        document.createElement("div");
+
+    box.className=
+        "card-box";
+
+
+    box.textContent=
+        state.myCard||
+        "?";
+
+
+    gameArea.appendChild(
+        box
+    );
+
+
+    gameActionBtn.textContent=
+        "🃏 Draw Card";
+
+
+    gameMessage.textContent=
+        state.winner
+        ?`Winner: ${state.winner}`
+        :"Draw your card.";
+
+
+}
+
+
+/* =========================================================
+   BOARD RACE
+========================================================= */
+
+function renderBoardRace(state){
+
+    const positions=
+        state.positions||
+        {};
+
+
+    const board=
+        document.createElement("div");
+
+    board.className=
+        "board";
+
+
+    for(
+        let i=0;
+        i<100;
+        i++
+    ){
+
+        const cell=
+            document.createElement("div");
+
+        cell.className=
+            "board-cell";
+
+
+        cell.textContent=
+            i+1;
+
+
+        Object.keys(
+            positions
+        ).forEach(
+            playerId=>{
+
+                if(
+                    Number(
+                        positions[playerId]
+                    )===i
+                ){
+
+                    const token=
+                        document.createElement(
+                            "div"
+                        );
+
+                    token.className=
+                        "board-token";
+
+                    token.textContent=
+                        "●";
+
+                    cell.appendChild(
+                        token
+                    );
+
+                }
+
+            }
+        );
+
+
+        board.appendChild(
+            cell
+        );
+
+    }
+
+
+    gameArea.appendChild(
+        board
+    );
+
+
+    gameActionBtn.textContent=
+        "🎲 Roll & Move";
+
+    gameMessage.textContent=
+        state.winner
+        ?`Winner: ${state.winner}`
+        :"Race to square 100.";
+
+}
+
+
+/* =========================================================
+   GAME ACTION
+========================================================= */
+
+gameActionBtn.onclick=()=>{
+
+    if(!currentGame)return;
+
+
+    switch(
+        currentGame.game_type
+    ){
+
+        case "dice":
+
+            gameMove({
+                move_type:
+                    "roll"
+            });
+
+            break;
+
+
+        case "cards":
+
+            gameMove({
+                move_type:
+                    "draw"
+            });
+
+            break;
+
+
+        case "boardrace":
+
+            gameMove({
+                move_type:
+                    "roll"
+            });
+
+            break;
+
+    }
 
 };
 
 
-/* REMOVE EVERYTHING */
+/* =========================================================
+   SEND GAME MOVE
+========================================================= */
 
-removeEverything.onclick=()=>{
+async function gameMove(move){
 
-openConfirm(
-"Remove everything?",
-"This will permanently remove every message and image from the chat for EVERYONE.",
-()=>{
-
-openConfirm(
-"I know",
-"You understand that the entire chat history will be deleted.",
-()=>{
-
-openConfirm(
-"Are you ultra sure?",
-"Every stored message will be permanently removed.",
-permanentlyDeleteEverything
-);
-
-});
-
-}
-);
-
-};
+    if(!currentGame)return;
 
 
-async function permanentlyDeleteEverything(){
-
-try{
-
-const response=
-await fetch(
-API_URL,
-{
-
-method:"DELETE",
-
-headers:{
-"Content-Type":
-"application/json"
-},
-
-body:JSON.stringify({
-delete_all:true
-})
-
-});
-
-const data=
-await response.json();
-
-if(!response.ok){
-
-throw new Error(
-data.error||
-"Failed to remove everything."
-);
-
-}
-
-currentMessages=[];
-
-renderMessages();
-
-alert(
-"The entire chat has been wiped."
-);
-
-}catch(error){
-
-alert(
-"Failed to wipe chat:\n\n"+
-error.message
-);
-
-}
-
-}
+    const players=
+        Array.isArray(
+            currentGame.players
+        )
+        ?currentGame.players
+        :[];
 
 
-/* REFRESH */
+    const me=
+        players.find(
+            player=>
+                player.id===deviceId
+        );
 
-function startRefreshTimer(){
 
-if(refreshTimer){
+    if(!me){
 
-clearInterval(refreshTimer);
+        alert(
+            "You are spectating this game."
+        );
 
-}
+        return;
 
-refreshTimer=
-setInterval(
-loadMessages,
-Number(settings.refreshRate)
-);
+    }
+
+
+    if(
+        currentGame.turn_player_id &&
+        currentGame.turn_player_id!==deviceId
+    ){
+
+        alert(
+            "It is not your turn."
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const data=
+            await gameRequest(
+                "PATCH",
+                {
+
+                    action:"move",
+
+                    game_id:
+                        currentGame.id,
+
+                    player_id:
+                        deviceId,
+
+                    move:move
+
+                }
+            );
+
+
+        if(data.game){
+
+            currentGame=
+                data.game;
+
+            renderGame();
+
+        }
+
+    }catch(error){
+
+        alert(
+            "Move failed:\n\n"+
+            error.message
+        );
+
+    }
 
 }
 
 
-/* TIME */
+/* =========================================================
+   GAME REFRESH
+========================================================= */
 
-function formatTime(date){
+function startGameTimer(){
 
-if(!date)
-return "";
+    if(gameTimer){
 
-const d=
-new Date(date);
+        clearInterval(
+            gameTimer
+        );
 
-if(settings.timestampFormat==="full"){
+    }
 
-return d.toLocaleString();
+
+    gameTimer=
+        setInterval(
+            async()=>{
+
+                await loadActiveGames();
+
+
+                if(
+                    currentGame &&
+                    gameOverlay.classList.contains(
+                        "show"
+                    )
+                ){
+
+                    try{
+
+                        const data=
+                            await gameRequest(
+                                "GET",
+                                null,
+                                "?id="+
+                                encodeURIComponent(
+                                    currentGame.id
+                                )
+                            );
+
+
+                        if(data.game){
+
+                            currentGame=
+                                data.game;
+
+                            renderGame();
+
+                        }
+
+                    }catch(error){
+
+                        console.error(
+                            "Game refresh:",
+                            error
+                        );
+
+                    }
+
+                }
+
+            },
+            Number(
+                settings.gameRefreshRate
+            )
+        );
 
 }
 
-if(settings.timestampFormat==="seconds"){
 
-return d.toLocaleTimeString(
-[],
-{
-hour:"2-digit",
-minute:"2-digit",
-second:"2-digit"
+function startMessageTimer(){
+
+    if(messageTimer){
+
+        clearInterval(
+            messageTimer
+        );
+
+    }
+
+
+    messageTimer=
+        setInterval(
+            loadMessages,
+            Number(
+                settings.refreshRate
+            )
+        );
+
 }
-);
-
-}
-
-return d.toLocaleTimeString(
-[],
-{
-hour:"2-digit",
-minute:"2-digit"
-}
-);
-
-}
 
 
-/* ESCAPE */
+/* =========================================================
+   HELPERS
+========================================================= */
 
 function escapeHtml(value){
 
-return String(value)
-.replaceAll("&","&amp;")
-.replaceAll("<","&lt;")
-.replaceAll(">","&gt;")
-.replaceAll('"',"&quot;")
-.replaceAll("'","&#039;");
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
 
 }
 
 
-/*
-IMPORTANT:
-Audio must be unlocked by a user interaction
-because browsers block autoplay.
-*/
-
-document.addEventListener(
-"click",
-()=>{
-
-try{
-
-if(audioContext &&
-audioContext.state==="suspended"
-){
-
-audioContext.resume();
-
-}
-
-}catch(e){}
-
-},
-{passive:true}
-);
-
-
-/*
-Register service worker if you create /sw.js.
-
-This is required for real background
-push notifications when the page is closed.
-*/
-
-if("serviceWorker" in navigator){
-
-window.addEventListener(
-"load",
-()=>{
-
-navigator.serviceWorker
-.register("/sw.js")
-.then(
-()=>console.log(
-"Service worker registered."
-)
-)
-.catch(
-error=>console.warn(
-"Service worker registration failed:",
-error
-)
-);
-
-});
-
-}
-
-
-/* START */
+/* =========================================================
+   START
+========================================================= */
 
 loadSettingsUI();
 
 applySettings();
 
 loadMessages();
+
+loadActiveGames();
 
 </script>
 
