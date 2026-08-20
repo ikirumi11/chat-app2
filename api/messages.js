@@ -1,41 +1,15 @@
 export default async function handler(req, res) {
 
-    res.setHeader(
-        "Content-Type",
-        "application/json"
-    );
-
-    res.setHeader(
-        "Access-Control-Allow-Origin",
-        "*"
-    );
-
-    res.setHeader(
-        "Access-Control-Allow-Methods",
-        "GET,POST,OPTIONS"
-    );
-
-    res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Content-Type"
-    );
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
     if (req.method === "OPTIONS") {
-
-        return res
-            .status(200)
-            .end();
+        return res.status(200).end();
     }
 
     try {
-
-        /*
-         * IMPORTANT
-         *
-         * These come from Vercel Environment Variables.
-         *
-         * Do NOT put your sb_secret_ key in this file.
-         */
 
         const supabaseUrl =
             process.env.https://wlvbkdzcueqkknysisfw.supabase.co;
@@ -44,88 +18,63 @@ export default async function handler(req, res) {
             process.env.sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL;
 
 
+        // =========================
+        // CHECK ENVIRONMENT VARIABLES
+        // =========================
+
         if (!supabaseUrl) {
 
             return res.status(500).json({
-
-                error:
-                    "SUPABASE_URL is missing.",
-
-                fix:
-                    "Add SUPABASE_URL to Vercel Environment Variables and redeploy."
-
+                error: "SUPABASE_URL is missing",
+                fix: "Go to Vercel → Project → Settings → Environment Variables and add SUPABASE_URL."
             });
         }
-
 
         if (!supabaseKey) {
 
             return res.status(500).json({
-
-                error:
-                    "SUPABASE_SECRET_KEY is missing.",
-
-                fix:
-                    "Add SUPABASE_SECRET_KEY to Vercel Environment Variables and redeploy."
-
+                error: "SUPABASE_SECRET_KEY is missing",
+                fix: "Go to Vercel → Project → Settings → Environment Variables and add SUPABASE_SECRET_KEY."
             });
         }
 
 
         const cleanUrl =
-            supabaseUrl.replace(
-                /\/+$/,
-                ""
-            );
+            supabaseUrl.replace(/\/+$/, "");
 
 
-        /*
-         * =========================
-         * GET
-         * =========================
-         */
+        // =========================
+        // GET MESSAGES
+        // =========================
 
         if (req.method === "GET") {
 
             const channel =
                 String(
-                    req.query.channel ||
-                    "general"
+                    req.query.channel || "general"
                 )
                 .trim()
                 .substring(0, 32);
 
 
-            const query =
+            const url =
                 cleanUrl +
                 "/rest/v1/messages" +
                 "?select=id,username,channel,message,created_at" +
                 "&channel=eq." +
-                encodeURIComponent(
-                    channel
-                ) +
+                encodeURIComponent(channel) +
                 "&order=created_at.asc";
 
 
             const response =
-                await fetch(
-                    query,
-                    {
+                await fetch(url, {
+                    method: "GET",
 
-                        method: "GET",
-
-                        headers: {
-
-                            "apikey":
-                                supabaseKey,
-
-                            "Accept":
-                                "application/json"
-
-                        }
-
+                    headers: {
+                        "apikey": supabaseKey,
+                        "Accept": "application/json"
                     }
-                );
+                });
 
 
             const text =
@@ -134,27 +83,25 @@ export default async function handler(req, res) {
 
             let data;
 
-
             try {
 
-                data =
-                    JSON.parse(text);
+                data = JSON.parse(text);
 
             } catch {
 
                 return res.status(500).json({
 
                     error:
-                        "Supabase returned invalid JSON.",
+                        "Supabase did not return JSON.",
 
                     httpStatus:
                         response.status,
 
-                    response:
-                        text.substring(
-                            0,
-                            2000
-                        )
+                    rawResponse:
+                        text.substring(0, 2000),
+
+                    fix:
+                        "Check your SUPABASE_URL and SUPABASE_SECRET_KEY in Vercel."
 
                 });
             }
@@ -162,18 +109,19 @@ export default async function handler(req, res) {
 
             if (!response.ok) {
 
-                return res.status(
-                    response.status
-                ).json({
+                return res.status(response.status).json({
 
                     error:
-                        data.message ||
-                        data.error ||
-                        data.hint ||
-                        "Supabase request failed.",
+                        "Supabase GET request failed.",
 
-                    details:
-                        data
+                    supabaseError:
+                        data,
+
+                    httpStatus:
+                        response.status,
+
+                    fix:
+                        "Check your Supabase URL, key and messages table."
 
                 });
             }
@@ -192,11 +140,9 @@ export default async function handler(req, res) {
         }
 
 
-        /*
-         * =========================
-         * POST
-         * =========================
-         */
+        // =========================
+        // POST MESSAGE
+        // =========================
 
         if (req.method === "POST") {
 
@@ -205,26 +151,21 @@ export default async function handler(req, res) {
 
 
             const username =
-                String(
-                    body.username || ""
-                )
+                String(body.username || "")
                 .trim()
                 .substring(0, 24);
 
 
             const channel =
                 String(
-                    body.channel ||
-                    "general"
+                    body.channel || "general"
                 )
                 .trim()
                 .substring(0, 32);
 
 
             const message =
-                String(
-                    body.message || ""
-                )
+                String(body.message || "")
                 .trim()
                 .substring(0, 2000);
 
@@ -299,7 +240,6 @@ export default async function handler(req, res) {
 
             let data;
 
-
             try {
 
                 data =
@@ -310,16 +250,13 @@ export default async function handler(req, res) {
                 return res.status(500).json({
 
                     error:
-                        "Supabase returned invalid JSON.",
+                        "Supabase did not return JSON.",
 
                     httpStatus:
                         response.status,
 
-                    response:
-                        text.substring(
-                            0,
-                            2000
-                        )
+                    rawResponse:
+                        text.substring(0, 2000)
 
                 });
             }
@@ -327,18 +264,16 @@ export default async function handler(req, res) {
 
             if (!response.ok) {
 
-                return res.status(
-                    response.status
-                ).json({
+                return res.status(response.status).json({
 
                     error:
-                        data.message ||
-                        data.error ||
-                        data.hint ||
                         "Supabase rejected the message.",
 
-                    details:
+                    supabaseError:
                         data,
+
+                    httpStatus:
+                        response.status,
 
                     fix:
                         "Check the messages table and its RLS policies."
@@ -363,18 +298,17 @@ export default async function handler(req, res) {
         return res.status(405).json({
 
             error:
-                "Method not allowed."
+                "Method not allowed.",
+
+            method:
+                req.method
 
         });
 
 
     } catch (error) {
 
-        console.error(
-            "SERVER ERROR:",
-            error
-        );
-
+        console.error(error);
 
         return res.status(500).json({
 
@@ -382,12 +316,12 @@ export default async function handler(req, res) {
                 error.message ||
                 "Unknown server error.",
 
-            type:
+            errorName:
                 error.name ||
                 "Error",
 
             fix:
-                "Check Vercel Environment Variables and Supabase."
+                "Check your Vercel Environment Variables."
 
         });
     }
