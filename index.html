@@ -17,12 +17,12 @@
     --muted:#7e8793;
     --accent:#e8eaed;
     --danger:#ff7070;
-    --green:#6ee7a0;
     --radius:12px;
     --ui-scale:1;
     --text-size:16px;
     --word-spacing:0px;
     --line-spacing:1.45;
+    --message-gap:17px;
 }
 
 html,body{
@@ -67,12 +67,6 @@ button{
     border-bottom:1px solid var(--border);
 }
 
-.header-left{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
 .logo{
     display:flex;
     align-items:center;
@@ -108,53 +102,7 @@ button{
     filter:brightness(1.15);
 }
 
-/* PAGE NAVIGATION */
-
-.page-tabs{
-    display:flex;
-    gap:5px;
-    padding:8px 14px;
-    background:var(--panel);
-    border-bottom:1px solid var(--border);
-}
-
-.page-tab{
-    border:1px solid transparent;
-    background:transparent;
-    color:var(--muted);
-    padding:8px 14px;
-    border-radius:9px;
-    font-weight:600;
-}
-
-.page-tab:hover{
-    background:var(--panel2);
-    color:var(--text);
-}
-
-.page-tab.active{
-    background:var(--panel2);
-    border-color:var(--border);
-    color:var(--text);
-}
-
-/* PAGES */
-
-.page{
-    flex:1;
-    min-height:0;
-    display:none;
-}
-
-.page.active{
-    display:flex;
-}
-
-/* CHAT PAGE */
-
-.chat-page{
-    flex-direction:column;
-}
+/* MESSAGES */
 
 .messages{
     flex:1;
@@ -165,7 +113,11 @@ button{
 .message{
     display:flex;
     gap:11px;
-    margin-bottom:17px;
+    margin-bottom:var(--message-gap);
+}
+
+.message.compact{
+    margin-bottom:7px;
 }
 
 .avatar{
@@ -208,6 +160,16 @@ button{
     font-size:var(--text-size);
     word-spacing:var(--word-spacing);
     line-height:var(--line-spacing);
+}
+
+.message-link{
+    color:#8eb9ff;
+    text-decoration:underline;
+    cursor:pointer;
+}
+
+.message-link:hover{
+    filter:brightness(1.25);
 }
 
 .message-image{
@@ -284,119 +246,7 @@ textarea{
     cursor:not-allowed;
 }
 
-/* SCREEN SHARE */
-
-.screen-page{
-    flex-direction:column;
-    overflow:auto;
-    padding:20px;
-}
-
-.screen-header{
-    width:min(1200px,100%);
-    margin:0 auto 16px;
-}
-
-.screen-header h1{
-    margin:0 0 5px;
-}
-
-.screen-header p{
-    margin:0;
-    color:var(--muted);
-}
-
-.screen-actions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    margin-top:18px;
-}
-
-.screen-btn{
-    padding:11px 17px;
-    border-radius:9px;
-    border:1px solid var(--border);
-    background:var(--panel2);
-    color:var(--text);
-    font-weight:600;
-}
-
-.screen-btn:hover{
-    filter:brightness(1.15);
-}
-
-.screen-btn.primary{
-    background:var(--accent);
-    color:#111;
-}
-
-.screen-btn.danger{
-    border-color:#743333;
-    background:#241719;
-    color:#ff8585;
-}
-
-.screen-btn:disabled{
-    opacity:.5;
-    cursor:not-allowed;
-}
-
-.screen-status{
-    margin-top:12px;
-    color:var(--muted);
-}
-
-.screen-status.connected{
-    color:var(--green);
-}
-
-.video-grid{
-    width:min(1200px,100%);
-    margin:20px auto;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-    gap:14px;
-}
-
-.video-card{
-    position:relative;
-    min-height:240px;
-    background:#050607;
-    border:1px solid var(--border);
-    border-radius:14px;
-    overflow:hidden;
-}
-
-.video-card video{
-    width:100%;
-    height:100%;
-    min-height:240px;
-    display:block;
-    object-fit:contain;
-    background:#000;
-}
-
-.video-label{
-    position:absolute;
-    left:10px;
-    top:10px;
-    padding:6px 9px;
-    border-radius:7px;
-    background:#000b;
-    color:white;
-    font-size:12px;
-}
-
-.no-video{
-    position:absolute;
-    inset:0;
-    display:grid;
-    place-items:center;
-    color:var(--muted);
-}
-
-/* SETTINGS */
+/* OVERLAYS */
 
 .overlay{
     position:fixed;
@@ -413,7 +263,7 @@ textarea{
 }
 
 .panel{
-    width:min(520px,calc(100vw - 25px));
+    width:min(560px,calc(100vw - 25px));
     max-height:calc(100vh - 25px);
     overflow-y:auto;
     background:var(--panel);
@@ -437,6 +287,8 @@ textarea{
 .panel-body{
     padding:18px;
 }
+
+/* SETTINGS */
 
 .category{
     margin-bottom:12px;
@@ -503,18 +355,60 @@ textarea{
     margin-top:5px;
 }
 
-.save-btn{
+.save-btn,
+.test-btn{
     width:100%;
     margin-top:8px;
     padding:12px;
     border:0;
     border-radius:9px;
-    background:var(--accent);
-    color:#111;
     font-weight:700;
 }
 
-/* CONTEXT MENU */
+.save-btn{
+    background:var(--accent);
+    color:#111;
+}
+
+.test-btn{
+    background:#242b34;
+    border:1px solid var(--border);
+    color:white;
+}
+
+.test-btn:hover{
+    filter:brightness(1.15);
+}
+
+/* DANGER */
+
+.danger-zone{
+    margin-top:20px;
+    padding-top:20px;
+    border-top:1px solid #402529;
+}
+
+.danger-title{
+    color:var(--danger);
+    font-weight:700;
+    margin-bottom:7px;
+}
+
+.danger-zone p{
+    color:var(--muted);
+    line-height:1.45;
+}
+
+.danger-btn{
+    width:100%;
+    padding:12px;
+    border-radius:9px;
+    border:1px solid #743333;
+    background:#241719;
+    color:#ff8585;
+}
+
+/* CONTEXT */
 
 .context-menu{
     position:fixed;
@@ -655,13 +549,6 @@ textarea{
         max-width:calc(100vw - 70px);
     }
 
-    .screen-page{
-        padding:12px;
-    }
-
-    .video-grid{
-        grid-template-columns:1fr;
-    }
 }
 </style>
 </head>
@@ -672,172 +559,56 @@ textarea{
 
 <header class="header">
 
-    <div class="header-left">
+<div class="logo">
+<div class="logo-icon">💬</div>
+<span>Chat</span>
+<span class="channel"># general</span>
+</div>
 
-        <div class="logo">
-            <div class="logo-icon">💬</div>
-            <span>Chat</span>
-        </div>
-
-        <span
-            class="channel"
-            id="currentChannel"
-        ># general</span>
-
-    </div>
-
-    <button
-        class="icon-btn"
-        id="settingsBtn"
-        title="Settings"
-    >⚙</button>
+<button class="icon-btn" id="settingsBtn">⚙</button>
 
 </header>
 
-
-<!-- PAGE TABS -->
-
-<nav class="page-tabs">
-
-    <button
-        class="page-tab active"
-        data-page="general"
-    >
-        💬 General
-    </button>
-
-    <button
-        class="page-tab"
-        data-page="screenshare"
-    >
-        🖥️ Screen Share
-    </button>
-
-</nav>
-
-
-<!-- GENERAL -->
-
-<section
-    class="page chat-page active"
-    id="generalPage"
->
-
-<main
-    class="messages"
-    id="messages"
-></main>
+<main class="messages" id="messages"></main>
 
 <div class="composer">
 
-    <div class="composer-box">
+<div class="composer-box">
 
-        <input
-            type="file"
-            id="imageInput"
-            accept="image/*"
-            hidden
-        >
-
-        <button
-            class="attach-btn"
-            id="attachBtn"
-        >＋</button>
-
-        <textarea
-            id="messageInput"
-            rows="1"
-            placeholder="Message #general"
-        ></textarea>
-
-        <button
-            class="send-btn"
-            id="sendBtn"
-        >Send</button>
-
-    </div>
-
-</div>
-
-</section>
-
-
-<!-- SCREEN SHARE -->
-
-<section
-    class="page screen-page"
-    id="screensharePage"
+<input
+type="file"
+id="imageInput"
+accept="image/*"
+hidden
 >
 
-<div class="screen-header">
+<button
+class="attach-btn"
+id="attachBtn"
+title="Choose image"
+>＋</button>
 
-    <h1>Screen Share</h1>
+<textarea
+id="messageInput"
+rows="1"
+placeholder="Message #general"
+></textarea>
 
-    <p>
-        Host your screen or watch a screen being shared by another user.
-    </p>
-
-    <div class="screen-actions">
-
-        <button
-            class="screen-btn primary"
-            id="startShareBtn"
-        >
-            🖥️ Share my screen
-        </button>
-
-        <button
-            class="screen-btn danger"
-            id="stopShareBtn"
-            disabled
-        >
-            Stop sharing
-        </button>
-
-    </div>
-
-    <div
-        class="screen-status"
-        id="screenStatus"
-    >
-        Not connected
-    </div>
-
-</div>
-
-<div
-    class="video-grid"
-    id="videoGrid"
->
-
-<div class="video-card" id="localVideoCard">
-
-    <video
-        id="localVideo"
-        autoplay
-        muted
-        playsinline
-    ></video>
-
-    <div class="video-label">
-        Your screen
-    </div>
+<button
+class="send-btn"
+id="sendBtn"
+>Send</button>
 
 </div>
 
 </div>
-
-</section>
 
 </div>
 
 
 <!-- SETTINGS -->
 
-<div
-    class="overlay"
-    id="settingsOverlay"
->
+<div class="overlay" id="settingsOverlay">
 
 <div class="panel">
 
@@ -845,15 +616,14 @@ textarea{
 
 <h2>Settings</h2>
 
-<button
-    class="icon-btn"
-    id="closeSettings"
->×</button>
+<button class="icon-btn" id="closeSettings">×</button>
 
 </div>
 
 <div class="panel-body">
 
+
+<!-- PROFILE -->
 
 <div class="category open">
 
@@ -865,31 +635,20 @@ textarea{
 <div class="category-body">
 
 <div class="setting">
-
 <label>Your name</label>
-
-<input
-    id="usernameInput"
-    maxlength="24"
-    placeholder="Enter your name"
->
-
+<input id="usernameInput" maxlength="24" placeholder="Enter your name">
 </div>
 
 <div class="setting">
-
 <label>Device ID</label>
-
-<input
-    id="deviceIdInput"
-    readonly
->
-
+<input id="deviceIdInput" readonly>
 </div>
 
 </div>
 </div>
 
+
+<!-- TEXT -->
 
 <div class="category">
 
@@ -901,65 +660,37 @@ textarea{
 <div class="category-body">
 
 <div class="setting">
-
 <label>Text size</label>
-
-<input
-    id="textSize"
-    type="range"
-    min="12"
-    max="24"
-    step="1"
->
-
-<div
-    class="setting-value"
-    id="textSizeValue"
-></div>
-
+<input id="textSize" type="range" min="12" max="28" step="1">
+<div class="setting-value" id="textSizeValue"></div>
 </div>
 
 <div class="setting">
-
 <label>Word spacing</label>
-
-<input
-    id="wordSpacing"
-    type="range"
-    min="0"
-    max="12"
-    step="1"
->
-
-<div
-    class="setting-value"
-    id="wordSpacingValue"
-></div>
-
+<input id="wordSpacing" type="range" min="0" max="12" step="1">
+<div class="setting-value" id="wordSpacingValue"></div>
 </div>
 
 <div class="setting">
-
 <label>Line spacing</label>
+<input id="lineSpacing" type="range" min="1" max="2" step=".05">
+<div class="setting-value" id="lineSpacingValue"></div>
+</div>
 
-<input
-    id="lineSpacing"
-    type="range"
-    min="1"
-    max="2"
-    step=".05"
->
-
-<div
-    class="setting-value"
-    id="lineSpacingValue"
-></div>
-
+<div class="setting">
+<label>Message density</label>
+<select id="messageDensity">
+<option value="normal">Normal</option>
+<option value="compact">Compact</option>
+<option value="spacious">Spacious</option>
+</select>
 </div>
 
 </div>
 </div>
 
+
+<!-- CHAT -->
 
 <div class="category">
 
@@ -971,11 +702,8 @@ textarea{
 <div class="category-body">
 
 <div class="setting">
-
 <label>Refresh rate</label>
-
 <select id="refreshRate">
-
 <option value="10000">10 seconds</option>
 <option value="5000">5 seconds</option>
 <option value="3000">3 seconds</option>
@@ -983,40 +711,39 @@ textarea{
 <option value="1000">1 second</option>
 <option value="500">0.5 seconds</option>
 <option value="100">0.1 seconds</option>
-
 </select>
-
 </div>
 
 <div class="setting">
-
 <label>Show timestamps</label>
-
 <select id="showTimestamps">
-
 <option value="true">On</option>
 <option value="false">Off</option>
-
 </select>
-
 </div>
 
 <div class="setting">
-
-<label>Compact messages</label>
-
-<select id="compactMessages">
-
-<option value="false">Off</option>
-<option value="true">On</option>
-
+<label>Timestamp format</label>
+<select id="timestampFormat">
+<option value="short">12:34</option>
+<option value="seconds">12:34:56</option>
+<option value="full">Date + time</option>
 </select>
+</div>
 
+<div class="setting">
+<label>Auto-scroll</label>
+<select id="autoScroll">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
 </div>
 
 </div>
 </div>
 
+
+<!-- APPEARANCE -->
 
 <div class="category">
 
@@ -1028,7 +755,6 @@ textarea{
 <div class="category-body">
 
 <div class="setting">
-
 <label>Theme</label>
 
 <select id="themeSelect">
@@ -1044,105 +770,31 @@ textarea{
 <option value="gray">Classic Gray</option>
 <option value="light">Light</option>
 <option value="oled">OLED</option>
+<option value="carbon">Carbon</option>
+<option value="steel">Steel</option>
+<option value="terminal">Terminal</option>
+<option value="brown">Dark Brown</option>
 
 </select>
-
 </div>
 
 <div class="setting">
-
 <label>Corner roundness</label>
-
-<input
-    id="cornerRadius"
-    type="range"
-    min="0"
-    max="25"
->
-
-<div
-    class="setting-value"
-    id="cornerRadiusValue"
-></div>
-
+<input id="cornerRadius" type="range" min="0" max="25">
+<div class="setting-value" id="cornerRadiusValue"></div>
 </div>
 
 <div class="setting">
-
 <label>UI scale</label>
-
-<input
-    id="uiScale"
-    type="range"
-    min=".8"
-    max="1.2"
-    step=".05"
->
-
-<div
-    class="setting-value"
-    id="uiScaleValue"
-></div>
-
+<input id="uiScale" type="range" min=".8" max="1.2" step=".05">
+<div class="setting-value" id="uiScaleValue"></div>
 </div>
 
 </div>
 </div>
 
 
-<div class="category">
-
-<button class="category-title">
-<span>🖥️ Screen Share</span>
-<span>⌄</span>
-</button>
-
-<div class="category-body">
-
-<div class="setting">
-
-<label>Preferred quality</label>
-
-<select id="screenQuality">
-
-<option value="1080">1080p</option>
-<option value="720">720p</option>
-<option value="480">480p</option>
-
-</select>
-
-</div>
-
-<div class="setting">
-
-<label>Frame rate</label>
-
-<select id="screenFPS">
-
-<option value="60">60 FPS</option>
-<option value="30">30 FPS</option>
-<option value="15">15 FPS</option>
-
-</select>
-
-</div>
-
-<div class="setting">
-
-<label>Automatically switch to Screen Share</label>
-
-<select id="autoScreenPage">
-
-<option value="false">Off</option>
-<option value="true">On</option>
-
-</select>
-
-</div>
-
-</div>
-</div>
-
+<!-- NOTIFICATIONS -->
 
 <div class="category">
 
@@ -1154,34 +806,155 @@ textarea{
 <div class="category-body">
 
 <div class="setting">
-
 <label>Desktop notifications</label>
-
 <select id="desktopNotifications">
-
 <option value="false">Off</option>
 <option value="true">On</option>
-
 </select>
-
 </div>
 
 <div class="setting">
+<label>Notify only when chat is hidden</label>
+<select id="hiddenOnly">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
+</div>
 
+<div class="setting">
 <label>Notification sound</label>
-
 <select id="notificationSound">
 
 <option value="false">Off</option>
 <option value="true">On</option>
 
 </select>
+</div>
 
+<div class="setting">
+<label>Sound theme</label>
+
+<select id="soundTheme">
+
+<option value="classic">1 — Classic</option>
+<option value="soft">2 — Soft</option>
+<option value="digital">3 — Digital</option>
+<option value="pop">4 — Pop</option>
+<option value="bell">5 — Bell</option>
+<option value="chime">6 — Chime</option>
+<option value="retro">7 — Retro</option>
+<option value="computer">8 — Computer</option>
+<option value="alert">9 — Alert</option>
+<option value="warning">10 — Warning</option>
+<option value="alarm">11 — Nuclear Alarm</option>
+<option value="opera">12 — Opera</option>
+<option value="synth">13 — Synth</option>
+<option value="pulse">14 — Pulse</option>
+<option value="space">15 — Space</option>
+
+</select>
+</div>
+
+<div class="setting">
+<label>Sound duration</label>
+
+<input
+id="soundDuration"
+type="range"
+min="100"
+max="5000"
+step="100"
+>
+
+<div
+class="setting-value"
+id="soundDurationValue"
+></div>
+
+</div>
+
+<div class="setting">
+<label>Sound volume</label>
+
+<input
+id="soundVolume"
+type="range"
+min="0"
+max="100"
+step="1"
+>
+
+<div
+class="setting-value"
+id="soundVolumeValue"
+></div>
+
+</div>
+
+<div class="setting">
+<label>Notification preview</label>
+
+<select id="notificationPreview">
+<option value="full">Show message</option>
+<option value="name">Name only</option>
+<option value="generic">New message</option>
+</select>
+</div>
+
+<button
+class="test-btn"
+id="testNotification"
+>
+🔔 Test Windows notification
+</button>
+
+</div>
+</div>
+
+
+<!-- LINKS -->
+
+<div class="category">
+
+<button class="category-title">
+<span>🔗 Links & Media</span>
+<span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+<label>Clickable links</label>
+
+<select id="clickableLinks">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
+</div>
+
+<div class="setting">
+<label>Automatic image links</label>
+
+<select id="imageLinks">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
+</div>
+
+<div class="setting">
+<label>Open links in new tab</label>
+
+<select id="newTabLinks">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
 </div>
 
 </div>
 </div>
 
+
+<!-- BEHAVIOR -->
 
 <div class="category">
 
@@ -1193,55 +966,59 @@ textarea{
 <div class="category-body">
 
 <div class="setting">
-
 <label>Enter to send</label>
 
 <select id="enterToSend">
-
 <option value="true">On</option>
 <option value="false">Off</option>
-
 </select>
-
 </div>
 
 <div class="setting">
-
-<label>Auto-scroll</label>
-
-<select id="autoScroll">
-
-<option value="true">On</option>
-<option value="false">Off</option>
-
-</select>
-
-</div>
-
-<div class="setting">
-
 <label>Confirm before deleting</label>
 
 <select id="confirmDelete">
-
 <option value="true">On</option>
 <option value="false">Off</option>
-
 </select>
+</div>
 
+<div class="setting">
+<label>Keep composer text after failed send</label>
+
+<select id="keepText">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
 </div>
 
 </div>
 </div>
 
 
-<button
-    class="save-btn"
-    id="saveSettings"
->
+<button class="save-btn" id="saveSettings">
 Save settings
 </button>
 
+
+<!-- DANGER -->
+
+<div class="danger-zone">
+
+<div class="danger-title">
+⚠ Danger Zone
+</div>
+
+<p>
+Remove every message from the chat permanently.
+This affects everyone using the chat.
+</p>
+
+<button class="danger-btn" id="removeEverything">
+Remove everything
+</button>
+
+</div>
 
 </div>
 </div>
@@ -1250,18 +1027,13 @@ Save settings
 
 <!-- CONTEXT MENU -->
 
-<div
-    class="context-menu"
-    id="contextMenu"
->
+<div class="context-menu" id="contextMenu">
 
-<button id="editMessage">
-Edit
-</button>
+<button id="editMessage">Edit</button>
 
 <button
-    class="delete-option"
-    id="deleteMessage"
+class="delete-option"
+id="deleteMessage"
 >
 Delete
 </button>
@@ -1271,21 +1043,19 @@ Delete
 
 <!-- IMAGE VIEWER -->
 
-<div
-    class="image-viewer"
-    id="imageViewer"
->
+<div class="image-viewer" id="imageViewer">
 
 <button
-    class="back-image"
-    id="backImage"
+class="back-image"
+id="backImage"
 >
 ← Back
 </button>
 
 <img
-    class="full-image"
-    id="fullImage"
+class="full-image"
+id="fullImage"
+alt="Full image"
 >
 
 </div>
@@ -1293,16 +1063,11 @@ Delete
 
 <!-- DIALOG -->
 
-<div
-    class="overlay"
-    id="dialogOverlay"
->
+<div class="overlay" id="dialogOverlay">
 
 <div class="dialog">
 
-<h2 id="dialogTitle">
-Confirm
-</h2>
+<h2 id="dialogTitle">Confirm</h2>
 
 <p id="dialogText"></p>
 
@@ -1313,8 +1078,8 @@ Cancel
 </button>
 
 <button
-    class="danger"
-    id="dialogConfirm"
+class="danger"
+id="dialogConfirm"
 >
 Yes
 </button>
@@ -1322,237 +1087,295 @@ Yes
 </div>
 
 </div>
-
 </div>
 
 
 <script>
 
-/* =========================================================
-   CHAT
-========================================================= */
-
 const API_URL="/api/messages";
 const CHANNEL="general";
 
+
+/* DEVICE */
 
 let deviceId=localStorage.getItem("chat_device_id");
 
 if(!deviceId){
 
-    deviceId=crypto.randomUUID();
+    deviceId=
+        crypto.randomUUID();
 
     localStorage.setItem(
         "chat_device_id",
         deviceId
     );
+
 }
 
 
+/* SETTINGS */
+
 const defaults={
 
-    username:"",
+username:"",
 
-    theme:"dark",
+theme:"dark",
 
-    refreshRate:500,
+refreshRate:500,
 
-    showTimestamps:true,
+showTimestamps:true,
 
-    compactMessages:false,
+timestampFormat:"short",
 
-    textSize:16,
+autoScroll:true,
 
-    wordSpacing:0,
+textSize:16,
 
-    lineSpacing:1.45,
+wordSpacing:0,
 
-    cornerRadius:12,
+lineSpacing:1.45,
 
-    uiScale:1,
+messageDensity:"normal",
 
-    desktopNotifications:false,
+cornerRadius:12,
 
-    notificationSound:false,
+uiScale:1,
 
-    enterToSend:true,
+desktopNotifications:false,
 
-    autoScroll:true,
+hiddenOnly:true,
 
-    confirmDelete:true,
+notificationSound:true,
 
-    screenQuality:1080,
+soundTheme:"classic",
 
-    screenFPS:30,
+soundDuration:1000,
 
-    autoScreenPage:false
+soundVolume:70,
+
+notificationPreview:"full",
+
+clickableLinks:true,
+
+imageLinks:true,
+
+newTabLinks:true,
+
+enterToSend:true,
+
+confirmDelete:true,
+
+keepText:true
+
 };
 
 
 function getSetting(key){
 
-    const value=
-        localStorage.getItem("chat_"+key);
+const value=
+localStorage.getItem(
+"chat_"+key
+);
 
-    if(value===null)
-        return defaults[key];
+if(value===null){
 
-    if(
-        value==="true"||
-        value==="false"
-    )
-        return value==="true";
+return defaults[key];
 
-    const number=Number(value);
+}
 
-    return Number.isNaN(number)
-        ?value
-        :number;
+if(
+value==="true"||
+value==="false"
+){
+
+return value==="true";
+
+}
+
+const number=Number(value);
+
+return Number.isNaN(number)
+?value
+:number;
+
 }
 
 
 let settings={};
 
 Object.keys(defaults).forEach(
-    key=>{
-        settings[key]=getSetting(key);
-    }
-);
+key=>{
+settings[key]=getSetting(key);
+});
 
 
 /* ELEMENTS */
 
 const messagesEl=
-    document.getElementById("messages");
+document.getElementById("messages");
 
 const messageInput=
-    document.getElementById("messageInput");
+document.getElementById("messageInput");
 
 const sendBtn=
-    document.getElementById("sendBtn");
+document.getElementById("sendBtn");
 
 const imageInput=
-    document.getElementById("imageInput");
+document.getElementById("imageInput");
 
 const attachBtn=
-    document.getElementById("attachBtn");
+document.getElementById("attachBtn");
 
 const settingsBtn=
-    document.getElementById("settingsBtn");
+document.getElementById("settingsBtn");
 
 const settingsOverlay=
-    document.getElementById("settingsOverlay");
+document.getElementById("settingsOverlay");
 
 const closeSettings=
-    document.getElementById("closeSettings");
+document.getElementById("closeSettings");
 
 const saveSettings=
-    document.getElementById("saveSettings");
+document.getElementById("saveSettings");
 
 const usernameInput=
-    document.getElementById("usernameInput");
+document.getElementById("usernameInput");
 
 const deviceIdInput=
-    document.getElementById("deviceIdInput");
+document.getElementById("deviceIdInput");
 
 const themeSelect=
-    document.getElementById("themeSelect");
+document.getElementById("themeSelect");
 
 const refreshRate=
-    document.getElementById("refreshRate");
+document.getElementById("refreshRate");
 
 const showTimestamps=
-    document.getElementById("showTimestamps");
+document.getElementById("showTimestamps");
 
-const compactMessages=
-    document.getElementById("compactMessages");
-
-const textSize=
-    document.getElementById("textSize");
-
-const wordSpacing=
-    document.getElementById("wordSpacing");
-
-const lineSpacing=
-    document.getElementById("lineSpacing");
-
-const cornerRadius=
-    document.getElementById("cornerRadius");
-
-const uiScale=
-    document.getElementById("uiScale");
-
-const desktopNotifications=
-    document.getElementById("desktopNotifications");
-
-const notificationSound=
-    document.getElementById("notificationSound");
-
-const enterToSend=
-    document.getElementById("enterToSend");
+const timestampFormat=
+document.getElementById("timestampFormat");
 
 const autoScroll=
-    document.getElementById("autoScroll");
+document.getElementById("autoScroll");
+
+const textSize=
+document.getElementById("textSize");
+
+const wordSpacing=
+document.getElementById("wordSpacing");
+
+const lineSpacing=
+document.getElementById("lineSpacing");
+
+const messageDensity=
+document.getElementById("messageDensity");
+
+const cornerRadius=
+document.getElementById("cornerRadius");
+
+const uiScale=
+document.getElementById("uiScale");
+
+const desktopNotifications=
+document.getElementById("desktopNotifications");
+
+const hiddenOnly=
+document.getElementById("hiddenOnly");
+
+const notificationSound=
+document.getElementById("notificationSound");
+
+const soundTheme=
+document.getElementById("soundTheme");
+
+const soundDuration=
+document.getElementById("soundDuration");
+
+const soundVolume=
+document.getElementById("soundVolume");
+
+const notificationPreview=
+document.getElementById("notificationPreview");
+
+const clickableLinks=
+document.getElementById("clickableLinks");
+
+const imageLinks=
+document.getElementById("imageLinks");
+
+const newTabLinks=
+document.getElementById("newTabLinks");
+
+const enterToSend=
+document.getElementById("enterToSend");
 
 const confirmDelete=
-    document.getElementById("confirmDelete");
+document.getElementById("confirmDelete");
 
-const screenQuality=
-    document.getElementById("screenQuality");
+const keepText=
+document.getElementById("keepText");
 
-const screenFPS=
-    document.getElementById("screenFPS");
-
-const autoScreenPage=
-    document.getElementById("autoScreenPage");
+const testNotification=
+document.getElementById("testNotification");
 
 const contextMenu=
-    document.getElementById("contextMenu");
+document.getElementById("contextMenu");
 
 const editMessageBtn=
-    document.getElementById("editMessage");
+document.getElementById("editMessage");
 
 const deleteMessageBtn=
-    document.getElementById("deleteMessage");
+document.getElementById("deleteMessage");
 
 const imageViewer=
-    document.getElementById("imageViewer");
+document.getElementById("imageViewer");
 
 const fullImage=
-    document.getElementById("fullImage");
+document.getElementById("fullImage");
 
 const backImage=
-    document.getElementById("backImage");
+document.getElementById("backImage");
 
 const dialogOverlay=
-    document.getElementById("dialogOverlay");
+document.getElementById("dialogOverlay");
 
 const dialogTitle=
-    document.getElementById("dialogTitle");
+document.getElementById("dialogTitle");
 
 const dialogText=
-    document.getElementById("dialogText");
+document.getElementById("dialogText");
 
 const dialogCancel=
-    document.getElementById("dialogCancel");
+document.getElementById("dialogCancel");
 
 const dialogConfirm=
-    document.getElementById("dialogConfirm");
+document.getElementById("dialogConfirm");
+
+const removeEverything=
+document.getElementById("removeEverything");
+
 
 const textSizeValue=
-    document.getElementById("textSizeValue");
+document.getElementById("textSizeValue");
 
 const wordSpacingValue=
-    document.getElementById("wordSpacingValue");
+document.getElementById("wordSpacingValue");
 
 const lineSpacingValue=
-    document.getElementById("lineSpacingValue");
+document.getElementById("lineSpacingValue");
 
 const cornerRadiusValue=
-    document.getElementById("cornerRadiusValue");
+document.getElementById("cornerRadiusValue");
 
 const uiScaleValue=
-    document.getElementById("uiScaleValue");
+document.getElementById("uiScaleValue");
+
+const soundDurationValue=
+document.getElementById("soundDurationValue");
+
+const soundVolumeValue=
+document.getElementById("soundVolumeValue");
 
 
 let selectedFile=null;
@@ -1560,1155 +1383,2064 @@ let selectedMessage=null;
 let currentMessages=[];
 let confirmCallback=null;
 let refreshTimer=null;
+let audioContext=null;
 
 
-/* =========================================================
-   PAGE SWITCHING
-========================================================= */
-
-const pageTabs=
-    document.querySelectorAll(".page-tab");
-
-const generalPage=
-    document.getElementById("generalPage");
-
-const screensharePage=
-    document.getElementById("screensharePage");
-
-pageTabs.forEach(tab=>{
-
-    tab.onclick=()=>{
-
-        const page=tab.dataset.page;
-
-        pageTabs.forEach(
-            x=>x.classList.remove("active")
-        );
-
-        tab.classList.add("active");
-
-        generalPage.classList.toggle(
-            "active",
-            page==="general"
-        );
-
-        screensharePage.classList.toggle(
-            "active",
-            page==="screenshare"
-        );
-
-        document.getElementById(
-            "currentChannel"
-        ).textContent=
-            page==="general"
-            ?" # general"
-            :" # screen-share";
-
-    };
-
-});
-
-
-/* =========================================================
-   SETTINGS
-========================================================= */
+/* APPLY SETTINGS */
 
 function applySettings(){
 
-    document.documentElement.style.setProperty(
-        "--text-size",
-        settings.textSize+"px"
-    );
+document.documentElement.style.setProperty(
+"--text-size",
+settings.textSize+"px"
+);
 
-    document.documentElement.style.setProperty(
-        "--word-spacing",
-        settings.wordSpacing+"px"
-    );
+document.documentElement.style.setProperty(
+"--word-spacing",
+settings.wordSpacing+"px"
+);
 
-    document.documentElement.style.setProperty(
-        "--line-spacing",
-        settings.lineSpacing
-    );
+document.documentElement.style.setProperty(
+"--line-spacing",
+settings.lineSpacing
+);
 
-    document.documentElement.style.setProperty(
-        "--radius",
-        settings.cornerRadius+"px"
-    );
+document.documentElement.style.setProperty(
+"--radius",
+settings.cornerRadius+"px"
+);
 
-    document.documentElement.style.setProperty(
-        "--ui-scale",
-        settings.uiScale
-    );
+document.documentElement.style.setProperty(
+"--ui-scale",
+settings.uiScale
+);
 
-    applyTheme(settings.theme);
+let gap=17;
 
-    renderMessages();
+if(settings.messageDensity==="compact")
+gap=7;
 
-    startRefreshTimer();
+if(settings.messageDensity==="spacious")
+gap=28;
+
+document.documentElement.style.setProperty(
+"--message-gap",
+gap+"px"
+);
+
+applyTheme(settings.theme);
+
+renderMessages();
+
+startRefreshTimer();
+
 }
 
+
+/* THEMES */
 
 function applyTheme(name){
 
-    const themes={
+const themes={
 
-        dark:["#0b0d10","#111419"],
+dark:["#0b0d10","#111419"],
 
-        midnight:["#080b14","#101522"],
+midnight:["#080b14","#101522"],
 
-        slate:["#101418","#171d22"],
+slate:["#101418","#171d22"],
 
-        black:["#000","#090909"],
+black:["#000","#090909"],
 
-        blue:["#091018","#101c29"],
+blue:["#091018","#101c29"],
 
-        purple:["#100b17","#191021"],
+purple:["#100b17","#191021"],
 
-        green:["#09120d","#101b15"],
+green:["#09120d","#101b15"],
 
-        red:["#140b0b","#1e1111"],
+red:["#140b0b","#1e1111"],
 
-        gray:["#151515","#202020"],
+gray:["#151515","#202020"],
 
-        light:["#eeeeee","#fff"],
+light:["#eeeeee","#fff"],
 
-        oled:["#000","#000"]
+oled:["#000","#000"],
 
-    };
+carbon:["#0d0d0d","#161616"],
 
-    const t=
-        themes[name]||themes.dark;
+steel:["#101214","#1b1e21"],
 
-    document.documentElement.style.setProperty(
-        "--bg",
-        t[0]
-    );
+terminal:["#030903","#071007"],
 
-    document.documentElement.style.setProperty(
-        "--panel",
-        t[1]
-    );
+brown:["#120e0b","#1d1611"]
 
-    document.body.style.background=t[0];
+};
+
+const t=themes[name]||themes.dark;
+
+document.documentElement.style.setProperty(
+"--bg",t[0]
+);
+
+document.documentElement.style.setProperty(
+"--panel",t[1]
+);
+
+document.body.style.background=t[0];
+
 }
 
 
+/* SETTINGS UI */
+
 function loadSettingsUI(){
 
-    usernameInput.value=settings.username;
+usernameInput.value=settings.username;
 
-    deviceIdInput.value=deviceId;
+deviceIdInput.value=deviceId;
 
-    themeSelect.value=settings.theme;
+themeSelect.value=settings.theme;
 
-    refreshRate.value=settings.refreshRate;
+refreshRate.value=settings.refreshRate;
 
-    showTimestamps.value=
-        String(settings.showTimestamps);
+showTimestamps.value=
+String(settings.showTimestamps);
 
-    compactMessages.value=
-        String(settings.compactMessages);
+timestampFormat.value=
+settings.timestampFormat;
 
-    textSize.value=settings.textSize;
+autoScroll.value=
+String(settings.autoScroll);
 
-    wordSpacing.value=settings.wordSpacing;
+textSize.value=settings.textSize;
 
-    lineSpacing.value=settings.lineSpacing;
+wordSpacing.value=settings.wordSpacing;
 
-    cornerRadius.value=settings.cornerRadius;
+lineSpacing.value=settings.lineSpacing;
 
-    uiScale.value=settings.uiScale;
+messageDensity.value=
+settings.messageDensity;
 
-    desktopNotifications.value=
-        String(settings.desktopNotifications);
+cornerRadius.value=
+settings.cornerRadius;
 
-    notificationSound.value=
-        String(settings.notificationSound);
+uiScale.value=
+settings.uiScale;
 
-    enterToSend.value=
-        String(settings.enterToSend);
+desktopNotifications.value=
+String(settings.desktopNotifications);
 
-    autoScroll.value=
-        String(settings.autoScroll);
+hiddenOnly.value=
+String(settings.hiddenOnly);
 
-    confirmDelete.value=
-        String(settings.confirmDelete);
+notificationSound.value=
+String(settings.notificationSound);
 
-    screenQuality.value=
-        settings.screenQuality;
+soundTheme.value=
+settings.soundTheme;
 
-    screenFPS.value=
-        settings.screenFPS;
+soundDuration.value=
+settings.soundDuration;
 
-    autoScreenPage.value=
-        String(settings.autoScreenPage);
+soundVolume.value=
+settings.soundVolume;
 
-    updateRangeLabels();
+notificationPreview.value=
+settings.notificationPreview;
+
+clickableLinks.value=
+String(settings.clickableLinks);
+
+imageLinks.value=
+String(settings.imageLinks);
+
+newTabLinks.value=
+String(settings.newTabLinks);
+
+enterToSend.value=
+String(settings.enterToSend);
+
+confirmDelete.value=
+String(settings.confirmDelete);
+
+keepText.value=
+String(settings.keepText);
+
+updateRangeLabels();
+
 }
 
 
 function updateRangeLabels(){
 
-    textSizeValue.textContent=
-        settings.textSize+"px";
+textSizeValue.textContent=
+settings.textSize+"px";
 
-    wordSpacingValue.textContent=
-        settings.wordSpacing+"px";
+wordSpacingValue.textContent=
+settings.wordSpacing+"px";
 
-    lineSpacingValue.textContent=
-        settings.lineSpacing;
+lineSpacingValue.textContent=
+settings.lineSpacing;
 
-    cornerRadiusValue.textContent=
-        settings.cornerRadius+"px";
+cornerRadiusValue.textContent=
+settings.cornerRadius+"px";
 
-    uiScaleValue.textContent=
-        Math.round(
-            settings.uiScale*100
-        )+"%";
+uiScaleValue.textContent=
+Math.round(settings.uiScale*100)+"%";
+
+soundDurationValue.textContent=
+(settings.soundDuration/1000)
+.toFixed(1)+" seconds";
+
+soundVolumeValue.textContent=
+settings.soundVolume+"%";
+
 }
 
 
+/* SETTINGS */
+
 settingsBtn.onclick=()=>{
 
-    loadSettingsUI();
+loadSettingsUI();
 
-    settingsOverlay.classList.add("show");
+settingsOverlay.classList.add("show");
 
 };
 
 
 closeSettings.onclick=()=>{
 
-    settingsOverlay.classList.remove("show");
+settingsOverlay.classList.remove("show");
 
 };
 
 
-saveSettings.onclick=()=>{
+saveSettings.onclick=async()=>{
 
-    settings.username=
-        usernameInput.value
-        .trim()
-        .substring(0,24);
+settings.username=
+usernameInput.value
+.trim()
+.substring(0,24);
 
-    settings.theme=
-        themeSelect.value;
+settings.theme=
+themeSelect.value;
 
-    settings.refreshRate=
-        Number(refreshRate.value);
+settings.refreshRate=
+Number(refreshRate.value);
 
-    settings.showTimestamps=
-        showTimestamps.value==="true";
+settings.showTimestamps=
+showTimestamps.value==="true";
 
-    settings.compactMessages=
-        compactMessages.value==="true";
+settings.timestampFormat=
+timestampFormat.value;
 
-    settings.textSize=
-        Number(textSize.value);
+settings.autoScroll=
+autoScroll.value==="true";
 
-    settings.wordSpacing=
-        Number(wordSpacing.value);
+settings.textSize=
+Number(textSize.value);
 
-    settings.lineSpacing=
-        Number(lineSpacing.value);
+settings.wordSpacing=
+Number(wordSpacing.value);
 
-    settings.cornerRadius=
-        Number(cornerRadius.value);
+settings.lineSpacing=
+Number(lineSpacing.value);
 
-    settings.uiScale=
-        Number(uiScale.value);
+settings.messageDensity=
+messageDensity.value;
 
-    settings.desktopNotifications=
-        desktopNotifications.value==="true";
+settings.cornerRadius=
+Number(cornerRadius.value);
 
-    settings.notificationSound=
-        notificationSound.value==="true";
+settings.uiScale=
+Number(uiScale.value);
 
-    settings.enterToSend=
-        enterToSend.value==="true";
+settings.desktopNotifications=
+desktopNotifications.value==="true";
 
-    settings.autoScroll=
-        autoScroll.value==="true";
+settings.hiddenOnly=
+hiddenOnly.value==="true";
 
-    settings.confirmDelete=
-        confirmDelete.value==="true";
+settings.notificationSound=
+notificationSound.value==="true";
 
-    settings.screenQuality=
-        Number(screenQuality.value);
+settings.soundTheme=
+soundTheme.value;
 
-    settings.screenFPS=
-        Number(screenFPS.value);
+settings.soundDuration=
+Number(soundDuration.value);
 
-    settings.autoScreenPage=
-        autoScreenPage.value==="true";
+settings.soundVolume=
+Number(soundVolume.value);
+
+settings.notificationPreview=
+notificationPreview.value;
+
+settings.clickableLinks=
+clickableLinks.value==="true";
+
+settings.imageLinks=
+imageLinks.value==="true";
+
+settings.newTabLinks=
+newTabLinks.value==="true";
+
+settings.enterToSend=
+enterToSend.value==="true";
+
+settings.confirmDelete=
+confirmDelete.value==="true";
+
+settings.keepText=
+keepText.value==="true";
 
 
-    Object.keys(settings).forEach(key=>{
+Object.keys(settings).forEach(key=>{
 
-        localStorage.setItem(
-            "chat_"+key,
-            settings[key]
-        );
-
-    });
-
-
-    applySettings();
-
-    settingsOverlay.classList.remove("show");
-
-};
-
-
-document
-.querySelectorAll(".category-title")
-.forEach(btn=>{
-
-    btn.onclick=()=>{
-
-        btn.parentElement
-            .classList
-            .toggle("open");
-
-    };
+localStorage.setItem(
+"chat_"+key,
+settings[key]
+);
 
 });
 
 
+applySettings();
+
+settingsOverlay.classList.remove("show");
+
+
+if(settings.desktopNotifications){
+
+await requestNotificationPermission();
+
+}
+
+};
+
+
+/* ACCORDIONS */
+
+document.querySelectorAll(".category-title")
+.forEach(btn=>{
+
+btn.onclick=()=>{
+
+btn.parentElement.classList.toggle("open");
+
+};
+
+});
+
+
+/* RANGE PREVIEWS */
+
 textSize.oninput=()=>{
-    textSizeValue.textContent=
-        textSize.value+"px";
+textSizeValue.textContent=
+textSize.value+"px";
 };
 
 wordSpacing.oninput=()=>{
-    wordSpacingValue.textContent=
-        wordSpacing.value+"px";
+wordSpacingValue.textContent=
+wordSpacing.value+"px";
 };
 
 lineSpacing.oninput=()=>{
-    lineSpacingValue.textContent=
-        lineSpacing.value;
+lineSpacingValue.textContent=
+lineSpacing.value;
 };
 
 cornerRadius.oninput=()=>{
-    cornerRadiusValue.textContent=
-        cornerRadius.value+"px";
+cornerRadiusValue.textContent=
+cornerRadius.value+"px";
 };
 
 uiScale.oninput=()=>{
-    uiScaleValue.textContent=
-        Math.round(uiScale.value*100)+"%";
+uiScaleValue.textContent=
+Math.round(uiScale.value*100)+"%";
+};
+
+soundDuration.oninput=()=>{
+soundDurationValue.textContent=
+(Number(soundDuration.value)/1000)
+.toFixed(1)+" seconds";
+};
+
+soundVolume.oninput=()=>{
+soundVolumeValue.textContent=
+soundVolume.value+"%";
 };
 
 
-/* =========================================================
-   IMAGE
-========================================================= */
+/* TEXTAREA */
+
+messageInput.addEventListener(
+"input",
+()=>{
+
+messageInput.style.height="auto";
+
+messageInput.style.height=
+Math.min(
+messageInput.scrollHeight,
+150
+)+"px";
+
+});
+
+
+/* IMAGE */
 
 attachBtn.onclick=()=>{
-    imageInput.click();
+imageInput.click();
 };
 
 imageInput.onchange=()=>{
 
-    selectedFile=
-        imageInput.files[0]||null;
+selectedFile=
+imageInput.files[0]||null;
 
-    attachBtn.textContent=
-        selectedFile
-        ?"✓"
-        :"＋";
+attachBtn.textContent=
+selectedFile?"✓":"＋";
 
 };
 
 
+/* IMAGE RESIZE */
+
 function resizeImage(file){
 
-    return new Promise((resolve,reject)=>{
+return new Promise(
+(resolve,reject)=>{
 
-        const reader=new FileReader();
+const reader=new FileReader();
 
-        reader.onload=()=>{
+reader.onload=()=>{
 
-            const img=new Image();
+const img=new Image();
 
-            img.onload=()=>{
+img.onload=()=>{
 
-                let width=img.width;
+let width=img.width;
+let height=img.height;
 
-                let height=img.height;
+const max=1500;
 
-                const max=1500;
+if(width>max||height>max){
 
-                if(
-                    width>max||
-                    height>max
-                ){
+const scale=Math.min(
+max/width,
+max/height
+);
 
-                    const scale=
-                        Math.min(
-                            max/width,
-                            max/height
-                        );
+width=Math.round(width*scale);
+height=Math.round(height*scale);
 
-                    width=
-                        Math.round(
-                            width*scale
-                        );
+}
 
-                    height=
-                        Math.round(
-                            height*scale
-                        );
+const canvas=
+document.createElement("canvas");
 
-                }
+canvas.width=width;
+canvas.height=height;
 
+const ctx=
+canvas.getContext("2d");
 
-                const canvas=
-                    document.createElement(
-                        "canvas"
-                    );
+ctx.drawImage(
+img,
+0,
+0,
+width,
+height
+);
 
-                canvas.width=width;
+resolve(
+canvas.toDataURL(
+"image/jpeg",
+.78
+)
+);
 
-                canvas.height=height;
+};
 
-                const ctx=
-                    canvas.getContext("2d");
+img.onerror=reject;
 
-                ctx.drawImage(
-                    img,
-                    0,
-                    0,
-                    width,
-                    height
-                );
+img.src=reader.result;
 
+};
 
-                resolve(
-                    canvas.toDataURL(
-                        "image/jpeg",
-                        .78
-                    )
-                );
+reader.onerror=reject;
 
-            };
+reader.readAsDataURL(file);
 
-            img.onerror=reject;
-
-            img.src=reader.result;
-
-        };
-
-        reader.onerror=reject;
-
-        reader.readAsDataURL(file);
-
-    });
+});
 
 }
 
 
-/* =========================================================
-   SEND
-========================================================= */
+/* SEND */
 
 sendBtn.onclick=sendMessage;
 
 messageInput.addEventListener(
-    "keydown",
-    event=>{
+"keydown",
+event=>{
 
-        if(
-            event.key==="Enter" &&
-            !event.shiftKey &&
-            settings.enterToSend
-        ){
+if(
+event.key==="Enter" &&
+!event.shiftKey &&
+settings.enterToSend
+){
 
-            event.preventDefault();
+event.preventDefault();
 
-            sendMessage();
+sendMessage();
 
-        }
+}
 
-    }
-);
-
-
-messageInput.addEventListener(
-    "input",
-    ()=>{
-
-        messageInput.style.height="auto";
-
-        messageInput.style.height=
-            Math.min(
-                messageInput.scrollHeight,
-                150
-            )+"px";
-
-    }
-);
+});
 
 
 async function sendMessage(){
 
-    const text=
-        messageInput.value.trim();
+const text=
+messageInput.value.trim();
 
+if(!settings.username){
 
-    if(!settings.username){
+settingsBtn.click();
 
-        settingsBtn.click();
+usernameInput.focus();
 
-        usernameInput.focus();
+alert(
+"Set your name in Settings first."
+);
 
-        alert(
-            "Set your name in Settings first."
-        );
+return;
 
-        return;
-    }
+}
 
+if(!text&&!selectedFile)
+return;
 
-    if(!text&&!selectedFile)
-        return;
+sendBtn.disabled=true;
 
+try{
 
-    sendBtn.disabled=true;
+let image=null;
 
+if(selectedFile){
 
-    try{
+image=
+await resizeImage(selectedFile);
 
-        let image=null;
+}
 
-        if(selectedFile){
+const response=
+await fetch(API_URL,{
 
-            image=
-                await resizeImage(
-                    selectedFile
-                );
+method:"POST",
 
-        }
+headers:{
+"Content-Type":"application/json"
+},
 
+body:JSON.stringify({
 
-        const response=
-            await fetch(
-                API_URL,
-                {
-                    method:"POST",
+username:settings.username,
 
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
+channel:CHANNEL,
 
-                    body:JSON.stringify({
+message:text,
 
-                        username:
-                            settings.username,
+image:image,
 
-                        channel:
-                            CHANNEL,
+device_id:deviceId
 
-                        message:
-                            text,
+})
 
-                        image:
-                            image,
+});
 
-                        device_id:
-                            deviceId
+const data=
+await response.json();
 
-                    })
+if(!response.ok){
 
-                }
-            );
+throw new Error(
+data.error||
+"Failed to send message."
+);
 
+}
 
-        const data=
-            await response.json();
+messageInput.value="";
 
+messageInput.style.height="auto";
 
-        if(!response.ok){
+selectedFile=null;
 
-            throw new Error(
-                data.error||
-                "Failed to send message."
-            );
+imageInput.value="";
 
-        }
+attachBtn.textContent="＋";
 
+await loadMessages();
 
-        messageInput.value="";
+}catch(error){
 
-        messageInput.style.height="auto";
+if(!settings.keepText){
 
-        selectedFile=null;
+messageInput.value="";
 
-        imageInput.value="";
+}
 
-        attachBtn.textContent="＋";
+alert(
+"Failed to send:\n\n"+
+error.message
+);
 
+}finally{
 
-        await loadMessages();
+sendBtn.disabled=false;
 
-
-    }catch(error){
-
-        alert(
-            "Failed to send:\n\n"+
-            error.message
-        );
-
-    }finally{
-
-        sendBtn.disabled=false;
-
-    }
+}
 
 }
 
 
-/* =========================================================
-   LOAD
-========================================================= */
+/* LOAD */
 
 async function loadMessages(){
 
-    try{
+try{
 
-        const response=
-            await fetch(
-                API_URL+
-                "?channel="+
-                encodeURIComponent(
-                    CHANNEL
-                )
-            );
+const response=
+await fetch(
+API_URL+
+"?channel="+
+encodeURIComponent(CHANNEL)
+);
 
+const data=
+await response.json();
 
-        const data=
-            await response.json();
+if(!response.ok){
 
+throw new Error(
+data.error||
+"Failed to load messages."
+);
 
-        if(!response.ok){
+}
 
-            throw new Error(
-                data.error||
-                "Failed to load messages."
-            );
+const oldMessages=
+currentMessages;
 
-        }
-
-
-        currentMessages=
-            Array.isArray(data.messages)
-            ?data.messages
-            :[];
+currentMessages=
+Array.isArray(data.messages)
+?data.messages
+:[];
 
 
-        renderMessages();
+/*
+Detect newly received messages.
+*/
 
+if(oldMessages.length){
 
-    }catch(error){
+const oldIds=
+new Set(
+oldMessages.map(m=>String(m.id))
+);
 
-        messagesEl.innerHTML=`
+const newMessages=
+currentMessages.filter(
+m=>!oldIds.has(String(m.id))
+);
 
-            <div class="empty">
+for(const message of newMessages){
 
-                <div>
+handleIncomingNotification(message);
 
-                    <strong>
-                        Unable to load messages
-                    </strong>
+}
 
-                    ${escapeHtml(
-                        error.message
-                    )}
+}
 
-                </div>
+renderMessages();
 
-            </div>
+}catch(error){
 
-        `;
+messagesEl.innerHTML=`
 
-    }
+<div class="empty">
+
+<div>
+
+<strong>
+Unable to load messages
+</strong>
+
+${escapeHtml(error.message)}
+
+</div>
+
+</div>
+
+`;
+
+}
 
 }
 
 
-/* =========================================================
-   RENDER
-========================================================= */
+/* NOTIFICATION PERMISSION */
+
+async function requestNotificationPermission(){
+
+if(!("Notification" in window)){
+
+alert(
+"Your browser does not support desktop notifications."
+);
+
+return false;
+
+}
+
+if(Notification.permission==="granted")
+return true;
+
+if(Notification.permission==="denied"){
+
+alert(
+"Notifications are blocked in your browser. Allow notifications for this site in browser settings."
+);
+
+return false;
+
+}
+
+const permission=
+await Notification.requestPermission();
+
+return permission==="granted";
+
+}
+
+
+/* NOTIFICATION */
+
+let lastNotificationId=null;
+
+function handleIncomingNotification(message){
+
+if(!message)
+return;
+
+if(
+String(message.device_id)===
+String(deviceId)
+)
+return;
+
+if(
+settings.hiddenOnly &&
+document.visibilityState!=="hidden"
+)
+return;
+
+if(
+settings.desktopNotifications
+){
+
+showWindowsNotification(message);
+
+}
+
+if(
+settings.notificationSound
+){
+
+if(document.visibilityState==="hidden"){
+
+playNotificationSound(
+settings.soundTheme,
+settings.soundDuration,
+settings.soundVolume
+);
+
+}
+
+}
+
+}
+
+
+/* WINDOWS NOTIFICATION */
+
+async function showWindowsNotification(message){
+
+const allowed=
+await requestNotificationPermission();
+
+if(!allowed)
+return;
+
+let body="New message";
+
+if(settings.notificationPreview==="name"){
+
+body=
+(message.username||"Someone")+
+" sent a message";
+
+}
+
+else if(
+settings.notificationPreview==="full"
+){
+
+body=
+(message.message||
+(message.image?"📷 Image":"New message"))
+.substring(0,180);
+
+}
+
+const title=
+(message.username||"Chat")+
+" • #"+CHANNEL;
+
+
+/*
+Browser notifications behave like Windows
+notifications on supported Windows browsers.
+*/
+
+try{
+
+const notification=
+new Notification(
+title,
+{
+body:body,
+tag:"chat-"+message.id,
+renotify:true,
+silent:true
+}
+);
+
+notification.onclick=()=>{
+
+window.focus();
+
+notification.close();
+
+};
+
+}catch(error){
+
+console.warn(
+"Notification failed:",
+error
+);
+
+}
+
+}
+
+
+/* TEST NOTIFICATION */
+
+testNotification.onclick=async()=>{
+
+const allowed=
+await requestNotificationPermission();
+
+if(!allowed)
+return;
+
+const testMessage={
+
+id:"test-"+Date.now(),
+
+username:settings.username||
+"Chat",
+
+message:
+"This is a Windows notification test."
+
+};
+
+showWindowsNotification(
+testMessage
+);
+
+if(settings.notificationSound){
+
+playNotificationSound(
+settings.soundTheme,
+settings.soundDuration,
+settings.soundVolume
+);
+
+}
+
+};
+
+
+/* AUDIO */
+
+function getAudioContext(){
+
+if(!audioContext){
+
+audioContext=
+new (
+window.AudioContext||
+window.webkitAudioContext
+)();
+
+}
+
+if(
+audioContext.state==="suspended"
+){
+
+audioContext.resume();
+
+}
+
+return audioContext;
+
+}
+
+
+/*
+These sounds are synthesized locally.
+No external audio files are needed.
+*/
+
+function playTone(
+ctx,
+frequency,
+start,
+duration,
+volume,
+type="sine"
+){
+
+const oscillator=
+ctx.createOscillator();
+
+const gain=
+ctx.createGain();
+
+oscillator.type=type;
+
+oscillator.frequency
+.setValueAtTime(
+frequency,
+start
+);
+
+gain.gain.setValueAtTime(
+0,
+start
+);
+
+gain.gain.linearRampToValueAtTime(
+volume,
+start+.015
+);
+
+gain.gain.exponentialRampToValueAtTime(
+.001,
+start+duration
+);
+
+oscillator.connect(gain);
+
+gain.connect(ctx.destination);
+
+oscillator.start(start);
+
+oscillator.stop(
+start+duration+.03
+);
+
+}
+
+
+/* 15 SOUND THEMES */
+
+function playNotificationSound(
+theme,
+duration,
+volume
+){
+
+const ctx=
+getAudioContext();
+
+const now=
+ctx.currentTime;
+
+const maxDuration=
+Math.max(
+.1,
+duration/1000
+);
+
+const master=
+Math.max(
+0,
+Math.min(1,volume/100)
+)*.25;
+
+
+/* 1 CLASSIC */
+
+if(theme==="classic"){
+
+playTone(
+ctx,
+880,
+now,
+Math.min(.18,maxDuration),
+master
+);
+
+playTone(
+ctx,
+1175,
+now+.19,
+Math.min(.22,maxDuration-.19),
+master
+);
+
+return;
+
+}
+
+
+/* 2 SOFT */
+
+if(theme==="soft"){
+
+playTone(
+ctx,
+523.25,
+now,
+Math.min(.35,maxDuration),
+master*.65
+);
+
+playTone(
+ctx,
+659.25,
+now+.25,
+Math.min(.45,maxDuration-.25),
+master*.65
+);
+
+return;
+
+}
+
+
+/* 3 DIGITAL */
+
+if(theme==="digital"){
+
+playTone(
+ctx,
+1000,
+now,
+.07,
+master,
+"square"
+);
+
+playTone(
+ctx,
+1500,
+now+.09,
+.09,
+master,
+"square"
+);
+
+return;
+
+}
+
+
+/* 4 POP */
+
+if(theme==="pop"){
+
+playTone(
+ctx,
+660,
+now,
+.12,
+master,
+"sine"
+);
+
+playTone(
+ctx,
+880,
+now+.12,
+.16,
+master,
+"sine"
+);
+
+return;
+
+}
+
+
+/* 5 BELL */
+
+if(theme==="bell"){
+
+playTone(
+ctx,
+784,
+now,
+.7,
+master*.7
+);
+
+playTone(
+ctx,
+1174,
+now,
+.9,
+master*.45
+);
+
+return;
+
+}
+
+
+/* 6 CHIME */
+
+if(theme==="chime"){
+
+const notes=[
+523.25,
+659.25,
+783.99
+];
+
+notes.forEach(
+(f,i)=>{
+
+playTone(
+ctx,
+f,
+now+i*.18,
+Math.min(
+.7,
+maxDuration-i*.18
+),
+master*.6
+);
+
+});
+
+return;
+
+}
+
+
+/* 7 RETRO */
+
+if(theme==="retro"){
+
+playTone(
+ctx,
+440,
+now,
+.1,
+master,
+"square"
+);
+
+playTone(
+ctx,
+660,
+now+.12,
+.1,
+master,
+"square"
+);
+
+playTone(
+ctx,
+880,
+now+.24,
+.13,
+master,
+"square"
+);
+
+return;
+
+}
+
+
+/* 8 COMPUTER */
+
+if(theme==="computer"){
+
+playTone(
+ctx,
+600,
+now,
+.06,
+master,
+"square"
+);
+
+playTone(
+ctx,
+900,
+now+.08,
+.06,
+master,
+"square"
+);
+
+playTone(
+ctx,
+1200,
+now+.16,
+.08,
+master,
+"square"
+);
+
+return;
+
+}
+
+
+/* 9 ALERT */
+
+if(theme==="alert"){
+
+playTone(
+ctx,
+740,
+now,
+.18,
+master,
+"sawtooth"
+);
+
+playTone(
+ctx,
+540,
+now+.2,
+.18,
+master,
+"sawtooth"
+);
+
+return;
+
+}
+
+
+/* 10 WARNING */
+
+if(theme==="warning"){
+
+playTone(
+ctx,
+500,
+now,
+.3,
+master,
+"sawtooth"
+);
+
+playTone(
+ctx,
+500,
+now+.35,
+.3,
+master,
+"sawtooth"
+);
+
+return;
+
+}
+
+
+/* 11 NUCLEAR ALARM */
+
+if(theme==="alarm"){
+
+const cycles=
+Math.max(
+1,
+Math.ceil(maxDuration/.8)
+);
+
+for(let i=0;i<cycles;i++){
+
+const t=
+now+i*.8;
+
+playTone(
+ctx,
+420,
+t,
+.35,
+master,
+"sawtooth"
+);
+
+playTone(
+ctx,
+820,
+t+.35,
+.35,
+master,
+"sawtooth"
+);
+
+}
+
+return;
+
+}
+
+
+/* 12 OPERA */
+
+if(theme==="opera"){
+
+/*
+A synthetic vocal-like sequence.
+It is an original melody, not a recording.
+*/
+
+const notes=[
+261.63,
+329.63,
+392,
+329.63,
+293.66,
+349.23,
+440,
+392,
+329.63,
+392,
+523.25
+];
+
+const noteLength=
+Math.min(
+.28,
+maxDuration/notes.length
+);
+
+notes.forEach(
+(f,i)=>{
+
+const t=
+now+i*noteLength;
+
+playTone(
+ctx,
+f,
+t,
+Math.max(
+.08,
+noteLength*.9
+),
+master*.55,
+"sine"
+);
+
+});
+
+return;
+
+}
+
+
+/* 13 SYNTH */
+
+if(theme==="synth"){
+
+const notes=[
+220,
+330,
+440,
+660
+];
+
+notes.forEach(
+(f,i)=>{
+
+playTone(
+ctx,
+f,
+now+i*.12,
+.2,
+master,
+"triangle"
+);
+
+});
+
+return;
+
+}
+
+
+/* 14 PULSE */
+
+if(theme==="pulse"){
+
+for(
+let i=0;
+i<4;
+i++
+){
+
+playTone(
+ctx,
+700,
+now+i*.16,
+.07,
+master,
+"square"
+);
+
+}
+
+return;
+
+}
+
+
+/* 15 SPACE */
+
+if(theme==="space"){
+
+playTone(
+ctx,
+180,
+now,
+.5,
+master*.5,
+"sine"
+);
+
+playTone(
+ctx,
+270,
+now+.2,
+.7,
+master*.4,
+"triangle"
+);
+
+playTone(
+ctx,
+540,
+now+.4,
+.8,
+master*.3,
+"sine"
+);
+
+}
+
+}
+
+
+/* RENDER */
 
 function renderMessages(){
 
-    const wasBottom=
-        messagesEl.scrollHeight-
-        messagesEl.scrollTop-
-        messagesEl.clientHeight
-        <100;
+const wasBottom=
+messagesEl.scrollHeight-
+messagesEl.scrollTop-
+messagesEl.clientHeight<100;
 
+if(!currentMessages.length){
 
-    if(!currentMessages.length){
+messagesEl.innerHTML=`
 
-        messagesEl.innerHTML=`
+<div class="empty">
 
-            <div class="empty">
+<div>
 
-                <div>
+<strong>No messages yet</strong>
 
-                    <strong>
-                        No messages yet
-                    </strong>
+Be the first to send something.
 
-                    Be the first to send something.
+</div>
 
-                </div>
+</div>
 
-            </div>
+`;
 
-        `;
+return;
 
-        return;
+}
 
-    }
+const fragment=
+document.createDocumentFragment();
 
+currentMessages.forEach(
+message=>{
 
-    const fragment=
-        document.createDocumentFragment();
+const item=
+document.createElement("div");
 
+item.className="message";
 
-    currentMessages.forEach(message=>{
+if(settings.messageDensity==="compact")
+item.classList.add("compact");
 
-        const item=
-            document.createElement("div");
+item.dataset.id=
+message.id;
 
-        item.className="message";
+const avatar=
+document.createElement("div");
 
-        item.dataset.id=
-            message.id;
+avatar.className="avatar";
 
+avatar.textContent=
+(message.username||"?")
+.charAt(0)
+.toUpperCase();
 
-        const avatar=
-            document.createElement("div");
+const content=
+document.createElement("div");
 
-        avatar.className="avatar";
+content.className=
+"message-content";
 
-        avatar.textContent=
-            (message.username||"?")
-            .charAt(0)
-            .toUpperCase();
+const top=
+document.createElement("div");
 
+top.className=
+"message-top";
 
-        const content=
-            document.createElement("div");
+const name=
+document.createElement("span");
 
-        content.className=
-            "message-content";
+name.className=
+"username";
 
+name.textContent=
+message.username||"User";
 
-        const top=
-            document.createElement("div");
+top.appendChild(name);
 
-        top.className="message-top";
 
+if(settings.showTimestamps){
 
-        const name=
-            document.createElement("span");
+const time=
+document.createElement("span");
 
-        name.className="username";
+time.className="time";
 
-        name.textContent=
-            message.username||"User";
+time.textContent=
+formatTime(
+message.created_at
+);
 
-
-        top.appendChild(name);
-
-
-        if(settings.showTimestamps){
-
-            const time=
-                document.createElement(
-                    "span"
-                );
-
-            time.className="time";
-
-            time.textContent=
-                formatTime(
-                    message.created_at
-                );
-
-            top.appendChild(time);
-
-        }
-
-
-        if(message.edited){
-
-            const edited=
-                document.createElement(
-                    "span"
-                );
-
-            edited.className="edited";
-
-            edited.textContent=
-                "(edited)";
-
-            top.appendChild(edited);
-
-        }
-
-
-        content.appendChild(top);
-
-
-        if(message.message){
-
-            const text=
-                document.createElement(
-                    "div"
-                );
-
-            text.className=
-                "message-text";
-
-            text.textContent=
-                message.message;
-
-            content.appendChild(text);
-
-        }
-
-
-        if(message.image){
-
-            const img=
-                document.createElement(
-                    "img"
-                );
-
-            img.className=
-                "message-image";
-
-            img.src=
-                message.image;
-
-            img.alt="Image";
-
-            img.onclick=()=>{
-                openImage(
-                    message.image
-                );
-            };
-
-            content.appendChild(img);
-
-        }
-
-
-        item.appendChild(avatar);
-
-        item.appendChild(content);
-
-
-        if(
-            message.device_id &&
-            message.device_id===deviceId
-        ){
-
-            item.addEventListener(
-                "contextmenu",
-                event=>{
-
-                    event.preventDefault();
-
-                    showContextMenu(
-                        event.clientX,
-                        event.clientY,
-                        message
-                    );
-
-                }
-            );
-
-        }
-
-
-        fragment.appendChild(item);
-
-    });
-
-
-    messagesEl.replaceChildren(
-        fragment
-    );
-
-
-    if(
-        wasBottom &&
-        settings.autoScroll
-    ){
-
-        messagesEl.scrollTop=
-            messagesEl.scrollHeight;
-
-    }
+top.appendChild(time);
 
 }
 
 
-/* =========================================================
-   CONTEXT MENU
-========================================================= */
+if(message.edited){
 
-function showContextMenu(
-    x,
-    y,
-    message
+const edited=
+document.createElement("span");
+
+edited.className="edited";
+
+edited.textContent=
+"(edited)";
+
+top.appendChild(edited);
+
+}
+
+content.appendChild(top);
+
+
+/* TEXT + LINKS */
+
+if(message.message){
+
+const text=
+createMessageContent(
+message.message
+);
+
+content.appendChild(text);
+
+}
+
+
+/* STORED IMAGE */
+
+if(message.image){
+
+const img=
+document.createElement("img");
+
+img.className=
+"message-image";
+
+img.src=
+message.image;
+
+img.alt="Image";
+
+img.onclick=()=>{
+openImage(message.image);
+};
+
+content.appendChild(img);
+
+}
+
+
+item.appendChild(avatar);
+
+item.appendChild(content);
+
+
+/* ONLY OWNER CONTEXT MENU */
+
+if(
+message.device_id &&
+message.device_id===deviceId
 ){
 
-    selectedMessage=message;
+item.addEventListener(
+"contextmenu",
+event=>{
 
-    contextMenu.style.left=
-        Math.min(
-            x,
-            window.innerWidth-170
-        )+"px";
+event.preventDefault();
 
-    contextMenu.style.top=
-        Math.min(
-            y,
-            window.innerHeight-100
-        )+"px";
+showContextMenu(
+event.clientX,
+event.clientY,
+message
+);
 
-    contextMenu.classList.add(
-        "show"
-    );
+});
+
+}
+
+fragment.appendChild(item);
+
+});
+
+messagesEl.replaceChildren(fragment);
+
+if(
+wasBottom &&
+settings.autoScroll
+){
+
+messagesEl.scrollTop=
+messagesEl.scrollHeight;
+
+}
+
+}
+
+
+/* LINK PARSER */
+
+function createMessageContent(text){
+
+const container=
+document.createElement("div");
+
+container.className=
+"message-text";
+
+if(!settings.clickableLinks){
+
+container.textContent=text;
+
+return container;
+
+}
+
+const urlRegex=
+/(https?:\/\/[^\s<]+)/gi;
+
+let last=0;
+
+let match;
+
+while(
+(match=urlRegex.exec(text))!==null
+){
+
+const before=
+text.slice(
+last,
+match.index
+);
+
+if(before){
+
+container.appendChild(
+document.createTextNode(before)
+);
+
+}
+
+let url=
+match[0];
+
+let punctuation="";
+
+/*
+Remove common punctuation from the URL.
+*/
+
+while(
+/[.,!?;:)\]}]$/.test(url)
+){
+
+punctuation=
+url.slice(-1)+
+punctuation;
+
+url=url.slice(0,-1);
+
+}
+
+const isImage=
+settings.imageLinks &&
+isImageUrl(url);
+
+if(isImage){
+
+const img=
+document.createElement("img");
+
+img.className=
+"message-image";
+
+img.src=url;
+
+img.alt="Linked image";
+
+img.loading="lazy";
+
+img.onclick=()=>{
+openImage(url);
+};
+
+container.appendChild(img);
+
+}else{
+
+const link=
+document.createElement("a");
+
+link.className=
+"message-link";
+
+link.href=url;
+
+link.textContent=url;
+
+link.rel=
+"noopener noreferrer";
+
+if(settings.newTabLinks){
+
+link.target="_blank";
+
+}
+
+container.appendChild(link);
+
+}
+
+if(punctuation){
+
+container.appendChild(
+document.createTextNode(
+punctuation
+)
+);
+
+}
+
+last=
+match.index+
+match[0].length;
+
+}
+
+const after=
+text.slice(last);
+
+if(after){
+
+container.appendChild(
+document.createTextNode(after)
+);
+
+}
+
+return container;
+
+}
+
+
+function isImageUrl(url){
+
+return /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?.*)?$/i
+.test(url);
+
+}
+
+
+/* CONTEXT MENU */
+
+function showContextMenu(
+x,
+y,
+message
+){
+
+selectedMessage=message;
+
+contextMenu.style.left=
+Math.min(
+x,
+window.innerWidth-170
+)+"px";
+
+contextMenu.style.top=
+Math.min(
+y,
+window.innerHeight-100
+)+"px";
+
+contextMenu.classList.add("show");
 
 }
 
 
 document.addEventListener(
-    "click",
-    ()=>{
-        contextMenu.classList.remove(
-            "show"
-        );
-    }
+"click",
+()=>{
+contextMenu.classList.remove("show");
+}
 );
 
 
-/* =========================================================
-   EDIT
-========================================================= */
+/* EDIT */
 
 editMessageBtn.onclick=
 async event=>{
 
-    event.stopPropagation();
+event.stopPropagation();
 
-    contextMenu.classList.remove(
-        "show"
-    );
+contextMenu.classList.remove("show");
 
-    if(!selectedMessage)
-        return;
+if(!selectedMessage)
+return;
 
+const newText=
+prompt(
+"Edit message:",
+selectedMessage.message||""
+);
 
-    const newText=
-        prompt(
-            "Edit message:",
-            selectedMessage.message||""
-        );
+if(newText===null)
+return;
 
+try{
 
-    if(newText===null)
-        return;
+const response=
+await fetch(
+API_URL,
+{
 
+method:"PATCH",
 
-    try{
+headers:{
+"Content-Type":
+"application/json"
+},
 
-        const response=
-            await fetch(
-                API_URL,
-                {
-                    method:"PATCH",
+body:JSON.stringify({
 
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
+id:selectedMessage.id,
 
-                    body:JSON.stringify({
+device_id:deviceId,
 
-                        id:
-                            selectedMessage.id,
+message:newText.trim()
 
-                        device_id:
-                            deviceId,
+})
 
-                        message:
-                            newText.trim()
+});
 
-                    })
+const data=
+await response.json();
 
-                }
-            );
+if(!response.ok){
 
+throw new Error(
+data.error||
+"Failed to edit message."
+);
 
-        const data=
-            await response.json();
+}
 
+await loadMessages();
 
-        if(!response.ok){
+}catch(error){
 
-            throw new Error(
-                data.error||
-                "Failed to edit message."
-            );
+alert(
+"Failed to edit:\n\n"+
+error.message
+);
 
-        }
-
-
-        await loadMessages();
-
-
-    }catch(error){
-
-        alert(
-            "Failed to edit:\n\n"+
-            error.message
-        );
-
-    }
+}
 
 };
 
 
-/* =========================================================
-   DELETE
-========================================================= */
+/* DELETE */
 
 deleteMessageBtn.onclick=
 event=>{
 
-    event.stopPropagation();
+event.stopPropagation();
 
-    contextMenu.classList.remove(
-        "show"
-    );
+contextMenu.classList.remove(
+"show"
+);
 
-    if(!selectedMessage)
-        return;
+if(!selectedMessage)
+return;
 
+if(settings.confirmDelete){
 
-    if(settings.confirmDelete){
+openConfirm(
+"Delete message?",
+"This message will be permanently removed.",
+deleteSelectedMessage
+);
 
-        openConfirm(
-            "Delete message?",
-            "This message will be permanently removed.",
-            deleteSelectedMessage
-        );
+}else{
 
-    }else{
+deleteSelectedMessage();
 
-        deleteSelectedMessage();
-
-    }
+}
 
 };
 
 
 async function deleteSelectedMessage(){
 
-    if(!selectedMessage)
-        return;
+if(!selectedMessage)
+return;
 
+try{
 
-    try{
+const response=
+await fetch(
+API_URL,
+{
 
-        const response=
-            await fetch(
-                API_URL,
-                {
-                    method:"DELETE",
+method:"DELETE",
 
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
+headers:{
+"Content-Type":
+"application/json"
+},
 
-                    body:JSON.stringify({
+body:JSON.stringify({
 
-                        id:
-                            selectedMessage.id,
+id:selectedMessage.id,
 
-                        device_id:
-                            deviceId
+device_id:deviceId
 
-                    })
+})
 
-                }
-            );
+});
 
+const data=
+await response.json();
 
-        const data=
-            await response.json();
+if(!response.ok){
 
+throw new Error(
+data.error||
+"Failed to delete message."
+);
 
-        if(!response.ok){
+}
 
-            throw new Error(
-                data.error||
-                "Failed to delete message."
-            );
+selectedMessage=null;
 
-        }
+await loadMessages();
 
+}catch(error){
 
-        selectedMessage=null;
+alert(
+"Failed to delete:\n\n"+
+error.message
+);
 
-        await loadMessages();
-
-
-    }catch(error){
-
-        alert(
-            "Failed to delete:\n\n"+
-            error.message
-        );
-
-    }
+}
 
 }
 
 
-/* =========================================================
-   IMAGE VIEWER
-========================================================= */
+/* IMAGE VIEWER */
 
 function openImage(src){
 
-    fullImage.src=src;
+fullImage.src=src;
 
-    imageViewer.classList.add(
-        "show"
-    );
+imageViewer.classList.add(
+"show"
+);
 
 }
 
 
 function closeImage(){
 
-    imageViewer.classList.remove(
-        "show"
-    );
+imageViewer.classList.remove(
+"show"
+);
 
-    fullImage.src="";
+fullImage.src="";
 
 }
 
@@ -2716,54 +3448,64 @@ function closeImage(){
 backImage.onclick=closeImage;
 
 
-imageViewer.onclick=
-event=>{
+imageViewer.onclick=event=>{
 
-    if(
-        event.target===
-        imageViewer
-    ){
+if(event.target===imageViewer){
 
-        closeImage();
+closeImage();
 
-    }
+}
 
 };
 
 
-/* =========================================================
-   CONFIRM
-========================================================= */
+document.addEventListener(
+"keydown",
+event=>{
 
-function openConfirm(
-    title,
-    text,
-    callback
+if(
+event.key==="Escape" &&
+imageViewer.classList.contains("show")
 ){
 
-    dialogTitle.textContent=
-        title;
+closeImage();
 
-    dialogText.textContent=
-        text;
+}
 
-    confirmCallback=
-        callback;
+});
 
-    dialogOverlay.classList.add(
-        "show"
-    );
+
+/* CONFIRM */
+
+function openConfirm(
+title,
+text,
+callback
+){
+
+dialogTitle.textContent=
+title;
+
+dialogText.textContent=
+text;
+
+confirmCallback=
+callback;
+
+dialogOverlay.classList.add(
+"show"
+);
 
 }
 
 
 dialogCancel.onclick=()=>{
 
-    dialogOverlay.classList.remove(
-        "show"
-    );
+dialogOverlay.classList.remove(
+"show"
+);
 
-    confirmCallback=null;
+confirmCallback=null;
 
 };
 
@@ -2771,1062 +3513,245 @@ dialogCancel.onclick=()=>{
 dialogConfirm.onclick=
 async()=>{
 
-    const callback=
-        confirmCallback;
+const callback=
+confirmCallback;
 
-    dialogOverlay.classList.remove(
-        "show"
-    );
+dialogOverlay.classList.remove(
+"show"
+);
 
-    confirmCallback=null;
+confirmCallback=null;
 
-    if(callback)
-        await callback();
+if(callback){
+
+await callback();
+
+}
 
 };
 
 
-/* =========================================================
-   REFRESH
-========================================================= */
+/* REMOVE EVERYTHING */
+
+removeEverything.onclick=()=>{
+
+openConfirm(
+"Remove everything?",
+"This will permanently remove every message and image from the chat for EVERYONE.",
+()=>{
+
+openConfirm(
+"I know",
+"You understand that the entire chat history will be deleted.",
+()=>{
+
+openConfirm(
+"Are you ultra sure?",
+"Every stored message will be permanently removed.",
+permanentlyDeleteEverything
+);
+
+});
+
+}
+);
+
+};
+
+
+async function permanentlyDeleteEverything(){
+
+try{
+
+const response=
+await fetch(
+API_URL,
+{
+
+method:"DELETE",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:JSON.stringify({
+delete_all:true
+})
+
+});
+
+const data=
+await response.json();
+
+if(!response.ok){
+
+throw new Error(
+data.error||
+"Failed to remove everything."
+);
+
+}
+
+currentMessages=[];
+
+renderMessages();
+
+alert(
+"The entire chat has been wiped."
+);
+
+}catch(error){
+
+alert(
+"Failed to wipe chat:\n\n"+
+error.message
+);
+
+}
+
+}
+
+
+/* REFRESH */
 
 function startRefreshTimer(){
 
-    if(refreshTimer)
-        clearInterval(
-            refreshTimer
-        );
+if(refreshTimer){
 
+clearInterval(refreshTimer);
 
-    refreshTimer=
-        setInterval(
-            loadMessages,
-            Number(
-                settings.refreshRate
-            )
-        );
+}
+
+refreshTimer=
+setInterval(
+loadMessages,
+Number(settings.refreshRate)
+);
 
 }
 
 
-/* =========================================================
-   HELPERS
-========================================================= */
+/* TIME */
 
 function formatTime(date){
 
-    if(!date)
-        return "";
+if(!date)
+return "";
 
-    return new Date(date)
-        .toLocaleTimeString(
-            [],
-            {
-                hour:"2-digit",
-                minute:"2-digit"
-            }
-        );
+const d=
+new Date(date);
+
+if(settings.timestampFormat==="full"){
+
+return d.toLocaleString();
 
 }
 
+if(settings.timestampFormat==="seconds"){
+
+return d.toLocaleTimeString(
+[],
+{
+hour:"2-digit",
+minute:"2-digit",
+second:"2-digit"
+}
+);
+
+}
+
+return d.toLocaleTimeString(
+[],
+{
+hour:"2-digit",
+minute:"2-digit"
+}
+);
+
+}
+
+
+/* ESCAPE */
 
 function escapeHtml(value){
 
-    return String(value)
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-        .replaceAll(
-            "'",
-            "&#039;"
-        );
+return String(value)
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
 
 }
 
 
-/* =========================================================
-   WEBRTC SCREEN SHARE
-========================================================= */
+/*
+IMPORTANT:
+Audio must be unlocked by a user interaction
+because browsers block autoplay.
+*/
 
-const SIGNAL_URL=
-    location.protocol==="https:"
-    ?"wss://"+location.host
-    :"ws://"+location.host;
+document.addEventListener(
+"click",
+()=>{
 
+try{
 
-const startShareBtn=
-    document.getElementById(
-        "startShareBtn"
-    );
-
-const stopShareBtn=
-    document.getElementById(
-        "stopShareBtn"
-    );
-
-const localVideo=
-    document.getElementById(
-        "localVideo"
-    );
-
-const videoGrid=
-    document.getElementById(
-        "videoGrid"
-    );
-
-const screenStatus=
-    document.getElementById(
-        "screenStatus"
-    );
-
-
-let signalSocket=null;
-
-let screenStream=null;
-
-let isHost=false;
-
-let roomId=null;
-
-const peers=new Map();
-
-
-function setScreenStatus(
-    text,
-    connected=false
+if(audioContext &&
+audioContext.state==="suspended"
 ){
 
-    screenStatus.textContent=
-        text;
+audioContext.resume();
 
-    screenStatus.classList.toggle(
-        "connected",
-        connected
-    );
+}
+
+}catch(e){}
+
+},
+{passive:true}
+);
+
+
+/*
+Register service worker if you create /sw.js.
+
+This is required for real background
+push notifications when the page is closed.
+*/
+
+if("serviceWorker" in navigator){
+
+window.addEventListener(
+"load",
+()=>{
+
+navigator.serviceWorker
+.register("/sw.js")
+.then(
+()=>console.log(
+"Service worker registered."
+)
+)
+.catch(
+error=>console.warn(
+"Service worker registration failed:",
+error
+)
+);
+
+});
 
 }
 
 
-/* CONNECT SIGNAL SERVER */
-
-function connectSignal(){
-
-    return new Promise(
-        (resolve,reject)=>{
-
-            if(
-                signalSocket &&
-                signalSocket.readyState===
-                WebSocket.OPEN
-            ){
-
-                resolve();
-
-                return;
-
-            }
-
-
-            signalSocket=
-                new WebSocket(
-                    SIGNAL_URL
-                );
-
-
-            signalSocket.onopen=()=>{
-
-                resolve();
-
-            };
-
-
-            signalSocket.onerror=
-                ()=>{
-
-                    reject(
-                        new Error(
-                            "Could not connect to screen-share server."
-                        )
-                    );
-
-                };
-
-
-            signalSocket.onclose=()=>{
-
-                signalSocket=null;
-
-                peers.forEach(
-                    peer=>{
-                        peer.close();
-                    }
-                );
-
-                peers.clear();
-
-            };
-
-
-            signalSocket.onmessage=
-                async event=>{
-
-                    try{
-
-                        const data=
-                            JSON.parse(
-                                event.data
-                            );
-
-                        await handleSignal(
-                            data
-                        );
-
-                    }catch(error){
-
-                        console.error(
-                            "Signal error:",
-                            error
-                        );
-
-                    }
-
-                };
-
-        }
-    );
-
-}
-
-
-/* SIGNAL */
-
-function sendSignal(data){
-
-    if(
-        !signalSocket ||
-        signalSocket.readyState!==
-        WebSocket.OPEN
-    )
-        return;
-
-    signalSocket.send(
-        JSON.stringify(data)
-    );
-
-}
-
-
-/* START SHARING */
-
-startShareBtn.onclick=
-async()=>{
-
-    if(isHost)
-        return;
-
-
-    try{
-
-        await connectSignal();
-
-
-        roomId=
-            crypto.randomUUID();
-
-
-        const quality=
-            Number(
-                settings.screenQuality
-            );
-
-        const fps=
-            Number(
-                settings.screenFPS
-            );
-
-
-        screenStream=
-            await navigator.mediaDevices
-            .getDisplayMedia({
-
-                video:{
-                    width:{
-                        ideal:quality
-                    },
-
-                    height:{
-                        ideal:Math.round(
-                            quality*9/16
-                        )
-                    },
-
-                    frameRate:{
-                        ideal:fps
-                    }
-                },
-
-                audio:false
-
-            });
-
-
-        localVideo.srcObject=
-            screenStream;
-
-
-        isHost=true;
-
-
-        startShareBtn.disabled=
-            true;
-
-        stopShareBtn.disabled=
-            false;
-
-
-        setScreenStatus(
-            "Hosting screen share",
-            true
-        );
-
-
-        sendSignal({
-
-            type:"host",
-
-            roomId:roomId,
-
-            userId:deviceId,
-
-            username:
-                settings.username||
-                "Host"
-
-        });
-
-
-        const track=
-            screenStream
-            .getVideoTracks()[0];
-
-
-        track.addEventListener(
-            "ended",
-            stopScreenShare
-        );
-
-
-    }catch(error){
-
-        console.error(error);
-
-        alert(
-            "Could not start screen sharing.\n\n"+
-            error.message
-        );
-
-    }
-
-};
-
-
-/* STOP SHARING */
-
-stopShareBtn.onclick=
-stopScreenShare;
-
-
-function stopScreenShare(){
-
-    if(screenStream){
-
-        screenStream
-            .getTracks()
-            .forEach(
-                track=>{
-                    track.stop();
-                }
-            );
-
-        screenStream=null;
-
-    }
-
-
-    localVideo.srcObject=null;
-
-
-    peers.forEach(
-        peer=>{
-            peer.close();
-        }
-    );
-
-    peers.clear();
-
-
-    if(signalSocket){
-
-        sendSignal({
-
-            type:"host-stop",
-
-            roomId:roomId,
-
-            userId:deviceId
-
-        });
-
-    }
-
-
-    isHost=false;
-
-    roomId=null;
-
-
-    startShareBtn.disabled=
-        false;
-
-    stopShareBtn.disabled=
-        true;
-
-
-    setScreenStatus(
-        "Not connected"
-    );
-
-
-    removeRemoteVideos();
-
-}
-
-
-/* HOST DISCOVERY */
-
-async function handleSignal(data){
-
-    if(
-        data.userId===
-        deviceId
-    )
-        return;
-
-
-    /* Another user started hosting */
-
-    if(data.type==="host"){
-
-        if(isHost)
-            return;
-
-
-        if(
-            settings.autoScreenPage
-        ){
-
-            switchToScreenPage();
-
-        }
-
-
-        await connectToHost(
-            data.roomId,
-            data.userId,
-            data.username
-        );
-
-        return;
-
-    }
-
-
-    if(data.type==="host-stop"){
-
-        if(
-            data.roomId===
-            roomId
-        ){
-
-            removeRemoteVideos();
-
-            peers.forEach(
-                peer=>{
-                    peer.close();
-                }
-            );
-
-            peers.clear();
-
-            setScreenStatus(
-                "Host stopped sharing"
-            );
-
-        }
-
-        return;
-
-    }
-
-
-    if(data.type==="viewer-ready"){
-
-        if(
-            !isHost ||
-            data.roomId!==roomId
-        )
-            return;
-
-
-        await createOfferForViewer(
-            data.userId
-        );
-
-        return;
-
-    }
-
-
-    if(data.type==="offer"){
-
-        await handleOffer(data);
-
-        return;
-
-    }
-
-
-    if(data.type==="answer"){
-
-        const peer=
-            peers.get(
-                data.from
-            );
-
-        if(!peer)
-            return;
-
-
-        await peer.setRemoteDescription(
-            new RTCSessionDescription(
-                data.answer
-            )
-        );
-
-        return;
-
-    }
-
-
-    if(data.type==="ice"){
-
-        const peer=
-            peers.get(
-                data.from
-            );
-
-        if(!peer)
-            return;
-
-
-        try{
-
-            await peer.addIceCandidate(
-                new RTCIceCandidate(
-                    data.candidate
-                )
-            );
-
-        }catch(error){
-
-            console.warn(
-                "ICE error:",
-                error
-            );
-
-        }
-
-    }
-
-}
-
-
-/* CONNECT VIEWER */
-
-async function connectToHost(
-    hostRoomId,
-    hostId,
-    hostName
-){
-
-    roomId=
-        hostRoomId;
-
-
-    setScreenStatus(
-        "Connecting to "+hostName+"...",
-        true
-    );
-
-
-    const peer=
-        createPeer(
-            hostId,
-            false
-        );
-
-
-    peers.set(
-        hostId,
-        peer
-    );
-
-
-    sendSignal({
-
-        type:"viewer-ready",
-
-        roomId:roomId,
-
-        userId:deviceId,
-
-        target:hostId
-
-    });
-
-}
-
-
-/* HOST OFFER */
-
-async function createOfferForViewer(
-    viewerId
-){
-
-    const peer=
-        createPeer(
-            viewerId,
-            true
-        );
-
-
-    peers.set(
-        viewerId,
-        peer
-    );
-
-
-    if(screenStream){
-
-        screenStream
-            .getTracks()
-            .forEach(
-                track=>{
-
-                    peer.addTrack(
-                        track,
-                        screenStream
-                    );
-
-                }
-            );
-
-    }
-
-
-    const offer=
-        await peer.createOffer();
-
-
-    await peer.setLocalDescription(
-        offer
-    );
-
-
-    sendSignal({
-
-        type:"offer",
-
-        roomId:roomId,
-
-        from:deviceId,
-
-        target:viewerId,
-
-        offer:offer
-
-    });
-
-}
-
-
-/* OFFER */
-
-async function handleOffer(data){
-
-    if(
-        data.target &&
-        data.target!==deviceId
-    )
-        return;
-
-
-    let peer=
-        peers.get(
-            data.from
-        );
-
-
-    if(!peer){
-
-        peer=
-            createPeer(
-                data.from,
-                false
-            );
-
-        peers.set(
-            data.from,
-            peer
-        );
-
-    }
-
-
-    await peer.setRemoteDescription(
-        new RTCSessionDescription(
-            data.offer
-        )
-    );
-
-
-    const answer=
-        await peer.createAnswer();
-
-
-    await peer.setLocalDescription(
-        answer
-    );
-
-
-    sendSignal({
-
-        type:"answer",
-
-        roomId:data.roomId,
-
-        from:deviceId,
-
-        target:data.from,
-
-        answer:answer
-
-    });
-
-}
-
-
-/* CREATE PEER */
-
-function createPeer(
-    remoteId,
-    hostSide
-){
-
-    const peer=
-        new RTCPeerConnection({
-
-            iceServers:[
-
-                {
-                    urls:
-                        "stun:stun.l.google.com:19302"
-                },
-
-                {
-                    urls:
-                        "stun:stun1.l.google.com:19302"
-                }
-
-            ]
-
-        });
-
-
-    peer.onicecandidate=
-        event=>{
-
-            if(!event.candidate)
-                return;
-
-
-            sendSignal({
-
-                type:"ice",
-
-                roomId:roomId,
-
-                from:deviceId,
-
-                target:remoteId,
-
-                candidate:
-                    event.candidate
-
-            });
-
-        };
-
-
-    peer.ontrack=
-        event=>{
-
-            if(!event.streams[0])
-                return;
-
-
-            showRemoteVideo(
-                remoteId,
-                event.streams[0]
-            );
-
-
-            setScreenStatus(
-                "Watching screen share",
-                true
-            );
-
-        };
-
-
-    peer.onconnectionstatechange=
-        ()=>{
-
-            const state=
-                peer.connectionState;
-
-
-            if(
-                state==="failed"||
-                state==="closed"
-            ){
-
-                peer.close();
-
-                peers.delete(
-                    remoteId
-                );
-
-                removeRemoteVideo(
-                    remoteId
-                );
-
-            }
-
-        };
-
-
-    return peer;
-
-}
-
-
-/* REMOTE VIDEO */
-
-function showRemoteVideo(
-    id,
-    stream
-){
-
-    let card=
-        document.getElementById(
-            "remote-"+id
-        );
-
-
-    if(!card){
-
-        card=
-            document.createElement(
-                "div"
-            );
-
-        card.className=
-            "video-card";
-
-        card.id=
-            "remote-"+id;
-
-
-        const video=
-            document.createElement(
-                "video"
-            );
-
-        video.autoplay=true;
-
-        video.playsInline=true;
-
-        video.srcObject=
-            stream;
-
-
-        const label=
-            document.createElement(
-                "div"
-            );
-
-        label.className=
-            "video-label";
-
-        label.textContent=
-            "Shared screen";
-
-
-        card.appendChild(video);
-
-        card.appendChild(label);
-
-        videoGrid.appendChild(
-            card
-        );
-
-    }else{
-
-        const video=
-            card.querySelector(
-                "video"
-            );
-
-        if(video)
-            video.srcObject=
-                stream;
-
-    }
-
-}
-
-
-/* REMOVE REMOTE */
-
-function removeRemoteVideo(id){
-
-    const card=
-        document.getElementById(
-            "remote-"+id
-        );
-
-    if(card)
-        card.remove();
-
-}
-
-
-function removeRemoteVideos(){
-
-    document
-        .querySelectorAll(
-            '[id^="remote-"]'
-        )
-        .forEach(
-            element=>{
-                element.remove();
-            }
-        );
-
-}
-
-
-/* SWITCH PAGE */
-
-function switchToScreenPage(){
-
-    const tab=
-        document.querySelector(
-            '[data-page="screenshare"]'
-        );
-
-    if(tab)
-        tab.click();
-
-}
-
-
-/* =========================================================
-   START
-========================================================= */
+/* START */
 
 loadSettingsUI();
 
 applySettings();
 
 loadMessages();
-
-
-/*
-   Try connecting to the signaling server
-   when Screen Share is opened.
-*/
-
-document
-.querySelector(
-    '[data-page="screenshare"]'
-)
-.addEventListener(
-    "click",
-    async()=>{
-
-        try{
-
-            await connectSignal();
-
-            setScreenStatus(
-                "Connected — waiting for a host"
-            );
-
-        }catch(error){
-
-            setScreenStatus(
-                "Screen-share server unavailable"
-            );
-
-            console.warn(error);
-
-        }
-
-    }
-);
-
-
-/*
-   Close connections when leaving page.
-*/
-
-window.addEventListener(
-    "beforeunload",
-    ()=>{
-
-        if(screenStream)
-            stopScreenShare();
-
-        if(signalSocket)
-            signalSocket.close();
-
-    }
-);
 
 </script>
 
