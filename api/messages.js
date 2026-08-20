@@ -1,8 +1,8 @@
 export default async function handler(req, res) {
 
-    // ==============================
-    // SERVER SETTINGS
-    // ==============================
+    // =====================================================
+    // CORS / SERVER SETTINGS
+    // =====================================================
 
     res.setHeader(
         "Content-Type",
@@ -25,9 +25,9 @@ export default async function handler(req, res) {
     );
 
 
-    // ==============================
+    // =====================================================
     // OPTIONS
-    // ==============================
+    // =====================================================
 
     if (req.method === "OPTIONS") {
 
@@ -40,463 +40,816 @@ export default async function handler(req, res) {
 
     try {
 
-        // ==============================
-        // SUPABASE URL
-        // ==============================
-        //
-        // Example:
-        // https://abcdefghijklmnop.supabase.co
-        //
+        // =================================================
+        // ENVIRONMENT VARIABLES
+        // =================================================
 
         const supabaseUrl =
-            "https://wlvbkdzcueqkknysisfw.supabase.co";
-
-
-        // ==============================
-        // SUPABASE KEY
-        // ==============================
-        //
-        // Put your Supabase server key here.
-        //
-        // IMPORTANT:
-        // Do NOT send this key to anyone.
-        //
+            process.env.SUPABASE_URL;
 
         const supabaseKey =
-            "sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL";
+            process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 
-        // ==============================
-        // CHECK SETTINGS
-        // ==============================
+        // =================================================
+        // CHECK ENVIRONMENT
+        // =================================================
 
-        if (
-            !supabaseUrl ||
-            supabaseUrl ===
-                "PLACE SUPABASE URL HERE"
-        ) {
+        if (!supabaseUrl) {
 
             return res.status(500).json({
 
                 error:
-                    "Supabase URL has not been added.",
+                    "SUPABASE_URL is missing.",
 
                 fix:
-                    "Open api/messages.js and replace PLACE SUPABASE URL HERE with your Supabase Project URL."
+                    "Add SUPABASE_URL to Vercel Environment Variables."
 
             });
 
         }
 
 
-        if (
-            !supabaseKey ||
-            supabaseKey ===
-                "PLACE SUPABASE KEY HERE"
-        ) {
+        if (!supabaseKey) {
 
             return res.status(500).json({
 
                 error:
-                    "Supabase key has not been added.",
+                    "SUPABASE_SERVICE_ROLE_KEY is missing.",
 
                 fix:
-                    "Open api/messages.js and replace PLACE SUPABASE KEY HERE with your Supabase key."
+                    "Add SUPABASE_SERVICE_ROLE_KEY to Vercel Environment Variables."
 
             });
 
         }
 
-
-        // Remove accidental slash
 
         const cleanUrl =
-            supabaseUrl.replace(/\/+$/, "");
+            supabaseUrl.replace(
+                /\/+$/,
+                ""
+            );
 
 
-        // ==============================
-        // GET MESSAGES
-        // ==============================
+        // =================================================
+        // SUPABASE REQUEST HELPER
+        // =================================================
+
+        async function supabaseFetch(
+            path,
+            options = {}
+        ) {
+
+            return await fetch(
+                cleanUrl + path,
+                {
+
+                    ...options,
+
+                    headers: {
+
+                        "apikey":
+                            supabaseKey,
+
+                        "Authorization":
+                            "Bearer " +
+                            supabaseKey,
+
+                        ...(options.headers || {})
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        // =================================================
+        // GET
+        // =================================================
 
         if (req.method === "GET") {
 
-            const channel =
+            const action =
                 String(
-                    req.query.channel ||
-                    "general"
-                )
-                .trim()
-                .substring(0, 32);
-
-
-            const query =
-                cleanUrl +
-                "/rest/v1/messages" +
-                "?select=id,username,channel,message,created_at" +
-                "&channel=eq." +
-                encodeURIComponent(channel) +
-                "&order=created_at.asc";
-
-
-            const response =
-                await fetch(
-                    query,
-                    {
-
-                        method: "GET",
-
-                        headers: {
-
-                            "apikey":
-                                supabaseKey,
-
-                            "Authorization":
-                                "Bearer " +
-                                supabaseKey,
-
-                            "Accept":
-                                "application/json"
-
-                        }
-
-                    }
+                    req.query.action ||
+                    "messages"
                 );
 
 
-            const text =
-                await response.text();
+            // =============================================
+            // GET MESSAGES
+            // =============================================
+
+            if (
+                action === "messages"
+            ) {
+
+                const channel =
+                    String(
+                        req.query.channel ||
+                        "general"
+                    )
+                    .trim()
+                    .substring(
+                        0,
+                        32
+                    );
 
 
-            let data;
+                const query =
+                    "/rest/v1/messages" +
+                    "?select=id,username,channel,message,created_at" +
+                    "&channel=eq." +
+                    encodeURIComponent(
+                        channel
+                    ) +
+                    "&order=created_at.asc" +
+                    "&limit=500";
 
 
-            // ==============================
-            // READ SUPABASE RESPONSE
-            // ==============================
+                const response =
+                    await supabaseFetch(
+                        query,
+                        {
 
-            try {
+                            method:
+                                "GET",
 
-                data =
-                    JSON.parse(text);
+                            headers: {
 
-            } catch {
+                                "Accept":
+                                    "application/json"
 
-                return res.status(500).json({
+                            }
 
-                    error:
-                        "Supabase returned invalid JSON.",
+                        }
+                    );
 
-                    httpStatus:
-                        response.status,
 
-                    response:
-                        text.substring(
-                            0,
-                            1500
-                        ),
+                const text =
+                    await response.text();
 
-                    fix:
-                        "Check that your Supabase URL and key are correct."
+
+                let data;
+
+
+                try {
+
+                    data =
+                        JSON.parse(
+                            text
+                        );
+
+                }
+                catch {
+
+                    return res.status(500).json({
+
+                        error:
+                            "Supabase returned invalid JSON.",
+
+                        response:
+                            text.substring(
+                                0,
+                                2000
+                            )
+
+                    });
+
+                }
+
+
+                if (!response.ok) {
+
+                    return res.status(
+                        response.status
+                    ).json({
+
+                        error:
+                            data.message ||
+                            data.error ||
+                            data.hint ||
+                            "Supabase request failed.",
+
+                        details:
+                            data,
+
+                        fix:
+                            "Check your Supabase URL, key and messages table."
+
+                    });
+
+                }
+
+
+                return res.status(200).json({
+
+                    success:
+                        true,
+
+                    messages:
+                        Array.isArray(
+                            data
+                        )
+                            ? data
+                            : []
 
                 });
 
             }
 
 
-            // ==============================
-            // SUPABASE ERROR
-            // ==============================
+            // =============================================
+            // GET ONLINE USERS
+            // =============================================
 
-            if (!response.ok) {
+            if (
+                action === "players"
+            ) {
 
-                return res.status(
-                    response.status
-                ).json({
+                /*
+                    Users that have not sent a heartbeat
+                    for 20 seconds are considered offline.
+                */
 
-                    error:
-                        data.message ||
-                        data.error ||
-                        data.hint ||
-                        "Supabase request failed.",
+                const cutoff =
+                    new Date(
+                        Date.now() -
+                        20000
+                    ).toISOString();
 
-                    details:
-                        data,
 
-                    fix:
-                        "Check your Supabase key, URL, and messages table."
+                const query =
+                    "/rest/v1/online_users" +
+                    "?select=id,username,last_seen" +
+                    "&last_seen=gte." +
+                    encodeURIComponent(
+                        cutoff
+                    ) +
+                    "&order=username.asc";
+
+
+                const response =
+                    await supabaseFetch(
+                        query,
+                        {
+
+                            method:
+                                "GET",
+
+                            headers: {
+
+                                "Accept":
+                                    "application/json"
+
+                            }
+
+                        }
+                    );
+
+
+                const text =
+                    await response.text();
+
+
+                let data;
+
+
+                try {
+
+                    data =
+                        JSON.parse(
+                            text
+                        );
+
+                }
+                catch {
+
+                    return res.status(500).json({
+
+                        error:
+                            "Invalid JSON from Supabase.",
+
+                        response:
+                            text.substring(
+                                0,
+                                2000
+                            )
+
+                    });
+
+                }
+
+
+                if (!response.ok) {
+
+                    return res.status(
+                        response.status
+                    ).json({
+
+                        error:
+                            data.message ||
+                            data.error ||
+                            data.hint ||
+                            "Could not get online players.",
+
+                        details:
+                            data
+
+                    });
+
+                }
+
+
+                return res.status(200).json({
+
+                    success:
+                        true,
+
+                    players:
+                        Array.isArray(
+                            data
+                        )
+                            ? data
+                            : []
 
                 });
 
             }
 
 
-            // ==============================
-            // SUCCESS
-            // ==============================
+            return res.status(400).json({
 
-            return res.status(200).json({
-
-                success: true,
-
-                messages:
-                    Array.isArray(data)
-                        ? data
-                        : []
+                error:
+                    "Unknown GET action."
 
             });
 
         }
 
 
-        // ==============================
-        // SEND MESSAGE
-        // ==============================
+        // =================================================
+        // POST
+        // =================================================
 
         if (req.method === "POST") {
 
             const body =
-                req.body || {};
+                req.body ||
+                {};
 
 
-            // ==============================
-            // USERNAME
-            // ==============================
-
-            const username =
+            const action =
                 String(
-                    body.username || ""
-                )
-                .trim()
-                .substring(0, 24);
-
-
-            // ==============================
-            // CHANNEL
-            // ==============================
-
-            const channel =
-                String(
-                    body.channel ||
-                    "general"
-                )
-                .trim()
-                .substring(0, 32);
-
-
-            // ==============================
-            // MESSAGE
-            // ==============================
-
-            const message =
-                String(
-                    body.message || ""
-                )
-                .trim()
-                .substring(0, 2000);
-
-
-            // ==============================
-            // VALIDATE USERNAME
-            // ==============================
-
-            if (!username) {
-
-                return res.status(400).json({
-
-                    error:
-                        "Username is required.",
-
-                    fix:
-                        "Enter a username before sending a message."
-
-                });
-
-            }
-
-
-            // ==============================
-            // VALIDATE MESSAGE
-            // ==============================
-
-            if (!message) {
-
-                return res.status(400).json({
-
-                    error:
-                        "Message is required.",
-
-                    fix:
-                        "Type a message before pressing Send."
-
-                });
-
-            }
-
-
-            // ==============================
-            // DATA TO SUPABASE
-            // ==============================
-
-            const messageData = {
-
-                username:
-                    username,
-
-                channel:
-                    channel,
-
-                message:
-                    message
-
-            };
-
-
-            // ==============================
-            // SEND TO SUPABASE
-            // ==============================
-
-            const response =
-                await fetch(
-                    cleanUrl +
-                    "/rest/v1/messages",
-                    {
-
-                        method: "POST",
-
-                        headers: {
-
-                            "apikey":
-                                supabaseKey,
-
-                            "Authorization":
-                                "Bearer " +
-                                supabaseKey,
-
-                            "Content-Type":
-                                "application/json",
-
-                            "Accept":
-                                "application/json",
-
-                            "Prefer":
-                                "return=representation"
-
-                        },
-
-                        body:
-                            JSON.stringify(
-                                messageData
-                            )
-
-                    }
+                    body.action ||
+                    "message"
                 );
 
 
-            // ==============================
-            // READ RESPONSE
-            // ==============================
+            // =============================================
+            // SEND MESSAGE
+            // =============================================
 
-            const text =
-                await response.text();
+            if (
+                action === "message"
+            ) {
+
+                const username =
+                    String(
+                        body.username ||
+                        ""
+                    )
+                    .trim()
+                    .substring(
+                        0,
+                        24
+                    );
 
 
-            let data;
+                const channel =
+                    String(
+                        body.channel ||
+                        "general"
+                    )
+                    .trim()
+                    .substring(
+                        0,
+                        32
+                    );
 
 
-            try {
+                const message =
+                    String(
+                        body.message ||
+                        ""
+                    )
+                    .trim()
+                    .substring(
+                        0,
+                        5000000
+                    );
 
-                data =
-                    JSON.parse(text);
 
-            } catch {
+                if (!username) {
 
-                return res.status(500).json({
+                    return res.status(400).json({
 
-                    error:
-                        "Supabase returned invalid JSON.",
+                        error:
+                            "Username is required.",
 
-                    httpStatus:
-                        response.status,
+                        fix:
+                            "Enter a username."
 
-                    response:
-                        text.substring(
-                            0,
-                            1500
+                    });
+
+                }
+
+
+                if (!message) {
+
+                    return res.status(400).json({
+
+                        error:
+                            "Message is required.",
+
+                        fix:
+                            "Type something before sending."
+
+                    });
+
+                }
+
+
+                const response =
+                    await supabaseFetch(
+                        "/rest/v1/messages",
+                        {
+
+                            method:
+                                "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json",
+
+                                "Accept":
+                                    "application/json",
+
+                                "Prefer":
+                                    "return=representation"
+
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    username:
+                                        username,
+
+                                    channel:
+                                        channel,
+
+                                    message:
+                                        message
+
+                                })
+
+                        }
+                    );
+
+
+                const text =
+                    await response.text();
+
+
+                let data;
+
+
+                try {
+
+                    data =
+                        JSON.parse(
+                            text
+                        );
+
+                }
+                catch {
+
+                    return res.status(500).json({
+
+                        error:
+                            "Supabase returned invalid JSON.",
+
+                        httpStatus:
+                            response.status,
+
+                        response:
+                            text.substring(
+                                0,
+                                2000
+                            )
+
+                    });
+
+                }
+
+
+                if (!response.ok) {
+
+                    return res.status(
+                        response.status
+                    ).json({
+
+                        error:
+                            data.message ||
+                            data.error ||
+                            data.hint ||
+                            "Supabase rejected the message.",
+
+                        details:
+                            data,
+
+                        fix:
+                            "Check the messages table and RLS policies."
+
+                    });
+
+                }
+
+
+                return res.status(200).json({
+
+                    success:
+                        true,
+
+                    message:
+                        Array.isArray(
+                            data
+                        )
+                            ? data[0]
+                            : data
+
+                });
+
+            }
+
+
+            // =============================================
+            // HEARTBEAT
+            // =============================================
+
+            if (
+                action === "heartbeat"
+            ) {
+
+                const username =
+                    String(
+                        body.username ||
+                        ""
+                    )
+                    .trim()
+                    .substring(
+                        0,
+                        24
+                    );
+
+
+                if (!username) {
+
+                    return res.status(400).json({
+
+                        error:
+                            "Username is required."
+
+                    });
+
+                }
+
+
+                // Look for existing username
+
+                const searchResponse =
+                    await supabaseFetch(
+                        "/rest/v1/online_users" +
+                        "?select=id" +
+                        "&username=eq." +
+                        encodeURIComponent(
+                            username
                         ),
+                        {
 
-                    fix:
-                        "Check your Supabase URL, key, and database."
+                            method:
+                                "GET",
+
+                            headers: {
+
+                                "Accept":
+                                    "application/json"
+
+                            }
+
+                        }
+                    );
+
+
+                const searchText =
+                    await searchResponse.text();
+
+
+                let existing = [];
+
+
+                try {
+
+                    existing =
+                        JSON.parse(
+                            searchText
+                        );
+
+                }
+                catch {
+
+                    existing =
+                        [];
+
+                }
+
+
+                // Update existing user
+
+                if (
+                    Array.isArray(
+                        existing
+                    ) &&
+                    existing.length > 0
+                ) {
+
+                    const id =
+                        existing[0].id;
+
+
+                    const response =
+                        await supabaseFetch(
+                            "/rest/v1/online_users" +
+                            "?id=eq." +
+                            encodeURIComponent(
+                                id
+                            ),
+                            {
+
+                                method:
+                                    "PATCH",
+
+                                headers: {
+
+                                    "Content-Type":
+                                        "application/json",
+
+                                    "Prefer":
+                                        "return=minimal"
+
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        username:
+                                            username,
+
+                                        last_seen:
+                                            new Date()
+                                                .toISOString()
+
+                                    })
+
+                            }
+                        );
+
+
+                    if (!response.ok) {
+
+                        const errorText =
+                            await response.text();
+
+
+                        return res.status(
+                            response.status
+                        ).json({
+
+                            error:
+                                "Could not update online status.",
+
+                            details:
+                                errorText
+
+                        });
+
+                    }
+
+                }
+
+                // Create new user
+
+                else {
+
+                    const response =
+                        await supabaseFetch(
+                            "/rest/v1/online_users",
+                            {
+
+                                method:
+                                    "POST",
+
+                                headers: {
+
+                                    "Content-Type":
+                                        "application/json",
+
+                                    "Prefer":
+                                        "return=minimal"
+
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        username:
+                                            username,
+
+                                        last_seen:
+                                            new Date()
+                                                .toISOString()
+
+                                    })
+
+                            }
+                        );
+
+
+                    if (!response.ok) {
+
+                        const errorText =
+                            await response.text();
+
+
+                        return res.status(
+                            response.status
+                        ).json({
+
+                            error:
+                                "Could not create online status.",
+
+                            details:
+                                errorText
+
+                        });
+
+                    }
+
+                }
+
+
+                return res.status(200).json({
+
+                    success:
+                        true
 
                 });
 
             }
 
 
-            // ==============================
-            // SUPABASE ERROR
-            // ==============================
+            // =============================================
+            // UNKNOWN POST
+            // =============================================
 
-            if (!response.ok) {
+            return res.status(400).json({
 
-                return res.status(
-                    response.status
-                ).json({
-
-                    error:
-                        data.message ||
-                        data.error ||
-                        data.hint ||
-                        "Supabase rejected the message.",
-
-                    details:
-                        data,
-
-                    fix:
-                        "Check that your messages table exists and contains username, channel and message columns."
-
-                });
-
-            }
-
-
-            // ==============================
-            // SUCCESS
-            // ==============================
-
-            return res.status(200).json({
-
-                success: true,
-
-                message:
-                    Array.isArray(data)
-                        ? data[0]
-                        : data
+                error:
+                    "Unknown POST action."
 
             });
 
         }
 
 
-        // ==============================
-        // UNKNOWN METHOD
-        // ==============================
+        // =================================================
+        // METHOD NOT ALLOWED
+        // =================================================
 
         return res.status(405).json({
 
             error:
-                "Method not allowed.",
-
-            method:
-                req.method
+                "Method not allowed."
 
         });
 
-
-    } catch (error) {
-
-        // ==============================
-        // UNEXPECTED SERVER ERROR
-        // ==============================
+    }
+    catch (error) {
 
         console.error(
             "SERVER ERROR:",
@@ -515,7 +868,7 @@ export default async function handler(req, res) {
                 "Error",
 
             fix:
-                "Copy this error and send it to me. Do not send your Supabase key."
+                "Check your Vercel logs. Never send your secret key."
 
         });
 
