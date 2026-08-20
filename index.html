@@ -10,8 +10,7 @@
     box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
     margin: 0;
     width: 100%;
     height: 100%;
@@ -41,9 +40,7 @@ button {
     flex-direction: column;
 }
 
-/* =========================
-   HEADER
-========================= */
+/* HEADER */
 
 .header {
     height: 64px;
@@ -98,9 +95,7 @@ button {
     background: #20252d;
 }
 
-/* =========================
-   CHAT
-========================= */
+/* CHAT */
 
 .messages {
     flex: 1;
@@ -175,9 +170,7 @@ button {
     background: #080a0d;
 }
 
-/* =========================
-   COMPOSER
-========================= */
+/* COMPOSER */
 
 .composer {
     padding: 12px 16px 16px;
@@ -246,9 +239,7 @@ button {
     background: #242932;
 }
 
-/* =========================
-   SETTINGS
-========================= */
+/* SETTINGS */
 
 .overlay {
     position: fixed;
@@ -313,10 +304,6 @@ button {
     color: white;
 }
 
-.setting select {
-    cursor: pointer;
-}
-
 .save-btn {
     width: 100%;
     padding: 11px;
@@ -325,10 +312,6 @@ button {
     background: #e8eaed;
     color: #111;
     font-weight: 700;
-}
-
-.save-btn:hover {
-    background: white;
 }
 
 .danger-zone {
@@ -344,8 +327,8 @@ button {
 }
 
 .danger-zone p {
-    color: #8f98a4;
-    line-height: 1.45;
+    color: #929aa5;
+    line-height: 1.5;
 }
 
 .danger-btn {
@@ -361,9 +344,7 @@ button {
     background: #321c1e;
 }
 
-/* =========================
-   CONTEXT MENU
-========================= */
+/* CONTEXT MENU */
 
 .context-menu {
     position: fixed;
@@ -399,9 +380,7 @@ button {
     color: #ff7777;
 }
 
-/* =========================
-   IMAGE FULLSCREEN
-========================= */
+/* IMAGE VIEWER */
 
 .image-viewer {
     position: fixed;
@@ -434,9 +413,7 @@ button {
     color: white;
 }
 
-/* =========================
-   DIALOG
-========================= */
+/* DIALOG */
 
 .dialog {
     width: min(450px, calc(100vw - 30px));
@@ -470,22 +447,12 @@ button {
     color: white;
 }
 
-.dialog-buttons button:hover {
-    background: #2b313a;
-}
-
 .dialog-buttons .danger {
     background: #6b2929;
     border-color: #813434;
 }
 
-.dialog-buttons .danger:hover {
-    background: #833434;
-}
-
-/* =========================
-   EMPTY
-========================= */
+/* EMPTY */
 
 .empty {
     height: 100%;
@@ -501,9 +468,7 @@ button {
     margin-bottom: 5px;
 }
 
-/* =========================
-   MOBILE
-========================= */
+/* MOBILE */
 
 @media (max-width: 600px) {
 
@@ -531,18 +496,6 @@ button {
         font-size: 16px;
     }
 
-    .composer {
-        padding: 8px;
-    }
-
-    .composer-box {
-        padding: 6px;
-    }
-
-    .send-btn {
-        padding: 0 13px;
-    }
-
 }
 </style>
 </head>
@@ -551,358 +504,324 @@ button {
 
 <div class="app">
 
-    <!-- HEADER -->
+<header class="header">
 
-    <header class="header">
+    <div class="logo">
 
-        <div class="logo">
-
-            <div class="logo-icon">
-                💬
-            </div>
-
-            <span>
-                Chat
-            </span>
-
-            <span class="channel">
-                # general
-            </span>
-
+        <div class="logo-icon">
+            💬
         </div>
 
-        <div class="header-buttons">
+        <span>Chat</span>
 
-            <button
-                class="icon-btn"
-                id="settingsBtn"
-                title="Settings"
-            >
-                ⚙
-            </button>
+        <span class="channel">
+            # general
+        </span>
 
-        </div>
+    </div>
 
-    </header>
+    <div class="header-buttons">
+
+        <button
+            class="icon-btn"
+            id="settingsBtn"
+            title="Settings"
+        >
+            ⚙
+        </button>
+
+    </div>
+
+</header>
 
 
-    <!-- MESSAGES -->
-
-    <main
-        class="messages"
-        id="messages"
-    ></main>
+<main
+    class="messages"
+    id="messages"
+></main>
 
 
-    <!-- COMPOSER -->
+<div class="composer">
 
-    <div class="composer">
+    <div class="composer-box">
 
-        <div class="composer-box">
+        <input
+            type="file"
+            id="imageInput"
+            accept="image/*"
+            hidden
+        >
 
-            <input
-                type="file"
-                id="imageInput"
-                accept="image/*"
-                hidden
-            >
+        <button
+            class="attach-btn"
+            id="attachBtn"
+            title="Choose image"
+        >
+            ＋
+        </button>
 
-            <button
-                class="attach-btn"
-                id="attachBtn"
-                title="Choose image"
-            >
-                ＋
-            </button>
+        <textarea
+            id="messageInput"
+            placeholder="Message #general"
+            rows="1"
+        ></textarea>
 
-            <textarea
-                id="messageInput"
-                placeholder="Message #general"
-                rows="1"
-            ></textarea>
-
-            <button
-                class="send-btn"
-                id="sendBtn"
-            >
-                Send
-            </button>
-
-        </div>
+        <button
+            class="send-btn"
+            id="sendBtn"
+        >
+            Send
+        </button>
 
     </div>
 
 </div>
 
+</div>
 
-<!-- =========================
-     SETTINGS
-========================= -->
+
+<!-- SETTINGS -->
 
 <div
     class="overlay"
     id="settingsOverlay"
 >
 
-    <div class="panel">
+<div class="panel">
 
-        <div class="panel-header">
+<div class="panel-header">
 
-            <h2>
-                Settings
-            </h2>
+    <h2>Settings</h2>
 
-            <button
-                class="icon-btn"
-                id="closeSettings"
-            >
-                ×
-            </button>
-
-        </div>
-
-
-        <div class="panel-body">
-
-            <!-- NAME -->
-
-            <div class="setting">
-
-                <label>
-                    Your name
-                </label>
-
-                <input
-                    id="usernameInput"
-                    maxlength="24"
-                    placeholder="Enter your name"
-                >
-
-            </div>
-
-
-            <!-- THEME -->
-
-            <div class="setting">
-
-                <label>
-                    Theme
-                </label>
-
-                <select id="themeSelect">
-
-                    <option value="dark">
-                        Dark
-                    </option>
-
-                    <option value="midnight">
-                        Midnight
-                    </option>
-
-                    <option value="slate">
-                        Slate
-                    </option>
-
-                    <option value="black">
-                        Pure Black
-                    </option>
-
-                    <option value="blue">
-                        Dark Blue
-                    </option>
-
-                    <option value="purple">
-                        Dark Purple
-                    </option>
-
-                    <option value="green">
-                        Dark Green
-                    </option>
-
-                    <option value="red">
-                        Dark Red
-                    </option>
-
-                    <option value="gray">
-                        Classic Gray
-                    </option>
-
-                    <option value="light">
-                        Light
-                    </option>
-
-                    <option value="oled">
-                        OLED
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <!-- REFRESH RATE -->
-
-            <div class="setting">
-
-                <label>
-                    Message refresh rate
-                </label>
-
-                <select id="refreshSelect">
-
-                    <option value="10000">
-                        10 seconds
-                    </option>
-
-                    <option value="5000">
-                        5 seconds
-                    </option>
-
-                    <option value="3000">
-                        3 seconds
-                    </option>
-
-                    <option value="2000">
-                        2 seconds
-                    </option>
-
-                    <option value="1000">
-                        1 second
-                    </option>
-
-                    <option value="500">
-                        0.5 seconds
-                    </option>
-
-                    <option value="100">
-                        0.1 seconds
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <!-- SAVE -->
-
-            <button
-                class="save-btn"
-                id="saveSettings"
-            >
-                Save settings
-            </button>
-
-
-            <!-- DANGER -->
-
-            <div class="danger-zone">
-
-                <div class="danger-title">
-                    Danger zone
-                </div>
-
-                <p>
-                    Permanently remove every message
-                    from the chat database.
-                </p>
-
-                <button
-                    class="danger-btn"
-                    id="removeEverything"
-                >
-                    Remove everything
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
+    <button
+        class="icon-btn"
+        id="closeSettings"
+    >
+        ×
+    </button>
 
 </div>
 
 
-<!-- =========================
-     CONTEXT MENU
-========================= -->
+<div class="panel-body">
+
+<div class="setting">
+
+    <label>Your name</label>
+
+    <input
+        id="usernameInput"
+        maxlength="24"
+        placeholder="Enter your name"
+    >
+
+</div>
+
+
+<div class="setting">
+
+    <label>Theme</label>
+
+    <select id="themeSelect">
+
+        <option value="dark">
+            Dark
+        </option>
+
+        <option value="midnight">
+            Midnight
+        </option>
+
+        <option value="slate">
+            Slate
+        </option>
+
+        <option value="black">
+            Pure Black
+        </option>
+
+        <option value="blue">
+            Dark Blue
+        </option>
+
+        <option value="purple">
+            Dark Purple
+        </option>
+
+        <option value="green">
+            Dark Green
+        </option>
+
+        <option value="red">
+            Dark Red
+        </option>
+
+        <option value="gray">
+            Classic Gray
+        </option>
+
+        <option value="light">
+            Light
+        </option>
+
+        <option value="oled">
+            OLED
+        </option>
+
+    </select>
+
+</div>
+
+
+<div class="setting">
+
+    <label>Message refresh rate</label>
+
+    <select id="refreshSelect">
+
+        <option value="10000">
+            10 seconds
+        </option>
+
+        <option value="5000">
+            5 seconds
+        </option>
+
+        <option value="3000">
+            3 seconds
+        </option>
+
+        <option value="2000">
+            2 seconds
+        </option>
+
+        <option value="1000">
+            1 second
+        </option>
+
+        <option value="500">
+            0.5 seconds
+        </option>
+
+        <option value="100">
+            0.1 seconds
+        </option>
+
+    </select>
+
+</div>
+
+
+<button
+    class="save-btn"
+    id="saveSettings"
+>
+    Save settings
+</button>
+
+
+<div class="danger-zone">
+
+    <div class="danger-title">
+        Danger zone
+    </div>
+
+    <p>
+        Permanently remove every message from
+        the chat database.
+    </p>
+
+    <button
+        class="danger-btn"
+        id="removeEverything"
+    >
+        Remove everything
+    </button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- CONTEXT MENU -->
 
 <div
     class="context-menu"
     id="contextMenu"
 >
 
-    <button id="editMessage">
-        Edit
-    </button>
+<button id="editMessage">
+    Edit
+</button>
 
-    <button
-        class="delete-option"
-        id="deleteMessage"
-    >
-        Delete
-    </button>
+<button
+    class="delete-option"
+    id="deleteMessage"
+>
+    Delete
+</button>
 
 </div>
 
 
-<!-- =========================
-     IMAGE VIEWER
-========================= -->
+<!-- IMAGE VIEWER -->
 
 <div
     class="image-viewer"
     id="imageViewer"
 >
 
-    <button
-        class="back-image"
-        id="backImage"
-    >
-        ← Back
-    </button>
+<button
+    class="back-image"
+    id="backImage"
+>
+    ← Back
+</button>
 
-    <img
-        class="full-image"
-        id="fullImage"
-        alt="Full image"
-    >
+<img
+    class="full-image"
+    id="fullImage"
+    alt="Full image"
+>
 
 </div>
 
 
-<!-- =========================
-     CONFIRM DIALOG
-========================= -->
+<!-- DIALOG -->
 
 <div
     class="overlay"
     id="dialogOverlay"
 >
 
-    <div class="dialog">
+<div class="dialog">
 
-        <h2 id="dialogTitle">
-            Confirm
-        </h2>
+<h2 id="dialogTitle">
+    Confirm
+</h2>
 
-        <p id="dialogText"></p>
+<p id="dialogText"></p>
 
-        <div class="dialog-buttons">
+<div class="dialog-buttons">
 
-            <button id="dialogCancel">
-                Cancel
-            </button>
+<button id="dialogCancel">
+    Cancel
+</button>
 
-            <button
-                class="danger"
-                id="dialogConfirm"
-            >
-                Yes
-            </button>
+<button
+    class="danger"
+    id="dialogConfirm"
+>
+    Yes
+</button>
 
-        </div>
+</div>
 
-    </div>
+</div>
 
 </div>
 
@@ -956,12 +875,38 @@ let theme =
         "chat_theme"
     ) || "dark";
 
+/*
+   DEFAULT REFRESH = 0.5 SECOND
+*/
+
 let refreshRate =
     Number(
         localStorage.getItem(
             "chat_refresh_rate"
         )
-    ) || 3000;
+    );
+
+if (
+    !refreshRate ||
+    ![
+        10000,
+        5000,
+        3000,
+        2000,
+        1000,
+        500,
+        100
+    ].includes(refreshRate)
+) {
+
+    refreshRate = 500;
+
+    localStorage.setItem(
+        "chat_refresh_rate",
+        "500"
+    );
+
+}
 
 
 /* =====================================================
@@ -1105,9 +1050,6 @@ let currentMessages =
 let refreshTimer =
     null;
 
-let confirmCallback =
-    null;
-
 
 /* =====================================================
    THEME
@@ -1199,15 +1141,38 @@ applyTheme(theme);
 themeSelect.value =
     theme;
 
-usernameInput.value =
-    username;
-
 refreshSelect.value =
     String(refreshRate);
 
+usernameInput.value =
+    username;
+
 
 /* =====================================================
-   SETTINGS OPEN
+   REFRESH TIMER
+===================================================== */
+
+function startRefreshTimer() {
+
+    if (refreshTimer) {
+
+        clearInterval(
+            refreshTimer
+        );
+
+    }
+
+    refreshTimer =
+        setInterval(
+            loadMessages,
+            refreshRate
+        );
+
+}
+
+
+/* =====================================================
+   SETTINGS
 ===================================================== */
 
 settingsBtn.onclick = () => {
@@ -1228,10 +1193,6 @@ settingsBtn.onclick = () => {
 };
 
 
-/* =====================================================
-   SETTINGS CLOSE
-===================================================== */
-
 closeSettings.onclick = () => {
 
     settingsOverlay.classList.remove(
@@ -1240,10 +1201,6 @@ closeSettings.onclick = () => {
 
 };
 
-
-/* =====================================================
-   SAVE SETTINGS
-===================================================== */
 
 saveSettings.onclick = () => {
 
@@ -1254,6 +1211,12 @@ saveSettings.onclick = () => {
                 0,
                 24
             );
+
+    /*
+       Keep a valid default so sending
+       can never fail because the name
+       is empty.
+    */
 
     if (!username) {
 
@@ -1268,7 +1231,22 @@ saveSettings.onclick = () => {
     refreshRate =
         Number(
             refreshSelect.value
-        ) || 3000;
+        );
+
+    if (![
+        10000,
+        5000,
+        3000,
+        2000,
+        1000,
+        500,
+        100
+    ].includes(refreshRate)) {
+
+        refreshRate =
+            500;
+
+    }
 
     localStorage.setItem(
         "chat_username",
@@ -1282,14 +1260,14 @@ saveSettings.onclick = () => {
 
     localStorage.setItem(
         "chat_refresh_rate",
-        String(
-            refreshRate
-        )
+        String(refreshRate)
     );
 
-    applyTheme(theme);
+    applyTheme(
+        theme
+    );
 
-    restartMessageRefresh();
+    startRefreshTimer();
 
     settingsOverlay.classList.remove(
         "show"
@@ -1299,7 +1277,7 @@ saveSettings.onclick = () => {
 
 
 /* =====================================================
-   AUTO RESIZE TEXTAREA
+   AUTO RESIZE
 ===================================================== */
 
 messageInput.addEventListener(
@@ -1336,24 +1314,17 @@ imageInput.onchange = () => {
         imageInput.files[0] ||
         null;
 
-    if (selectedFile) {
-
-        attachBtn.textContent =
-            "✓";
-
-    } else {
-
-        attachBtn.textContent =
-            "＋";
-
-    }
+    attachBtn.textContent =
+        selectedFile
+        ? "✓"
+        : "＋";
 
 };
 
 
 /* =====================================================
    RESIZE IMAGE
-   MAX 1500 × 1500
+   MAXIMUM 1500 × 1500
 ===================================================== */
 
 function resizeImage(file) {
@@ -1486,26 +1457,40 @@ messageInput.addEventListener(
 
 async function sendMessage() {
 
-    const text =
-        messageInput.value.trim();
-
     /*
-       Username is always given a fallback.
-       This prevents the old
-       "Username is required" problem.
+       Make sure the username is always
+       available from localStorage.
     */
+
+    username =
+        localStorage.getItem(
+            "chat_username"
+        ) ||
+        username ||
+        "User";
+
+    username =
+        username
+            .trim()
+            .substring(
+                0,
+                24
+            );
 
     if (!username) {
 
         username =
             "User";
 
-        localStorage.setItem(
-            "chat_username",
-            username
-        );
-
     }
+
+    localStorage.setItem(
+        "chat_username",
+        username
+    );
+
+    const text =
+        messageInput.value.trim();
 
     if (
         !text &&
@@ -1658,18 +1643,23 @@ async function loadMessages() {
 
     } catch (error) {
 
-        messagesEl.innerHTML = `
-            <div class="empty">
-                <div>
-                    <strong>
-                        Unable to load messages
-                    </strong>
-                    ${escapeHtml(
-                        error.message
-                    )}
+        /*
+           Don't replace existing messages
+           with an error every refresh.
+        */
+
+        if (!currentMessages.length) {
+
+            messagesEl.innerHTML = `
+                <div class="empty">
+                    <div>
+                        <strong>Unable to load messages</strong>
+                        ${escapeHtml(error.message)}
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+
+        }
 
     }
 
@@ -1678,8 +1668,6 @@ async function loadMessages() {
 
 /* =====================================================
    RENDER
-   No fade animation.
-   No refresh animation.
 ===================================================== */
 
 function renderMessages() {
@@ -1695,9 +1683,7 @@ function renderMessages() {
         messagesEl.innerHTML = `
             <div class="empty">
                 <div>
-                    <strong>
-                        No messages yet
-                    </strong>
+                    <strong>No messages yet</strong>
                     Be the first to send something.
                 </div>
             </div>
@@ -1744,7 +1730,6 @@ function renderMessages() {
                 .charAt(0)
                 .toUpperCase();
 
-
             const content =
                 document.createElement(
                     "div"
@@ -1753,7 +1738,6 @@ function renderMessages() {
             content.className =
                 "message-content";
 
-
             const top =
                 document.createElement(
                     "div"
@@ -1761,7 +1745,6 @@ function renderMessages() {
 
             top.className =
                 "message-top";
-
 
             const name =
                 document.createElement(
@@ -1774,7 +1757,6 @@ function renderMessages() {
             name.textContent =
                 message.username ||
                 "User";
-
 
             const time =
                 document.createElement(
@@ -1789,7 +1771,6 @@ function renderMessages() {
                     message.created_at
                 );
 
-
             top.appendChild(
                 name
             );
@@ -1797,7 +1778,6 @@ function renderMessages() {
             top.appendChild(
                 time
             );
-
 
             if (message.edited) {
 
@@ -1818,11 +1798,9 @@ function renderMessages() {
 
             }
 
-
             content.appendChild(
                 top
             );
-
 
             if (message.message) {
 
@@ -1842,7 +1820,6 @@ function renderMessages() {
                 );
 
             }
-
 
             if (message.image) {
 
@@ -1871,7 +1848,6 @@ function renderMessages() {
 
             }
 
-
             item.appendChild(
                 avatar
             );
@@ -1880,8 +1856,10 @@ function renderMessages() {
                 content
             );
 
-
-            /* DEVICE ID ONLY */
+            /*
+               Only the same DEVICE ID can
+               open edit/delete controls.
+            */
 
             item.addEventListener(
                 "contextmenu",
@@ -1910,7 +1888,6 @@ function renderMessages() {
                 }
             );
 
-
             fragment.appendChild(
                 item
             );
@@ -1918,11 +1895,9 @@ function renderMessages() {
         }
     );
 
-
     messagesEl.replaceChildren(
         fragment
     );
-
 
     if (wasAtBottom) {
 
@@ -1995,6 +1970,10 @@ editMessageBtn.onclick =
             return;
         }
 
+        /*
+           Double-check DEVICE ID on the
+           client before sending edit.
+        */
 
         if (
             String(
@@ -2006,10 +1985,13 @@ editMessageBtn.onclick =
             )
         ) {
 
+            alert(
+                "You can only edit your own messages."
+            );
+
             return;
 
         }
-
 
         const newText =
             prompt(
@@ -2018,7 +2000,6 @@ editMessageBtn.onclick =
                 ""
             );
 
-
         if (
             newText === null
         ) {
@@ -2026,7 +2007,6 @@ editMessageBtn.onclick =
             return;
 
         }
-
 
         try {
 
@@ -2060,10 +2040,8 @@ editMessageBtn.onclick =
                     }
                 );
 
-
             const data =
                 await response.json();
-
 
             if (!response.ok) {
 
@@ -2073,7 +2051,6 @@ editMessageBtn.onclick =
                 );
 
             }
-
 
             await loadMessages();
 
@@ -2090,7 +2067,7 @@ editMessageBtn.onclick =
 
 
 /* =====================================================
-   DELETE MESSAGE
+   DELETE
 ===================================================== */
 
 deleteMessageBtn.onclick =
@@ -2106,7 +2083,6 @@ deleteMessageBtn.onclick =
             return;
         }
 
-
         if (
             String(
                 selectedMessage.device_id ||
@@ -2117,10 +2093,13 @@ deleteMessageBtn.onclick =
             )
         ) {
 
+            alert(
+                "You can only delete your own messages."
+            );
+
             return;
 
         }
-
 
         openConfirm(
             "Delete message?",
@@ -2156,10 +2135,8 @@ deleteMessageBtn.onclick =
                             }
                         );
 
-
                     const data =
                         await response.json();
-
 
                     if (!response.ok) {
 
@@ -2169,7 +2146,6 @@ deleteMessageBtn.onclick =
                         );
 
                     }
-
 
                     await loadMessages();
 
@@ -2255,6 +2231,10 @@ document.addEventListener(
    CONFIRM DIALOG
 ===================================================== */
 
+let confirmCallback =
+    null;
+
+
 function openConfirm(
     title,
     text,
@@ -2320,49 +2300,33 @@ removeEverything.onclick =
     () => {
 
         openConfirm(
-
             "Remove everything?",
-
             "This will remove every message forever. There will be no messages left in the chat.",
-
             () => {
 
                 openConfirm(
-
                     "I know",
-
                     "You are about to permanently delete every message. Continue only if you understand.",
-
                     () => {
 
                         openConfirm(
-
                             "Are you sure?",
-
                             "Every stored message will be permanently removed.",
-
                             () => {
 
                                 openConfirm(
-
                                     "Last time",
-
                                     "Are you ultra sure every memory is being removed and has no evidence of existing?",
-
                                     permanentlyDeleteEverything
-
                                 );
 
                             }
-
                         );
 
                     }
-
                 );
 
             }
-
         );
 
     };
@@ -2399,10 +2363,8 @@ async function permanentlyDeleteEverything() {
                 }
             );
 
-
         const data =
             await response.json();
-
 
         if (!response.ok) {
 
@@ -2413,17 +2375,14 @@ async function permanentlyDeleteEverything() {
 
         }
 
-
         currentMessages =
             [];
 
         renderMessages();
 
-
         alert(
             "All messages were removed."
         );
-
 
     } catch (error) {
 
@@ -2438,56 +2397,23 @@ async function permanentlyDeleteEverything() {
 
 
 /* =====================================================
-   REFRESH SYSTEM
-===================================================== */
-
-function restartMessageRefresh() {
-
-    if (refreshTimer) {
-
-        clearInterval(
-            refreshTimer
-        );
-
-    }
-
-
-    refreshTimer =
-        setInterval(
-            loadMessages,
-            refreshRate
-        );
-
-}
-
-
-/* =====================================================
    HELPERS
 ===================================================== */
 
 function formatTime(date) {
 
     if (!date) {
-
         return "";
-
     }
-
 
     const d =
         new Date(date);
 
-
     return d.toLocaleTimeString(
         [],
         {
-
-            hour:
-                "2-digit",
-
-            minute:
-                "2-digit"
-
+            hour: "2-digit",
+            minute: "2-digit"
         }
     );
 
@@ -2497,27 +2423,22 @@ function formatTime(date) {
 function escapeHtml(value) {
 
     return String(value)
-
         .replaceAll(
             "&",
             "&amp;"
         )
-
         .replaceAll(
             "<",
             "&lt;"
         )
-
         .replaceAll(
             ">",
             "&gt;"
         )
-
         .replaceAll(
             '"',
             "&quot;"
         )
-
         .replaceAll(
             "'",
             "&#039;"
@@ -2532,7 +2453,12 @@ function escapeHtml(value) {
 
 loadMessages();
 
-restartMessageRefresh();
+/*
+   Default:
+   0.5 seconds = 500 ms
+*/
+
+startRefreshTimer();
 
 </script>
 
