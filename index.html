@@ -1490,6 +1490,9 @@ let refreshTimer=null;
 let syncing=false;
 let confirmCallback=null;
 
+// Track rendered elements by ID
+let renderedElements=new Map();
+
 
 /* =====================================================
    GAME TYPES
@@ -1635,6 +1638,8 @@ function applySettings(){
         settings.theme
     );
 
+    // Re-render everything when settings change
+    renderedElements.clear();
     renderMessages();
     restartRefresh();
 }
@@ -2051,16 +2056,21 @@ async function loadMessages(){
             );
         }
 
-        currentMessages=
+        const newMessages=
             Array.isArray(
                 data.messages
             )
             ?data.messages
             :[];
 
-        processGameMessages();
-
-        renderMessages();
+        // Check if messages changed before updating
+        const changed = messagesChanged(currentMessages, newMessages);
+        
+        if (changed) {
+            currentMessages = newMessages;
+            processGameMessages();
+            renderMessages();
+        }
 
     }catch(error){
 
@@ -2084,6 +2094,24 @@ async function loadMessages(){
 
         syncing=false;
     }
+}
+
+// Check if messages arrays are different
+function messagesChanged(oldMessages, newMessages) {
+    if (oldMessages.length !== newMessages.length) return true;
+    
+    for (let i = 0; i < oldMessages.length; i++) {
+        const oldMsg = oldMessages[i];
+        const newMsg = newMessages[i];
+        
+        if (oldMsg.id !== newMsg.id) return true;
+        if (oldMsg.message !== newMsg.message) return true;
+        if (oldMsg.username !== newMsg.username) return true;
+        if (oldMsg.edited !== newMsg.edited) return true;
+        if (oldMsg.image !== newMsg.image) return true;
+    }
+    
+    return false;
 }
 
 
@@ -2172,35 +2200,29 @@ function processGameMessages(){
 
 
 /* =====================================================
-   RENDER NORMAL CHAT
+   RENDER MESSAGES - SMART UPDATE
 ===================================================== */
 
 function renderMessages(){
 
-    const wasBottom=
-        messagesEl.scrollHeight-
-        messagesEl.scrollTop-
-        messagesEl.clientHeight
-        <100;
-
-    /*
-        Games are rendered separately
-        and normal game-state messages
-        are completely hidden.
-    */
-
-    const normal=
+    // Get all normal messages (non-game)
+    const normal =
         currentMessages.filter(
-            message=>
+            message =>
                 !isGameMessage(message)
         );
 
-    const fragment=
-        document.createDocumentFragment();
+    // Get active games
+    const activeGames =
+        games.filter(
+            game =>
+                game.status !== "finished" &&
+                game.status !== "forcequit"
+        );
 
-    if(!normal.length && !games.length){
-
-        messagesEl.innerHTML=`
+    // If no messages and no games, show empty state
+    if (!normal.length && !activeGames.length) {
+        messagesEl.innerHTML = `
             <div class="empty">
                 <div>
                     <strong>No messages yet</strong>
@@ -2208,132 +2230,192 @@ function renderMessages(){
                 </div>
             </div>
         `;
-
+        renderedElements.clear();
         return;
     }
 
-    // RENDER NORMAL MESSAGES FIRST (at the top)
-    for(const message of normal){
+    // Build the desired DOM structure as a document fragment
+    const fragment = document.createDocumentFragment();
+    const elementIds = [];
 
-        const item=
-            document.createElement("div");
+    // Add normal messages first (top)
+    for (const message of normal) {
+        const item = createMessageElement(message);
+        fragment.appendChild(item);
+        elementIds.push('msg_' + message.id);
+    }
 
-        item.className="message";
+    // Add game messages last (bottom)
+    for (const game of activeGames) {
+        const gameEl = createGameElement(game);
+        fragment.appendChild(gameEl);
+        elementIds.push('game_' + game.id);
+    }
 
-        const avatar=
-            document.createElement("div");
+    // Get current children
+    const currentChildren = messagesEl.children;
+    const currentIds = [];
 
-        avatar.className="avatar";
+    // Build list of current element IDs
+    for (let i = 0; i < currentChildren.length; i++) {
+        const child = currentChildren[i];
+        if (child.dataset && child.dataset.id) {
+            currentIds.push(child.dataset.id);
+        } else {
+            // If no data-id, treat it as a temporary element that should be replaced
+            currentIds.push('__temp_' + i);
+        }
+    }
 
-        avatar.textContent=
-            (
-                message.username ||
-                "?"
-            )
-            .charAt(0)
-            .toUpperCase();
+    // Compare and update
+    const newChildren = Array.from(fragment.children);
+    
+    // If the structure is completely different, replace everything
+    if (currentIds.length !== elementIds.length || 
+        currentIds.some((id, idx) => id !== elementIds[idx])) {
+        
+        // Replace all children
+        messagesEl.replaceChildren(fragment);
+        
+        // Store references
+        renderedElements.clear();
+        for (let i = 0; i < newChildren.length; i++) {
+            const el = newChildren[i];
+            if (el.dataset && el.dataset.id) {
+                renderedElements.set(el.dataset.id, el);
+            }
+        }
+        
+        return;
+    }
 
-        const content=
-            document.createElement("div");
+    // Update existing elements in place
+    for (let i = 0; i < newChildren.length; i++) {
+        const newEl = newChildren[i];
+        const oldEl = currentChildren[i];
+        
+        // If the element ID matches, update its content
+        if (newEl.dataset && newEl.dataset.id === oldEl.dataset.id) {
+            // Replace the old element's content with the new element's content
+            oldEl.replaceWith(newEl);
+            renderedElements.set(newEl.dataset.id, newEl);
+        } else {
+            // IDs don't match, replace the whole thing
+            oldEl.replaceWith(newEl);
+            if (newEl.dataset && newEl.dataset.id) {
+                renderedElements.set(newEl.dataset.id, newEl);
+            }
+        }
+    }
 
-        content.className=
-            "message-content";
+    // Clean up any stale references
+    const validIds = new Set(elementIds);
+    for (const [id, el] of renderedElements) {
+        if (!validIds.has(id)) {
+            renderedElements.delete(id);
+        }
+    }
+}
 
-        const top=
-            document.createElement("div");
 
-        top.className=
-            "message-top";
+/* =====================================================
+   CREATE MESSAGE ELEMENT
+===================================================== */
 
-        const name=
+function createMessageElement(message) {
+
+    const item =
+        document.createElement("div");
+
+    item.className = "message";
+    item.dataset.id = 'msg_' + message.id;
+
+    const avatar =
+        document.createElement("div");
+
+    avatar.className = "avatar";
+
+    avatar.textContent =
+        (
+            message.username ||
+            "?"
+        )
+        .charAt(0)
+        .toUpperCase();
+
+    const content =
+        document.createElement("div");
+
+    content.className =
+        "message-content";
+
+    const top =
+        document.createElement("div");
+
+    top.className =
+        "message-top";
+
+    const name =
+        document.createElement("span");
+
+    name.className =
+        "username";
+
+    name.textContent =
+        message.username ||
+        "User";
+
+    top.appendChild(name);
+
+    if (settings.showTimestamps) {
+
+        const time =
             document.createElement("span");
 
-        name.className=
-            "username";
+        time.className = "time";
 
-        name.textContent=
-            message.username ||
-            "User";
-
-        top.appendChild(name);
-
-        if(settings.showTimestamps){
-
-            const time=
-                document.createElement("span");
-
-            time.className="time";
-
-            time.textContent=
-                formatTime(
-                    message.created_at
-                );
-
-            top.appendChild(time);
-        }
-
-        if(message.edited){
-
-            const edited=
-                document.createElement("span");
-
-            edited.className=
-                "edited";
-
-            edited.textContent=
-                "(edited)";
-
-            top.appendChild(edited);
-        }
-
-        content.appendChild(top);
-
-        if(message.message){
-
-            const text=
-                document.createElement("div");
-
-            text.className=
-                "message-text";
-
-            text.textContent=
-                message.message;
-
-            content.appendChild(text);
-        }
-
-        item.appendChild(avatar);
-        item.appendChild(content);
-
-        fragment.appendChild(item);
-    }
-
-    // RENDER GAME MESSAGES LAST (at the bottom)
-    for(const game of games){
-
-        if(
-            game.status!=="finished" &&
-            game.status!=="forcequit"
-        ){
-
-            fragment.appendChild(
-                createGameElement(game)
+        time.textContent =
+            formatTime(
+                message.created_at
             );
-        }
+
+        top.appendChild(time);
     }
 
-    messagesEl.replaceChildren(
-        fragment
-    );
+    if (message.edited) {
 
-    if(
-        wasBottom &&
-        settings.autoScroll
-    ){
+        const edited =
+            document.createElement("span");
 
-        messagesEl.scrollTop=
-            messagesEl.scrollHeight;
+        edited.className =
+            "edited";
+
+        edited.textContent =
+            "(edited)";
+
+        top.appendChild(edited);
     }
+
+    content.appendChild(top);
+
+    if (message.message) {
+
+        const text =
+            document.createElement("div");
+
+        text.className =
+            "message-text";
+
+        text.textContent =
+            message.message;
+
+        content.appendChild(text);
+    }
+
+    item.appendChild(avatar);
+    item.appendChild(content);
+
+    return item;
 }
 
 
@@ -2612,6 +2694,7 @@ function createGameElement(game){
 
     wrapper.className=
         "game-message";
+    wrapper.dataset.id = 'game_' + game.id;
 
     const card=
         document.createElement("div");
@@ -4508,6 +4591,7 @@ removeEverything.onclick=()=>{
 
                 currentMessages=[];
                 games=[];
+                renderedElements.clear();
 
                 renderMessages();
 
