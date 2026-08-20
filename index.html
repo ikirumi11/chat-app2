@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 
 <title>Chat</title>
 
@@ -11,1242 +11,1053 @@
 
 *{
     box-sizing:border-box;
-    margin:0;
-    padding:0;
 }
 
-:root{
-
-    --bg:#0b0b0d;
-    --panel:#121216;
-    --panel2:#18181d;
-    --panel3:#202026;
-
-    --text:#eeeeee;
-    --muted:#85858f;
-
-    --accent:#6d7cff;
-    --accent2:#8793ff;
-
-    --border:#292930;
-
-    --danger:#ff5c6c;
-    --success:#55d98b;
-
+html,
+body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Inter,Arial,sans-serif;
+    background:#101114;
+    color:#eee;
 }
 
 body{
-
-    font-family:
-        Inter,
-        Arial,
-        sans-serif;
-
-    background:
-        var(--bg);
-
-    color:
-        var(--text);
-
-    height:100vh;
-
-    overflow:hidden;
-
+    transition:
+        background .25s ease,
+        color .25s ease;
 }
 
-
-/* =====================================================
+/* ==============================
    APP
-===================================================== */
+============================== */
 
 .app{
-
-    height:100vh;
-
+    width:100%;
+    height:100%;
     display:flex;
-
-}
-
-
-/* =====================================================
-   SIDEBAR
-===================================================== */
-
-.sidebar{
-
-    width:260px;
-
-    background:
-        var(--panel);
-
-    border-right:
-        1px solid var(--border);
-
-    display:flex;
-
     flex-direction:column;
-
-    transition:
-        .25s;
-
 }
 
+/* ==============================
+   TOP BAR
+============================== */
+
+.topbar{
+    height:64px;
+    min-height:64px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:0 18px;
+
+    background:#17181d;
+    border-bottom:1px solid #292b32;
+
+    z-index:20;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
 
 .logo{
-
-    height:70px;
+    width:36px;
+    height:36px;
 
     display:flex;
-
     align-items:center;
+    justify-content:center;
 
-    padding:
-        0 22px;
+    border-radius:10px;
 
-    border-bottom:
-        1px solid var(--border);
+    background:#252832;
 
-    font-size:21px;
-
-    font-weight:800;
-
+    font-size:18px;
 }
 
-
-.logo span{
-
-    color:
-        var(--accent);
-
-}
-
-
-.channels{
-
-    padding:
-        20px 12px;
-
-    flex:1;
-
-}
-
-
-.channel-title{
-
-    color:
-        var(--muted);
-
-    font-size:11px;
-
-    font-weight:800;
-
-    text-transform:
-        uppercase;
-
-    letter-spacing:
-        1px;
-
-    padding:
-        0 10px 10px;
-
-}
-
-
-.channel{
-
-    width:100%;
-
-    border:0;
-
-    background:
-        transparent;
-
-    color:
-        var(--muted);
-
-    padding:
-        11px 12px;
-
-    border-radius:
-        8px;
-
-    text-align:left;
-
-    font-size:14px;
-
-    cursor:pointer;
-
-}
-
-
-.channel:hover{
-
-    background:
-        var(--panel2);
-
-    color:
-        var(--text);
-
-}
-
-
-.channel.active{
-
-    background:
-        var(--panel3);
-
-    color:
-        var(--text);
-
-}
-
-
-.channel-icon{
-
-    margin-right:8px;
-
-    color:
-        var(--muted);
-
-}
-
-
-/* =====================================================
-   SIDEBAR FOOTER
-===================================================== */
-
-.sidebar-footer{
-
-    padding:
-        12px;
-
-    border-top:
-        1px solid var(--border);
-
-}
-
-
-.settings-button{
-
-    width:100%;
-
-    border:0;
-
-    background:
-        transparent;
-
-    color:
-        var(--muted);
-
-    padding:
-        11px;
-
-    border-radius:
-        8px;
-
-    cursor:pointer;
-
-    text-align:left;
-
-}
-
-
-.settings-button:hover{
-
-    background:
-        var(--panel2);
-
-    color:
-        var(--text);
-
-}
-
-
-/* =====================================================
-   MAIN
-===================================================== */
-
-.main{
-
-    flex:1;
-
-    min-width:0;
-
-    display:flex;
-
-    flex-direction:column;
-
-}
-
-
-/* =====================================================
-   HEADER
-===================================================== */
-
-.header{
-
-    height:70px;
-
-    border-bottom:
-        1px solid var(--border);
-
-    background:
-        var(--panel);
-
-    display:flex;
-
-    align-items:center;
-
-    padding:
-        0 22px;
-
-}
-
-
-.channel-name{
-
+.title{
+    font-weight:700;
     font-size:17px;
-
-    font-weight:700;
-
 }
 
-
-.channel-name span{
-
-    color:
-        var(--muted);
-
-    margin-right:6px;
-
-}
-
-
-.status{
-
-    margin-left:auto;
-
+.subtitle{
+    color:#777c87;
     font-size:12px;
-
-    color:
-        var(--muted);
-
+    margin-top:2px;
 }
 
-
-.status-dot{
-
-    display:inline-block;
-
-    width:7px;
-
-    height:7px;
-
-    border-radius:50%;
-
-    background:
-        var(--success);
-
-    margin-right:6px;
-
-}
-
-
-/* =====================================================
-   MESSAGES
-===================================================== */
-
-.messages{
-
-    flex:1;
-
-    overflow-y:auto;
-
-    padding:
-        25px;
-
-    scroll-behavior:smooth;
-
-}
-
-
-.messages::-webkit-scrollbar{
-
-    width:8px;
-
-}
-
-
-.messages::-webkit-scrollbar-thumb{
-
-    background:
-        var(--panel3);
-
-    border-radius:20px;
-
-}
-
-
-.message{
-
+.topButtons{
     display:flex;
-
-    gap:12px;
-
-    margin-bottom:22px;
-
-    animation:
-        messageIn .18s ease;
-
+    gap:7px;
 }
 
-
-@keyframes messageIn{
-
-    from{
-
-        opacity:0;
-
-        transform:
-            translateY(5px);
-
-    }
-
-    to{
-
-        opacity:1;
-
-        transform:
-            translateY(0);
-
-    }
-
-}
-
-
-.avatar{
-
-    width:38px;
-
-    height:38px;
-
-    border-radius:50%;
-
-    background:
-        var(--accent);
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    flex-shrink:0;
-
-    font-size:14px;
-
-    font-weight:800;
-
-    color:white;
-
-}
-
-
-.message-content{
-
-    min-width:0;
-
-}
-
-
-.message-top{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:9px;
-
-    margin-bottom:4px;
-
-}
-
-
-.username{
-
-    font-weight:700;
-
-    font-size:14px;
-
-}
-
-
-.time{
-
-    color:
-        var(--muted);
-
-    font-size:11px;
-
-}
-
-
-.message-text{
-
-    color:
-        #d6d6db;
-
-    font-size:14px;
-
-    line-height:1.55;
-
-    white-space:pre-wrap;
-
-    word-break:break-word;
-
-}
-
-
-.message-image{
-
-    display:block;
-
-    max-width:min(500px, 100%);
-
-    max-height:500px;
-
-    object-fit:contain;
-
-    border-radius:10px;
-
-    margin-top:9px;
-
-    border:
-        1px solid var(--border);
-
-    cursor:pointer;
-
-}
-
-
-/* =====================================================
-   EMPTY
-===================================================== */
-
-.empty{
-
-    height:100%;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    text-align:center;
-
-    color:
-        var(--muted);
-
-}
-
-
-.empty-icon{
-
-    font-size:45px;
-
-    margin-bottom:12px;
-
-}
-
-
-.empty h2{
-
-    color:
-        var(--text);
-
-    margin-bottom:5px;
-
-}
-
-
-/* =====================================================
-   INPUT
-===================================================== */
-
-.input-area{
-
-    padding:
-        14px 20px 20px;
-
-}
-
-
-.image-preview{
-
-    display:none;
-
-    margin-bottom:8px;
-
-    background:
-        var(--panel);
-
-    border:
-        1px solid var(--border);
-
-    border-radius:10px;
-
-    padding:8px;
-
-    position:relative;
-
-    width:max-content;
-
-    max-width:100%;
-
-}
-
-
-.image-preview img{
-
-    display:block;
-
-    max-width:200px;
-
-    max-height:150px;
-
-    border-radius:6px;
-
-}
-
-
-.remove-image{
-
-    position:absolute;
-
-    top:-8px;
-
-    right:-8px;
-
-    width:25px;
-
-    height:25px;
-
-    border:0;
-
-    border-radius:50%;
-
-    background:
-        var(--danger);
-
-    color:white;
-
-    cursor:pointer;
-
-    font-weight:bold;
-
-}
-
-
-.input-box{
-
-    display:flex;
-
-    align-items:flex-end;
-
-    gap:8px;
-
-    background:
-        var(--panel2);
-
-    border:
-        1px solid var(--border);
-
-    border-radius:12px;
-
-    padding:7px;
-
-}
-
-
-.input-box:focus-within{
-
-    border-color:
-        var(--accent);
-
-}
-
-
-textarea{
-
-    flex:1;
-
-    resize:none;
-
-    border:0;
-
-    outline:0;
-
-    background:transparent;
-
-    color:
-        var(--text);
-
-    font-family:inherit;
-
-    font-size:14px;
-
-    line-height:1.5;
-
-    min-height:42px;
-
-    max-height:180px;
-
-    padding:
-        10px;
-
-}
-
-
-textarea::placeholder{
-
-    color:
-        var(--muted);
-
-}
-
-
-.icon-button{
-
+.iconButton{
     width:40px;
-
     height:40px;
 
     border:0;
+    border-radius:10px;
 
-    border-radius:8px;
-
-    background:transparent;
-
-    color:
-        var(--muted);
+    background:#22242b;
+    color:#ddd;
 
     cursor:pointer;
 
     font-size:18px;
 
+    transition:
+        background .18s ease,
+        transform .18s ease;
 }
 
-
-.icon-button:hover{
-
-    background:
-        var(--panel3);
-
-    color:
-        var(--text);
-
+.iconButton:hover{
+    background:#2d3039;
 }
 
+.iconButton:active{
+    transform:scale(.94);
+}
 
-.send-button{
+/* ==============================
+   MAIN
+============================== */
 
-    width:44px;
+.main{
+    flex:1;
+    min-height:0;
 
-    height:40px;
+    display:flex;
+}
 
-    border:0;
+/* ==============================
+   CHANNEL SIDEBAR
+============================== */
 
-    border-radius:8px;
+.sidebar{
+    width:230px;
+    min-width:230px;
 
-    background:
-        var(--accent);
+    background:#15161a;
+    border-right:1px solid #292b32;
 
-    color:white;
+    padding:18px 12px;
+}
+
+.channelTitle{
+    color:#737783;
+    font-size:11px;
+    font-weight:700;
+
+    text-transform:uppercase;
+    letter-spacing:.08em;
+
+    padding:0 10px 10px;
+}
+
+.channel{
+    width:100%;
+
+    display:flex;
+    align-items:center;
+
+    gap:9px;
+
+    padding:11px 12px;
+
+    border-radius:9px;
+
+    color:#aaaeba;
 
     cursor:pointer;
 
-    font-size:17px;
-
+    font-size:14px;
 }
 
-
-.send-button:hover{
-
-    background:
-        var(--accent2);
-
+.channel.active{
+    background:#252831;
+    color:#fff;
 }
 
-
-.send-button:disabled{
-
-    opacity:.45;
-
-    cursor:not-allowed;
-
+.channelIcon{
+    color:#747985;
+    font-size:18px;
 }
 
+.channel.active .channelIcon{
+    color:#aaa;
+}
 
-.input-hint{
+/* ==============================
+   CHAT
+============================== */
 
+.chat{
+    flex:1;
+    min-width:0;
+    min-height:0;
+
+    display:flex;
+    flex-direction:column;
+}
+
+.messages{
+    flex:1;
+    min-height:0;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    padding:20px 22px 12px;
+
+    scroll-behavior:smooth;
+}
+
+.messages::-webkit-scrollbar{
+    width:8px;
+}
+
+.messages::-webkit-scrollbar-thumb{
+    background:#30333b;
+    border-radius:10px;
+}
+
+/* ==============================
+   MESSAGE
+============================== */
+
+.message{
+    display:flex;
+
+    gap:11px;
+
+    padding:8px 10px;
+    margin-bottom:2px;
+
+    border-radius:9px;
+
+    transition:
+        background .15s ease;
+}
+
+.message:hover{
+    background:rgba(255,255,255,.025);
+}
+
+.avatar{
+    width:38px;
+    height:38px;
+
+    min-width:38px;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#282b33;
+
+    color:#d8d8dc;
+
+    font-weight:700;
+    font-size:14px;
+}
+
+.messageContent{
+    min-width:0;
+    flex:1;
+}
+
+.messageHeader{
+    display:flex;
+    align-items:baseline;
+
+    gap:8px;
+
+    min-height:20px;
+}
+
+.username{
+    font-size:14px;
+    font-weight:700;
+}
+
+.time{
+    color:#666b75;
     font-size:10px;
-
-    color:
-        var(--muted);
-
-    margin-top:7px;
-
-    text-align:right;
-
 }
 
+.messageText{
+    margin-top:2px;
 
-/* =====================================================
-   USERNAME SETUP
-===================================================== */
+    font-size:14px;
+    line-height:1.5;
+
+    color:#d5d7dc;
+
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+}
+
+.messageImage{
+    display:block;
+
+    max-width:min(420px,80vw);
+    max-height:420px;
+
+    margin-top:8px;
+
+    border-radius:10px;
+
+    object-fit:contain;
+
+    cursor:pointer;
+
+    background:#0b0c0e;
+
+    border:1px solid #292c33;
+
+    transition:
+        transform .18s ease,
+        opacity .18s ease;
+}
+
+.messageImage:hover{
+    opacity:.9;
+    transform:scale(1.01);
+}
+
+/* ==============================
+   EMPTY
+============================== */
+
+.empty{
+    height:100%;
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:center;
+    justify-content:center;
+
+    color:#656a74;
+
+    text-align:center;
+}
+
+.emptyIcon{
+    font-size:40px;
+    margin-bottom:10px;
+}
+
+.emptyTitle{
+    color:#b9bcc4;
+    font-size:16px;
+    font-weight:700;
+}
+
+.emptyText{
+    margin-top:5px;
+    font-size:13px;
+}
+
+/* ==============================
+   INPUT
+============================== */
+
+.inputArea{
+    padding:12px 18px 16px;
+
+    background:#101114;
+}
+
+.inputBox{
+    display:flex;
+    align-items:flex-end;
+
+    gap:8px;
+
+    padding:8px;
+
+    background:#1a1c21;
+
+    border:1px solid #292c34;
+
+    border-radius:13px;
+
+    transition:border .2s ease;
+}
+
+.inputBox:focus-within{
+    border-color:#414550;
+}
+
+.input{
+    flex:1;
+
+    min-width:0;
+
+    max-height:150px;
+
+    resize:none;
+
+    border:0;
+    outline:0;
+
+    background:transparent;
+
+    color:#eee;
+
+    font-family:inherit;
+    font-size:14px;
+
+    line-height:1.45;
+
+    padding:8px;
+}
+
+.input::placeholder{
+    color:#666b75;
+}
+
+.attach{
+    width:40px;
+    height:40px;
+
+    border:0;
+    border-radius:9px;
+
+    background:transparent;
+    color:#8b909b;
+
+    cursor:pointer;
+
+    font-size:19px;
+}
+
+.attach:hover{
+    background:#252830;
+    color:#ddd;
+}
+
+.send{
+    width:42px;
+    height:40px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#30333b;
+    color:#eee;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    transition:
+        background .18s ease,
+        transform .18s ease;
+}
+
+.send:hover{
+    background:#3b3f49;
+}
+
+.send:active{
+    transform:scale(.94);
+}
+
+.send:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+}
+
+/* ==============================
+   IMAGE PREVIEW
+============================== */
+
+.preview{
+    display:none;
+
+    margin-bottom:8px;
+
+    padding:8px;
+
+    border-radius:10px;
+
+    background:#1b1d22;
+    border:1px solid #292c33;
+}
+
+.preview.show{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.preview img{
+    width:70px;
+    height:70px;
+
+    object-fit:cover;
+
+    border-radius:7px;
+}
+
+.previewInfo{
+    flex:1;
+    min-width:0;
+}
+
+.previewName{
+    color:#ddd;
+    font-size:13px;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.previewSize{
+    color:#737783;
+    font-size:11px;
+    margin-top:3px;
+}
+
+.removeImage{
+    width:32px;
+    height:32px;
+
+    border:0;
+    border-radius:7px;
+
+    background:#292b32;
+    color:#aaa;
+
+    cursor:pointer;
+}
+
+/* ==============================
+   SETTINGS
+============================== */
 
 .overlay{
-
     position:fixed;
-
     inset:0;
 
-    background:
-        rgba(0,0,0,.75);
-
-    backdrop-filter:
-        blur(8px);
+    background:rgba(0,0,0,.62);
 
     display:none;
 
     align-items:center;
-
     justify-content:center;
 
     z-index:100;
 
+    backdrop-filter:blur(5px);
 }
 
+.overlay.show{
+    display:flex;
+}
 
-.setup-card{
+.settings{
+    width:min(480px,92vw);
+    max-height:85vh;
 
-    width:min(420px, calc(100% - 30px));
+    overflow:auto;
 
-    background:
-        var(--panel);
+    background:#191b20;
 
-    border:
-        1px solid var(--border);
+    border:1px solid #30333b;
 
     border-radius:15px;
 
-    padding:28px;
+    box-shadow:0 20px 70px rgba(0,0,0,.5);
 
+    padding:20px;
 }
 
+.settingsHeader{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
 
-.setup-card h2{
-
-    margin-bottom:8px;
-
+    margin-bottom:18px;
 }
 
-
-.setup-card p{
-
-    color:
-        var(--muted);
-
-    font-size:13px;
-
-    margin-bottom:20px;
-
+.settingsTitle{
+    font-size:19px;
+    font-weight:700;
 }
 
-
-.input{
-
-    width:100%;
-
-    background:
-        var(--panel2);
-
-    border:
-        1px solid var(--border);
-
-    border-radius:8px;
-
-    color:
-        var(--text);
-
-    padding:12px;
-
-    outline:0;
-
-}
-
-
-.input:focus{
-
-    border-color:
-        var(--accent);
-
-}
-
-
-.primary{
-
-    width:100%;
+.close{
+    width:36px;
+    height:36px;
 
     border:0;
-
     border-radius:8px;
 
-    background:
-        var(--accent);
-
-    color:white;
-
-    padding:12px;
-
-    margin-top:12px;
+    background:#262930;
+    color:#bbb;
 
     cursor:pointer;
+}
 
+.settingSection{
+    margin-top:18px;
+}
+
+.settingLabel{
+    color:#858a95;
+
+    font-size:11px;
     font-weight:700;
 
+    text-transform:uppercase;
+
+    letter-spacing:.08em;
+
+    margin-bottom:9px;
 }
-
-
-/* =====================================================
-   SETTINGS
-===================================================== */
-
-.settings-panel{
-
-    position:fixed;
-
-    right:20px;
-
-    top:80px;
-
-    width:300px;
-
-    background:
-        var(--panel);
-
-    border:
-        1px solid var(--border);
-
-    border-radius:14px;
-
-    padding:18px;
-
-    z-index:50;
-
-    box-shadow:
-        0 20px 60px rgba(0,0,0,.4);
-
-    display:none;
-
-}
-
-
-.settings-panel.open{
-
-    display:block;
-
-}
-
-
-.settings-title{
-
-    font-weight:800;
-
-    margin-bottom:15px;
-
-}
-
-
-.setting-label{
-
-    font-size:12px;
-
-    color:
-        var(--muted);
-
-    margin-bottom:8px;
-
-}
-
 
 .themes{
-
     display:grid;
 
     grid-template-columns:
-        repeat(2,1fr);
+        repeat(2,minmax(0,1fr));
 
-    gap:7px;
-
+    gap:8px;
 }
 
-
 .theme{
+    padding:11px;
 
-    border:
-        1px solid var(--border);
+    border:1px solid #30333b;
 
-    background:
-        var(--panel2);
+    background:#22242a;
 
-    color:
-        var(--text);
+    color:#bbb;
 
-    padding:9px;
-
-    border-radius:7px;
+    border-radius:9px;
 
     cursor:pointer;
 
     text-align:left;
 
-    font-size:12px;
-
+    transition:.18s ease;
 }
-
 
 .theme:hover{
-
-    border-color:
-        var(--accent);
-
+    background:#2a2d34;
 }
 
+.theme.active{
+    border-color:#777;
+    color:#fff;
+}
 
-/* =====================================================
-   MOBILE
-===================================================== */
+.themeDot{
+    display:inline-block;
 
-.mobile-menu{
+    width:10px;
+    height:10px;
+
+    border-radius:50%;
+
+    margin-right:7px;
+
+    background:#777;
+}
+
+/* ==============================
+   FULLSCREEN IMAGE VIEWER
+============================== */
+
+.imageViewer{
+    position:fixed;
+    inset:0;
+
+    background:#050506;
+
+    z-index:300;
 
     display:none;
 
+    flex-direction:column;
 }
 
+.imageViewer.show{
+    display:flex;
+}
+
+.viewerTop{
+    height:60px;
+    min-height:60px;
+
+    display:flex;
+    align-items:center;
+
+    padding:0 15px;
+
+    background:rgba(12,13,15,.96);
+
+    border-bottom:1px solid #25272d;
+}
+
+.backButton{
+    height:40px;
+
+    padding:0 15px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#24262c;
+
+    color:#eee;
+
+    cursor:pointer;
+
+    font-size:14px;
+}
+
+.backButton:hover{
+    background:#30333b;
+}
+
+.viewerTitle{
+    margin-left:12px;
+
+    color:#aaa;
+
+    font-size:13px;
+}
+
+.viewerContent{
+    flex:1;
+    min-height:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:20px;
+}
+
+.viewerContent img{
+    max-width:100%;
+    max-height:100%;
+
+    object-fit:contain;
+
+    user-select:none;
+}
+
+/* ==============================
+   STATUS
+============================== */
+
+.status{
+    position:fixed;
+
+    left:50%;
+    bottom:80px;
+
+    transform:
+        translate(-50%,10px);
+
+    opacity:0;
+
+    pointer-events:none;
+
+    padding:9px 14px;
+
+    border-radius:9px;
+
+    background:#25272d;
+
+    border:1px solid #353840;
+
+    color:#ddd;
+
+    font-size:12px;
+
+    transition:
+        opacity .2s ease,
+        transform .2s ease;
+
+    z-index:500;
+}
+
+.status.show{
+    opacity:1;
+
+    transform:
+        translate(-50%,0);
+}
+
+/* ==============================
+   MOBILE
+============================== */
 
 @media(max-width:700px){
 
     .sidebar{
-
-        position:fixed;
-
-        left:-270px;
-
-        top:0;
-
-        bottom:0;
-
-        z-index:80;
-
+        display:none;
     }
-
-
-    .sidebar.open{
-
-        left:0;
-
-    }
-
-
-    .mobile-menu{
-
-        display:block;
-
-        width:38px;
-
-        height:38px;
-
-        border:0;
-
-        background:transparent;
-
-        color:var(--text);
-
-        font-size:20px;
-
-        margin-right:8px;
-
-    }
-
 
     .messages{
+        padding:15px 8px 8px;
+    }
 
+    .message{
+        padding:8px 5px;
+    }
+
+    .inputArea{
         padding:
-            18px 14px;
-
+            8px
+            8px
+            calc(8px + env(safe-area-inset-bottom));
     }
 
-
-    .input-area{
-
-        padding:
-            10px;
-
+    .messageImage{
+        max-width:85vw;
+        max-height:350px;
     }
 
-
-    .header{
-
-        padding:
-            0 10px;
-
+    .themes{
+        grid-template-columns:1fr;
     }
 
+}
 
-    .status{
+/* ==============================
+   THEMES
+============================== */
 
-        display:none;
+body.theme-midnight{
+    background:#0e1013;
+}
 
-    }
+body.theme-slate{
+    background:#11161b;
+}
 
+body.theme-carbon{
+    background:#0c0c0d;
+}
 
-    .settings-panel{
+body.theme-purple{
+    background:#120f17;
+}
 
-        right:10px;
+body.theme-blue{
+    background:#0d131b;
+}
 
-        left:10px;
+body.theme-red{
+    background:#160f10;
+}
 
-        width:auto;
+body.theme-green{
+    background:#0d1511;
+}
 
-    }
+body.theme-ocean{
+    background:#0b1417;
+}
 
+body.theme-amoled{
+    background:#000;
+}
+
+body.theme-coffee{
+    background:#15110e;
+}
+
+body.theme-gray{
+    background:#151515;
 }
 
 </style>
 </head>
 
-<body>
+<body class="theme-midnight">
 
 <div class="app">
 
+    <!-- TOP BAR -->
 
-    <!-- =================================================
-         SIDEBAR
-    ================================================== -->
+    <header class="topbar">
 
-    <aside class="sidebar" id="sidebar">
+        <div class="brand">
 
-        <div class="logo">
+            <div class="logo">💬</div>
 
-            Chat<span>.</span>
+            <div>
 
-        </div>
+                <div class="title">
+                    Chat
+                </div>
 
-
-        <div class="channels">
-
-            <div class="channel-title">
-
-                Channels
+                <div class="subtitle">
+                    Simple community chat
+                </div>
 
             </div>
 
+        </div>
+
+
+        <div class="topButtons">
 
             <button
-                class="channel active"
-                id="generalChannel">
-
-                <span class="channel-icon">#</span>
-
-                general
-
+                class="iconButton"
+                id="settingsButton"
+                title="Settings">
+                ⚙
             </button>
 
         </div>
 
-
-        <div class="sidebar-footer">
-
-            <button
-                class="settings-button"
-                id="settingsButton">
-
-                ⚙ Settings
-
-            </button>
-
-        </div>
-
-    </aside>
+    </header>
 
 
-    <!-- =================================================
-         MAIN
-    ================================================== -->
+    <!-- MAIN -->
 
     <main class="main">
 
+        <!-- CHANNELS -->
 
-        <header class="header">
+        <aside class="sidebar">
 
-            <button
-                class="mobile-menu"
-                id="mobileMenu">
+            <div class="channelTitle">
+                Channels
+            </div>
 
-                ☰
+            <div
+                class="channel active">
 
-            </button>
+                <span class="channelIcon">
+                    #
+                </span>
 
-
-            <div class="channel-name">
-
-                <span>#</span> general
+                <span>
+                    general
+                </span>
 
             </div>
 
-
-            <div class="status">
-
-                <span class="status-dot"></span>
-
-                Connected
-
-            </div>
-
-        </header>
+        </aside>
 
 
-        <!-- =================================================
-             MESSAGES
-        ================================================== -->
+        <!-- CHAT -->
 
-        <section
-            class="messages"
-            id="messages">
+        <section class="chat">
 
-            <div class="empty" id="empty">
+            <div
+                id="messages"
+                class="messages">
 
-                <div>
+                <div
+                    class="empty"
+                    id="empty">
 
-                    <div class="empty-icon">
-
+                    <div class="emptyIcon">
                         💬
+                    </div>
+
+                    <div class="emptyTitle">
+                        Welcome to #general
+                    </div>
+
+                    <div class="emptyText">
+                        No messages yet.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- INPUT -->
+
+            <div class="inputArea">
+
+                <div
+                    id="preview"
+                    class="preview">
+
+                    <img
+                        id="previewImage"
+                        src=""
+                        alt="Preview">
+
+                    <div class="previewInfo">
+
+                        <div
+                            id="previewName"
+                            class="previewName">
+                            Image
+                        </div>
+
+                        <div
+                            id="previewSize"
+                            class="previewSize">
+                            Preparing...
+                        </div>
 
                     </div>
 
-                    <h2>
+                    <button
+                        class="removeImage"
+                        id="removeImage">
+                        ×
+                    </button>
 
-                        Welcome to general
+                </div>
 
-                    </h2>
 
-                    <p>
+                <div class="inputBox">
 
-                        Be the first to send a message.
+                    <button
+                        class="attach"
+                        id="attachButton"
+                        title="Send image">
+                        ＋
+                    </button>
 
-                    </p>
+                    <input
+                        id="fileInput"
+                        type="file"
+                        accept="image/*"
+                        hidden>
+
+
+                    <textarea
+                        id="messageInput"
+                        class="input"
+                        rows="1"
+                        maxlength="2000"
+                        placeholder="Message #general"></textarea>
+
+
+                    <button
+                        id="sendButton"
+                        class="send"
+                        title="Send">
+                        ➤
+                    </button>
 
                 </div>
 
@@ -1254,538 +1065,1061 @@ textarea::placeholder{
 
         </section>
 
-
-        <!-- =================================================
-             INPUT
-        ================================================== -->
-
-        <div class="input-area">
-
-
-            <div
-                class="image-preview"
-                id="imagePreview">
-
-                <img
-                    id="previewImage"
-                    alt="Image preview">
-
-                <button
-                    class="remove-image"
-                    id="removeImage">
-
-                    ×
-
-                </button>
-
-            </div>
-
-
-            <div class="input-box">
-
-
-                <button
-                    class="icon-button"
-                    id="imageButton"
-                    title="Send image">
-
-                    📎
-
-                </button>
-
-
-                <input
-                    type="file"
-                    id="imageInput"
-                    accept="image/*"
-                    hidden>
-
-
-                <textarea
-                    id="messageInput"
-                    placeholder="Message #general"
-                    rows="1"></textarea>
-
-
-                <button
-                    class="send-button"
-                    id="sendButton">
-
-                    ➤
-
-                </button>
-
-
-            </div>
-
-
-            <div class="input-hint">
-
-                Enter to send · Shift+Enter for new line
-
-            </div>
-
-        </div>
-
     </main>
 
 </div>
 
 
-<!-- =====================================================
-     SETTINGS
-===================================================== -->
+<!-- SETTINGS -->
 
 <div
-    class="settings-panel"
-    id="settingsPanel">
+    id="settingsOverlay"
+    class="overlay">
 
-    <div class="settings-title">
+    <div class="settings">
 
-        Settings
+        <div class="settingsHeader">
 
-    </div>
+            <div class="settingsTitle">
+                Settings
+            </div>
 
+            <button
+                id="closeSettings"
+                class="close">
+                ×
+            </button>
 
-    <div class="setting-label">
-
-        Theme
-
-    </div>
-
-
-    <div class="themes">
-
-
-        <button
-            class="theme"
-            data-theme="dark">
-
-            Dark
-
-        </button>
+        </div>
 
 
-        <button
-            class="theme"
-            data-theme="midnight">
+        <div class="settingSection">
 
-            Midnight
+            <div class="settingLabel">
+                Theme
+            </div>
 
-        </button>
+            <div class="themes">
 
+                <button
+                    class="theme active"
+                    data-theme="midnight">
+                    <span class="themeDot"></span>
+                    Midnight
+                </button>
 
-        <button
-            class="theme"
-            data-theme="purple">
+                <button
+                    class="theme"
+                    data-theme="slate">
+                    <span class="themeDot"></span>
+                    Slate
+                </button>
 
-            Purple
+                <button
+                    class="theme"
+                    data-theme="carbon">
+                    <span class="themeDot"></span>
+                    Carbon
+                </button>
 
-        </button>
+                <button
+                    class="theme"
+                    data-theme="purple">
+                    <span class="themeDot"></span>
+                    Purple
+                </button>
 
+                <button
+                    class="theme"
+                    data-theme="blue">
+                    <span class="themeDot"></span>
+                    Blue
+                </button>
 
-        <button
-            class="theme"
-            data-theme="blue">
+                <button
+                    class="theme"
+                    data-theme="red">
+                    <span class="themeDot"></span>
+                    Red
+                </button>
 
-            Ocean
+                <button
+                    class="theme"
+                    data-theme="green">
+                    <span class="themeDot"></span>
+                    Green
+                </button>
 
-        </button>
+                <button
+                    class="theme"
+                    data-theme="ocean">
+                    <span class="themeDot"></span>
+                    Ocean
+                </button>
 
+                <button
+                    class="theme"
+                    data-theme="amoled">
+                    <span class="themeDot"></span>
+                    AMOLED
+                </button>
 
-        <button
-            class="theme"
-            data-theme="red">
+                <button
+                    class="theme"
+                    data-theme="coffee">
+                    <span class="themeDot"></span>
+                    Coffee
+                </button>
 
-            Red
+                <button
+                    class="theme"
+                    data-theme="gray">
+                    <span class="themeDot"></span>
+                    Gray
+                </button>
 
-        </button>
+            </div>
 
-
-        <button
-            class="theme"
-            data-theme="green">
-
-            Forest
-
-        </button>
-
-
-        <button
-            class="theme"
-            data-theme="orange">
-
-            Ember
-
-        </button>
-
-
-        <button
-            class="theme"
-            data-theme="pink">
-
-            Pink
-
-        </button>
-
-
-        <button
-            class="theme"
-            data-theme="cyan">
-
-            Cyan
-
-        </button>
-
-
-        <button
-            class="theme"
-            data-theme="gray">
-
-            Slate
-
-        </button>
-
+        </div>
 
     </div>
 
 </div>
 
 
-<!-- =====================================================
-     USERNAME SETUP
-===================================================== -->
+<!-- FULLSCREEN IMAGE -->
 
 <div
-    class="overlay"
-    id="setupOverlay">
+    id="imageViewer"
+    class="imageViewer">
 
-    <div class="setup-card">
-
-        <h2>
-
-            Welcome
-
-        </h2>
-
-        <p>
-
-            Choose a username to enter the chat.
-
-        </p>
-
-
-        <input
-            class="input"
-            id="usernameInput"
-            maxlength="24"
-            placeholder="Username">
-
+    <div class="viewerTop">
 
         <button
-            class="primary"
-            id="joinButton">
-
-            Enter Chat
-
+            id="backImage"
+            class="backButton">
+            ← Back
         </button>
+
+        <div class="viewerTitle">
+            Image
+        </div>
+
+    </div>
+
+    <div class="viewerContent">
+
+        <img
+            id="fullscreenImage"
+            src=""
+            alt="Fullscreen image">
 
     </div>
 
 </div>
 
 
-<script>
+<!-- STATUS -->
 
-/* ========================================================
-   CONFIG
-======================================================== */
-
-// Because this HTML is deployed on the SAME Vercel project
-// as /api/messages.js, this works automatically.
-
-const API_URL = "/api/messages";
-
-const CHANNEL = "general";
+<div
+    id="status"
+    class="status">
+</div>
 
 
-/* ========================================================
+<script type="module">
+
+/* =====================================================
+   SETTINGS
+===================================================== */
+
+const API =
+    "/api/messages";
+
+const CHANNEL =
+    "general";
+
+
+/* =====================================================
    ELEMENTS
-======================================================== */
+===================================================== */
 
-const messagesElement =
-    document.getElementById("messages");
+const messagesEl =
+    document.getElementById(
+        "messages"
+    );
 
-const emptyElement =
-    document.getElementById("empty");
+const emptyEl =
+    document.getElementById(
+        "empty"
+    );
 
 const input =
-    document.getElementById("messageInput");
+    document.getElementById(
+        "messageInput"
+    );
 
 const sendButton =
-    document.getElementById("sendButton");
+    document.getElementById(
+        "sendButton"
+    );
 
-const imageButton =
-    document.getElementById("imageButton");
+const attachButton =
+    document.getElementById(
+        "attachButton"
+    );
 
-const imageInput =
-    document.getElementById("imageInput");
+const fileInput =
+    document.getElementById(
+        "fileInput"
+    );
 
-const imagePreview =
-    document.getElementById("imagePreview");
+const preview =
+    document.getElementById(
+        "preview"
+    );
 
 const previewImage =
-    document.getElementById("previewImage");
+    document.getElementById(
+        "previewImage"
+    );
+
+const previewName =
+    document.getElementById(
+        "previewName"
+    );
+
+const previewSize =
+    document.getElementById(
+        "previewSize"
+    );
 
 const removeImage =
-    document.getElementById("removeImage");
+    document.getElementById(
+        "removeImage"
+    );
 
-const setupOverlay =
-    document.getElementById("setupOverlay");
-
-const usernameInput =
-    document.getElementById("usernameInput");
-
-const joinButton =
-    document.getElementById("joinButton");
+const statusEl =
+    document.getElementById(
+        "status"
+    );
 
 const settingsButton =
-    document.getElementById("settingsButton");
+    document.getElementById(
+        "settingsButton"
+    );
 
-const settingsPanel =
-    document.getElementById("settingsPanel");
+const settingsOverlay =
+    document.getElementById(
+        "settingsOverlay"
+    );
 
-const sidebar =
-    document.getElementById("sidebar");
+const closeSettings =
+    document.getElementById(
+        "closeSettings"
+    );
 
-const mobileMenu =
-    document.getElementById("mobileMenu");
+const imageViewer =
+    document.getElementById(
+        "imageViewer"
+    );
+
+const fullscreenImage =
+    document.getElementById(
+        "fullscreenImage"
+    );
+
+const backImage =
+    document.getElementById(
+        "backImage"
+    );
 
 
-/* ========================================================
-   STATE
-======================================================== */
+/* =====================================================
+   USERNAME
+===================================================== */
 
 let username =
-    localStorage.getItem("chat_username") || "";
-
-let selectedImage = null;
-
-let loadingMessages = false;
-
-
-/* ========================================================
-   USERNAME
-======================================================== */
+    localStorage.getItem(
+        "chat_username"
+    );
 
 if(!username){
 
-    setupOverlay.style.display =
-        "flex";
-
-    setTimeout(() => {
-
-        usernameInput.focus();
-
-    },100);
-
-}
-
-
-/* ========================================================
-   JOIN
-======================================================== */
-
-joinButton.addEventListener(
-    "click",
-    saveUsername
-);
-
-
-usernameInput.addEventListener(
-    "keydown",
-    event => {
-
-        if(event.key === "Enter"){
-
-            saveUsername();
-
-        }
-
-    }
-);
-
-
-function saveUsername(){
-
-    const name =
-        usernameInput.value
-        .trim()
-        .substring(0,24);
-
-
-    if(!name){
-
-        alert(
-            "Please enter a username."
+    username =
+        prompt(
+            "Choose a username:"
         );
 
-        return;
+    if(!username){
+
+        username =
+            "User";
 
     }
 
-
     username =
-        name;
-
+        username
+        .trim()
+        .substring(0,24);
 
     localStorage.setItem(
         "chat_username",
         username
     );
 
-
-    setupOverlay.style.display =
-        "none";
+}
 
 
-    loadMessages();
+/* =====================================================
+   STATE
+===================================================== */
+
+let selectedImage =
+    null;
+
+let selectedImageName =
+    "";
+
+let messagesCache =
+    new Map();
+
+let firstLoad =
+    true;
+
+let loading =
+    false;
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+let statusTimer;
+
+function showStatus(text){
+
+    clearTimeout(
+        statusTimer
+    );
+
+    statusEl.textContent =
+        text;
+
+    statusEl.classList.add(
+        "show"
+    );
+
+    statusTimer =
+        setTimeout(
+            () => {
+
+                statusEl.classList.remove(
+                    "show"
+                );
+
+            },
+            3000
+        );
 
 }
 
 
-/* ========================================================
-   IMAGE BUTTON
-======================================================== */
+/* =====================================================
+   FORMAT TIME
+===================================================== */
 
-imageButton.addEventListener(
-    "click",
-    () => {
+function formatTime(value){
 
-        imageInput.click();
+    const date =
+        new Date(value);
 
-    }
-);
+    if(
+        Number.isNaN(
+            date.getTime()
+        )
+    ){
 
-
-/* ========================================================
-   IMAGE SELECT
-======================================================== */
-
-imageInput.addEventListener(
-    "change",
-    async event => {
-
-        const file =
-            event.target.files[0];
-
-
-        if(!file){
-
-            return;
-
-        }
-
-
-        if(!file.type.startsWith("image/")){
-
-            alert(
-                "Please choose an image."
-            );
-
-            return;
-
-        }
-
-
-        try{
-
-            selectedImage =
-                await resizeImage(file);
-
-
-            previewImage.src =
-                selectedImage;
-
-
-            imagePreview.style.display =
-                "block";
-
-        }
-        catch(error){
-
-            console.error(error);
-
-            alert(
-                "Could not process the image."
-            );
-
-        }
+        return "";
 
     }
-);
+
+    return date.toLocaleTimeString(
+        [],
+        {
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
+
+}
 
 
-/* ========================================================
+/* =====================================================
+   ESCAPE TEXT
+===================================================== */
+
+function escapeHTML(text){
+
+    return String(text)
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+
+/* =====================================================
+   AVATAR
+===================================================== */
+
+function avatarLetter(name){
+
+    return (
+        String(name || "U")
+        .trim()
+        .charAt(0)
+        .toUpperCase()
+    ) || "U";
+
+}
+
+
+/* =====================================================
+   CREATE MESSAGE ELEMENT
+===================================================== */
+
+function createMessageElement(msg){
+
+    const wrapper =
+        document.createElement(
+            "div"
+        );
+
+    wrapper.className =
+        "message";
+
+    const avatar =
+        document.createElement(
+            "div"
+        );
+
+    avatar.className =
+        "avatar";
+
+    avatar.textContent =
+        avatarLetter(
+            msg.username
+        );
+
+
+    const content =
+        document.createElement(
+            "div"
+        );
+
+    content.className =
+        "messageContent";
+
+
+    const header =
+        document.createElement(
+            "div"
+        );
+
+    header.className =
+        "messageHeader";
+
+
+    const name =
+        document.createElement(
+            "span"
+        );
+
+    name.className =
+        "username";
+
+    name.textContent =
+        msg.username ||
+        "User";
+
+
+    const time =
+        document.createElement(
+            "span"
+        );
+
+    time.className =
+        "time";
+
+    time.textContent =
+        formatTime(
+            msg.created_at
+        );
+
+
+    header.appendChild(
+        name
+    );
+
+    header.appendChild(
+        time
+    );
+
+
+    content.appendChild(
+        header
+    );
+
+
+    if(msg.message){
+
+        const text =
+            document.createElement(
+                "div"
+            );
+
+        text.className =
+            "messageText";
+
+        text.textContent =
+            msg.message;
+
+        content.appendChild(
+            text
+        );
+
+    }
+
+
+    if(msg.image){
+
+        const image =
+            document.createElement(
+                "img"
+            );
+
+        image.className =
+            "messageImage";
+
+        image.src =
+            msg.image;
+
+        image.alt =
+            "Image sent by " +
+            (
+                msg.username ||
+                "User"
+            );
+
+        image.loading =
+            "lazy";
+
+
+        image.addEventListener(
+            "click",
+            () => {
+
+                openImage(
+                    msg.image
+                );
+
+            }
+        );
+
+
+        content.appendChild(
+            image
+        );
+
+    }
+
+
+    wrapper.appendChild(
+        avatar
+    );
+
+    wrapper.appendChild(
+        content
+    );
+
+
+    return wrapper;
+
+}
+
+
+/* =====================================================
+   RENDER WITHOUT FLICKER
+===================================================== */
+
+function renderMessages(data){
+
+    if(!Array.isArray(data)){
+        return;
+    }
+
+
+    const wasAtBottom =
+        messagesEl.scrollHeight -
+        messagesEl.scrollTop -
+        messagesEl.clientHeight
+        < 80;
+
+
+    const newIds =
+        new Set();
+
+
+    for(
+        const msg of data
+    ){
+
+        const id =
+            String(
+                msg.id ??
+                (
+                    String(
+                        msg.created_at
+                    ) +
+                    "|" +
+                    String(
+                        msg.username
+                    ) +
+                    "|" +
+                    String(
+                        msg.message
+                    )
+                )
+            );
+
+
+        newIds.add(
+            id
+        );
+
+
+        if(
+            !messagesCache.has(
+                id
+            )
+        ){
+
+            messagesCache.set(
+                id,
+                msg
+            );
+
+
+            const element =
+                createMessageElement(
+                    msg
+                );
+
+            element.dataset.id =
+                id;
+
+
+            messagesEl.appendChild(
+                element
+            );
+
+        }
+
+    }
+
+
+    for(
+        const [id] of messagesCache
+    ){
+
+        if(
+            !newIds.has(id)
+        ){
+
+            messagesCache.delete(
+                id
+            );
+
+            const old =
+                messagesEl.querySelector(
+                    `[data-id="${CSS.escape(id)}"]`
+                );
+
+            if(old){
+
+                old.remove();
+
+            }
+
+        }
+
+    }
+
+
+    emptyEl.style.display =
+        data.length
+            ? "none"
+            : "flex";
+
+
+    if(
+        firstLoad ||
+        wasAtBottom
+    ){
+
+        messagesEl.scrollTop =
+            messagesEl.scrollHeight;
+
+    }
+
+
+    firstLoad =
+        false;
+
+}
+
+
+/* =====================================================
+   LOAD MESSAGES
+===================================================== */
+
+async function loadMessages(){
+
+    if(loading){
+        return;
+    }
+
+    loading =
+        true;
+
+    try{
+
+        const response =
+            await fetch(
+                API +
+                "?channel=" +
+                encodeURIComponent(
+                    CHANNEL
+                ),
+                {
+                    method:"GET",
+                    cache:"no-store",
+                    headers:{
+                        "Accept":
+                            "application/json"
+                    }
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error ||
+                "HTTP " +
+                response.status
+            );
+
+        }
+
+
+        renderMessages(
+            data.messages || []
+        );
+
+
+    }catch(error){
+
+        console.error(
+            error
+        );
+
+        if(firstLoad){
+
+            showStatus(
+                "Failed to load messages"
+            );
+
+        }
+
+    }finally{
+
+        loading =
+            false;
+
+    }
+
+}
+
+
+/* =====================================================
+   SEND MESSAGE
+===================================================== */
+
+async function sendMessage(){
+
+    if(
+        sendButton.disabled
+    ){
+
+        return;
+
+    }
+
+
+    const text =
+        input.value
+        .trim();
+
+
+    if(
+        !text &&
+        !selectedImage
+    ){
+
+        return;
+
+    }
+
+
+    sendButton.disabled =
+        true;
+
+
+    try{
+
+        const response =
+            await fetch(
+                API,
+                {
+
+                    method:
+                        "POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json",
+
+                        "Accept":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            username:
+                                username,
+
+                            channel:
+                                CHANNEL,
+
+                            message:
+                                text,
+
+                            image:
+                                selectedImage
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error ||
+                "HTTP " +
+                response.status
+            );
+
+        }
+
+
+        input.value =
+            "";
+
+        input.style.height =
+            "auto";
+
+
+        clearImage();
+
+
+        if(
+            data.message
+        ){
+
+            const msg =
+                data.message;
+
+            const id =
+                String(
+                    msg.id ??
+                    (
+                        String(
+                            msg.created_at
+                        ) +
+                        "|" +
+                        String(
+                            msg.username
+                        ) +
+                        "|" +
+                        String(
+                            msg.message
+                        )
+                    )
+                );
+
+
+            if(
+                !messagesCache.has(id)
+            ){
+
+                messagesCache.set(
+                    id,
+                    msg
+                );
+
+                emptyEl.style.display =
+                    "none";
+
+
+                const element =
+                    createMessageElement(
+                        msg
+                    );
+
+                element.dataset.id =
+                    id;
+
+                messagesEl.appendChild(
+                    element
+                );
+
+                messagesEl.scrollTop =
+                    messagesEl.scrollHeight;
+
+            }
+
+        }
+
+
+    }catch(error){
+
+        console.error(
+            error
+        );
+
+        showStatus(
+            error.message ||
+            "Failed to send message"
+        );
+
+    }finally{
+
+        sendButton.disabled =
+            false;
+
+        input.focus();
+
+    }
+
+}
+
+
+/* =====================================================
    IMAGE RESIZE
-======================================================== */
+===================================================== */
 
-function resizeImage(file){
+function resizeImage(
+    file
+){
 
     return new Promise(
-        (resolve,reject) => {
+        (
+            resolve,
+            reject
+        ) => {
 
             const reader =
                 new FileReader();
 
 
             reader.onload =
-                event => {
+                () => {
 
-                    const img =
+                    const image =
                         new Image();
 
 
-                    img.onload =
+                    image.onload =
                         () => {
 
-                            const MAX =
+                            const max =
                                 1500;
 
 
                             let width =
-                                img.width;
+                                image.naturalWidth;
 
                             let height =
-                                img.height;
+                                image.naturalHeight;
 
-
-                            /*
-                             * Keep original size if
-                             * already below 1500x1500.
-                             */
 
                             if(
-                                width > MAX ||
-                                height > MAX
+                                width >
+                                max ||
+                                height >
+                                max
                             ){
 
                                 const scale =
                                     Math.min(
-                                        MAX / width,
-                                        MAX / height
+                                        max /
+                                        width,
+
+                                        max /
+                                        height
                                     );
 
 
                                 width =
                                     Math.round(
-                                        width * scale
+                                        width *
+                                        scale
                                     );
-
 
                                 height =
                                     Math.round(
-                                        height * scale
+                                        height *
+                                        scale
                                     );
 
                             }
@@ -1810,19 +2144,8 @@ function resizeImage(file){
                                 );
 
 
-                            /*
-                             * Better resizing quality.
-                             */
-
-                            ctx.imageSmoothingEnabled =
-                                true;
-
-                            ctx.imageSmoothingQuality =
-                                "high";
-
-
                             ctx.drawImage(
-                                img,
+                                image,
                                 0,
                                 0,
                                 width,
@@ -1831,39 +2154,65 @@ function resizeImage(file){
 
 
                             /*
-                             * JPEG compression.
-                             *
-                             * 0.78 = good quality
-                             * with much smaller Base64.
+                             * JPEG keeps Base64
+                             * much smaller than
+                             * the original image.
                              */
 
-                            const result =
+                            const base64 =
                                 canvas.toDataURL(
                                     "image/jpeg",
-                                    0.78
+                                    0.82
                                 );
 
 
-                            resolve(result);
+                            resolve({
+                                base64:
+                                    base64,
+
+                                width:
+                                    width,
+
+                                height:
+                                    height
+                            });
 
                         };
 
 
-                    img.onerror =
-                        reject;
+                    image.onerror =
+                        () => {
+
+                            reject(
+                                new Error(
+                                    "Could not read image."
+                                )
+                            );
+
+                        };
 
 
-                    img.src =
-                        event.target.result;
+                    image.src =
+                        reader.result;
 
                 };
 
 
             reader.onerror =
-                reject;
+                () => {
+
+                    reject(
+                        new Error(
+                            "Could not read file."
+                        )
+                    );
+
+                };
 
 
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(
+                file
+            );
 
         }
     );
@@ -1871,9 +2220,119 @@ function resizeImage(file){
 }
 
 
-/* ========================================================
-   REMOVE IMAGE
-======================================================== */
+/* =====================================================
+   SELECT IMAGE
+===================================================== */
+
+fileInput.addEventListener(
+    "change",
+    async () => {
+
+        const file =
+            fileInput.files?.[0];
+
+
+        if(!file){
+            return;
+        }
+
+
+        if(
+            !file.type.startsWith(
+                "image/"
+            )
+        ){
+
+            showStatus(
+                "Please choose an image."
+            );
+
+            return;
+
+        }
+
+
+        try{
+
+            showStatus(
+                "Preparing image..."
+            );
+
+
+            const result =
+                await resizeImage(
+                    file
+                );
+
+
+            selectedImage =
+                result.base64;
+
+            selectedImageName =
+                file.name;
+
+
+            previewImage.src =
+                selectedImage;
+
+
+            previewName.textContent =
+                file.name;
+
+
+            previewSize.textContent =
+                result.width +
+                " × " +
+                result.height +
+                " • optimized";
+
+
+            preview.classList.add(
+                "show"
+            );
+
+
+        }catch(error){
+
+            console.error(
+                error
+            );
+
+            showStatus(
+                "Could not prepare image."
+            );
+
+        }
+
+
+        fileInput.value =
+            "";
+
+    }
+);
+
+
+/* =====================================================
+   CLEAR IMAGE
+===================================================== */
+
+function clearImage(){
+
+    selectedImage =
+        null;
+
+    selectedImageName =
+        "";
+
+    previewImage.src =
+        "";
+
+    preview.classList.remove(
+        "show"
+    );
+
+}
+
 
 removeImage.addEventListener(
     "click",
@@ -1881,39 +2340,49 @@ removeImage.addEventListener(
 );
 
 
-function clearImage(){
-
-    selectedImage =
-        null;
-
-    imageInput.value =
-        "";
-
-    previewImage.src =
-        "";
-
-    imagePreview.style.display =
-        "none";
-
-}
-
-
-/* ========================================================
-   SEND
-======================================================== */
-
-sendButton.addEventListener(
+attachButton.addEventListener(
     "click",
-    sendMessage
+    () => {
+
+        fileInput.click();
+
+    }
 );
 
+
+/* =====================================================
+   INPUT AUTO RESIZE
+===================================================== */
+
+input.addEventListener(
+    "input",
+    () => {
+
+        input.style.height =
+            "auto";
+
+        input.style.height =
+            Math.min(
+                input.scrollHeight,
+                150
+            ) +
+            "px";
+
+    }
+);
+
+
+/* =====================================================
+   ENTER TO SEND
+===================================================== */
 
 input.addEventListener(
     "keydown",
     event => {
 
         if(
-            event.key === "Enter" &&
+            event.key ===
+            "Enter" &&
             !event.shiftKey
         ){
 
@@ -1927,674 +2396,112 @@ input.addEventListener(
 );
 
 
-/* ========================================================
-   SEND MESSAGE
-======================================================== */
+/* =====================================================
+   SEND BUTTON
+===================================================== */
 
-async function sendMessage(){
-
-    const message =
-        input.value
-        .trim();
-
-
-    if(
-        !message &&
-        !selectedImage
-    ){
-
-        return;
-
-    }
+sendButton.addEventListener(
+    "click",
+    sendMessage
+);
 
 
-    if(!username){
+/* =====================================================
+   SETTINGS
+===================================================== */
 
-        setupOverlay.style.display =
-            "flex";
+settingsButton.addEventListener(
+    "click",
+    () => {
 
-        return;
-
-    }
-
-
-    sendButton.disabled =
-        true;
-
-
-    try{
-
-        const response =
-            await fetch(
-                API_URL,
-                {
-
-                    method:"POST",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            username:
-                                username,
-
-                            channel:
-                                CHANNEL,
-
-                            message:
-                                message,
-
-                            image:
-                                selectedImage
-
-                        })
-
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if(!response.ok){
-
-            throw new Error(
-                data.error ||
-                "Message could not be sent."
-            );
-
-        }
-
-
-        input.value =
-            "";
-
-        input.style.height =
-            "42px";
-
-
-        clearImage();
-
-
-        await loadMessages(true);
-
-    }
-    catch(error){
-
-        console.error(error);
-
-        alert(
-            "SEND ERROR\n\n" +
-            error.message
+        settingsOverlay.classList.add(
+            "show"
         );
 
     }
-    finally{
-
-        sendButton.disabled =
-            false;
-
-    }
-
-}
+);
 
 
-/* ========================================================
-   LOAD MESSAGES
-======================================================== */
+closeSettings.addEventListener(
+    "click",
+    () => {
 
-async function loadMessages(
-    keepBottom = false
-){
-
-    if(loadingMessages){
-
-        return;
-
-    }
-
-
-    loadingMessages =
-        true;
-
-
-    try{
-
-        const response =
-            await fetch(
-                API_URL +
-                "?channel=" +
-                encodeURIComponent(
-                    CHANNEL
-                ),
-                {
-                    cache:"no-store"
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if(!response.ok){
-
-            throw new Error(
-                data.error ||
-                "Could not load messages."
-            );
-
-        }
-
-
-        renderMessages(
-            data.messages || [],
-            keepBottom
+        settingsOverlay.classList.remove(
+            "show"
         );
 
     }
-    catch(error){
+);
 
-        console.error(
-            "LOAD ERROR:",
-            error
-        );
 
-        /*
-         * Only show an error if there
-         * isn't already a conversation.
-         */
+settingsOverlay.addEventListener(
+    "click",
+    event => {
 
         if(
-            messagesElement
-            .children.length === 1
+            event.target ===
+            settingsOverlay
         ){
 
-            emptyElement.innerHTML = `
-
-                <div>
-
-                    <div class="empty-icon">
-                        ⚠️
-                    </div>
-
-                    <h2>
-                        Could not connect
-                    </h2>
-
-                    <p>
-                        ${escapeHTML(
-                            error.message
-                        )}
-                    </p>
-
-                </div>
-
-            `;
+            settingsOverlay.classList.remove(
+                "show"
+            );
 
         }
 
     }
-    finally{
-
-        loadingMessages =
-            false;
-
-    }
-
-}
+);
 
 
-/* ========================================================
-   RENDER
-======================================================== */
+/* =====================================================
+   THEMES
+===================================================== */
 
-function renderMessages(
-    messages,
-    keepBottom
+const themeButtons =
+    document.querySelectorAll(
+        ".theme"
+    );
+
+
+function setTheme(
+    theme
 ){
 
-    const wasAtBottom =
-        messagesElement.scrollHeight -
-        messagesElement.scrollTop -
-        messagesElement.clientHeight
-        < 100;
+    document.body.className =
+        "theme-" +
+        theme;
 
 
-    messagesElement.innerHTML =
-        "";
+    localStorage.setItem(
+        "chat_theme",
+        theme
+    );
 
 
-    if(!messages.length){
+    themeButtons.forEach(
+        button => {
 
-        messagesElement.appendChild(
-            emptyElement
-        );
-
-        emptyElement.style.display =
-            "flex";
-
-        return;
-
-    }
-
-
-    emptyElement.style.display =
-        "none";
-
-
-    messages.forEach(
-        message => {
-
-            const element =
-                document.createElement(
-                    "div"
-                );
-
-
-            element.className =
-                "message";
-
-
-            const initial =
-                (
-                    message.username ||
-                    "?"
-                )
-                .charAt(0)
-                .toUpperCase();
-
-
-            const date =
-                message.created_at
-                    ? new Date(
-                        message.created_at
-                      )
-                    : new Date();
-
-
-            const time =
-                date.toLocaleTimeString(
-                    [],
-                    {
-                        hour:"2-digit",
-                        minute:"2-digit"
-                    }
-                );
-
-
-            let html = `
-
-                <div class="avatar">
-
-                    ${escapeHTML(initial)}
-
-                </div>
-
-                <div class="message-content">
-
-                    <div class="message-top">
-
-                        <span class="username">
-
-                            ${escapeHTML(
-                                message.username ||
-                                "Anonymous"
-                            )}
-
-                        </span>
-
-                        <span class="time">
-
-                            ${time}
-
-                        </span>
-
-                    </div>
-
-            `;
-
-
-            if(message.message){
-
-                html += `
-
-                    <div class="message-text">
-
-                        ${escapeHTML(
-                            message.message
-                        )}
-
-                    </div>
-
-                `;
-
-            }
-
-
-            if(
-                message.image &&
-                typeof message.image ===
-                    "string"
-            ){
-
-                html += `
-
-                    <img
-                        class="message-image"
-                        src="${escapeAttribute(
-                            message.image
-                        )}"
-                        loading="lazy"
-                        alt="Sent image"
-                    >
-
-                `;
-
-            }
-
-
-            html += `
-
-                </div>
-
-            `;
-
-
-            element.innerHTML =
-                html;
-
-
-            messagesElement.appendChild(
-                element
+            button.classList.toggle(
+                "active",
+                button.dataset.theme ===
+                theme
             );
 
         }
     );
 
-
-    if(
-        keepBottom ||
-        wasAtBottom
-    ){
-
-        requestAnimationFrame(
-            () => {
-
-                messagesElement.scrollTop =
-                    messagesElement.scrollHeight;
-
-            }
-        );
-
-    }
-
 }
 
 
-/* ========================================================
-   ESCAPE HTML
-======================================================== */
-
-function escapeHTML(value){
-
-    return String(value)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-
-}
-
-
-function escapeAttribute(value){
-
-    return String(value)
-        .replaceAll("&","&amp;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;");
-
-}
-
-
-/* ========================================================
-   AUTO RESIZE TEXTAREA
-======================================================== */
-
-input.addEventListener(
-    "input",
-    () => {
-
-        input.style.height =
-            "auto";
-
-        input.style.height =
-            Math.min(
-                input.scrollHeight,
-                180
-            ) + "px";
-
-    }
-);
-
-
-/* ========================================================
-   SETTINGS
-======================================================== */
-
-settingsButton.addEventListener(
-    "click",
-    event => {
-
-        event.stopPropagation();
-
-        settingsPanel.classList.toggle(
-            "open"
-        );
-
-    }
-);
-
-
-document.addEventListener(
-    "click",
-    event => {
-
-        if(
-            !settingsPanel.contains(
-                event.target
-            ) &&
-            event.target !==
-                settingsButton
-        ){
-
-            settingsPanel.classList.remove(
-                "open"
-            );
-
-        }
-
-    }
-);
-
-
-/* ========================================================
-   THEMES
-======================================================== */
-
-const themes = {
-
-    dark:{
-
-        bg:"#0b0b0d",
-        panel:"#121216",
-        panel2:"#18181d",
-        panel3:"#202026",
-        text:"#eeeeee",
-        muted:"#85858f",
-        accent:"#6d7cff",
-        accent2:"#8793ff",
-        border:"#292930"
-
-    },
-
-    midnight:{
-
-        bg:"#050914",
-        panel:"#09101e",
-        panel2:"#0d1728",
-        panel3:"#142038",
-        text:"#e8f0ff",
-        muted:"#71809b",
-        accent:"#4d8dff",
-        accent2:"#73a5ff",
-        border:"#1c2a43"
-
-    },
-
-    purple:{
-
-        bg:"#0d0814",
-        panel:"#160d20",
-        panel2:"#20132c",
-        panel3:"#2b1a39",
-        text:"#f2eaff",
-        muted:"#9a82ad",
-        accent:"#a65cff",
-        accent2:"#bd83ff",
-        border:"#39224b"
-
-    },
-
-    blue:{
-
-        bg:"#071014",
-        panel:"#0b171d",
-        panel2:"#10232c",
-        panel3:"#17303b",
-        text:"#e7faff",
-        muted:"#73939e",
-        accent:"#32b7e8",
-        accent2:"#61cbed",
-        border:"#20414e"
-
-    },
-
-    red:{
-
-        bg:"#120808",
-        panel:"#1b0d0d",
-        panel2:"#281212",
-        panel3:"#371818",
-        text:"#fff0f0",
-        muted:"#a27878",
-        accent:"#ed4c5c",
-        accent2:"#ff7080",
-        border:"#482022"
-
-    },
-
-    green:{
-
-        bg:"#07100b",
-        panel:"#0b1710",
-        panel2:"#102319",
-        panel3:"#173021",
-        text:"#eaffef",
-        muted:"#72937c",
-        accent:"#3fc978",
-        accent2:"#65dc95",
-        border:"#20472f"
-
-    },
-
-    orange:{
-
-        bg:"#120c07",
-        panel:"#1c120b",
-        panel2:"#291a10",
-        panel3:"#392316",
-        text:"#fff1e5",
-        muted:"#a68b76",
-        accent:"#ed8a3c",
-        accent2:"#ffa766",
-        border:"#4b2c19"
-
-    },
-
-    pink:{
-
-        bg:"#12080f",
-        panel:"#1b0d16",
-        panel2:"#281320",
-        panel3:"#371a2b",
-        text:"#ffeaf5",
-        muted:"#a77c91",
-        accent:"#e85a9b",
-        accent2:"#f27ab0",
-        border:"#4b2238"
-
-    },
-
-    cyan:{
-
-        bg:"#061010",
-        panel:"#0a1818",
-        panel2:"#0e2424",
-        panel3:"#143131",
-        text:"#e5ffff",
-        muted:"#709494",
-        accent:"#31d4d4",
-        accent2:"#62e6e6",
-        border:"#1d4444"
-
-    },
-
-    gray:{
-
-        bg:"#0b0c0d",
-        panel:"#141516",
-        panel2:"#1c1e20",
-        panel3:"#25282a",
-        text:"#eeeeee",
-        muted:"#898d91",
-        accent:"#9da3aa",
-        accent2:"#c0c5ca",
-        border:"#303438"
-
-    }
-
-};
-
-
-document
-.querySelectorAll(".theme")
-.forEach(
+themeButtons.forEach(
     button => {
 
         button.addEventListener(
             "click",
             () => {
 
-                const theme =
-                    button.dataset.theme;
-
-
-                applyTheme(
-                    theme
-                );
-
-
-                localStorage.setItem(
-                    "chat_theme",
-                    theme
+                setTheme(
+                    button.dataset.theme
                 );
 
             }
@@ -2604,91 +2511,95 @@ document
 );
 
 
-function applyTheme(name){
-
-    const theme =
-        themes[name] ||
-        themes.dark;
-
-
-    const root =
-        document.documentElement;
+const savedTheme =
+    localStorage.getItem(
+        "chat_theme"
+    );
 
 
-    Object.keys(theme)
-        .forEach(
-            key => {
+if(savedTheme){
 
-                root.style.setProperty(
-                    "--" + key,
-                    theme[key]
-                );
-
-            }
-        );
+    setTheme(
+        savedTheme
+    );
 
 }
 
 
-/* ========================================================
-   LOAD SAVED THEME
-======================================================== */
+/* =====================================================
+   FULLSCREEN IMAGE
+===================================================== */
 
-applyTheme(
-    localStorage.getItem(
-        "chat_theme"
-    ) || "dark"
-);
+function openImage(
+    src
+){
+
+    fullscreenImage.src =
+        src;
+
+    imageViewer.classList.add(
+        "show"
+    );
+
+    document.body.style.overflow =
+        "hidden";
+
+}
 
 
-/* ========================================================
-   MOBILE SIDEBAR
-======================================================== */
+function closeImage(){
 
-mobileMenu.addEventListener(
+    imageViewer.classList.remove(
+        "show"
+    );
+
+    fullscreenImage.src =
+        "";
+
+    document.body.style.overflow =
+        "";
+
+}
+
+
+backImage.addEventListener(
     "click",
-    () => {
-
-        sidebar.classList.toggle(
-            "open"
-        );
-
-    }
+    closeImage
 );
 
 
-document
-.getElementById("generalChannel")
-.addEventListener(
-    "click",
-    () => {
-
-        sidebar.classList.remove(
-            "open"
-        );
-
-    }
-);
-
-
-/* ========================================================
-   IMAGE CLICK
-======================================================== */
+/* ESC CLOSES IMAGE */
 
 document.addEventListener(
-    "click",
+    "keydown",
     event => {
 
         if(
-            event.target.classList.contains(
-                "message-image"
-            )
+            event.key ===
+            "Escape"
         ){
 
-            window.open(
-                event.target.src,
-                "_blank"
-            );
+            if(
+                imageViewer.classList.contains(
+                    "show"
+                )
+            ){
+
+                closeImage();
+
+            }
+
+            else if(
+                settingsOverlay.classList.contains(
+                    "show"
+                )
+            ){
+
+                settingsOverlay.classList.remove(
+                    "show"
+                );
+
+            }
 
         }
 
@@ -2696,34 +2607,23 @@ document.addEventListener(
 );
 
 
-/* ========================================================
-   INITIAL LOAD
-======================================================== */
+/* =====================================================
+   START
+===================================================== */
 
-if(username){
-
-    loadMessages();
-
-}
+loadMessages();
 
 
-/* ========================================================
-   AUTO REFRESH
-======================================================== */
+/*
+ * Poll the API without rebuilding
+ * existing messages.
+ *
+ * This prevents the text from
+ * flashing/reloading.
+ */
 
 setInterval(
-    () => {
-
-        if(
-            document.visibilityState ===
-            "visible"
-        ){
-
-            loadMessages();
-
-        }
-
-    },
+    loadMessages,
     2000
 );
 
