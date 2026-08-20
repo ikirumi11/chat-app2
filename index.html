@@ -2,500 +2,502 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat App</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Chat</title>
 
 <style>
-* {
-    box-sizing: border-box;
+*{box-sizing:border-box}
+
+:root{
+    --bg:#0b0d10;
+    --panel:#111419;
+    --panel2:#181c22;
+    --border:#292e36;
+    --text:#eef1f5;
+    --muted:#7c8591;
+    --hover:#242a32;
+    --button:#e8eaed;
+    --buttonText:#111;
+    --danger:#7a3030;
 }
 
-html, body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    font-family: Inter, Arial, sans-serif;
-    background: #0b0d10;
-    color: #eee;
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    background:var(--bg);
+    color:var(--text);
+    font-family:Inter,Arial,sans-serif;
 }
 
-body {
-    overflow: hidden;
+body{
+    overflow:hidden;
 }
 
-button,
-input,
-textarea,
-select {
-    font: inherit;
+button,input,textarea,select{
+    font:inherit;
 }
 
-button {
-    cursor: pointer;
+button{
+    cursor:pointer;
 }
 
-.app {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
+.app{
+    width:100%;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
 }
 
 /* HEADER */
 
-.header {
-    height: 64px;
-    min-height: 64px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 18px;
-    background: #111419;
-    border-bottom: 1px solid #252a31;
+.header{
+    height:64px;
+    min-height:64px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 18px;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
 }
 
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    font-size: 18px;
-    font-weight: 700;
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:700;
 }
 
-.logo-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    display: grid;
-    place-items: center;
-    background: #1b2028;
-    border: 1px solid #303640;
+.logo-icon{
+    width:35px;
+    height:35px;
+    display:grid;
+    place-items:center;
+    border-radius:10px;
+    background:var(--panel2);
+    border:1px solid var(--border);
 }
 
-.channel {
-    color: #aeb6c2;
-    font-size: 14px;
+.channel{
+    color:var(--muted);
+    font-weight:400;
+    font-size:14px;
 }
 
-.header-buttons {
-    display: flex;
-    gap: 8px;
+.header-buttons{
+    display:flex;
+    gap:8px;
 }
 
-.icon-btn {
-    width: 38px;
-    height: 38px;
-    border: 1px solid #2b3038;
-    background: #171b21;
-    color: #dce1e8;
-    border-radius: 9px;
-    transition: .15s;
+.icon-btn{
+    width:38px;
+    height:38px;
+    border:1px solid var(--border);
+    border-radius:9px;
+    background:var(--panel2);
+    color:var(--text);
 }
 
-.icon-btn:hover {
-    background: #20252d;
+.icon-btn:hover{
+    background:var(--hover);
 }
 
-/* CHAT */
+/* MESSAGES */
 
-.messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px 18px;
-    scroll-behavior: auto;
+.messages{
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:20px;
 }
 
-.message {
-    display: flex;
-    gap: 11px;
-    margin-bottom: 18px;
-    position: relative;
+.message{
+    display:flex;
+    gap:11px;
+    margin-bottom:18px;
+    position:relative;
 }
 
-.avatar {
-    flex: 0 0 40px;
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: grid;
-    place-items: center;
-    background: #20252d;
-    color: #dbe1e9;
-    font-weight: 700;
-    border: 1px solid #303640;
+.avatar{
+    flex:0 0 40px;
+    width:40px;
+    height:40px;
+    border-radius:10px;
+    display:grid;
+    place-items:center;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    font-weight:700;
 }
 
-.message-content {
-    min-width: 0;
-    max-width: min(850px, calc(100vw - 90px));
+.message-content{
+    min-width:0;
+    max-width:min(850px,calc(100vw - 90px));
 }
 
-.message-top {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 3px;
+.message-top{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:3px;
 }
 
-.username {
-    font-weight: 700;
-    color: #f1f3f5;
+.username{
+    font-weight:700;
 }
 
-.time {
-    font-size: 11px;
-    color: #6f7782;
+.time{
+    color:var(--muted);
+    font-size:11px;
 }
 
-.edited {
-    font-size: 10px;
-    color: #68717d;
+.edited{
+    color:var(--muted);
+    font-size:10px;
 }
 
-.message-text {
-    color: #d7dce2;
-    white-space: pre-wrap;
-    word-break: break-word;
-    line-height: 1.45;
+.message-text{
+    white-space:pre-wrap;
+    word-break:break-word;
+    line-height:1.45;
+    color:#d9dde3;
 }
 
-.message-image {
-    display: block;
-    max-width: min(500px, 80vw);
-    max-height: 500px;
-    margin-top: 8px;
-    border-radius: 10px;
-    border: 1px solid #303640;
-    cursor: pointer;
-    object-fit: contain;
-    background: #080a0d;
+.message-image{
+    display:block;
+    max-width:min(500px,80vw);
+    max-height:500px;
+    margin-top:8px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#000;
+    object-fit:contain;
+    cursor:pointer;
 }
 
 /* COMPOSER */
 
-.composer {
-    padding: 12px 16px 16px;
-    background: #111419;
-    border-top: 1px solid #252a31;
+.composer{
+    padding:12px 16px 16px;
+    background:var(--panel);
+    border-top:1px solid var(--border);
 }
 
-.composer-box {
-    max-width: 1100px;
-    margin: auto;
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    background: #181c22;
-    border: 1px solid #2a3038;
-    border-radius: 13px;
-    padding: 8px;
+.composer-box{
+    max-width:1100px;
+    margin:auto;
+    display:flex;
+    align-items:flex-end;
+    gap:8px;
+    padding:8px;
+    border:1px solid var(--border);
+    border-radius:13px;
+    background:var(--panel2);
 }
 
-.composer textarea {
-    flex: 1;
-    min-height: 42px;
-    max-height: 150px;
-    resize: none;
-    border: 0;
-    outline: none;
-    background: transparent;
-    color: white;
-    padding: 10px;
+textarea{
+    flex:1;
+    min-height:42px;
+    max-height:150px;
+    resize:none;
+    outline:none;
+    border:0;
+    background:transparent;
+    color:white;
+    padding:10px;
 }
 
-.composer textarea::placeholder {
-    color: #69717c;
+textarea::placeholder{
+    color:var(--muted);
 }
 
-.send-btn {
-    height: 42px;
-    padding: 0 18px;
-    border: 0;
-    border-radius: 9px;
-    background: #e8eaed;
-    color: #111;
-    font-weight: 700;
+.attach-btn{
+    width:42px;
+    height:42px;
+    border:0;
+    border-radius:9px;
+    background:transparent;
+    color:#adb5c0;
+    font-size:20px;
 }
 
-.send-btn:hover {
-    background: white;
+.attach-btn:hover{
+    background:var(--hover);
 }
 
-.send-btn:disabled {
-    opacity: .5;
-    cursor: not-allowed;
+.send-btn{
+    height:42px;
+    padding:0 18px;
+    border:0;
+    border-radius:9px;
+    background:var(--button);
+    color:var(--buttonText);
+    font-weight:700;
 }
 
-.attach-btn {
-    width: 42px;
-    height: 42px;
-    border: 0;
-    border-radius: 9px;
-    background: transparent;
-    color: #aeb6c2;
-    font-size: 20px;
+.send-btn:disabled{
+    opacity:.5;
+    cursor:not-allowed;
 }
 
-.attach-btn:hover {
-    background: #242932;
+/* OVERLAY */
+
+.overlay{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.7);
 }
 
-/* SETTINGS */
-
-.overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.65);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
+.overlay.show{
+    display:flex;
 }
 
-.overlay.show {
-    display: flex;
+.panel{
+    width:min(480px,calc(100vw - 30px));
+    max-height:calc(100vh - 30px);
+    overflow:auto;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:15px;
+    box-shadow:0 25px 80px rgba(0,0,0,.6);
 }
 
-.panel {
-    width: min(480px, calc(100vw - 30px));
-    max-height: calc(100vh - 30px);
-    overflow-y: auto;
-    background: #12161b;
-    border: 1px solid #303640;
-    border-radius: 15px;
-    box-shadow: 0 25px 80px rgba(0,0,0,.55);
+.panel-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px;
+    border-bottom:1px solid var(--border);
 }
 
-.panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px;
-    border-bottom: 1px solid #292e36;
+.panel-header h2{
+    margin:0;
+    font-size:18px;
 }
 
-.panel-header h2 {
-    margin: 0;
-    font-size: 18px;
+.panel-body{
+    padding:18px;
 }
 
-.panel-body {
-    padding: 18px;
+.setting{
+    margin-bottom:20px;
 }
 
-.setting {
-    margin-bottom: 20px;
-}
-
-.setting label {
-    display: block;
-    margin-bottom: 7px;
-    font-size: 13px;
-    color: #9ca5b1;
+.setting label{
+    display:block;
+    margin-bottom:7px;
+    color:#aab2bd;
+    font-size:13px;
 }
 
 .setting input,
-.setting select {
-    width: 100%;
-    padding: 11px;
-    border-radius: 9px;
-    border: 1px solid #303640;
-    outline: none;
-    background: #1a1f26;
-    color: white;
+.setting select{
+    width:100%;
+    padding:11px;
+    border-radius:9px;
+    border:1px solid var(--border);
+    outline:none;
+    background:var(--panel2);
+    color:var(--text);
 }
 
-.save-btn {
-    width: 100%;
-    padding: 11px;
-    border: 0;
-    border-radius: 9px;
-    background: #e8eaed;
-    color: #111;
-    font-weight: 700;
+.save-btn{
+    width:100%;
+    padding:11px;
+    border:0;
+    border-radius:9px;
+    background:var(--button);
+    color:var(--buttonText);
+    font-weight:700;
 }
 
-.danger-zone {
-    margin-top: 25px;
-    padding-top: 20px;
-    border-top: 1px solid #30262a;
+/* DANGER */
+
+.danger-zone{
+    margin-top:25px;
+    padding-top:20px;
+    border-top:1px solid #422626;
 }
 
-.danger-title {
-    color: #ff7777;
-    font-weight: 700;
-    margin-bottom: 7px;
+.danger-title{
+    color:#ff7777;
+    font-weight:700;
 }
 
-.danger-zone p {
-    color: #929aa5;
-    line-height: 1.5;
+.danger-zone p{
+    color:#9da5af;
+    line-height:1.45;
 }
 
-.danger-btn {
-    width: 100%;
-    padding: 11px;
-    border-radius: 9px;
-    border: 1px solid #743333;
-    background: #241719;
-    color: #ff8585;
+.danger-btn{
+    width:100%;
+    padding:11px;
+    border-radius:9px;
+    border:1px solid #743333;
+    background:#241719;
+    color:#ff8585;
 }
 
-.danger-btn:hover {
-    background: #321c1e;
+.danger-btn:hover{
+    background:#321c1e;
 }
 
 /* CONTEXT MENU */
 
-.context-menu {
-    position: fixed;
-    display: none;
-    z-index: 200;
-    width: 160px;
-    padding: 5px;
-    background: #171b21;
-    border: 1px solid #343a43;
-    border-radius: 9px;
-    box-shadow: 0 15px 40px rgba(0,0,0,.5);
+.context-menu{
+    position:fixed;
+    z-index:200;
+    display:none;
+    width:160px;
+    padding:5px;
+    border:1px solid #343a43;
+    border-radius:9px;
+    background:#171b21;
+    box-shadow:0 15px 40px rgba(0,0,0,.6);
 }
 
-.context-menu.show {
-    display: block;
+.context-menu.show{
+    display:block;
 }
 
-.context-menu button {
-    width: 100%;
-    text-align: left;
-    padding: 9px 10px;
-    border: 0;
-    background: transparent;
-    color: #e4e8ed;
-    border-radius: 6px;
+.context-menu button{
+    width:100%;
+    text-align:left;
+    padding:9px 10px;
+    border:0;
+    border-radius:6px;
+    background:transparent;
+    color:#eee;
 }
 
-.context-menu button:hover {
-    background: #252b33;
+.context-menu button:hover{
+    background:#252b33;
 }
 
-.context-menu .delete-option {
-    color: #ff7777;
+.context-menu .delete-option{
+    color:#ff7777;
 }
 
 /* IMAGE VIEWER */
 
-.image-viewer {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.96);
-    display: none;
-    z-index: 300;
-    align-items: center;
-    justify-content: center;
+.image-viewer{
+    position:fixed;
+    inset:0;
+    z-index:300;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.97);
 }
 
-.image-viewer.show {
-    display: flex;
+.image-viewer.show{
+    display:flex;
 }
 
-.full-image {
-    max-width: 95vw;
-    max-height: 90vh;
-    object-fit: contain;
+.full-image{
+    max-width:95vw;
+    max-height:90vh;
+    object-fit:contain;
 }
 
-.back-image {
-    position: absolute;
-    top: 18px;
-    left: 18px;
-    padding: 10px 16px;
-    border-radius: 9px;
-    border: 1px solid #3a4049;
-    background: #171b21;
-    color: white;
+.back-image{
+    position:absolute;
+    top:18px;
+    left:18px;
+    padding:10px 16px;
+    border-radius:9px;
+    border:1px solid #3a4049;
+    background:#171b21;
+    color:white;
 }
 
 /* DIALOG */
 
-.dialog {
-    width: min(450px, calc(100vw - 30px));
-    background: #14181e;
-    border: 1px solid #303640;
-    border-radius: 14px;
-    padding: 20px;
+.dialog{
+    width:min(450px,calc(100vw - 30px));
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px;
 }
 
-.dialog h2 {
-    margin-top: 0;
+.dialog h2{
+    margin-top:0;
 }
 
-.dialog p {
-    color: #aab2bd;
-    line-height: 1.5;
+.dialog p{
+    color:#aab2bd;
+    line-height:1.5;
 }
 
-.dialog-buttons {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-    margin-top: 18px;
+.dialog-buttons{
+    display:flex;
+    gap:8px;
+    justify-content:flex-end;
+    margin-top:18px;
 }
 
-.dialog-buttons button {
-    padding: 10px 16px;
-    border-radius: 8px;
-    border: 1px solid #343a43;
-    background: #20252c;
-    color: white;
+.dialog-buttons button{
+    padding:10px 16px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#20252c;
+    color:white;
 }
 
-.dialog-buttons .danger {
-    background: #6b2929;
-    border-color: #813434;
+.dialog-buttons .danger{
+    background:#6b2929;
+    border-color:#813434;
 }
 
 /* EMPTY */
 
-.empty {
-    height: 100%;
-    display: grid;
-    place-items: center;
-    color: #656d78;
-    text-align: center;
+.empty{
+    height:100%;
+    display:grid;
+    place-items:center;
+    color:#656d78;
+    text-align:center;
 }
 
-.empty strong {
-    display: block;
-    color: #aab2bd;
-    margin-bottom: 5px;
+.empty strong{
+    display:block;
+    color:#aab2bd;
+    margin-bottom:5px;
 }
 
 /* MOBILE */
 
-@media (max-width: 600px) {
+@media(max-width:600px){
 
-    .header {
-        padding: 0 11px;
+    .header{
+        padding:0 11px;
     }
 
-    .messages {
-        padding: 15px 11px;
+    .messages{
+        padding:15px 11px;
     }
 
-    .message-content {
-        max-width: calc(100vw - 70px);
+    .message-content{
+        max-width:calc(100vw - 70px);
     }
 
-    .message-image {
-        max-width: 80vw;
+    .channel{
+        display:none;
     }
 
-    .channel {
-        display: none;
+    .logo{
+        font-size:16px;
     }
 
-    .logo {
-        font-size: 16px;
+    .message-image{
+        max-width:80vw;
     }
-
 }
 </style>
 </head>
@@ -526,9 +528,7 @@ button {
             class="icon-btn"
             id="settingsBtn"
             title="Settings"
-        >
-            ⚙
-        </button>
+        >⚙</button>
 
     </div>
 
@@ -556,22 +556,18 @@ button {
             class="attach-btn"
             id="attachBtn"
             title="Choose image"
-        >
-            ＋
-        </button>
+        >＋</button>
 
         <textarea
             id="messageInput"
-            placeholder="Message #general"
             rows="1"
+            placeholder="Message #general"
         ></textarea>
 
         <button
             class="send-btn"
             id="sendBtn"
-        >
-            Send
-        </button>
+        >Send</button>
 
     </div>
 
@@ -596,118 +592,63 @@ button {
     <button
         class="icon-btn"
         id="closeSettings"
-    >
-        ×
-    </button>
+    >×</button>
 
 </div>
-
 
 <div class="panel-body">
 
 <div class="setting">
 
-    <label>Your name</label>
+<label>Your name</label>
 
-    <input
-        id="usernameInput"
-        maxlength="24"
-        placeholder="Enter your name"
-    >
-
-</div>
-
-
-<div class="setting">
-
-    <label>Theme</label>
-
-    <select id="themeSelect">
-
-        <option value="dark">
-            Dark
-        </option>
-
-        <option value="midnight">
-            Midnight
-        </option>
-
-        <option value="slate">
-            Slate
-        </option>
-
-        <option value="black">
-            Pure Black
-        </option>
-
-        <option value="blue">
-            Dark Blue
-        </option>
-
-        <option value="purple">
-            Dark Purple
-        </option>
-
-        <option value="green">
-            Dark Green
-        </option>
-
-        <option value="red">
-            Dark Red
-        </option>
-
-        <option value="gray">
-            Classic Gray
-        </option>
-
-        <option value="light">
-            Light
-        </option>
-
-        <option value="oled">
-            OLED
-        </option>
-
-    </select>
+<input
+    id="usernameInput"
+    maxlength="24"
+    placeholder="Enter your name"
+>
 
 </div>
 
 
 <div class="setting">
 
-    <label>Message refresh rate</label>
+<label>Theme</label>
 
-    <select id="refreshSelect">
+<select id="themeSelect">
 
-        <option value="10000">
-            10 seconds
-        </option>
+<option value="dark">Dark</option>
+<option value="midnight">Midnight</option>
+<option value="slate">Slate</option>
+<option value="black">Pure Black</option>
+<option value="blue">Dark Blue</option>
+<option value="purple">Dark Purple</option>
+<option value="green">Dark Green</option>
+<option value="red">Dark Red</option>
+<option value="gray">Classic Gray</option>
+<option value="light">Light</option>
+<option value="oled">OLED</option>
 
-        <option value="5000">
-            5 seconds
-        </option>
+</select>
 
-        <option value="3000">
-            3 seconds
-        </option>
+</div>
 
-        <option value="2000">
-            2 seconds
-        </option>
 
-        <option value="1000">
-            1 second
-        </option>
+<div class="setting">
 
-        <option value="500">
-            0.5 seconds
-        </option>
+<label>Message refresh rate</label>
 
-        <option value="100">
-            0.1 seconds
-        </option>
+<select id="refreshSelect">
 
-    </select>
+<option value="10000">10 seconds</option>
+<option value="5000">5 seconds</option>
+<option value="3000">3 seconds</option>
+<option value="2000">2 seconds</option>
+<option value="1000">1 second</option>
+<option value="500">0.5 seconds</option>
+<option value="100">0.1 seconds</option>
+
+</select>
 
 </div>
 
@@ -716,34 +657,32 @@ button {
     class="save-btn"
     id="saveSettings"
 >
-    Save settings
+Save settings
 </button>
 
 
 <div class="danger-zone">
 
-    <div class="danger-title">
-        Danger zone
-    </div>
+<div class="danger-title">
+Danger zone
+</div>
 
-    <p>
-        Permanently remove every message from
-        the chat database.
-    </p>
+<p>
+Remove every message from the entire chat for
+everyone. This is not limited to your device.
+</p>
 
-    <button
-        class="danger-btn"
-        id="removeEverything"
-    >
-        Remove everything
-    </button>
+<button
+    class="danger-btn"
+    id="removeEverything"
+>
+Remove everything
+</button>
 
 </div>
 
 </div>
-
 </div>
-
 </div>
 
 
@@ -755,14 +694,14 @@ button {
 >
 
 <button id="editMessage">
-    Edit
+Edit
 </button>
 
 <button
     class="delete-option"
     id="deleteMessage"
 >
-    Delete
+Delete
 </button>
 
 </div>
@@ -779,7 +718,7 @@ button {
     class="back-image"
     id="backImage"
 >
-    ← Back
+← Back
 </button>
 
 <img
@@ -791,7 +730,7 @@ button {
 </div>
 
 
-<!-- DIALOG -->
+<!-- CONFIRM DIALOG -->
 
 <div
     class="overlay"
@@ -801,7 +740,7 @@ button {
 <div class="dialog">
 
 <h2 id="dialogTitle">
-    Confirm
+Confirm
 </h2>
 
 <p id="dialogText"></p>
@@ -809,14 +748,14 @@ button {
 <div class="dialog-buttons">
 
 <button id="dialogCancel">
-    Cancel
+Cancel
 </button>
 
 <button
     class="danger"
     id="dialogConfirm"
 >
-    Yes
+Yes
 </button>
 
 </div>
@@ -828,425 +767,215 @@ button {
 
 <script>
 
-/* =====================================================
-   CONFIG
-===================================================== */
-
-const API_URL =
-    "/api/messages";
-
-const CHANNEL =
-    "general";
+const API_URL="/api/messages";
+const CHANNEL="general";
 
 
-/* =====================================================
-   DEVICE ID
-===================================================== */
+/* DEVICE ID */
 
-let deviceId =
-    localStorage.getItem(
-        "chat_device_id"
-    );
+let deviceId=
+localStorage.getItem("chat_device_id");
 
-if (!deviceId) {
+if(!deviceId){
 
-    deviceId =
+    deviceId=
         crypto.randomUUID();
 
     localStorage.setItem(
         "chat_device_id",
         deviceId
     );
-
 }
 
 
-/* =====================================================
-   USER SETTINGS
-===================================================== */
+/* SETTINGS */
 
-let username =
+let username=
+localStorage.getItem("chat_username") || "";
+
+let theme=
+localStorage.getItem("chat_theme") || "dark";
+
+let refreshRate=
+Number(
     localStorage.getItem(
-        "chat_username"
-    ) || "";
-
-let theme =
-    localStorage.getItem(
-        "chat_theme"
-    ) || "dark";
-
-/*
-   DEFAULT REFRESH = 0.5 SECOND
-*/
-
-let refreshRate =
-    Number(
-        localStorage.getItem(
-            "chat_refresh_rate"
-        )
-    );
-
-if (
-    !refreshRate ||
-    ![
-        10000,
-        5000,
-        3000,
-        2000,
-        1000,
-        500,
-        100
-    ].includes(refreshRate)
-) {
-
-    refreshRate = 500;
-
-    localStorage.setItem(
-        "chat_refresh_rate",
-        "500"
-    );
-
-}
+        "chat_refresh_rate"
+    )
+) || 500;
 
 
-/* =====================================================
-   ELEMENTS
-===================================================== */
+/* ELEMENTS */
 
-const messagesEl =
-    document.getElementById(
-        "messages"
-    );
+const messagesEl=
+document.getElementById("messages");
 
-const messageInput =
-    document.getElementById(
-        "messageInput"
-    );
+const messageInput=
+document.getElementById("messageInput");
 
-const sendBtn =
-    document.getElementById(
-        "sendBtn"
-    );
+const sendBtn=
+document.getElementById("sendBtn");
 
-const imageInput =
-    document.getElementById(
-        "imageInput"
-    );
+const imageInput=
+document.getElementById("imageInput");
 
-const attachBtn =
-    document.getElementById(
-        "attachBtn"
-    );
+const attachBtn=
+document.getElementById("attachBtn");
 
-const settingsBtn =
-    document.getElementById(
-        "settingsBtn"
-    );
+const settingsBtn=
+document.getElementById("settingsBtn");
 
-const settingsOverlay =
-    document.getElementById(
-        "settingsOverlay"
-    );
+const settingsOverlay=
+document.getElementById("settingsOverlay");
 
-const closeSettings =
-    document.getElementById(
-        "closeSettings"
-    );
+const closeSettings=
+document.getElementById("closeSettings");
 
-const usernameInput =
-    document.getElementById(
-        "usernameInput"
-    );
+const usernameInput=
+document.getElementById("usernameInput");
 
-const themeSelect =
-    document.getElementById(
-        "themeSelect"
-    );
+const themeSelect=
+document.getElementById("themeSelect");
 
-const refreshSelect =
-    document.getElementById(
-        "refreshSelect"
-    );
+const refreshSelect=
+document.getElementById("refreshSelect");
 
-const saveSettings =
-    document.getElementById(
-        "saveSettings"
-    );
+const saveSettings=
+document.getElementById("saveSettings");
 
-const contextMenu =
-    document.getElementById(
-        "contextMenu"
-    );
+const removeEverything=
+document.getElementById("removeEverything");
 
-const editMessageBtn =
-    document.getElementById(
-        "editMessage"
-    );
+const contextMenu=
+document.getElementById("contextMenu");
 
-const deleteMessageBtn =
-    document.getElementById(
-        "deleteMessage"
-    );
+const editMessageBtn=
+document.getElementById("editMessage");
 
-const imageViewer =
-    document.getElementById(
-        "imageViewer"
-    );
+const deleteMessageBtn=
+document.getElementById("deleteMessage");
 
-const fullImage =
-    document.getElementById(
-        "fullImage"
-    );
+const imageViewer=
+document.getElementById("imageViewer");
 
-const backImage =
-    document.getElementById(
-        "backImage"
-    );
+const fullImage=
+document.getElementById("fullImage");
 
-const dialogOverlay =
-    document.getElementById(
-        "dialogOverlay"
-    );
+const backImage=
+document.getElementById("backImage");
 
-const dialogTitle =
-    document.getElementById(
-        "dialogTitle"
-    );
+const dialogOverlay=
+document.getElementById("dialogOverlay");
 
-const dialogText =
-    document.getElementById(
-        "dialogText"
-    );
+const dialogTitle=
+document.getElementById("dialogTitle");
 
-const dialogCancel =
-    document.getElementById(
-        "dialogCancel"
-    );
+const dialogText=
+document.getElementById("dialogText");
 
-const dialogConfirm =
-    document.getElementById(
-        "dialogConfirm"
-    );
+const dialogCancel=
+document.getElementById("dialogCancel");
 
-const removeEverything =
-    document.getElementById(
-        "removeEverything"
-    );
+const dialogConfirm=
+document.getElementById("dialogConfirm");
 
 
-/* =====================================================
-   STATE
-===================================================== */
-
-let selectedMessage =
-    null;
-
-let selectedFile =
-    null;
-
-let currentMessages =
-    [];
-
-let refreshTimer =
-    null;
+let selectedMessage=null;
+let selectedFile=null;
+let currentMessages=[];
+let refreshTimer=null;
+let confirmCallback=null;
 
 
-/* =====================================================
-   THEME
-===================================================== */
+/* THEMES */
 
-function applyTheme(name) {
+function applyTheme(name){
 
-    const themes = {
+    const themes={
 
-        dark: {
-            bg: "#0b0d10",
-            panel: "#12161b"
-        },
-
-        midnight: {
-            bg: "#080b14",
-            panel: "#101522"
-        },
-
-        slate: {
-            bg: "#101418",
-            panel: "#171d22"
-        },
-
-        black: {
-            bg: "#000000",
-            panel: "#090909"
-        },
-
-        blue: {
-            bg: "#091018",
-            panel: "#101c29"
-        },
-
-        purple: {
-            bg: "#100b17",
-            panel: "#191021"
-        },
-
-        green: {
-            bg: "#09120d",
-            panel: "#101b15"
-        },
-
-        red: {
-            bg: "#140b0b",
-            panel: "#1e1111"
-        },
-
-        gray: {
-            bg: "#151515",
-            panel: "#202020"
-        },
-
-        light: {
-            bg: "#eeeeee",
-            panel: "#ffffff"
-        },
-
-        oled: {
-            bg: "#000000",
-            panel: "#000000"
-        }
+        dark:["#0b0d10","#111419"],
+        midnight:["#080b14","#101522"],
+        slate:["#101418","#171d22"],
+        black:["#000","#090909"],
+        blue:["#091018","#101c29"],
+        purple:["#100b17","#191021"],
+        green:["#09120d","#101b15"],
+        red:["#140b0b","#1e1111"],
+        gray:["#151515","#202020"],
+        light:["#eeeeee","#fff"],
+        oled:["#000","#000"]
 
     };
 
-    const selected =
+    const t=
         themes[name] ||
         themes.dark;
 
-    document.body.style.background =
-        selected.bg;
+    document.documentElement
+        .style.setProperty(
+            "--bg",
+            t[0]
+        );
 
-    document.querySelector(
-        ".header"
-    ).style.background =
-        selected.panel;
+    document.documentElement
+        .style.setProperty(
+            "--panel",
+            t[1]
+        );
 
-    document.querySelector(
-        ".composer"
-    ).style.background =
-        selected.panel;
-
+    document.body.style.background=
+        t[0];
 }
 
+
+/* START SETTINGS */
 
 applyTheme(theme);
 
-themeSelect.value =
-    theme;
-
-refreshSelect.value =
+themeSelect.value=theme;
+refreshSelect.value=
     String(refreshRate);
 
-usernameInput.value =
-    username;
+usernameInput.value=username;
 
 
-/* =====================================================
-   REFRESH TIMER
-===================================================== */
+/* SETTINGS OPEN */
 
-function startRefreshTimer() {
+settingsBtn.onclick=()=>{
 
-    if (refreshTimer) {
-
-        clearInterval(
-            refreshTimer
-        );
-
-    }
-
-    refreshTimer =
-        setInterval(
-            loadMessages,
-            refreshRate
-        );
-
-}
-
-
-/* =====================================================
-   SETTINGS
-===================================================== */
-
-settingsBtn.onclick = () => {
-
-    usernameInput.value =
-        username;
-
-    themeSelect.value =
-        theme;
-
-    refreshSelect.value =
+    usernameInput.value=username;
+    themeSelect.value=theme;
+    refreshSelect.value=
         String(refreshRate);
 
-    settingsOverlay.classList.add(
-        "show"
-    );
+    settingsOverlay.classList.add("show");
 
 };
 
 
-closeSettings.onclick = () => {
+closeSettings.onclick=()=>{
 
-    settingsOverlay.classList.remove(
-        "show"
-    );
+    settingsOverlay.classList.remove("show");
 
 };
 
 
-saveSettings.onclick = () => {
+saveSettings.onclick=()=>{
 
-    username =
+    const newName=
         usernameInput.value
             .trim()
-            .substring(
-                0,
-                24
-            );
+            .substring(0,24);
 
-    /*
-       Keep a valid default so sending
-       can never fail because the name
-       is empty.
-    */
+    username=
+        newName || "User";
 
-    if (!username) {
-
-        username =
-            "User";
-
-    }
-
-    theme =
+    theme=
         themeSelect.value;
 
-    refreshRate =
+    refreshRate=
         Number(
             refreshSelect.value
         );
-
-    if (![
-        10000,
-        5000,
-        3000,
-        2000,
-        1000,
-        500,
-        100
-    ].includes(refreshRate)) {
-
-        refreshRate =
-            500;
-
-    }
 
     localStorage.setItem(
         "chat_username",
@@ -1260,132 +989,97 @@ saveSettings.onclick = () => {
 
     localStorage.setItem(
         "chat_refresh_rate",
-        String(refreshRate)
+        refreshRate
     );
 
-    applyTheme(
-        theme
-    );
+    applyTheme(theme);
+
+    settingsOverlay.classList.remove("show");
 
     startRefreshTimer();
-
-    settingsOverlay.classList.remove(
-        "show"
-    );
 
 };
 
 
-/* =====================================================
-   AUTO RESIZE
-===================================================== */
+/* TEXTAREA */
 
 messageInput.addEventListener(
     "input",
-    () => {
+    ()=>{
 
-        messageInput.style.height =
-            "auto";
+        messageInput.style.height="auto";
 
-        messageInput.style.height =
+        messageInput.style.height=
             Math.min(
                 messageInput.scrollHeight,
                 150
-            ) + "px";
+            )+"px";
 
     }
 );
 
 
-/* =====================================================
-   IMAGE PICKER
-===================================================== */
+/* IMAGE */
 
-attachBtn.onclick = () => {
-
+attachBtn.onclick=()=>{
     imageInput.click();
+};
+
+imageInput.onchange=()=>{
+
+    selectedFile=
+        imageInput.files[0] || null;
+
+    attachBtn.textContent=
+        selectedFile ? "✓" : "＋";
 
 };
 
 
-imageInput.onchange = () => {
+/* RESIZE IMAGE */
 
-    selectedFile =
-        imageInput.files[0] ||
-        null;
-
-    attachBtn.textContent =
-        selectedFile
-        ? "✓"
-        : "＋";
-
-};
-
-
-/* =====================================================
-   RESIZE IMAGE
-   MAXIMUM 1500 × 1500
-===================================================== */
-
-function resizeImage(file) {
+function resizeImage(file){
 
     return new Promise(
-        (resolve, reject) => {
+        (resolve,reject)=>{
 
-            const reader =
+            const reader=
                 new FileReader();
 
-            reader.onload = () => {
+            reader.onload=()=>{
 
-                const img =
+                const img=
                     new Image();
 
-                img.onload = () => {
+                img.onload=()=>{
 
-                    let width =
-                        img.width;
+                    let w=img.width;
+                    let h=img.height;
 
-                    let height =
-                        img.height;
+                    const max=1500;
 
-                    const max =
-                        1500;
+                    if(w>max || h>max){
 
-                    if (
-                        width > max ||
-                        height > max
-                    ) {
-
-                        const scale =
+                        const scale=
                             Math.min(
-                                max / width,
-                                max / height
+                                max/w,
+                                max/h
                             );
 
-                        width =
-                            Math.round(
-                                width * scale
-                            );
-
-                        height =
-                            Math.round(
-                                height * scale
-                            );
+                        w=Math.round(w*scale);
+                        h=Math.round(h*scale);
 
                     }
 
-                    const canvas =
+                    const canvas=
                         document.createElement(
                             "canvas"
                         );
 
-                    canvas.width =
-                        width;
+                    canvas.width=w;
+                    canvas.height=h;
 
-                    canvas.height =
-                        height;
-
-                    const ctx =
+                    const ctx=
                         canvas.getContext(
                             "2d"
                         );
@@ -1394,33 +1088,27 @@ function resizeImage(file) {
                         img,
                         0,
                         0,
-                        width,
-                        height
+                        w,
+                        h
                     );
 
                     resolve(
                         canvas.toDataURL(
                             "image/jpeg",
-                            0.78
+                            .78
                         )
                     );
 
                 };
 
-                img.onerror =
-                    reject;
-
-                img.src =
-                    reader.result;
+                img.onerror=reject;
+                img.src=reader.result;
 
             };
 
-            reader.onerror =
-                reject;
+            reader.onerror=reject;
 
-            reader.readAsDataURL(
-                file
-            );
+            reader.readAsDataURL(file);
 
         }
     );
@@ -1428,25 +1116,20 @@ function resizeImage(file) {
 }
 
 
-/* =====================================================
-   SEND
-===================================================== */
+/* SEND */
 
-sendBtn.onclick =
-    sendMessage;
-
+sendBtn.onclick=sendMessage;
 
 messageInput.addEventListener(
     "keydown",
-    event => {
+    e=>{
 
-        if (
-            event.key === "Enter" &&
-            !event.shiftKey
-        ) {
+        if(
+            e.key==="Enter" &&
+            !e.shiftKey
+        ){
 
-            event.preventDefault();
-
+            e.preventDefault();
             sendMessage();
 
         }
@@ -1455,175 +1138,120 @@ messageInput.addEventListener(
 );
 
 
-async function sendMessage() {
+async function sendMessage(){
 
-    /*
-       Make sure the username is always
-       available from localStorage.
-    */
+    if(!username){
 
-    username =
-        localStorage.getItem(
-            "chat_username"
-        ) ||
-        username ||
-        "User";
-
-    username =
-        username
-            .trim()
-            .substring(
-                0,
-                24
-            );
-
-    if (!username) {
-
-        username =
-            "User";
-
-    }
-
-    localStorage.setItem(
-        "chat_username",
-        username
-    );
-
-    const text =
-        messageInput.value.trim();
-
-    if (
-        !text &&
-        !selectedFile
-    ) {
-
+        settingsOverlay.classList.add("show");
+        usernameInput.focus();
         return;
 
     }
 
-    sendBtn.disabled =
-        true;
+    const text=
+        messageInput.value.trim();
 
-    try {
+    if(!text && !selectedFile){
+        return;
+    }
 
-        let image =
-            null;
+    sendBtn.disabled=true;
 
-        if (selectedFile) {
+    try{
 
-            image =
+        let image=null;
+
+        if(selectedFile){
+
+            image=
                 await resizeImage(
                     selectedFile
                 );
 
         }
 
-        const response =
+        const response=
             await fetch(
                 API_URL,
                 {
+                    method:"POST",
 
-                    method:
-                        "POST",
-
-                    headers: {
+                    headers:{
                         "Content-Type":
                             "application/json"
                     },
 
-                    body:
-                        JSON.stringify({
+                    body:JSON.stringify({
 
-                            username:
-                                username,
+                        username,
+                        channel:CHANNEL,
+                        message:text,
+                        image,
+                        device_id:deviceId
 
-                            channel:
-                                CHANNEL,
-
-                            message:
-                                text,
-
-                            image:
-                                image,
-
-                            device_id:
-                                deviceId
-
-                        })
-
+                    })
                 }
             );
 
-        const data =
+        const data=
             await response.json();
 
-        if (!response.ok) {
+        if(!response.ok){
 
             throw new Error(
                 data.error ||
-                "Failed to send message."
+                "Failed to send."
             );
 
         }
 
-        messageInput.value =
-            "";
+        messageInput.value="";
+        messageInput.style.height="auto";
 
-        messageInput.style.height =
-            "auto";
-
-        selectedFile =
-            null;
-
-        imageInput.value =
-            "";
-
-        attachBtn.textContent =
-            "＋";
+        selectedFile=null;
+        imageInput.value="";
+        attachBtn.textContent="＋";
 
         await loadMessages();
 
-    } catch (error) {
+    }catch(error){
 
         alert(
-            "Failed to send:\n\n" +
+            "Failed to send:\n\n"+
             error.message
         );
 
-    } finally {
+    }finally{
 
-        sendBtn.disabled =
-            false;
+        sendBtn.disabled=false;
 
     }
 
 }
 
 
-/* =====================================================
-   LOAD MESSAGES
-===================================================== */
+/* LOAD */
 
-async function loadMessages() {
+async function loadMessages(){
 
-    try {
+    try{
 
-        const response =
+        const response=
             await fetch(
-                API_URL +
-                "?channel=" +
+                API_URL+
+                "?channel="+
                 encodeURIComponent(
                     CHANNEL
                 ),
                 {
-                    cache: "no-store"
+                    cache:"no-store"
                 }
             );
 
-        const data =
+        const data=
             await response.json();
 
-        if (!response.ok) {
+        if(!response.ok){
 
             throw new Error(
                 data.error ||
@@ -1632,7 +1260,7 @@ async function loadMessages() {
 
         }
 
-        currentMessages =
+        currentMessages=
             Array.isArray(
                 data.messages
             )
@@ -1641,267 +1269,212 @@ async function loadMessages() {
 
         renderMessages();
 
-    } catch (error) {
+    }catch(error){
 
-        /*
-           Don't replace existing messages
-           with an error every refresh.
-        */
-
-        if (!currentMessages.length) {
-
-            messagesEl.innerHTML = `
-                <div class="empty">
-                    <div>
-                        <strong>Unable to load messages</strong>
-                        ${escapeHtml(error.message)}
-                    </div>
-                </div>
-            `;
-
-        }
+        messagesEl.innerHTML=
+        `<div class="empty">
+            <div>
+                <strong>Unable to load messages</strong>
+                ${escapeHtml(error.message)}
+            </div>
+        </div>`;
 
     }
 
 }
 
 
-/* =====================================================
-   RENDER
-===================================================== */
+/* RENDER */
 
-function renderMessages() {
+function renderMessages(){
 
-    const wasAtBottom =
+    const wasBottom=
         messagesEl.scrollHeight -
         messagesEl.scrollTop -
-        messagesEl.clientHeight <
-        100;
+        messagesEl.clientHeight < 100;
 
-    if (!currentMessages.length) {
+    if(!currentMessages.length){
 
-        messagesEl.innerHTML = `
-            <div class="empty">
-                <div>
-                    <strong>No messages yet</strong>
-                    Be the first to send something.
-                </div>
+        messagesEl.innerHTML=
+        `<div class="empty">
+            <div>
+                <strong>No messages yet</strong>
+                Be the first to send something.
             </div>
-        `;
+        </div>`;
 
         return;
-
     }
 
-    const fragment =
+    const fragment=
         document.createDocumentFragment();
 
-    currentMessages.forEach(
-        message => {
+    currentMessages.forEach(message=>{
 
-            const item =
-                document.createElement(
-                    "div"
-                );
+        const item=
+            document.createElement("div");
 
-            item.className =
-                "message";
+        item.className="message";
 
-            item.dataset.id =
-                message.id;
+        item.dataset.id=
+            message.id;
 
-            item.dataset.deviceId =
-                message.device_id ||
-                "";
+        item.dataset.deviceId=
+            message.device_id || "";
 
-            const avatar =
-                document.createElement(
-                    "div"
-                );
 
-            avatar.className =
-                "avatar";
+        const avatar=
+            document.createElement("div");
 
-            avatar.textContent =
-                (
-                    message.username ||
-                    "?"
-                )
-                .charAt(0)
-                .toUpperCase();
+        avatar.className="avatar";
 
-            const content =
-                document.createElement(
-                    "div"
-                );
-
-            content.className =
-                "message-content";
-
-            const top =
-                document.createElement(
-                    "div"
-                );
-
-            top.className =
-                "message-top";
-
-            const name =
-                document.createElement(
-                    "span"
-                );
-
-            name.className =
-                "username";
-
-            name.textContent =
+        avatar.textContent=
+            (
                 message.username ||
-                "User";
+                "?"
+            )
+            .charAt(0)
+            .toUpperCase();
 
-            const time =
-                document.createElement(
-                    "span"
-                );
 
-            time.className =
-                "time";
+        const content=
+            document.createElement("div");
 
-            time.textContent =
-                formatTime(
-                    message.created_at
-                );
+        content.className=
+            "message-content";
 
-            top.appendChild(
-                name
+
+        const top=
+            document.createElement("div");
+
+        top.className="message-top";
+
+
+        const name=
+            document.createElement("span");
+
+        name.className="username";
+
+        name.textContent=
+            message.username ||
+            "User";
+
+
+        const time=
+            document.createElement("span");
+
+        time.className="time";
+
+        time.textContent=
+            formatTime(
+                message.created_at
             );
 
-            top.appendChild(
-                time
-            );
 
-            if (message.edited) {
+        top.appendChild(name);
+        top.appendChild(time);
 
-                const edited =
-                    document.createElement(
-                        "span"
-                    );
 
-                edited.className =
-                    "edited";
+        if(message.edited){
 
-                edited.textContent =
-                    "(edited)";
+            const edited=
+                document.createElement("span");
 
-                top.appendChild(
-                    edited
-                );
+            edited.className="edited";
 
-            }
+            edited.textContent=
+                "(edited)";
 
-            content.appendChild(
-                top
-            );
-
-            if (message.message) {
-
-                const text =
-                    document.createElement(
-                        "div"
-                    );
-
-                text.className =
-                    "message-text";
-
-                text.textContent =
-                    message.message;
-
-                content.appendChild(
-                    text
-                );
-
-            }
-
-            if (message.image) {
-
-                const img =
-                    document.createElement(
-                        "img"
-                    );
-
-                img.className =
-                    "message-image";
-
-                img.src =
-                    message.image;
-
-                img.alt =
-                    "Image";
-
-                img.onclick =
-                    () => openImage(
-                        message.image
-                    );
-
-                content.appendChild(
-                    img
-                );
-
-            }
-
-            item.appendChild(
-                avatar
-            );
-
-            item.appendChild(
-                content
-            );
-
-            /*
-               Only the same DEVICE ID can
-               open edit/delete controls.
-            */
-
-            item.addEventListener(
-                "contextmenu",
-                event => {
-
-                    event.preventDefault();
-
-                    if (
-                        String(
-                            message.device_id ||
-                            ""
-                        ) ===
-                        String(
-                            deviceId
-                        )
-                    ) {
-
-                        showContextMenu(
-                            event.clientX,
-                            event.clientY,
-                            message
-                        );
-
-                    }
-
-                }
-            );
-
-            fragment.appendChild(
-                item
-            );
+            top.appendChild(edited);
 
         }
-    );
+
+
+        content.appendChild(top);
+
+
+        if(message.message){
+
+            const text=
+                document.createElement("div");
+
+            text.className=
+                "message-text";
+
+            text.textContent=
+                message.message;
+
+            content.appendChild(text);
+
+        }
+
+
+        if(message.image){
+
+            const img=
+                document.createElement("img");
+
+            img.className=
+                "message-image";
+
+            img.src=
+                message.image;
+
+            img.alt="Image";
+
+            img.onclick=()=>{
+                openImage(
+                    message.image
+                );
+            };
+
+            content.appendChild(img);
+
+        }
+
+
+        item.appendChild(avatar);
+        item.appendChild(content);
+
+
+        /* ONLY YOUR DEVICE */
+
+        item.addEventListener(
+            "contextmenu",
+            event=>{
+
+                event.preventDefault();
+
+                if(
+                    message.device_id ===
+                    deviceId
+                ){
+
+                    showContextMenu(
+                        event.clientX,
+                        event.clientY,
+                        message
+                    );
+
+                }
+
+            }
+        );
+
+
+        fragment.appendChild(item);
+
+    });
+
 
     messagesEl.replaceChildren(
         fragment
     );
 
-    if (wasAtBottom) {
 
-        messagesEl.scrollTop =
+    if(wasBottom){
+
+        messagesEl.scrollTop=
             messagesEl.scrollHeight;
 
     }
@@ -1909,485 +1482,207 @@ function renderMessages() {
 }
 
 
-/* =====================================================
-   CONTEXT MENU
-===================================================== */
+/* CONTEXT MENU */
 
-function showContextMenu(
-    x,
-    y,
-    message
-) {
+function showContextMenu(x,y,message){
 
-    selectedMessage =
-        message;
+    selectedMessage=message;
 
-    contextMenu.style.left =
+    contextMenu.style.left=
         Math.min(
             x,
-            window.innerWidth - 170
-        ) + "px";
+            window.innerWidth-170
+        )+"px";
 
-    contextMenu.style.top =
+    contextMenu.style.top=
         Math.min(
             y,
-            window.innerHeight - 100
-        ) + "px";
+            window.innerHeight-100
+        )+"px";
 
-    contextMenu.classList.add(
-        "show"
-    );
+    contextMenu.classList.add("show");
 
 }
 
 
 document.addEventListener(
     "click",
-    () => {
-
-        contextMenu.classList.remove(
-            "show"
-        );
-
+    ()=>{
+        contextMenu.classList.remove("show");
     }
 );
 
 
-/* =====================================================
-   EDIT
-===================================================== */
+/* EDIT */
 
-editMessageBtn.onclick =
-    async event => {
+editMessageBtn.onclick=
+async e=>{
 
-        event.stopPropagation();
+    e.stopPropagation();
 
-        contextMenu.classList.remove(
-            "show"
+    contextMenu.classList.remove("show");
+
+    if(!selectedMessage)return;
+
+    /* DEVICE CHECK AGAIN */
+
+    if(
+        selectedMessage.device_id !==
+        deviceId
+    ){
+
+        alert(
+            "You can only edit your own messages."
         );
 
-        if (!selectedMessage) {
-            return;
-        }
-
-        /*
-           Double-check DEVICE ID on the
-           client before sending edit.
-        */
-
-        if (
-            String(
-                selectedMessage.device_id ||
-                ""
-            ) !==
-            String(
-                deviceId
-            )
-        ) {
-
-            alert(
-                "You can only edit your own messages."
-            );
-
-            return;
-
-        }
-
-        const newText =
-            prompt(
-                "Edit message:",
-                selectedMessage.message ||
-                ""
-            );
-
-        if (
-            newText === null
-        ) {
-
-            return;
-
-        }
-
-        try {
-
-            const response =
-                await fetch(
-                    API_URL,
-                    {
-
-                        method:
-                            "PATCH",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body:
-                            JSON.stringify({
-
-                                id:
-                                    selectedMessage.id,
-
-                                device_id:
-                                    deviceId,
-
-                                message:
-                                    newText.trim()
-
-                            })
-
-                    }
-                );
-
-            const data =
-                await response.json();
-
-            if (!response.ok) {
-
-                throw new Error(
-                    data.error ||
-                    "Failed to edit message."
-                );
-
-            }
-
-            await loadMessages();
-
-        } catch (error) {
-
-            alert(
-                "Failed to edit:\n\n" +
-                error.message
-            );
-
-        }
-
-    };
-
-
-/* =====================================================
-   DELETE
-===================================================== */
-
-deleteMessageBtn.onclick =
-    event => {
-
-        event.stopPropagation();
-
-        contextMenu.classList.remove(
-            "show"
-        );
-
-        if (!selectedMessage) {
-            return;
-        }
-
-        if (
-            String(
-                selectedMessage.device_id ||
-                ""
-            ) !==
-            String(
-                deviceId
-            )
-        ) {
-
-            alert(
-                "You can only delete your own messages."
-            );
-
-            return;
-
-        }
-
-        openConfirm(
-            "Delete message?",
-            "This message will be permanently removed.",
-            async () => {
-
-                try {
-
-                    const response =
-                        await fetch(
-                            API_URL,
-                            {
-
-                                method:
-                                    "DELETE",
-
-                                headers: {
-                                    "Content-Type":
-                                        "application/json"
-                                },
-
-                                body:
-                                    JSON.stringify({
-
-                                        id:
-                                            selectedMessage.id,
-
-                                        device_id:
-                                            deviceId
-
-                                    })
-
-                            }
-                        );
-
-                    const data =
-                        await response.json();
-
-                    if (!response.ok) {
-
-                        throw new Error(
-                            data.error ||
-                            "Failed to delete message."
-                        );
-
-                    }
-
-                    await loadMessages();
-
-                } catch (error) {
-
-                    alert(
-                        "Failed to delete:\n\n" +
-                        error.message
-                    );
-
-                }
-
-            }
-        );
-
-    };
-
-
-/* =====================================================
-   IMAGE FULLSCREEN
-===================================================== */
-
-function openImage(src) {
-
-    fullImage.src =
-        src;
-
-    imageViewer.classList.add(
-        "show"
-    );
-
-}
-
-
-function closeImage() {
-
-    imageViewer.classList.remove(
-        "show"
-    );
-
-    fullImage.src =
-        "";
-
-}
-
-
-backImage.onclick =
-    closeImage;
-
-
-imageViewer.onclick =
-    event => {
-
-        if (
-            event.target ===
-            imageViewer
-        ) {
-
-            closeImage();
-
-        }
-
-    };
-
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key === "Escape"
-        ) {
-
-            closeImage();
-
-        }
+        return;
 
     }
-);
 
-
-/* =====================================================
-   CONFIRM DIALOG
-===================================================== */
-
-let confirmCallback =
-    null;
-
-
-function openConfirm(
-    title,
-    text,
-    callback
-) {
-
-    dialogTitle.textContent =
-        title;
-
-    dialogText.textContent =
-        text;
-
-    confirmCallback =
-        callback;
-
-    dialogOverlay.classList.add(
-        "show"
-    );
-
-}
-
-
-dialogCancel.onclick =
-    () => {
-
-        dialogOverlay.classList.remove(
-            "show"
+    const newText=
+        prompt(
+            "Edit message:",
+            selectedMessage.message || ""
         );
 
-        confirmCallback =
-            null;
+    if(newText===null)return;
 
-    };
+    try{
 
-
-dialogConfirm.onclick =
-    async () => {
-
-        const callback =
-            confirmCallback;
-
-        dialogOverlay.classList.remove(
-            "show"
-        );
-
-        confirmCallback =
-            null;
-
-        if (callback) {
-
-            await callback();
-
-        }
-
-    };
-
-
-/* =====================================================
-   REMOVE EVERYTHING
-===================================================== */
-
-removeEverything.onclick =
-    () => {
-
-        openConfirm(
-            "Remove everything?",
-            "This will remove every message forever. There will be no messages left in the chat.",
-            () => {
-
-                openConfirm(
-                    "I know",
-                    "You are about to permanently delete every message. Continue only if you understand.",
-                    () => {
-
-                        openConfirm(
-                            "Are you sure?",
-                            "Every stored message will be permanently removed.",
-                            () => {
-
-                                openConfirm(
-                                    "Last time",
-                                    "Are you ultra sure every memory is being removed and has no evidence of existing?",
-                                    permanentlyDeleteEverything
-                                );
-
-                            }
-                        );
-
-                    }
-                );
-
-            }
-        );
-
-    };
-
-
-async function permanentlyDeleteEverything() {
-
-    try {
-
-        const response =
+        const response=
             await fetch(
                 API_URL,
                 {
+                    method:"PATCH",
 
-                    method:
-                        "DELETE",
-
-                    headers: {
+                    headers:{
                         "Content-Type":
                             "application/json"
                     },
 
-                    body:
-                        JSON.stringify({
+                    body:JSON.stringify({
 
-                            delete_all:
-                                true,
+                        id:
+                            selectedMessage.id,
 
-                            device_id:
-                                deviceId
+                        device_id:
+                            deviceId,
 
-                        })
+                        message:
+                            newText.trim()
 
+                    })
                 }
             );
 
-        const data =
+        const data=
             await response.json();
 
-        if (!response.ok) {
+        if(!response.ok){
 
             throw new Error(
                 data.error ||
-                "Failed to remove everything."
+                "Failed to edit."
             );
 
         }
 
-        currentMessages =
-            [];
+        await loadMessages();
 
-        renderMessages();
+    }catch(error){
 
         alert(
-            "All messages were removed."
+            "Failed to edit:\n\n"+
+            error.message
         );
 
-    } catch (error) {
+    }
+
+};
+
+
+/* DELETE */
+
+deleteMessageBtn.onclick=
+e=>{
+
+    e.stopPropagation();
+
+    contextMenu.classList.remove("show");
+
+    if(!selectedMessage)return;
+
+    if(
+        selectedMessage.device_id !==
+        deviceId
+    ){
 
         alert(
-            "Failed to remove everything:\n\n" +
+            "You can only delete your own messages."
+        );
+
+        return;
+
+    }
+
+    openConfirm(
+        "Delete message?",
+        "This message will be permanently removed.",
+        deleteSelectedMessage
+    );
+
+};
+
+
+async function deleteSelectedMessage(){
+
+    if(!selectedMessage)return;
+
+    try{
+
+        const response=
+            await fetch(
+                API_URL,
+                {
+                    method:"DELETE",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        id:
+                            selectedMessage.id,
+
+                        device_id:
+                            deviceId
+
+                    })
+                }
+            );
+
+        const data=
+            await response.json();
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error ||
+                "Failed to delete."
+            );
+
+        }
+
+        selectedMessage=null;
+
+        await loadMessages();
+
+    }catch(error){
+
+        alert(
+            "Failed to delete:\n\n"+
             error.message
         );
 
@@ -2396,67 +1691,219 @@ async function permanentlyDeleteEverything() {
 }
 
 
-/* =====================================================
-   HELPERS
-===================================================== */
+/* IMAGE */
 
-function formatTime(date) {
+function openImage(src){
 
-    if (!date) {
-        return "";
+    fullImage.src=src;
+
+    imageViewer.classList.add("show");
+
+}
+
+function closeImage(){
+
+    imageViewer.classList.remove("show");
+
+    fullImage.src="";
+
+}
+
+backImage.onclick=closeImage;
+
+imageViewer.onclick=e=>{
+
+    if(e.target===imageViewer){
+        closeImage();
     }
 
-    const d =
-        new Date(date);
+};
 
-    return d.toLocaleTimeString(
-        [],
-        {
-            hour: "2-digit",
-            minute: "2-digit"
-        }
-    );
+
+/* CONFIRM */
+
+function openConfirm(
+    title,
+    text,
+    callback
+){
+
+    dialogTitle.textContent=title;
+    dialogText.textContent=text;
+
+    confirmCallback=callback;
+
+    dialogOverlay.classList.add("show");
 
 }
 
 
-function escapeHtml(value) {
+dialogCancel.onclick=()=>{
 
-    return String(value)
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-        .replaceAll(
-            "'",
-            "&#039;"
+    dialogOverlay.classList.remove("show");
+
+    confirmCallback=null;
+
+};
+
+
+dialogConfirm.onclick=async()=>{
+
+    const callback=
+        confirmCallback;
+
+    dialogOverlay.classList.remove("show");
+
+    confirmCallback=null;
+
+    if(callback){
+        await callback();
+    }
+
+};
+
+
+/* GLOBAL REMOVE EVERYTHING */
+
+removeEverything.onclick=()=>{
+
+    openConfirm(
+        "Remove everything?",
+        "This will permanently remove EVERY message from the entire chat for EVERYONE.",
+        ()=>{
+            openConfirm(
+                "I know",
+                "Every stored message will be permanently deleted. This affects every user.",
+                ()=>{
+                    openConfirm(
+                        "Are you sure?",
+                        "There will be no messages left in the database.",
+                        ()=>{
+                            openConfirm(
+                                "Last time",
+                                "Are you ultra sure every memory is being removed and has no evidence of existing?",
+                                permanentlyDeleteEverything
+                            );
+                        }
+                    );
+                }
+            );
+        }
+    );
+
+};
+
+
+/* IMPORTANT:
+   NO DEVICE ID IS SENT HERE.
+   This is intentionally GLOBAL.
+*/
+
+async function permanentlyDeleteEverything(){
+
+    try{
+
+        const response=
+            await fetch(
+                API_URL,
+                {
+                    method:"DELETE",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+                        delete_all:true
+                    })
+                }
+            );
+
+        const data=
+            await response.json();
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error ||
+                "Failed to remove everything."
+            );
+
+        }
+
+        currentMessages=[];
+
+        renderMessages();
+
+        settingsOverlay.classList.remove("show");
+
+        alert(
+            "Every message has been removed for everyone."
+        );
+
+    }catch(error){
+
+        alert(
+            "Failed to remove everything:\n\n"+
+            error.message
+        );
+
+    }
+
+}
+
+
+/* REFRESH */
+
+function startRefreshTimer(){
+
+    if(refreshTimer){
+        clearInterval(refreshTimer);
+    }
+
+    refreshTimer=
+        setInterval(
+            loadMessages,
+            refreshRate
         );
 
 }
 
 
-/* =====================================================
-   START
-===================================================== */
+/* HELPERS */
+
+function formatTime(date){
+
+    if(!date)return "";
+
+    return new Date(date)
+        .toLocaleTimeString(
+            [],
+            {
+                hour:"2-digit",
+                minute:"2-digit"
+            }
+        );
+
+}
+
+
+function escapeHtml(value){
+
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+/* START */
 
 loadMessages();
-
-/*
-   Default:
-   0.5 seconds = 500 ms
-*/
 
 startRefreshTimer();
 
