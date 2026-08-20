@@ -252,7 +252,7 @@ textarea{
 }
 
 .panel{
-    width:min(520px,calc(100vw - 25px));
+    width:min(560px,calc(100vw - 25px));
     max-height:calc(100vh - 25px);
     overflow-y:auto;
     background:var(--panel);
@@ -344,6 +344,13 @@ textarea{
     margin-top:5px;
 }
 
+.info{
+    margin-top:7px;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.45;
+}
+
 .save-btn{
     width:100%;
     margin-top:8px;
@@ -353,6 +360,16 @@ textarea{
     background:var(--accent);
     color:#111;
     font-weight:700;
+}
+
+.permission-btn{
+    width:100%;
+    margin-top:10px;
+    padding:11px;
+    border:1px solid var(--border);
+    border-radius:9px;
+    background:#20252c;
+    color:white;
 }
 
 /* DANGER */
@@ -509,17 +526,21 @@ textarea{
 /* NOTIFICATION STATUS */
 
 .notification-status{
-    margin-top:8px;
+    padding:9px 10px;
+    border-radius:8px;
+    background:#101419;
+    border:1px solid var(--border);
     color:var(--muted);
     font-size:12px;
+    line-height:1.4;
 }
 
-.notification-status.ok{
-    color:#7ddc9b;
+.notification-status.ready{
+    color:#9be7ad;
 }
 
-.notification-status.warn{
-    color:#ffbd6b;
+.notification-status.denied{
+    color:#ff8585;
 }
 
 @media(max-width:600px){
@@ -563,10 +584,7 @@ textarea{
 
 </header>
 
-<main
-    class="messages"
-    id="messages"
-></main>
+<main class="messages" id="messages"></main>
 
 <div class="composer">
 
@@ -605,10 +623,7 @@ textarea{
 
 <!-- SETTINGS -->
 
-<div
-    class="overlay"
-    id="settingsOverlay"
->
+<div class="overlay" id="settingsOverlay">
 
 <div class="panel">
 
@@ -616,10 +631,7 @@ textarea{
 
     <h2>Settings</h2>
 
-    <button
-        class="icon-btn"
-        id="closeSettings"
-    >×</button>
+    <button class="icon-btn" id="closeSettings">×</button>
 
 </div>
 
@@ -653,10 +665,7 @@ textarea{
 
 <label>Device ID</label>
 
-<input
-    id="deviceIdInput"
-    readonly
->
+<input id="deviceIdInput" readonly>
 
 </div>
 
@@ -687,10 +696,7 @@ textarea{
     step="1"
 >
 
-<div
-    class="setting-value"
-    id="textSizeValue"
-></div>
+<div class="setting-value" id="textSizeValue"></div>
 
 </div>
 
@@ -706,10 +712,7 @@ textarea{
     step="1"
 >
 
-<div
-    class="setting-value"
-    id="wordSpacingValue"
-></div>
+<div class="setting-value" id="wordSpacingValue"></div>
 
 </div>
 
@@ -725,10 +728,7 @@ textarea{
     step=".05"
 >
 
-<div
-    class="setting-value"
-    id="lineSpacingValue"
-></div>
+<div class="setting-value" id="lineSpacingValue"></div>
 
 </div>
 
@@ -757,7 +757,7 @@ textarea{
 <option value="3000">3 seconds</option>
 <option value="2000">2 seconds</option>
 <option value="1000">1 second</option>
-<option value="500">0.5 seconds</option>
+<option value="500" selected>0.5 seconds</option>
 <option value="100">0.1 seconds</option>
 </select>
 
@@ -831,10 +831,7 @@ textarea{
     max="25"
 >
 
-<div
-    class="setting-value"
-    id="cornerRadiusValue"
-></div>
+<div class="setting-value" id="cornerRadiusValue"></div>
 
 </div>
 
@@ -850,10 +847,7 @@ textarea{
     step=".05"
 >
 
-<div
-    class="setting-value"
-    id="uiScaleValue"
-></div>
+<div class="setting-value" id="uiScaleValue"></div>
 
 </div>
 
@@ -877,39 +871,127 @@ textarea{
 <label>Notification sound</label>
 
 <select id="notificationSound">
+
 <option value="false">Off</option>
 <option value="true">On</option>
+
 </select>
 
 </div>
+
+
+<div class="setting">
+
+<label>Notification sound type</label>
+
+<select id="notificationType">
+
+<option value="1">1 — Soft Click</option>
+<option value="2">2 — Pop</option>
+<option value="3">3 — Double Beep</option>
+<option value="4">4 — Digital</option>
+<option value="5">5 — Bell</option>
+<option value="6">6 — Chime</option>
+<option value="7">7 — Pulse</option>
+<option value="8">8 — Alert</option>
+<option value="9">9 — Retro</option>
+<option value="10">10 — Deep Ping</option>
+<option value="11">11 — Emergency Alarm</option>
+
+</select>
+
+</div>
+
+
+<div class="setting">
+
+<label>Notification volume</label>
+
+<input
+    id="notificationVolume"
+    type="range"
+    min="0"
+    max="100"
+    step="1"
+>
+
+<div
+    class="setting-value"
+    id="notificationVolumeValue"
+></div>
+
+</div>
+
+
+<div class="setting">
+
+<label>Notification duration</label>
+
+<select id="notificationDuration">
+
+<option value="250">0.25 second</option>
+<option value="500">0.5 second</option>
+<option value="1000">1 second</option>
+<option value="1500">1.5 seconds</option>
+<option value="2000">2 seconds</option>
+<option value="3000">3 seconds</option>
+<option value="5000">5 seconds</option>
+</select>
+
+</div>
+
 
 <div class="setting">
 
 <label>Desktop notifications</label>
 
 <select id="desktopNotifications">
+
 <option value="false">Off</option>
 <option value="true">On</option>
+
 </select>
 
 </div>
+
 
 <div class="setting">
 
 <label>Mention notifications</label>
 
 <select id="mentionNotifications">
+
 <option value="false">Off</option>
 <option value="true">On</option>
+
 </select>
 
 </div>
+
+
+<div class="setting">
 
 <div
     class="notification-status"
     id="notificationStatus"
 >
-Desktop notifications require browser permission.
+Checking notification permission...
+</div>
+
+<button
+    class="permission-btn"
+    id="enableNotifications"
+>
+Enable Windows/Desktop Notifications
+</button>
+
+<button
+    class="permission-btn"
+    id="testNotification"
+>
+Test Notification
+</button>
+
 </div>
 
 </div>
@@ -964,10 +1046,7 @@ Desktop notifications require browser permission.
 </div>
 
 
-<button
-    class="save-btn"
-    id="saveSettings"
->
+<button class="save-btn" id="saveSettings">
 Save settings
 </button>
 
@@ -985,10 +1064,7 @@ Remove every message from the chat permanently.
 This affects everyone using the chat.
 </p>
 
-<button
-    class="danger-btn"
-    id="removeEverything"
->
+<button class="danger-btn" id="removeEverything">
 Remove everything
 </button>
 
@@ -1001,20 +1077,12 @@ Remove everything
 
 <!-- CONTEXT MENU -->
 
-<div
-    class="context-menu"
-    id="contextMenu"
->
+<div class="context-menu" id="contextMenu">
 
-<button id="editMessage">
-    Edit
-</button>
+<button id="editMessage">Edit</button>
 
-<button
-    class="delete-option"
-    id="deleteMessage"
->
-    Delete
+<button class="delete-option" id="deleteMessage">
+Delete
 </button>
 
 </div>
@@ -1022,15 +1090,9 @@ Remove everything
 
 <!-- IMAGE VIEWER -->
 
-<div
-    class="image-viewer"
-    id="imageViewer"
->
+<div class="image-viewer" id="imageViewer">
 
-<button
-    class="back-image"
-    id="backImage"
->
+<button class="back-image" id="backImage">
 ← Back
 </button>
 
@@ -1045,16 +1107,11 @@ Remove everything
 
 <!-- DIALOG -->
 
-<div
-    class="overlay"
-    id="dialogOverlay"
->
+<div class="overlay" id="dialogOverlay">
 
 <div class="dialog">
 
-<h2 id="dialogTitle">
-Confirm
-</h2>
+<h2 id="dialogTitle">Confirm</h2>
 
 <p id="dialogText"></p>
 
@@ -1064,10 +1121,7 @@ Confirm
 Cancel
 </button>
 
-<button
-    class="danger"
-    id="dialogConfirm"
->
+<button class="danger" id="dialogConfirm">
 Yes
 </button>
 
@@ -1091,13 +1145,7 @@ let deviceId=localStorage.getItem("chat_device_id");
 
 if(!deviceId){
 
-    if(window.crypto && crypto.randomUUID){
-        deviceId=crypto.randomUUID();
-    }else{
-        deviceId=
-            Date.now().toString(36)+
-            Math.random().toString(36).substring(2);
-    }
+    deviceId=crypto.randomUUID();
 
     localStorage.setItem(
         "chat_device_id",
@@ -1107,7 +1155,7 @@ if(!deviceId){
 
 
 /* =========================================================
-   SETTINGS
+   SETTINGS DEFAULTS
 ========================================================= */
 
 const defaults={
@@ -1134,6 +1182,12 @@ const defaults={
 
     notificationSound:false,
 
+    notificationType:1,
+
+    notificationVolume:70,
+
+    notificationDuration:1000,
+
     desktopNotifications:false,
 
     mentionNotifications:false,
@@ -1152,14 +1206,18 @@ function getSetting(key){
         localStorage.getItem("chat_"+key);
 
     if(value===null){
+
         return defaults[key];
+
     }
 
     if(
-        value==="true"||
+        value==="true" ||
         value==="false"
     ){
+
         return value==="true";
+
     }
 
     const number=Number(value);
@@ -1246,14 +1304,20 @@ const uiScale=
 const notificationSound=
     document.getElementById("notificationSound");
 
+const notificationType=
+    document.getElementById("notificationType");
+
+const notificationVolume=
+    document.getElementById("notificationVolume");
+
+const notificationDuration=
+    document.getElementById("notificationDuration");
+
 const desktopNotifications=
     document.getElementById("desktopNotifications");
 
 const mentionNotifications=
     document.getElementById("mentionNotifications");
-
-const notificationStatus=
-    document.getElementById("notificationStatus");
 
 const enterToSend=
     document.getElementById("enterToSend");
@@ -1263,6 +1327,15 @@ const autoScroll=
 
 const confirmDelete=
     document.getElementById("confirmDelete");
+
+const enableNotifications=
+    document.getElementById("enableNotifications");
+
+const testNotification=
+    document.getElementById("testNotification");
+
+const notificationStatus=
+    document.getElementById("notificationStatus");
 
 const contextMenu=
     document.getElementById("contextMenu");
@@ -1315,6 +1388,9 @@ const cornerRadiusValue=
 const uiScaleValue=
     document.getElementById("uiScaleValue");
 
+const notificationVolumeValue=
+    document.getElementById("notificationVolumeValue");
+
 
 let selectedFile=null;
 let selectedMessage=null;
@@ -1322,521 +1398,14 @@ let currentMessages=[];
 let confirmCallback=null;
 let refreshTimer=null;
 
-
-/* =========================================================
-   NOTIFICATION SYSTEM
-========================================================= */
-
-let knownMessageIds=
-    new Set();
-
-let notificationsInitialized=false;
-
-
-/*
-   This creates the notification sound without
-   needing an external audio file.
-*/
+let hasLoadedMessages=false;
+let knownMessageIds=new Set();
 
 let audioContext=null;
 
 
-function playNotificationSound(){
-
-    if(!settings.notificationSound){
-        return;
-    }
-
-    try{
-
-        if(
-            !audioContext &&
-            (window.AudioContext||
-             window.webkitAudioContext)
-        ){
-
-            const AudioCtx=
-                window.AudioContext||
-                window.webkitAudioContext;
-
-            audioContext=
-                new AudioCtx();
-        }
-
-        if(!audioContext){
-            return;
-        }
-
-        if(audioContext.state==="suspended"){
-            audioContext.resume();
-        }
-
-        const oscillator=
-            audioContext.createOscillator();
-
-        const gain=
-            audioContext.createGain();
-
-        oscillator.type="sine";
-
-        oscillator.frequency.setValueAtTime(
-            660,
-            audioContext.currentTime
-        );
-
-        oscillator.frequency.exponentialRampToValueAtTime(
-            880,
-            audioContext.currentTime+0.08
-        );
-
-        gain.gain.setValueAtTime(
-            0.0001,
-            audioContext.currentTime
-        );
-
-        gain.gain.exponentialRampToValueAtTime(
-            0.12,
-            audioContext.currentTime+0.01
-        );
-
-        gain.gain.exponentialRampToValueAtTime(
-            0.0001,
-            audioContext.currentTime+0.16
-        );
-
-        oscillator.connect(gain);
-        gain.connect(audioContext.destination);
-
-        oscillator.start();
-
-        oscillator.stop(
-            audioContext.currentTime+0.18
-        );
-
-    }catch(error){
-
-        console.warn(
-            "Notification sound failed:",
-            error
-        );
-
-    }
-}
-
-
-/*
-   Ask for notification permission.
-*/
-
-async function requestNotificationPermission(){
-
-    if(!("Notification" in window)){
-
-        updateNotificationStatus(
-            "Your browser does not support desktop notifications.",
-            "warn"
-        );
-
-        return false;
-    }
-
-    if(Notification.permission==="granted"){
-
-        updateNotificationStatus(
-            "Desktop notifications are allowed.",
-            "ok"
-        );
-
-        return true;
-    }
-
-    if(Notification.permission==="denied"){
-
-        updateNotificationStatus(
-            "Notifications are blocked by your browser. Allow them in browser site settings.",
-            "warn"
-        );
-
-        return false;
-    }
-
-    try{
-
-        const permission=
-            await Notification.requestPermission();
-
-        if(permission==="granted"){
-
-            updateNotificationStatus(
-                "Desktop notifications are allowed.",
-                "ok"
-            );
-
-            return true;
-
-        }else{
-
-            updateNotificationStatus(
-                "Desktop notification permission was not granted.",
-                "warn"
-            );
-
-            return false;
-        }
-
-    }catch(error){
-
-        console.warn(
-            "Notification permission error:",
-            error
-        );
-
-        return false;
-    }
-}
-
-
-function updateNotificationStatus(text,type=""){
-
-    notificationStatus.textContent=text;
-
-    notificationStatus.className=
-        "notification-status "+
-        type;
-}
-
-
-/*
-   Decide if this message should trigger
-   a notification.
-*/
-
-function shouldNotify(message){
-
-    if(!message){
-        return false;
-    }
-
-    /*
-       Never notify yourself.
-    */
-
-    if(
-        message.device_id &&
-        message.device_id===deviceId
-    ){
-        return false;
-    }
-
-    /*
-       If there is no device_id, compare username.
-    */
-
-    if(
-        message.username &&
-        settings.username &&
-        message.username.trim().toLowerCase()===
-        settings.username.trim().toLowerCase()
-    ){
-        return false;
-    }
-
-    /*
-       If desktop notifications are ON,
-       notify every new message.
-    */
-
-    if(settings.desktopNotifications){
-        return true;
-    }
-
-    /*
-       Mention notifications can work independently.
-    */
-
-    if(
-        settings.mentionNotifications &&
-        settings.username &&
-        message.message
-    ){
-
-        const text=
-            String(message.message)
-            .toLowerCase();
-
-        const name=
-            settings.username
-            .trim()
-            .toLowerCase();
-
-        if(name){
-
-            const escaped=
-                name.replace(
-                    /[.*+?^${}()|[\]\\]/g,
-                    "\\$&"
-                );
-
-            const mentionRegex=
-                new RegExp(
-                    "(^|\\s|@)"+escaped+"($|\\s|[.,!?])",
-                    "i"
-                );
-
-            if(mentionRegex.test(text)){
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-
-/*
-   Actually display desktop notification.
-*/
-
-function showDesktopNotification(message){
-
-    if(
-        !settings.desktopNotifications &&
-        !(
-            settings.mentionNotifications &&
-            message.message &&
-            settings.username &&
-            message.message
-                .toLowerCase()
-                .includes(
-                    settings.username.toLowerCase()
-                )
-        )
-    ){
-        return;
-    }
-
-    if(!("Notification" in window)){
-        return;
-    }
-
-    if(Notification.permission!=="granted"){
-        return;
-    }
-
-    const username=
-        message.username||
-        "Someone";
-
-    let body=
-        message.message||
-        "Sent an image";
-
-    /*
-       Prevent extremely large notifications.
-    */
-
-    if(body.length>180){
-        body=
-            body.substring(0,177)+"...";
-    }
-
-    try{
-
-        const notification=
-            new Notification(
-                username+
-                " in #"+
-                CHANNEL,
-                {
-                    body:body,
-                    tag:"chat-"+String(message.id),
-                    renotify:false,
-                    silent:true
-                }
-            );
-
-        notification.onclick=()=>{
-
-            window.focus();
-
-            notification.close();
-
-        };
-
-        setTimeout(()=>{
-
-            try{
-                notification.close();
-            }catch(e){}
-
-        },8000);
-
-    }catch(error){
-
-        console.warn(
-            "Desktop notification failed:",
-            error
-        );
-
-    }
-}
-
-
-/*
-   Process newly received messages.
-*/
-
-function processNotifications(messages){
-
-    if(!Array.isArray(messages)){
-        return;
-    }
-
-    /*
-       First load:
-       remember everything but DO NOT notify.
-    */
-
-    if(!notificationsInitialized){
-
-        knownMessageIds.clear();
-
-        messages.forEach(message=>{
-
-            if(message && message.id!==undefined){
-
-                knownMessageIds.add(
-                    String(message.id)
-                );
-
-            }
-
-        });
-
-        notificationsInitialized=true;
-
-        return;
-    }
-
-
-    const newMessages=[];
-
-    messages.forEach(message=>{
-
-        if(!message || message.id===undefined){
-            return;
-        }
-
-        const id=
-            String(message.id);
-
-        if(!knownMessageIds.has(id)){
-
-            knownMessageIds.add(id);
-
-            newMessages.push(message);
-        }
-
-    });
-
-
-    /*
-       Keep the set from growing forever.
-    */
-
-    if(knownMessageIds.size>1000){
-
-        const ids=
-            Array.from(
-                knownMessageIds
-            ).slice(-500);
-
-        knownMessageIds=
-            new Set(ids);
-    }
-
-
-    newMessages.forEach(message=>{
-
-        if(!shouldNotify(message)){
-            return;
-        }
-
-        /*
-           Mention or normal notification.
-        */
-
-        playNotificationSound();
-
-        showDesktopNotification(message);
-
-    });
-}
-
-
-/*
-   When notification settings are switched on,
-   request browser permission.
-*/
-
-desktopNotifications.onchange=async()=>{
-
-    if(desktopNotifications.value==="true"){
-
-        await requestNotificationPermission();
-
-    }else{
-
-        updateNotificationStatus(
-            "Desktop notifications are off."
-        );
-
-    }
-};
-
-
-/*
-   Also initialize notification status.
-*/
-
-async function initializeNotificationSettings(){
-
-    if(!("Notification" in window)){
-
-        updateNotificationStatus(
-            "Your browser does not support desktop notifications.",
-            "warn"
-        );
-
-        return;
-    }
-
-    if(Notification.permission==="granted"){
-
-        updateNotificationStatus(
-            "Desktop notifications are allowed.",
-            "ok"
-        );
-
-    }else if(Notification.permission==="denied"){
-
-        updateNotificationStatus(
-            "Notifications are blocked by your browser.",
-            "warn"
-        );
-
-    }else{
-
-        updateNotificationStatus(
-            "Turn Desktop notifications on and save settings to allow notifications."
-        );
-
-    }
-}
-
-
 /* =========================================================
-   APPLY SETTINGS
+   SETTINGS
 ========================================================= */
 
 function applySettings(){
@@ -1872,7 +1441,7 @@ function applySettings(){
 
     startRefreshTimer();
 
-    initializeNotificationSettings();
+    updateNotificationStatus();
 }
 
 
@@ -1909,8 +1478,7 @@ function applyTheme(name){
     };
 
     const t=
-        themes[name]||
-        themes.dark;
+        themes[name]||themes.dark;
 
     document.documentElement.style.setProperty(
         "--bg",
@@ -1942,7 +1510,7 @@ function loadSettingsUI(){
         settings.theme;
 
     refreshRate.value=
-        String(settings.refreshRate);
+        settings.refreshRate;
 
     showTimestamps.value=
         String(settings.showTimestamps);
@@ -1968,6 +1536,15 @@ function loadSettingsUI(){
     notificationSound.value=
         String(settings.notificationSound);
 
+    notificationType.value=
+        settings.notificationType;
+
+    notificationVolume.value=
+        settings.notificationVolume;
+
+    notificationDuration.value=
+        settings.notificationDuration;
+
     desktopNotifications.value=
         String(settings.desktopNotifications);
 
@@ -1985,7 +1562,7 @@ function loadSettingsUI(){
 
     updateRangeLabels();
 
-    initializeNotificationSettings();
+    updateNotificationStatus();
 }
 
 
@@ -2004,9 +1581,10 @@ function updateRangeLabels(){
         settings.cornerRadius+"px";
 
     uiScaleValue.textContent=
-        Math.round(
-            settings.uiScale*100
-        )+"%";
+        Math.round(settings.uiScale*100)+"%";
+
+    notificationVolumeValue.textContent=
+        settings.notificationVolume+"%";
 }
 
 
@@ -2018,27 +1596,18 @@ settingsBtn.onclick=()=>{
 
     loadSettingsUI();
 
-    settingsOverlay.classList.add(
-        "show"
-    );
+    settingsOverlay.classList.add("show");
 
 };
-
 
 closeSettings.onclick=()=>{
 
-    settingsOverlay.classList.remove(
-        "show"
-    );
+    settingsOverlay.classList.remove("show");
 
 };
 
 
-saveSettings.onclick=async()=>{
-
-    const oldDesktopNotifications=
-        settings.desktopNotifications;
-
+saveSettings.onclick=()=>{
 
     settings.username=
         usernameInput.value
@@ -2075,6 +1644,15 @@ saveSettings.onclick=async()=>{
     settings.notificationSound=
         notificationSound.value==="true";
 
+    settings.notificationType=
+        Number(notificationType.value);
+
+    settings.notificationVolume=
+        Number(notificationVolume.value);
+
+    settings.notificationDuration=
+        Number(notificationDuration.value);
+
     settings.desktopNotifications=
         desktopNotifications.value==="true";
 
@@ -2101,26 +1679,9 @@ saveSettings.onclick=async()=>{
     });
 
 
-    /*
-       Ask permission immediately when
-       desktop notifications are enabled.
-    */
-
-    if(
-        settings.desktopNotifications &&
-        !oldDesktopNotifications
-    ){
-
-        await requestNotificationPermission();
-
-    }
-
-
     applySettings();
 
-    settingsOverlay.classList.remove(
-        "show"
-    );
+    settingsOverlay.classList.remove("show");
 
 };
 
@@ -2136,8 +1697,8 @@ document
     btn.onclick=()=>{
 
         btn.parentElement
-            .classList
-            .toggle("open");
+        .classList
+        .toggle("open");
 
     };
 
@@ -2145,7 +1706,7 @@ document
 
 
 /* =========================================================
-   RANGE PREVIEW
+   RANGE PREVIEWS
 ========================================================= */
 
 textSize.oninput=()=>{
@@ -2155,14 +1716,12 @@ textSize.oninput=()=>{
 
 };
 
-
 wordSpacing.oninput=()=>{
 
     wordSpacingValue.textContent=
         wordSpacing.value+"px";
 
 };
-
 
 lineSpacing.oninput=()=>{
 
@@ -2171,7 +1730,6 @@ lineSpacing.oninput=()=>{
 
 };
 
-
 cornerRadius.oninput=()=>{
 
     cornerRadiusValue.textContent=
@@ -2179,13 +1737,788 @@ cornerRadius.oninput=()=>{
 
 };
 
-
 uiScale.oninput=()=>{
 
     uiScaleValue.textContent=
         Math.round(
             uiScale.value*100
         )+"%";
+
+};
+
+notificationVolume.oninput=()=>{
+
+    notificationVolumeValue.textContent=
+        notificationVolume.value+"%";
+
+};
+
+
+/* =========================================================
+   AUDIO ENGINE
+========================================================= */
+
+function getAudioContext(){
+
+    if(!audioContext){
+
+        const AudioContextClass=
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+        if(!AudioContextClass){
+            return null;
+        }
+
+        audioContext=
+            new AudioContextClass();
+
+    }
+
+    if(audioContext.state==="suspended"){
+
+        audioContext.resume().catch(()=>{});
+
+    }
+
+    return audioContext;
+}
+
+
+function tone(
+    ctx,
+    destination,
+    frequency,
+    start,
+    duration,
+    type="sine",
+    volume=0.15
+){
+
+    const oscillator=
+        ctx.createOscillator();
+
+    const gain=
+        ctx.createGain();
+
+    oscillator.type=type;
+
+    oscillator.frequency.setValueAtTime(
+        frequency,
+        start
+    );
+
+    gain.gain.setValueAtTime(
+        0,
+        start
+    );
+
+    gain.gain.linearRampToValueAtTime(
+        volume,
+        start+0.015
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        start+Math.max(duration,0.03)
+    );
+
+    oscillator.connect(gain);
+
+    gain.connect(destination);
+
+    oscillator.start(start);
+
+    oscillator.stop(
+        start+Math.max(duration,0.04)
+    );
+}
+
+
+/*
+    11 different notification sounds.
+
+    #11 is a fictional emergency alarm,
+    not a reproduction of a real-world warning signal.
+*/
+
+function playNotificationSound(){
+
+    if(!settings.notificationSound){
+        return;
+    }
+
+    const ctx=getAudioContext();
+
+    if(!ctx){
+        return;
+    }
+
+    const master=
+        ctx.createGain();
+
+    const volume=
+        Math.max(
+            0,
+            Math.min(
+                100,
+                settings.notificationVolume
+            )
+        )/100;
+
+    master.gain.value=
+        volume*0.22;
+
+    master.connect(
+        ctx.destination
+    );
+
+    const now=
+        ctx.currentTime+0.01;
+
+    const maxDuration=
+        Math.max(
+            0.1,
+            Number(settings.notificationDuration)/1000
+        );
+
+    const type=
+        Number(settings.notificationType);
+
+
+    if(type===1){
+
+        /* Soft click */
+
+        tone(
+            ctx,
+            master,
+            900,
+            now,
+            Math.min(.12,maxDuration),
+            "sine",
+            .7
+        );
+
+    }
+
+
+    else if(type===2){
+
+        /* Pop */
+
+        tone(
+            ctx,
+            master,
+            520,
+            now,
+            Math.min(.14,maxDuration),
+            "sine",
+            .8
+        );
+
+        tone(
+            ctx,
+            master,
+            760,
+            now+.04,
+            Math.min(.12,maxDuration-.04),
+            "sine",
+            .5
+        );
+
+    }
+
+
+    else if(type===3){
+
+        /* Double beep */
+
+        tone(
+            ctx,
+            master,
+            700,
+            now,
+            Math.min(.13,maxDuration),
+            "square",
+            .5
+        );
+
+        if(maxDuration>.18){
+
+            tone(
+                ctx,
+                master,
+                900,
+                now+.16,
+                Math.min(.13,maxDuration-.16),
+                "square",
+                .5
+            );
+
+        }
+
+    }
+
+
+    else if(type===4){
+
+        /* Digital */
+
+        tone(
+            ctx,
+            master,
+            1000,
+            now,
+            Math.min(.08,maxDuration),
+            "square",
+            .45
+        );
+
+        if(maxDuration>.12){
+
+            tone(
+                ctx,
+                master,
+                650,
+                now+.1,
+                Math.min(.08,maxDuration-.1),
+                "square",
+                .45
+            );
+
+        }
+
+        if(maxDuration>.24){
+
+            tone(
+                ctx,
+                master,
+                1200,
+                now+.2,
+                Math.min(.08,maxDuration-.2),
+                "square",
+                .45
+            );
+
+        }
+
+    }
+
+
+    else if(type===5){
+
+        /* Bell */
+
+        tone(
+            ctx,
+            master,
+            620,
+            now,
+            Math.min(.7,maxDuration),
+            "sine",
+            .75
+        );
+
+        tone(
+            ctx,
+            master,
+            930,
+            now+.015,
+            Math.min(.55,maxDuration),
+            "sine",
+            .4
+        );
+
+    }
+
+
+    else if(type===6){
+
+        /* Chime */
+
+        tone(
+            ctx,
+            master,
+            523.25,
+            now,
+            Math.min(.35,maxDuration),
+            "sine",
+            .55
+        );
+
+        if(maxDuration>.15){
+
+            tone(
+                ctx,
+                master,
+                659.25,
+                now+.13,
+                Math.min(.35,maxDuration-.13),
+                "sine",
+                .5
+            );
+
+        }
+
+        if(maxDuration>.3){
+
+            tone(
+                ctx,
+                master,
+                783.99,
+                now+.26,
+                Math.min(.4,maxDuration-.26),
+                "sine",
+                .45
+            );
+
+        }
+
+    }
+
+
+    else if(type===7){
+
+        /* Pulse */
+
+        tone(
+            ctx,
+            master,
+            400,
+            now,
+            Math.min(.12,maxDuration),
+            "triangle",
+            .8
+        );
+
+        if(maxDuration>.2){
+
+            tone(
+                ctx,
+                master,
+                400,
+                now+.2,
+                Math.min(.12,maxDuration-.2),
+                "triangle",
+                .8
+            );
+
+        }
+
+    }
+
+
+    else if(type===8){
+
+        /* Alert */
+
+        tone(
+            ctx,
+            master,
+            880,
+            now,
+            Math.min(.22,maxDuration),
+            "square",
+            .5
+        );
+
+        if(maxDuration>.27){
+
+            tone(
+                ctx,
+                master,
+                660,
+                now+.25,
+                Math.min(.22,maxDuration-.25),
+                "square",
+                .5
+            );
+
+        }
+
+    }
+
+
+    else if(type===9){
+
+        /* Retro */
+
+        tone(
+            ctx,
+            master,
+            440,
+            now,
+            Math.min(.1,maxDuration),
+            "square",
+            .45
+        );
+
+        if(maxDuration>.13){
+
+            tone(
+                ctx,
+                master,
+                660,
+                now+.12,
+                Math.min(.1,maxDuration-.12),
+                "square",
+                .45
+            );
+
+        }
+
+        if(maxDuration>.26){
+
+            tone(
+                ctx,
+                master,
+                880,
+                now+.25,
+                Math.min(.1,maxDuration-.25),
+                "square",
+                .45
+            );
+
+        }
+
+    }
+
+
+    else if(type===10){
+
+        /* Deep ping */
+
+        tone(
+            ctx,
+            master,
+            220,
+            now,
+            Math.min(.55,maxDuration),
+            "sine",
+            .8
+        );
+
+        tone(
+            ctx,
+            master,
+            440,
+            now+.04,
+            Math.min(.4,maxDuration-.04),
+            "sine",
+            .3
+        );
+
+    }
+
+
+    else if(type===11){
+
+        /*
+            Fictional emergency alarm.
+
+            Uses an escalating alternating warning
+            tone rather than reproducing an actual
+            nuclear/public-warning siren.
+        */
+
+        const step=
+            Math.min(
+                .7,
+                Math.max(
+                    .18,
+                    maxDuration/4
+                )
+            );
+
+        let position=0;
+
+        let high=true;
+
+        while(position<maxDuration){
+
+            const length=
+                Math.min(
+                    step,
+                    maxDuration-position
+                );
+
+            tone(
+                ctx,
+                master,
+                high ? 760 : 430,
+                now+position,
+                length,
+                "sawtooth",
+                .38
+            );
+
+            high=!high;
+
+            position+=length+.035;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   ENABLE AUDIO ON USER INTERACTION
+========================================================= */
+
+document.addEventListener(
+    "click",
+    ()=>{
+        getAudioContext();
+    },
+    {once:true}
+);
+
+
+/* =========================================================
+   DESKTOP / WINDOWS NOTIFICATIONS
+========================================================= */
+
+function updateNotificationStatus(){
+
+    if(!("Notification" in window)){
+
+        notificationStatus.textContent=
+            "Desktop notifications are not supported by this browser.";
+
+        notificationStatus.className=
+            "notification-status denied";
+
+        return;
+    }
+
+
+    if(Notification.permission==="granted"){
+
+        notificationStatus.textContent=
+            "✓ Desktop notifications are enabled.";
+
+        notificationStatus.className=
+            "notification-status ready";
+
+    }
+
+    else if(Notification.permission==="denied"){
+
+        notificationStatus.textContent=
+            "Notifications are blocked. Allow them in your browser/site permissions.";
+
+        notificationStatus.className=
+            "notification-status denied";
+
+    }
+
+    else{
+
+        notificationStatus.textContent=
+            "Desktop notifications are not enabled yet.";
+
+        notificationStatus.className=
+            "notification-status";
+
+    }
+
+}
+
+
+async function requestNotificationPermission(){
+
+    if(!("Notification" in window)){
+
+        alert(
+            "Desktop notifications are not supported by this browser."
+        );
+
+        return false;
+    }
+
+
+    try{
+
+        const permission=
+            await Notification.requestPermission();
+
+        updateNotificationStatus();
+
+        return permission==="granted";
+
+    }catch(error){
+
+        console.error(
+            "Notification permission error:",
+            error
+        );
+
+        return false;
+
+    }
+
+}
+
+
+function showDesktopNotification(message){
+
+    if(
+        !settings.desktopNotifications
+    ){
+        return;
+    }
+
+
+    if(
+        !("Notification" in window)
+    ){
+        return;
+    }
+
+
+    if(
+        Notification.permission!=="granted"
+    ){
+        return;
+    }
+
+
+    /*
+        This uses the browser Notification API.
+        On Windows, supported browsers normally
+        display it through the Windows notification system.
+    */
+
+    try{
+
+        const title=
+            message.username||
+            "New message";
+
+        let body=
+            message.message||
+            "Sent an image";
+
+
+        if(body.length>180){
+
+            body=
+                body.substring(0,180)+"…";
+
+        }
+
+
+        const notification=
+            new Notification(
+                title,
+                {
+                    body:body,
+                    tag:"chat-"+message.id,
+                    renotify:true,
+                    silent:true
+                }
+            );
+
+
+        notification.onclick=()=>{
+
+            window.focus();
+
+            notification.close();
+
+        };
+
+    }catch(error){
+
+        console.error(
+            "Desktop notification error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   TEST NOTIFICATION
+========================================================= */
+
+testNotification.onclick=async()=>{
+
+    /*
+        A user click unlocks browser audio.
+    */
+
+    getAudioContext();
+
+    playNotificationSound();
+
+
+    if(
+        desktopNotifications.value==="true"
+    ){
+
+        settings.desktopNotifications=true;
+
+        if(
+            Notification.permission!=="granted"
+        ){
+
+            const allowed=
+                await requestNotificationPermission();
+
+            if(!allowed){
+                return;
+            }
+
+        }
+
+
+        showDesktopNotification({
+
+            id:"test-"+Date.now(),
+
+            username:"Chat",
+
+            message:
+                "This is a test notification."
+
+        });
+
+    }
+
+};
+
+
+/* =========================================================
+   ENABLE NOTIFICATIONS BUTTON
+========================================================= */
+
+enableNotifications.onclick=async()=>{
+
+    getAudioContext();
+
+    const allowed=
+        await requestNotificationPermission();
+
+    if(allowed){
+
+        settings.desktopNotifications=true;
+
+        desktopNotifications.value="true";
+
+        localStorage.setItem(
+            "chat_desktopNotifications",
+            "true"
+        );
+
+        updateNotificationStatus();
+
+    }
 
 };
 
@@ -2198,8 +2531,7 @@ messageInput.addEventListener(
     "input",
     ()=>{
 
-        messageInput.style.height=
-            "auto";
+        messageInput.style.height="auto";
 
         messageInput.style.height=
             Math.min(
@@ -2225,8 +2557,7 @@ attachBtn.onclick=()=>{
 imageInput.onchange=()=>{
 
     selectedFile=
-        imageInput.files[0]||
-        null;
+        imageInput.files[0]||null;
 
     attachBtn.textContent=
         selectedFile
@@ -2263,8 +2594,9 @@ function resizeImage(file){
 
                     const max=1500;
 
+
                     if(
-                        width>max||
+                        width>max ||
                         height>max
                     ){
 
@@ -2283,7 +2615,9 @@ function resizeImage(file){
                             Math.round(
                                 height*scale
                             );
+
                     }
+
 
                     const canvas=
                         document.createElement(
@@ -2296,10 +2630,12 @@ function resizeImage(file){
                     canvas.height=
                         height;
 
+
                     const ctx=
                         canvas.getContext(
                             "2d"
                         );
+
 
                     ctx.drawImage(
                         img,
@@ -2308,6 +2644,7 @@ function resizeImage(file){
                         width,
                         height
                     );
+
 
                     resolve(
                         canvas.toDataURL(
@@ -2318,23 +2655,22 @@ function resizeImage(file){
 
                 };
 
-                img.onerror=
-                    reject;
+
+                img.onerror=reject;
 
                 img.src=
                     reader.result;
 
             };
 
-            reader.onerror=
-                reject;
 
-            reader.readAsDataURL(
-                file
-            );
+            reader.onerror=reject;
+
+            reader.readAsDataURL(file);
 
         }
     );
+
 }
 
 
@@ -2386,8 +2722,13 @@ async function sendMessage(){
     }
 
 
-    if(!text&&!selectedFile){
+    if(
+        !text &&
+        !selectedFile
+    ){
+
         return;
+
     }
 
 
@@ -2439,6 +2780,7 @@ async function sendMessage(){
                                 deviceId
 
                         })
+
                 }
             );
 
@@ -2480,7 +2822,6 @@ async function sendMessage(){
             error.message
         );
 
-
     }finally{
 
         sendBtn.disabled=false;
@@ -2491,7 +2832,7 @@ async function sendMessage(){
 
 
 /* =========================================================
-   LOAD
+   LOAD MESSAGES
 ========================================================= */
 
 async function loadMessages(){
@@ -2522,24 +2863,111 @@ async function loadMessages(){
         }
 
 
-        const newMessages=
+        const incoming=
             Array.isArray(data.messages)
             ?data.messages
             :[];
 
 
         /*
-           Process notifications BEFORE
-           replacing current messages.
+            First load establishes the known messages.
+            This prevents every old message from producing
+            a notification when the page starts.
         */
 
-        processNotifications(
-            newMessages
-        );
+        if(!hasLoadedMessages){
+
+            incoming.forEach(message=>{
+
+                knownMessageIds.add(
+                    String(message.id)
+                );
+
+            });
+
+            hasLoadedMessages=true;
+
+        }
+
+        else{
+
+            incoming.forEach(message=>{
+
+                const id=
+                    String(message.id);
+
+
+                if(
+                    !knownMessageIds.has(id)
+                ){
+
+                    knownMessageIds.add(id);
+
+
+                    const fromMe=
+                        message.device_id &&
+                        message.device_id===deviceId;
+
+
+                    const mentionsMe=
+                        message.message &&
+                        settings.username &&
+                        message.message
+                        .toLowerCase()
+                        .includes(
+                            "@"+
+                            settings.username
+                            .toLowerCase()
+                        );
+
+
+                    if(!fromMe){
+
+                        const shouldNotify=
+                            settings.mentionNotifications
+                            ?mentionsMe
+                            :true;
+
+
+                        if(shouldNotify){
+
+                            playNotificationSound();
+
+                            showDesktopNotification(
+                                message
+                            );
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+
+            /*
+                Prevent the set from growing forever.
+            */
+
+            if(
+                knownMessageIds.size>1000
+            ){
+
+                knownMessageIds=
+                    new Set(
+                        incoming.map(
+                            m=>String(m.id)
+                        )
+                    );
+
+            }
+
+        }
 
 
         currentMessages=
-            newMessages;
+            incoming;
 
 
         renderMessages();
@@ -2581,7 +3009,8 @@ function renderMessages(){
     const wasBottom=
         messagesEl.scrollHeight-
         messagesEl.scrollTop-
-        messagesEl.clientHeight<100;
+        messagesEl.clientHeight
+        <100;
 
 
     if(!currentMessages.length){
@@ -2605,6 +3034,7 @@ function renderMessages(){
         `;
 
         return;
+
     }
 
 
@@ -2620,13 +3050,19 @@ function renderMessages(){
                     "div"
                 );
 
+
             item.className=
-                "message"+
-                (
-                    settings.compactMessages
-                    ?" compact"
-                    :""
+                "message";
+
+
+            if(settings.compactMessages){
+
+                item.classList.add(
+                    "compact"
                 );
+
+            }
+
 
             item.dataset.id=
                 message.id;
@@ -2637,14 +3073,13 @@ function renderMessages(){
                     "div"
                 );
 
+
             avatar.className=
                 "avatar";
 
+
             avatar.textContent=
-                (
-                    message.username||
-                    "?"
-                )
+                (message.username||"?")
                 .charAt(0)
                 .toUpperCase();
 
@@ -2653,6 +3088,7 @@ function renderMessages(){
                 document.createElement(
                     "div"
                 );
+
 
             content.className=
                 "message-content";
@@ -2663,6 +3099,7 @@ function renderMessages(){
                     "div"
                 );
 
+
             top.className=
                 "message-top";
 
@@ -2672,12 +3109,15 @@ function renderMessages(){
                     "span"
                 );
 
+
             name.className=
                 "username";
+
 
             name.textContent=
                 message.username||
                 "User";
+
 
             top.appendChild(name);
 
@@ -2689,13 +3129,16 @@ function renderMessages(){
                         "span"
                     );
 
+
                 time.className=
                     "time";
+
 
                 time.textContent=
                     formatTime(
                         message.created_at
                     );
+
 
                 top.appendChild(time);
 
@@ -2709,13 +3152,18 @@ function renderMessages(){
                         "span"
                     );
 
+
                 edited.className=
                     "edited";
+
 
                 edited.textContent=
                     "(edited)";
 
-                top.appendChild(edited);
+
+                top.appendChild(
+                    edited
+                );
 
             }
 
@@ -2730,13 +3178,18 @@ function renderMessages(){
                         "div"
                     );
 
+
                 text.className=
                     "message-text";
+
 
                 text.textContent=
                     message.message;
 
-                content.appendChild(text);
+
+                content.appendChild(
+                    text
+                );
 
             }
 
@@ -2748,14 +3201,18 @@ function renderMessages(){
                         "img"
                     );
 
+
                 img.className=
                     "message-image";
+
 
                 img.src=
                     message.image;
 
+
                 img.alt=
                     "Image";
+
 
                 img.onclick=()=>{
 
@@ -2765,19 +3222,26 @@ function renderMessages(){
 
                 };
 
-                content.appendChild(img);
+
+                content.appendChild(
+                    img
+                );
 
             }
 
 
-            item.appendChild(avatar);
+            item.appendChild(
+                avatar
+            );
 
-            item.appendChild(content);
+            item.appendChild(
+                content
+            );
 
 
             /*
-               Only your own messages can be
-               edited/deleted.
+                Only allow the normal context menu
+                for your own messages.
             */
 
             if(
@@ -2803,7 +3267,9 @@ function renderMessages(){
             }
 
 
-            fragment.appendChild(item);
+            fragment.appendChild(
+                item
+            );
 
         }
     );
@@ -2896,8 +3362,7 @@ editMessageBtn.onclick=
         const newText=
             prompt(
                 "Edit message:",
-                selectedMessage.message||
-                ""
+                selectedMessage.message||""
             );
 
 
@@ -2932,6 +3397,7 @@ editMessageBtn.onclick=
                                     newText.trim()
 
                             })
+
                     }
                 );
 
@@ -2966,7 +3432,7 @@ editMessageBtn.onclick=
 
 
 /* =========================================================
-   DELETE OWN MESSAGE
+   DELETE
 ========================================================= */
 
 deleteMessageBtn.onclick=
@@ -3031,6 +3497,7 @@ async function deleteSelectedMessage(){
                                 deviceId
 
                         })
+
                 }
             );
 
@@ -3132,7 +3599,7 @@ document.addEventListener(
 
 
 /* =========================================================
-   CONFIRM DIALOG
+   CONFIRM
 ========================================================= */
 
 function openConfirm(
@@ -3178,6 +3645,7 @@ dialogConfirm.onclick=
         dialogOverlay.classList.remove(
             "show"
         );
+
 
         confirmCallback=null;
 
@@ -3253,6 +3721,7 @@ async function permanentlyDeleteEverything(){
                         JSON.stringify({
                             delete_all:true
                         })
+
                 }
             );
 
@@ -3310,26 +3779,12 @@ function startRefreshTimer(){
     }
 
 
-    let rate=
-        Number(
-            settings.refreshRate
-        );
-
-
-    if(
-        !Number.isFinite(rate)||
-        rate<100
-    ){
-
-        rate=500;
-
-    }
-
-
     refreshTimer=
         setInterval(
             loadMessages,
-            rate
+            Number(
+                settings.refreshRate
+            )
         );
 
 }
@@ -3346,22 +3801,9 @@ function formatTime(date){
     }
 
 
-    const parsed=
-        new Date(date);
-
-
-    if(
-        Number.isNaN(
-            parsed.getTime()
-        )
-    ){
-
-        return "";
-
-    }
-
-
-    return parsed.toLocaleTimeString(
+    return new Date(
+        date
+    ).toLocaleTimeString(
         [],
         {
             hour:"2-digit",
@@ -3402,43 +3844,6 @@ function escapeHtml(value){
         );
 
 }
-
-
-/* =========================================================
-   ACTIVATE AUDIO AFTER USER INTERACTION
-========================================================= */
-
-document.addEventListener(
-    "click",
-    ()=>{
-
-        if(
-            settings.notificationSound &&
-            !audioContext &&
-            (
-                window.AudioContext||
-                window.webkitAudioContext
-            )
-        ){
-
-            try{
-
-                const AudioCtx=
-                    window.AudioContext||
-                    window.webkitAudioContext;
-
-                audioContext=
-                    new AudioCtx();
-
-            }catch(error){}
-
-        }
-
-    },
-    {
-        once:false
-    }
-);
 
 
 /* =========================================================
