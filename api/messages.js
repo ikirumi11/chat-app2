@@ -37,7 +37,7 @@ export default async function handler(req, res) {
 
         // YOUR PUBLISHABLE KEY
         const supabaseKey =
-            "YOUR_SB_PUBLISHABLE_KEY_HERE";
+            "sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL";
 
 
         // =====================================================
