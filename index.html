@@ -753,6 +753,53 @@ textarea{
     margin-top:3px;
 }
 
+/* GAME SETTINGS - LOBBY */
+
+.game-settings{
+    background:#0d1015;
+    border-radius:10px;
+    padding:12px;
+    margin:10px 0;
+}
+
+.game-settings h4{
+    margin:0 0 10px 0;
+    color:#aab2bd;
+    font-size:13px;
+    font-weight:600;
+}
+
+.game-settings-row{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin:6px 0;
+}
+
+.game-settings-row label{
+    color:#aab2bd;
+    font-size:12px;
+    min-width:70px;
+}
+
+.game-settings-row select,
+.game-settings-row input[type=number]{
+    background:#1a1f26;
+    border:1px solid var(--border);
+    border-radius:6px;
+    color:white;
+    padding:5px 10px;
+    font-size:12px;
+    flex:1;
+    min-width:80px;
+}
+
+.game-settings-row input[type=number]{
+    width:80px;
+    flex:none;
+}
+
 /* DANGER */
 
 .danger-zone{
@@ -885,6 +932,15 @@ textarea{
     .type-sentence{
         font-size:18px;
         padding:15px;
+    }
+
+    .game-settings-row{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .game-settings-row label{
+        min-width:auto;
     }
 }
 </style>
@@ -2647,16 +2703,11 @@ async function createGame(gameType){
 
         winner:null,
 
-        data:{}
+        data:{
+            // Game settings will be stored here
+            settings: getDefaultSettings(gameType)
+        }
     };
-
-    // Game-specific options
-    if (gameType === "ttt") {
-        game.data.boardSize = 3;
-    }
-    if (gameType === "fourrow") {
-        game.data.boardSize = "7x6";
-    }
 
     try{
 
@@ -2677,6 +2728,28 @@ async function createGame(gameType){
             error.message
         );
     }
+}
+
+function getDefaultSettings(gameType){
+    const settings = {
+        ttt: {
+            boardSize: 3
+        },
+        fourrow: {
+            boardSize: "7x6"
+        },
+        reaction: {
+            rounds: 1
+        },
+        type: {
+            sentenceCount: 1
+        },
+        boss: {
+            bossHealth: 100000000,
+            upgradeCostMultiplier: 1
+        }
+    };
+    return settings[gameType] || {};
 }
 
 
@@ -2773,6 +2846,15 @@ function createGameElement(game){
     });
     body.appendChild(players);
 
+    // GAME SETTINGS - Only show in lobby to host
+    if (game.status === "lobby" && game.hostDeviceId === deviceId) {
+        const settingsDiv = document.createElement("div");
+        settingsDiv.className = "game-settings";
+        settingsDiv.innerHTML = `<h4>⚙️ Game Settings (Host only)</h4>`;
+        settingsDiv.appendChild(createSettingsUI(game));
+        body.appendChild(settingsDiv);
+    }
+
     // Turn banner
     if (game.status === "playing") {
         const turn = document.createElement("div");
@@ -2853,6 +2935,168 @@ function createGameElement(game){
 
 
 /* =====================================================
+   CREATE SETTINGS UI
+===================================================== */
+
+function createSettingsUI(game){
+    const container = document.createElement("div");
+    const gameType = game.gameType;
+    const settings = game.data.settings || {};
+
+    if (gameType === "ttt") {
+        // Tic-Tac-Toe: Board size 3-6
+        const row = document.createElement("div");
+        row.className = "game-settings-row";
+        row.innerHTML = `
+            <label>Board Size:</label>
+            <select id="tttSize">
+                <option value="3" ${settings.boardSize === 3 ? 'selected' : ''}>3x3</option>
+                <option value="4" ${settings.boardSize === 4 ? 'selected' : ''}>4x4</option>
+                <option value="5" ${settings.boardSize === 5 ? 'selected' : ''}>5x5</option>
+                <option value="6" ${settings.boardSize === 6 ? 'selected' : ''}>6x6</option>
+            </select>
+        `;
+        container.appendChild(row);
+        
+        // Save settings button
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "game-btn";
+        saveBtn.textContent = "Apply Settings";
+        saveBtn.style.marginTop = "8px";
+        saveBtn.onclick = async () => {
+            const size = parseInt(document.getElementById("tttSize").value);
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.settings.boardSize = size;
+            await writeGameState(copy);
+            await loadMessages();
+        };
+        container.appendChild(saveBtn);
+    }
+
+    if (gameType === "fourrow") {
+        // 4 in a Row: Board size
+        const row = document.createElement("div");
+        row.className = "game-settings-row";
+        row.innerHTML = `
+            <label>Board Size:</label>
+            <select id="fourRowSize">
+                <option value="7x6" ${settings.boardSize === "7x6" ? 'selected' : ''}>7x6</option>
+                <option value="8x7" ${settings.boardSize === "8x7" ? 'selected' : ''}>8x7</option>
+            </select>
+        `;
+        container.appendChild(row);
+        
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "game-btn";
+        saveBtn.textContent = "Apply Settings";
+        saveBtn.style.marginTop = "8px";
+        saveBtn.onclick = async () => {
+            const size = document.getElementById("fourRowSize").value;
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.settings.boardSize = size;
+            await writeGameState(copy);
+            await loadMessages();
+        };
+        container.appendChild(saveBtn);
+    }
+
+    if (gameType === "reaction") {
+        // Reaction Time: Rounds
+        const row = document.createElement("div");
+        row.className = "game-settings-row";
+        row.innerHTML = `
+            <label>Rounds:</label>
+            <input type="number" id="reactionRounds" value="${settings.rounds || 1}" min="1" max="5">
+        `;
+        container.appendChild(row);
+        
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "game-btn";
+        saveBtn.textContent = "Apply Settings";
+        saveBtn.style.marginTop = "8px";
+        saveBtn.onclick = async () => {
+            const rounds = parseInt(document.getElementById("reactionRounds").value) || 1;
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.settings.rounds = Math.max(1, Math.min(5, rounds));
+            await writeGameState(copy);
+            await loadMessages();
+        };
+        container.appendChild(saveBtn);
+    }
+
+    if (gameType === "type") {
+        // Type Sentence: Number of sentences
+        const row = document.createElement("div");
+        row.className = "game-settings-row";
+        row.innerHTML = `
+            <label>Sentences:</label>
+            <input type="number" id="typeSentences" value="${settings.sentenceCount || 1}" min="1" max="5">
+        `;
+        container.appendChild(row);
+        
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "game-btn";
+        saveBtn.textContent = "Apply Settings";
+        saveBtn.style.marginTop = "8px";
+        saveBtn.onclick = async () => {
+            const count = parseInt(document.getElementById("typeSentences").value) || 1;
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.settings.sentenceCount = Math.max(1, Math.min(5, count));
+            await writeGameState(copy);
+            await loadMessages();
+        };
+        container.appendChild(saveBtn);
+    }
+
+    if (gameType === "boss") {
+        // Boss Battle: Health and upgrade cost
+        const row1 = document.createElement("div");
+        row1.className = "game-settings-row";
+        row1.innerHTML = `
+            <label>Boss HP:</label>
+            <select id="bossHealth">
+                <option value="1000000" ${settings.bossHealth === 1000000 ? 'selected' : ''}>1M</option>
+                <option value="10000000" ${settings.bossHealth === 10000000 ? 'selected' : ''}>10M</option>
+                <option value="100000000" ${settings.bossHealth === 100000000 ? 'selected' : ''}>100M</option>
+                <option value="1000000000" ${settings.bossHealth === 1000000000 ? 'selected' : ''}>1B</option>
+            </select>
+        `;
+        container.appendChild(row1);
+        
+        const row2 = document.createElement("div");
+        row2.className = "game-settings-row";
+        row2.innerHTML = `
+            <label>Upgrade Cost:</label>
+            <select id="bossUpgradeCost">
+                <option value="1" ${settings.upgradeCostMultiplier === 1 ? 'selected' : ''}>Normal</option>
+                <option value="2" ${settings.upgradeCostMultiplier === 2 ? 'selected' : ''}>2x</option>
+                <option value="3" ${settings.upgradeCostMultiplier === 3 ? 'selected' : ''}>3x</option>
+                <option value="5" ${settings.upgradeCostMultiplier === 5 ? 'selected' : ''}>5x</option>
+            </select>
+        `;
+        container.appendChild(row2);
+        
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "game-btn";
+        saveBtn.textContent = "Apply Settings";
+        saveBtn.style.marginTop = "8px";
+        saveBtn.onclick = async () => {
+            const health = parseInt(document.getElementById("bossHealth").value);
+            const costMult = parseInt(document.getElementById("bossUpgradeCost").value);
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.settings.bossHealth = health;
+            copy.data.settings.upgradeCostMultiplier = costMult;
+            await writeGameState(copy);
+            await loadMessages();
+        };
+        container.appendChild(saveBtn);
+    }
+
+    return container;
+}
+
+
+/* =====================================================
    GAME DESCRIPTIONS
 ===================================================== */
 
@@ -2892,13 +3136,11 @@ function createGameBoard(game){
 ===================================================== */
 
 function createTTT(game){
-    const size = game.data.boardSize || 3;
+    const size = game.data.settings?.boardSize || 3;
     const total = size * size;
-    const winCount = game.data.winCount || size;
     
     if (!game.data.board || game.data.board.length !== total) {
         game.data.board = Array(total).fill("");
-        game.data.winCount = size;
     }
 
     const board = document.createElement("div");
@@ -2940,7 +3182,7 @@ function createTTT(game){
 function checkTTTWin(board, size, pos, symbol){
     const row = Math.floor(pos / size);
     const col = pos % size;
-    const winCount = size; // Need full line for Tic-Tac-Toe
+    const winCount = size;
     
     const dirs = [[1,0],[0,1],[1,1],[1,-1]];
     for (const [dr, dc] of dirs) {
@@ -2964,7 +3206,7 @@ function checkTTTWin(board, size, pos, symbol){
 ===================================================== */
 
 function createFourRow(game){
-    const boardSize = game.data.boardSize || "7x6";
+    const boardSize = game.data.settings?.boardSize || "7x6";
     const [cols, rows] = boardSize.split('x').map(Number);
     const total = cols * rows;
     
@@ -2981,7 +3223,6 @@ function createFourRow(game){
     const current = game.players[game.turnIndex % game.players.length];
     const myTurn = mine && current && current.deviceId === deviceId;
 
-    // Determine player colors
     const playerColors = game.data.playerColors || {};
     if (Object.keys(playerColors).length === 0) {
         game.players.forEach((p, idx) => {
@@ -2989,7 +3230,6 @@ function createFourRow(game){
         });
         game.data.playerColors = playerColors;
     }
-    const myColor = playerColors[deviceId];
 
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
@@ -3002,7 +3242,6 @@ function createFourRow(game){
             
             if (!game.data.board[index] && myTurn && !game.winner) {
                 cell.onclick = async () => {
-                    // Find lowest empty cell in this column
                     let placed = -1;
                     for (let r = rows - 1; r >= 0; r--) {
                         const idx = r * cols + col;
@@ -3087,7 +3326,6 @@ function createReaction(game){
     } else if (state === "ready") {
         const remaining = Math.max(0, (startTime - Date.now()) / 1000);
         box.textContent = "🟢 Get ready... " + remaining.toFixed(1) + "s";
-        // Auto transition to go
         if (remaining < 0.5 && myTurn) {
             setTimeout(async () => {
                 const copy = JSON.parse(JSON.stringify(game));
@@ -3107,7 +3345,6 @@ function createReaction(game){
                 copy.data.results[deviceId] = reactionTime;
                 copy.turnIndex++;
                 if (copy.turnIndex >= copy.players.length) {
-                    // All done - find winner
                     let winner = null;
                     let best = Infinity;
                     for (const [id, time] of Object.entries(copy.data.results)) {
@@ -3133,7 +3370,6 @@ function createReaction(game){
 
     area.appendChild(box);
 
-    // Show results
     if (Object.keys(results).length > 0) {
         const resultsDiv = document.createElement("div");
         resultsDiv.style.cssText = "color:#9da5b0;margin-top:10px;";
@@ -3184,7 +3420,6 @@ function createTypeSentence(game){
     const sentence = game.data.sentence;
     const results = game.data.results || {};
 
-    // Show sentence
     const sentDisplay = document.createElement("div");
     sentDisplay.className = "type-sentence";
     sentDisplay.textContent = sentence;
@@ -3214,13 +3449,11 @@ function createTypeSentence(game){
         return area;
     }
 
-    // Input for typing
     const input = document.createElement("input");
     input.className = "type-input";
     input.placeholder = "Type the sentence here...";
     input.autofocus = true;
 
-    // Start timer on first input
     let started = false;
 
     input.oninput = async () => {
@@ -3257,7 +3490,6 @@ function createTypeSentence(game){
 
     area.appendChild(input);
 
-    // Stats
     const stats = document.createElement("div");
     stats.className = "type-stats";
     const completed = Object.keys(results).length;
@@ -3279,9 +3511,10 @@ function createBossBattle(game){
     const area = document.createElement("div");
     area.className = "boss-area";
 
-    const BOSS_MAX_HEALTH = 100000000; // 100 million
+    const settings = game.data.settings || {};
+    const BOSS_MAX_HEALTH = settings.bossHealth || 100000000;
+    const UPGRADE_COST_MULT = settings.upgradeCostMultiplier || 1;
 
-    // Initialize boss data
     if (!game.data.bossHealth) {
         game.data.bossHealth = BOSS_MAX_HEALTH;
         game.data.maxHealth = BOSS_MAX_HEALTH;
@@ -3289,6 +3522,8 @@ function createBossBattle(game){
         game.data.upgrades = {};
         game.data.totalDamageDealt = {};
         game.data.bossDefeated = false;
+        game.data.critChance = 0;
+        game.data.multiHit = 1;
     }
 
     const mine = game.players.some(p => p.deviceId === deviceId);
@@ -3299,7 +3534,6 @@ function createBossBattle(game){
     const totalDamage = game.data.totalDamageDealt || {};
     const playerDamage = totalDamage[deviceId] || 0;
 
-    // Monster name
     const monsterName = document.createElement("div");
     monsterName.className = "boss-monster-name";
     const names = ["Cthulhu", "Mega Dragon", "Shadow Lord", "Void Beast", "Eldritch Horror", "Demon King"];
@@ -3309,7 +3543,6 @@ function createBossBattle(game){
     monsterName.textContent = "👹 " + game.data.monsterName;
     area.appendChild(monsterName);
 
-    // Health bar
     const healthBar = document.createElement("div");
     healthBar.className = "boss-health-bar";
     
@@ -3325,13 +3558,14 @@ function createBossBattle(game){
     healthBar.appendChild(healthText);
     area.appendChild(healthBar);
 
-    // Stats
     const stats = document.createElement("div");
     stats.className = "boss-stats";
     stats.innerHTML = `
         <div>⚔️ Damage: <strong>${damage.toLocaleString()}</strong></div>
         <div>💪 Your damage: <strong>${playerDamage.toLocaleString()}</strong></div>
         <div>👥 Players: <strong>${game.players.length}</strong></div>
+        <div>💥 Crit: <strong>${Math.round((game.data.critChance || 0) * 100)}%</strong></div>
+        <div>🌀 Multi: <strong>${game.data.multiHit || 1}x</strong></div>
     `;
     area.appendChild(stats);
 
@@ -3344,22 +3578,42 @@ function createBossBattle(game){
         return area;
     }
 
-    // Attack button
+    // Attack button with crit and multi-hit
     const attackBtn = document.createElement("button");
     attackBtn.className = "game-btn boss";
-    attackBtn.textContent = "⚔️ ATTACK!";
+    
+    let displayDamage = damage;
+    let critMultiplier = 1;
+    if (Math.random() < (game.data.critChance || 0)) {
+        critMultiplier = 2;
+        displayDamage = Math.floor(damage * 2);
+    }
+    const multiHits = game.data.multiHit || 1;
+    const totalDisplayDamage = displayDamage * multiHits;
+    
+    attackBtn.textContent = `⚔️ ATTACK! (${totalDisplayDamage.toLocaleString()} dmg)`;
+    
     attackBtn.onclick = async () => {
         const copy = JSON.parse(JSON.stringify(game));
-        const dmg = copy.data.damage || 1;
-        copy.data.bossHealth = Math.max(0, copy.data.bossHealth - dmg);
-        copy.data.totalDamageDealt = copy.data.totalDamageDealt || {};
-        copy.data.totalDamageDealt[deviceId] = (copy.data.totalDamageDealt[deviceId] || 0) + dmg;
+        let dmg = copy.data.damage || 1;
         
-        // Check if boss is defeated
+        // Apply crit
+        let crit = 1;
+        if (Math.random() < (copy.data.critChance || 0)) {
+            crit = 2;
+        }
+        
+        // Apply multi-hit
+        const multi = copy.data.multiHit || 1;
+        const totalDmg = Math.floor(dmg * crit * multi);
+        
+        copy.data.bossHealth = Math.max(0, copy.data.bossHealth - totalDmg);
+        copy.data.totalDamageDealt = copy.data.totalDamageDealt || {};
+        copy.data.totalDamageDealt[deviceId] = (copy.data.totalDamageDealt[deviceId] || 0) + totalDmg;
+        
         if (copy.data.bossHealth <= 0) {
             copy.data.bossDefeated = true;
             copy.data.bossHealth = 0;
-            // Find MVP
             let mvp = null;
             let maxDmg = -1;
             for (const [id, d] of Object.entries(copy.data.totalDamageDealt)) {
@@ -3373,7 +3627,7 @@ function createBossBattle(game){
         }
         
         // Random chance to drop upgrade points
-        if (Math.random() < 0.15 && !copy.data.bossDefeated) {
+        if (Math.random() < 0.2 && !copy.data.bossDefeated) {
             copy.data.upgrades = copy.data.upgrades || {};
             copy.data.upgrades[deviceId] = (copy.data.upgrades[deviceId] || 0) + 1;
         }
@@ -3382,10 +3636,9 @@ function createBossBattle(game){
     };
     area.appendChild(attackBtn);
 
-    // Damage display
     const dmgDisplay = document.createElement("div");
     dmgDisplay.className = "boss-damage-display";
-    dmgDisplay.textContent = "⚔️ " + damage.toLocaleString() + " damage per hit";
+    dmgDisplay.textContent = "⚔️ " + damage.toLocaleString() + " base damage";
     area.appendChild(dmgDisplay);
 
     // Upgrades
@@ -3393,9 +3646,9 @@ function createBossBattle(game){
     upgradesDiv.className = "boss-upgrades";
     
     const upgradeCosts = {
-        damage: 5,
-        crit: 10,
-        multi: 20
+        damage: 5 * UPGRADE_COST_MULT,
+        crit: 10 * UPGRADE_COST_MULT,
+        multi: 20 * UPGRADE_COST_MULT
     };
     
     const upgradePoints = upgrades[deviceId] || 0;
@@ -3405,35 +3658,32 @@ function createBossBattle(game){
     upgradeInfo.textContent = "🔧 Upgrade points: " + upgradePoints;
     upgradesDiv.appendChild(upgradeInfo);
 
-    // Damage upgrade
     const dmgUpgrade = document.createElement("button");
     dmgUpgrade.className = "boss-upgrade-btn";
-    dmgUpgrade.innerHTML = `⚔️ +10% Damage <span class="cost">(${upgradeCosts.damage} pts)</span>`;
+    dmgUpgrade.innerHTML = `⚔️ +20% Damage <span class="cost">(${upgradeCosts.damage} pts)</span>`;
     dmgUpgrade.disabled = upgradePoints < upgradeCosts.damage;
     dmgUpgrade.onclick = async () => {
         const copy = JSON.parse(JSON.stringify(game));
         copy.data.upgrades = copy.data.upgrades || {};
         copy.data.upgrades[deviceId] = (copy.data.upgrades[deviceId] || 0) - upgradeCosts.damage;
-        copy.data.damage = Math.floor((copy.data.damage || 1) * 1.1);
+        copy.data.damage = Math.floor((copy.data.damage || 1) * 1.2);
         await publishGameAndCleanup(game, copy);
     };
     upgradesDiv.appendChild(dmgUpgrade);
 
-    // Crit upgrade
     const critUpgrade = document.createElement("button");
     critUpgrade.className = "boss-upgrade-btn";
-    critUpgrade.innerHTML = `💥 +5% Crit Chance <span class="cost">(${upgradeCosts.crit} pts)</span>`;
+    critUpgrade.innerHTML = `💥 +10% Crit Chance <span class="cost">(${upgradeCosts.crit} pts)</span>`;
     critUpgrade.disabled = upgradePoints < upgradeCosts.crit;
     critUpgrade.onclick = async () => {
         const copy = JSON.parse(JSON.stringify(game));
         copy.data.upgrades = copy.data.upgrades || {};
         copy.data.upgrades[deviceId] = (copy.data.upgrades[deviceId] || 0) - upgradeCosts.crit;
-        copy.data.critChance = (copy.data.critChance || 0) + 0.05;
+        copy.data.critChance = Math.min(1, (copy.data.critChance || 0) + 0.1);
         await publishGameAndCleanup(game, copy);
     };
     upgradesDiv.appendChild(critUpgrade);
 
-    // Multi-hit upgrade
     const multiUpgrade = document.createElement("button");
     multiUpgrade.className = "boss-upgrade-btn";
     multiUpgrade.innerHTML = `🌀 +1 Multi-hit <span class="cost">(${upgradeCosts.multi} pts)</span>`;
@@ -3501,14 +3751,16 @@ async function startGame(game){
     copy.status = "playing";
     copy.turnIndex = 0;
     
-    // Initialize game-specific data
+    // Initialize game with settings
+    const settings = copy.data.settings || {};
+    
     if (copy.gameType === "ttt") {
-        if (!copy.data.boardSize) copy.data.boardSize = 3;
-        copy.data.board = Array(copy.data.boardSize * copy.data.boardSize).fill("");
+        const size = settings.boardSize || 3;
+        copy.data.board = Array(size * size).fill("");
     }
     if (copy.gameType === "fourrow") {
-        if (!copy.data.boardSize) copy.data.boardSize = "7x6";
-        const [cols, rows] = copy.data.boardSize.split('x').map(Number);
+        const boardSize = settings.boardSize || "7x6";
+        const [cols, rows] = boardSize.split('x').map(Number);
         copy.data.board = Array(cols * rows).fill("");
         copy.data.playerColors = {};
         copy.players.forEach((p, idx) => {
@@ -3537,8 +3789,9 @@ async function startGame(game){
         copy.data.done = false;
     }
     if (copy.gameType === "boss") {
-        copy.data.bossHealth = 100000000;
-        copy.data.maxHealth = 100000000;
+        const maxHealth = settings.bossHealth || 100000000;
+        copy.data.bossHealth = maxHealth;
+        copy.data.maxHealth = maxHealth;
         copy.data.damage = 1;
         copy.data.upgrades = {};
         copy.data.totalDamageDealt = {};
