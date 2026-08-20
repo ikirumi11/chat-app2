@@ -22,66 +22,90 @@ export default async function handler(req, res) {
         "Content-Type"
     );
 
-    if (req.method === "OPTIONS") {
-        return res.status(200).end();
+
+    if(req.method === "OPTIONS"){
+
+        return res
+            .status(200)
+            .end();
+
     }
 
-    try {
 
-        /* GET MESSAGES */
+    try{
 
-        if (req.method === "GET") {
+        /* GET */
+
+        if(req.method === "GET"){
 
             const channel =
                 String(
                     req.query.channel ||
                     "general"
-                ).slice(0, 32);
+                ).slice(0,32);
 
-            const { data, error } =
+
+            const {
+                data,
+                error
+            } =
                 await supabase
-                    .from("messages")
-                    .select(
-                        "id,username,channel,message,created_at"
-                    )
-                    .eq(
-                        "channel",
-                        channel
-                    )
-                    .order(
-                        "created_at",
-                        {
-                            ascending: true
-                        }
-                    )
-                    .limit(200);
+                .from("messages")
+                .select(
+                    "id,username,channel,message,created_at"
+                )
+                .eq(
+                    "channel",
+                    channel
+                )
+                .order(
+                    "created_at",
+                    {
+                        ascending:true
+                    }
+                )
+                .limit(200);
 
-            if (error) {
 
-                return res.status(500).json({
-                    error: error.message
-                });
+            if(error){
+
+                console.error(error);
+
+                return res
+                    .status(500)
+                    .json({
+                        error:
+                            error.message
+                    });
+
             }
 
-            return res.status(200).json({
-                messages: data || []
-            });
+
+            return res
+                .status(200)
+                .json({
+                    messages:
+                        data || []
+                });
+
         }
 
 
-        /* SEND MESSAGE */
+        /* POST */
 
-        if (req.method === "POST") {
+        if(req.method === "POST"){
 
             const body =
                 req.body || {};
+
 
             const username =
                 String(
                     body.username || ""
                 )
                 .trim()
-                .slice(0, 24);
+                .slice(0,24);
+
 
             const channel =
                 String(
@@ -89,80 +113,102 @@ export default async function handler(req, res) {
                     "general"
                 )
                 .trim()
-                .slice(0, 32);
+                .slice(0,32);
+
 
             const message =
                 String(
                     body.message || ""
                 )
                 .trim()
-                .slice(0, 2000);
+                .slice(0,2000);
 
 
-            if (
+            if(
                 !username ||
                 !message
-            ) {
+            ){
 
-                return res.status(400).json({
-                    error:
-                        "Username and message are required."
-                });
+                return res
+                    .status(400)
+                    .json({
+                        error:
+                            "Username and message are required."
+                    });
+
             }
 
 
-            const { data, error } =
+            const {
+                data,
+                error
+            } =
                 await supabase
-                    .from("messages")
-                    .insert({
+                .from("messages")
+                .insert({
 
-                        username:
-                            username,
+                    username:
+                        username,
 
-                        channel:
-                            channel,
+                    channel:
+                        channel,
 
-                        message:
-                            message
+                    message:
+                        message
 
-                    })
-                    .select(
-                        "id,username,channel,message,created_at"
-                    )
-                    .single();
+                })
+                .select(
+                    "id,username,channel,message,created_at"
+                )
+                .single();
 
 
-            if (error) {
+            if(error){
 
-                return res.status(500).json({
-                    error: error.message
-                });
+                console.error(error);
+
+                return res
+                    .status(500)
+                    .json({
+                        error:
+                            error.message
+                    });
+
             }
 
 
-            return res.status(200).json({
+            return res
+                .status(200)
+                .json({
 
-                success: true,
+                    success:true,
 
-                message: data
+                    message:data
 
-            });
+                });
+
         }
 
 
-        return res.status(405).json({
-            error:
-                "Method not allowed."
-        });
+        return res
+            .status(405)
+            .json({
+                error:
+                    "Method not allowed."
+            });
 
 
-    } catch (error) {
+    }catch(error){
 
         console.error(error);
 
-        return res.status(500).json({
-            error:
-                "Server error."
-        });
+        return res
+            .status(500)
+            .json({
+                error:
+                    "Server error."
+            });
+
     }
+
 }
