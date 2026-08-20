@@ -1,38 +1,19 @@
 export default async function handler(req, res) {
 
-    res.setHeader(
-        "Content-Type",
-        "application/json"
-    );
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    res.setHeader(
-        "Access-Control-Allow-Origin",
-        "*"
-    );
-
-    res.setHeader(
-        "Access-Control-Allow-Methods",
-        "GET,POST,OPTIONS"
-    );
-
-    res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Content-Type"
-    );
-
-
-    if (
-        req.method === "OPTIONS"
-    ) {
-
-        return res
-            .status(200)
-            .end();
-
+    if (req.method === "OPTIONS") {
+        return res.status(200).end();
     }
 
-
     try {
+
+        // ==========================================
+        // VERCEL ENVIRONMENT VARIABLES
+        // ==========================================
 
         const supabaseUrl =
             process.env.https://wlvbkdzcueqkknysisfw.supabase.co;
@@ -41,94 +22,73 @@ export default async function handler(req, res) {
             process.env.sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL;
 
 
+        // ==========================================
+        // CHECK URL
+        // ==========================================
+
         if (!supabaseUrl) {
 
             return res.status(500).json({
-
-                error:
-                    "SUPABASE_URL is missing.",
-
-                fix:
-                    "Add SUPABASE_URL to Vercel Environment Variables."
-
+                error: "SUPABASE_URL is missing.",
+                fix: "Go to Vercel → Project → Settings → Environment Variables and add SUPABASE_URL."
             });
 
         }
 
 
+        // ==========================================
+        // CHECK SECRET KEY
+        // ==========================================
+
         if (!supabaseKey) {
 
             return res.status(500).json({
-
-                error:
-                    "SUPABASE_SECRET_KEY is missing.",
-
-                fix:
-                    "Add SUPABASE_SECRET_KEY to Vercel Environment Variables."
-
+                error: "SUPABASE_SECRET_KEY is missing.",
+                fix: "Go to Vercel → Project → Settings → Environment Variables and add SUPABASE_SECRET_KEY."
             });
 
         }
 
 
         const cleanUrl =
-            supabaseUrl.replace(
-                /\/+$/,
-                ""
-            );
+            supabaseUrl.replace(/\/+$/, "");
 
 
-        /* =========================
-           GET
-        ========================= */
+        // ==========================================
+        // GET
+        // ==========================================
 
-        if (
-            req.method === "GET"
-        ) {
+        if (req.method === "GET") {
 
             const channel =
                 String(
-                    req.query.channel ||
-                    "general"
+                    req.query.channel || "general"
                 )
                 .trim()
-                .substring(
-                    0,
-                    32
-                );
+                .substring(0, 32);
 
 
-            const query =
+            const url =
                 cleanUrl +
                 "/rest/v1/messages" +
                 "?select=id,username,channel,message,image_data,created_at" +
                 "&channel=eq." +
-                encodeURIComponent(
-                    channel
-                ) +
+                encodeURIComponent(channel) +
                 "&order=created_at.asc";
 
 
             const response =
-                await fetch(
-                    query,
-                    {
+                await fetch(url, {
+                    method: "GET",
 
-                        method:
-                            "GET",
-
-                        headers: {
-
-                            "apikey":
-                                supabaseKey,
-
-                            "Accept":
-                                "application/json"
-
-                        }
-
+                    headers: {
+                        "apikey": supabaseKey,
+                        "Authorization":
+                            "Bearer " + supabaseKey,
+                        "Accept":
+                            "application/json"
                     }
-                );
+                });
 
 
             const text =
@@ -137,39 +97,29 @@ export default async function handler(req, res) {
 
             let data;
 
-
             try {
 
-                data =
-                    JSON.parse(
-                        text
-                    );
+                data = JSON.parse(text);
 
-            }
-            catch {
+            } catch {
 
                 return res.status(500).json({
 
                     error:
-                        "Supabase returned invalid JSON.",
+                        "Supabase did not return JSON.",
 
                     httpStatus:
                         response.status,
 
-                    response:
-                        text.substring(
-                            0,
-                            2000
-                        )
+                    rawResponse:
+                        text.substring(0, 2000)
 
                 });
 
             }
 
 
-            if (
-                !response.ok
-            ) {
+            if (!response.ok) {
 
                 return res.status(
                     response.status
@@ -178,9 +128,10 @@ export default async function handler(req, res) {
                     error:
                         data.message ||
                         data.error ||
-                        "Supabase request failed.",
+                        data.hint ||
+                        "Supabase GET request failed.",
 
-                    details:
+                    supabase:
                         data
 
                 });
@@ -188,17 +139,12 @@ export default async function handler(req, res) {
             }
 
 
-            return res.status(
-                200
-            ).json({
+            return res.status(200).json({
 
-                success:
-                    true,
+                success: true,
 
                 messages:
-                    Array.isArray(
-                        data
-                    )
+                    Array.isArray(data)
                         ? data
                         : []
 
@@ -207,13 +153,11 @@ export default async function handler(req, res) {
         }
 
 
-        /* =========================
-           POST
-        ========================= */
+        // ==========================================
+        // POST
+        // ==========================================
 
-        if (
-            req.method === "POST"
-        ) {
+        if (req.method === "POST") {
 
             const body =
                 req.body || {};
@@ -221,44 +165,29 @@ export default async function handler(req, res) {
 
             const username =
                 String(
-                    body.username ||
-                    ""
+                    body.username || ""
                 )
                 .trim()
-                .substring(
-                    0,
-                    24
-                );
-
-
-            const channel =
-                "general";
+                .substring(0, 24);
 
 
             const message =
                 String(
-                    body.message ||
-                    ""
+                    body.message || ""
                 )
                 .trim()
-                .substring(
-                    0,
-                    2000
-                );
+                .substring(0, 2000);
 
 
             const imageData =
-                typeof body.image_data ===
-                "string"
+                typeof body.image_data === "string"
                     ? body.image_data
                     : null;
 
 
             if (!username) {
 
-                return res.status(
-                    400
-                ).json({
+                return res.status(400).json({
 
                     error:
                         "Username is required."
@@ -268,14 +197,9 @@ export default async function handler(req, res) {
             }
 
 
-            if (
-                !message &&
-                !imageData
-            ) {
+            if (!message && !imageData) {
 
-                return res.status(
-                    400
-                ).json({
+                return res.status(400).json({
 
                     error:
                         "Message or image is required."
@@ -285,19 +209,17 @@ export default async function handler(req, res) {
             }
 
 
-            /* Image validation */
+            // ==========================================
+            // IMAGE CHECK
+            // ==========================================
 
             if (imageData) {
 
                 if (
-                    !imageData.startsWith(
-                        "data:image/"
-                    )
+                    !imageData.startsWith("data:image/")
                 ) {
 
-                    return res.status(
-                        400
-                    ).json({
+                    return res.status(400).json({
 
                         error:
                             "Invalid image data."
@@ -307,19 +229,12 @@ export default async function handler(req, res) {
                 }
 
 
-                /*
-                    Rough server-side size limit.
-                    2 MB file becomes larger when Base64 encoded.
-                */
-
                 if (
                     imageData.length >
                     3 * 1024 * 1024
                 ) {
 
-                    return res.status(
-                        413
-                    ).json({
+                    return res.status(413).json({
 
                         error:
                             "Image is too large.",
@@ -334,22 +249,26 @@ export default async function handler(req, res) {
             }
 
 
+            // ==========================================
+            // DATA
+            // ==========================================
+
             const messageData = {
 
-                username:
-                    username,
+                username: username,
 
-                channel:
-                    channel,
+                channel: "general",
 
-                message:
-                    message,
+                message: message,
 
-                image_data:
-                    imageData
+                image_data: imageData
 
             };
 
+
+            // ==========================================
+            // SEND TO SUPABASE
+            // ==========================================
 
             const response =
                 await fetch(
@@ -357,12 +276,15 @@ export default async function handler(req, res) {
                     "/rest/v1/messages",
                     {
 
-                        method:
-                            "POST",
+                        method: "POST",
 
                         headers: {
 
                             "apikey":
+                                supabaseKey,
+
+                            "Authorization":
+                                "Bearer " +
                                 supabaseKey,
 
                             "Content-Type":
@@ -391,41 +313,30 @@ export default async function handler(req, res) {
 
             let data;
 
-
             try {
 
                 data =
-                    JSON.parse(
-                        text
-                    );
+                    JSON.parse(text);
 
-            }
-            catch {
+            } catch {
 
-                return res.status(
-                    500
-                ).json({
+                return res.status(500).json({
 
                     error:
-                        "Supabase returned invalid JSON.",
+                        "Supabase did not return JSON.",
 
                     httpStatus:
                         response.status,
 
-                    response:
-                        text.substring(
-                            0,
-                            2000
-                        )
+                    rawResponse:
+                        text.substring(0, 2000)
 
                 });
 
             }
 
 
-            if (
-                !response.ok
-            ) {
+            if (!response.ok) {
 
                 return res.status(
                     response.status
@@ -437,28 +348,23 @@ export default async function handler(req, res) {
                         data.hint ||
                         "Supabase rejected the message.",
 
-                    details:
+                    supabase:
                         data,
 
                     fix:
-                        "Check the messages table and its RLS INSERT policy."
+                        "Check the messages table, image_data column, and INSERT policy."
 
                 });
 
             }
 
 
-            return res.status(
-                200
-            ).json({
+            return res.status(200).json({
 
-                success:
-                    true,
+                success: true,
 
                 message:
-                    Array.isArray(
-                        data
-                    )
+                    Array.isArray(data)
                         ? data[0]
                         : data
 
@@ -467,18 +373,22 @@ export default async function handler(req, res) {
         }
 
 
-        return res.status(
-            405
-        ).json({
+        // ==========================================
+        // UNKNOWN METHOD
+        // ==========================================
+
+        return res.status(405).json({
 
             error:
-                "Method not allowed."
+                "Method not allowed.",
+
+            method:
+                req.method
 
         });
 
 
-    }
-    catch (error) {
+    } catch (error) {
 
         console.error(
             "SERVER ERROR:",
@@ -486,17 +396,21 @@ export default async function handler(req, res) {
         );
 
 
-        return res.status(
-            500
-        ).json({
+        return res.status(500).json({
 
             error:
-                error.message ||
+                error?.message ||
+                String(error) ||
                 "Unknown server error.",
 
             type:
-                error.name ||
-                "Error"
+                error?.name ||
+                "Error",
+
+            stack:
+                error?.stack
+                    ? error.stack.substring(0, 2000)
+                    : null
 
         });
 
