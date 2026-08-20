@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,22 +13,30 @@
     --bg:#0b0d10;
     --panel:#111419;
     --panel2:#181c22;
-    --border:#292f37;
+    --border:#292f38;
     --text:#edf0f4;
-    --muted:#7c8591;
-    --button:#e8eaed;
-    --buttonText:#111;
-    --danger:#ff7777;
+    --muted:#7e8793;
+    --accent:#e8eaed;
+    --danger:#ff7070;
+    --radius:12px;
+    --ui-scale:1;
+    --text-size:16px;
+    --word-spacing:0px;
+    --line-spacing:1.45;
 }
 
 html,body{
     margin:0;
     width:100%;
     height:100%;
-    overflow:hidden;
     background:var(--bg);
     color:var(--text);
     font-family:Inter,Arial,sans-serif;
+}
+
+body{
+    overflow:hidden;
+    font-size:calc(16px * var(--ui-scale));
 }
 
 button,input,textarea,select{
@@ -50,10 +59,10 @@ button{
 .header{
     height:64px;
     min-height:64px;
+    padding:0 18px;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:0 18px;
     background:var(--panel);
     border-bottom:1px solid var(--border);
 }
@@ -66,8 +75,8 @@ button{
 }
 
 .logo-icon{
-    width:36px;
-    height:36px;
+    width:35px;
+    height:35px;
     display:grid;
     place-items:center;
     border-radius:10px;
@@ -77,21 +86,20 @@ button{
 
 .channel{
     color:var(--muted);
-    font-size:14px;
     font-weight:400;
 }
 
 .icon-btn{
-    width:38px;
-    height:38px;
-    border-radius:9px;
+    width:39px;
+    height:39px;
+    border-radius:10px;
     border:1px solid var(--border);
     background:var(--panel2);
     color:var(--text);
 }
 
 .icon-btn:hover{
-    background:#242932;
+    filter:brightness(1.15);
 }
 
 /* MESSAGES */
@@ -105,19 +113,18 @@ button{
 .message{
     display:flex;
     gap:11px;
-    margin-bottom:18px;
-    position:relative;
+    margin-bottom:17px;
 }
 
 .avatar{
+    flex:0 0 40px;
     width:40px;
     height:40px;
-    min-width:40px;
-    border-radius:10px;
     display:grid;
     place-items:center;
-    background:#20252d;
-    border:1px solid #303640;
+    border-radius:var(--radius);
+    background:var(--panel2);
+    border:1px solid var(--border);
     font-weight:700;
 }
 
@@ -137,21 +144,18 @@ button{
     font-weight:700;
 }
 
-.time{
-    color:#69727d;
+.time,.edited{
+    color:var(--muted);
     font-size:11px;
 }
 
-.edited{
-    color:#68717d;
-    font-size:10px;
-}
-
 .message-text{
-    color:#d7dce2;
+    color:#d8dde4;
     white-space:pre-wrap;
-    word-break:break-word;
-    line-height:1.45;
+    overflow-wrap:anywhere;
+    font-size:var(--text-size);
+    word-spacing:var(--word-spacing);
+    line-height:var(--line-spacing);
 }
 
 .message-image{
@@ -159,11 +163,11 @@ button{
     max-width:min(500px,80vw);
     max-height:500px;
     margin-top:8px;
-    border-radius:10px;
     border:1px solid var(--border);
+    border-radius:var(--radius);
     background:#000;
-    cursor:pointer;
     object-fit:contain;
+    cursor:pointer;
 }
 
 /* COMPOSER */
@@ -179,11 +183,11 @@ button{
     margin:auto;
     display:flex;
     align-items:flex-end;
-    gap:8px;
+    gap:7px;
+    padding:8px;
     background:var(--panel2);
     border:1px solid var(--border);
-    border-radius:13px;
-    padding:8px;
+    border-radius:14px;
 }
 
 textarea{
@@ -191,24 +195,24 @@ textarea{
     min-height:42px;
     max-height:150px;
     resize:none;
-    outline:none;
     border:0;
+    outline:none;
     background:transparent;
     color:white;
     padding:10px;
 }
 
-textarea::placeholder{
-    color:#69717c;
+.attach-btn,
+.send-btn{
+    height:42px;
+    border:0;
+    border-radius:9px;
 }
 
 .attach-btn{
     width:42px;
-    height:42px;
-    border:0;
-    border-radius:9px;
     background:transparent;
-    color:#aeb6c2;
+    color:#adb5c0;
     font-size:20px;
 }
 
@@ -217,17 +221,15 @@ textarea::placeholder{
 }
 
 .send-btn{
-    height:42px;
     padding:0 18px;
-    border:0;
-    border-radius:9px;
-    background:var(--button);
-    color:var(--buttonText);
+    background:var(--accent);
+    color:#111;
     font-weight:700;
 }
 
 .send-btn:disabled{
     opacity:.5;
+    cursor:not-allowed;
 }
 
 /* OVERLAYS */
@@ -238,7 +240,7 @@ textarea::placeholder{
     display:none;
     align-items:center;
     justify-content:center;
-    background:rgba(0,0,0,.7);
+    background:rgba(0,0,0,.72);
     z-index:100;
 }
 
@@ -247,19 +249,19 @@ textarea::placeholder{
 }
 
 .panel{
-    width:min(500px,calc(100vw - 30px));
-    max-height:calc(100vh - 30px);
-    overflow:auto;
+    width:min(520px,calc(100vw - 25px));
+    max-height:calc(100vh - 25px);
+    overflow-y:auto;
     background:var(--panel);
     border:1px solid var(--border);
     border-radius:15px;
-    box-shadow:0 25px 80px rgba(0,0,0,.6);
+    box-shadow:0 25px 80px #000b;
 }
 
 .panel-header{
     display:flex;
-    align-items:center;
     justify-content:space-between;
+    align-items:center;
     padding:18px;
     border-bottom:1px solid var(--border);
 }
@@ -272,65 +274,110 @@ textarea::placeholder{
     padding:18px;
 }
 
+/* SETTINGS CATEGORIES */
+
+.category{
+    margin-bottom:12px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+    background:var(--panel2);
+}
+
+.category-title{
+    width:100%;
+    padding:14px;
+    border:0;
+    background:transparent;
+    color:var(--text);
+    display:flex;
+    justify-content:space-between;
+    font-weight:700;
+    text-align:left;
+}
+
+.category-title span:last-child{
+    color:var(--muted);
+}
+
+.category-body{
+    display:none;
+    padding:0 14px 14px;
+}
+
+.category.open .category-body{
+    display:block;
+}
+
 .setting{
-    margin-bottom:20px;
+    margin-top:14px;
 }
 
 .setting label{
     display:block;
     margin-bottom:7px;
-    color:#aeb6c2;
+    color:#aab2bd;
     font-size:13px;
 }
 
 .setting input,
 .setting select{
     width:100%;
-    padding:11px;
-    border-radius:9px;
+    padding:10px;
     border:1px solid var(--border);
-    background:var(--panel2);
-    color:white;
+    border-radius:9px;
     outline:none;
+    background:#101419;
+    color:white;
+}
+
+.setting input[type="range"]{
+    padding:0;
+}
+
+.setting-value{
+    color:var(--muted);
+    font-size:12px;
+    margin-top:5px;
 }
 
 .save-btn{
     width:100%;
-    padding:11px;
+    margin-top:8px;
+    padding:12px;
     border:0;
     border-radius:9px;
-    background:var(--button);
-    color:var(--buttonText);
+    background:var(--accent);
+    color:#111;
     font-weight:700;
 }
 
+/* DANGER */
+
 .danger-zone{
-    margin-top:25px;
+    margin-top:20px;
     padding-top:20px;
-    border-top:1px solid #38272a;
+    border-top:1px solid #402529;
 }
 
 .danger-title{
     color:var(--danger);
     font-weight:700;
+    margin-bottom:7px;
 }
 
 .danger-zone p{
-    color:#929aa5;
-    line-height:1.5;
+    color:var(--muted);
+    line-height:1.45;
 }
 
 .danger-btn{
     width:100%;
-    padding:11px;
+    padding:12px;
     border-radius:9px;
     border:1px solid #743333;
     background:#241719;
     color:#ff8585;
-}
-
-.danger-btn:hover{
-    background:#321c1e;
 }
 
 /* CONTEXT MENU */
@@ -338,13 +385,13 @@ textarea::placeholder{
 .context-menu{
     position:fixed;
     display:none;
-    z-index:200;
     width:160px;
     padding:5px;
-    background:#171b21;
-    border:1px solid #343a43;
+    z-index:200;
+    background:var(--panel2);
+    border:1px solid var(--border);
     border-radius:9px;
-    box-shadow:0 15px 40px rgba(0,0,0,.5);
+    box-shadow:0 15px 40px #0009;
 }
 
 .context-menu.show{
@@ -353,20 +400,20 @@ textarea::placeholder{
 
 .context-menu button{
     width:100%;
-    text-align:left;
     padding:9px 10px;
+    text-align:left;
     border:0;
-    background:transparent;
-    color:#e4e8ed;
     border-radius:6px;
+    background:transparent;
+    color:var(--text);
 }
 
 .context-menu button:hover{
     background:#252b33;
 }
 
-.context-menu .delete-option{
-    color:#ff7777;
+.delete-option{
+    color:#ff7777!important;
 }
 
 /* IMAGE VIEWER */
@@ -377,7 +424,7 @@ textarea::placeholder{
     display:none;
     align-items:center;
     justify-content:center;
-    background:#000;
+    background:#000f;
     z-index:300;
 }
 
@@ -425,7 +472,6 @@ textarea::placeholder{
     display:flex;
     gap:8px;
     justify-content:flex-end;
-    margin-top:18px;
 }
 
 .dialog-buttons button{
@@ -458,16 +504,20 @@ textarea::placeholder{
 }
 
 @media(max-width:600px){
+    .header{
+        padding:0 11px;
+    }
+
     .messages{
         padding:15px 11px;
     }
 
-    .message-content{
-        max-width:calc(100vw - 70px);
-    }
-
     .channel{
         display:none;
+    }
+
+    .message-content{
+        max-width:calc(100vw - 70px);
     }
 }
 </style>
@@ -478,16 +528,25 @@ textarea::placeholder{
 <div class="app">
 
 <header class="header">
+
     <div class="logo">
         <div class="logo-icon">💬</div>
         <span>Chat</span>
         <span class="channel"># general</span>
     </div>
 
-    <button class="icon-btn" id="settingsBtn">⚙</button>
+    <button
+        class="icon-btn"
+        id="settingsBtn"
+        title="Settings"
+    >⚙</button>
+
 </header>
 
-<main class="messages" id="messages"></main>
+<main
+    class="messages"
+    id="messages"
+></main>
 
 <div class="composer">
 
@@ -508,8 +567,8 @@ textarea::placeholder{
 
         <textarea
             id="messageInput"
-            placeholder="Message #general"
             rows="1"
+            placeholder="Message #general"
         ></textarea>
 
         <button
@@ -526,22 +585,37 @@ textarea::placeholder{
 
 <!-- SETTINGS -->
 
-<div class="overlay" id="settingsOverlay">
+<div
+    class="overlay"
+    id="settingsOverlay"
+>
 
 <div class="panel">
 
 <div class="panel-header">
 
-<h2>Settings</h2>
+    <h2>Settings</h2>
 
-<button
-    class="icon-btn"
-    id="closeSettings"
->×</button>
+    <button
+        class="icon-btn"
+        id="closeSettings"
+    >×</button>
 
 </div>
 
 <div class="panel-body">
+
+
+<!-- PROFILE -->
+
+<div class="category open">
+
+<button class="category-title">
+    <span>👤 Profile</span>
+    <span>⌄</span>
+</button>
+
+<div class="category-body">
 
 <div class="setting">
 
@@ -554,6 +628,163 @@ textarea::placeholder{
 >
 
 </div>
+
+<div class="setting">
+
+<label>Device ID</label>
+
+<input
+    id="deviceIdInput"
+    readonly
+>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- TEXT -->
+
+<div class="category">
+
+<button class="category-title">
+    <span>📝 Text</span>
+    <span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+
+<label>Text size</label>
+
+<input
+    id="textSize"
+    type="range"
+    min="12"
+    max="24"
+    step="1"
+>
+
+<div
+    class="setting-value"
+    id="textSizeValue"
+></div>
+
+</div>
+
+<div class="setting">
+
+<label>Word spacing</label>
+
+<input
+    id="wordSpacing"
+    type="range"
+    min="0"
+    max="12"
+    step="1"
+>
+
+<div
+    class="setting-value"
+    id="wordSpacingValue"
+></div>
+
+</div>
+
+<div class="setting">
+
+<label>Line spacing</label>
+
+<input
+    id="lineSpacing"
+    type="range"
+    min="1"
+    max="2"
+    step=".05"
+>
+
+<div
+    class="setting-value"
+    id="lineSpacingValue"
+></div>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- CHAT -->
+
+<div class="category">
+
+<button class="category-title">
+    <span>💬 Chat</span>
+    <span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+
+<label>Refresh rate</label>
+
+<select id="refreshRate">
+
+<option value="10000">10 seconds</option>
+<option value="5000">5 seconds</option>
+<option value="3000">3 seconds</option>
+<option value="2000">2 seconds</option>
+<option value="1000">1 second</option>
+<option value="500">0.5 seconds</option>
+<option value="100">0.1 seconds</option>
+
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Show timestamps</label>
+
+<select id="showTimestamps">
+
+<option value="true">On</option>
+<option value="false">Off</option>
+
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Compact messages</label>
+
+<select id="compactMessages">
+
+<option value="false">Off</option>
+<option value="true">On</option>
+
+</select>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- APPEARANCE -->
+
+<div class="category">
+
+<button class="category-title">
+    <span>🎨 Appearance</span>
+    <span>⌄</span>
+</button>
+
+<div class="category-body">
 
 <div class="setting">
 
@@ -579,21 +810,152 @@ textarea::placeholder{
 
 <div class="setting">
 
-<label>Message refresh rate</label>
+<label>Corner roundness</label>
 
-<select id="refreshSelect">
+<input
+    id="cornerRadius"
+    type="range"
+    min="0"
+    max="25"
+>
 
-<option value="10000">10 seconds</option>
-<option value="5000">5 seconds</option>
-<option value="3000">3 seconds</option>
-<option value="2000">2 seconds</option>
-<option value="1000">1 second</option>
-<option value="500">0.5 seconds</option>
-<option value="100">0.1 seconds</option>
+<div
+    class="setting-value"
+    id="cornerRadiusValue"
+></div>
+
+</div>
+
+<div class="setting">
+
+<label>UI scale</label>
+
+<input
+    id="uiScale"
+    type="range"
+    min=".8"
+    max="1.2"
+    step=".05"
+>
+
+<div
+    class="setting-value"
+    id="uiScaleValue"
+></div>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- NOTIFICATIONS -->
+
+<div class="category">
+
+<button class="category-title">
+    <span>🔔 Notifications</span>
+    <span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+
+<label>Notification sound</label>
+
+<select id="notificationSound">
+
+<option value="false">Off</option>
+<option value="true">On</option>
 
 </select>
 
 </div>
+
+<div class="setting">
+
+<label>Desktop notifications</label>
+
+<select id="desktopNotifications">
+
+<option value="false">Off</option>
+<option value="true">On</option>
+
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Mention notifications</label>
+
+<select id="mentionNotifications">
+
+<option value="false">Off</option>
+<option value="true">On</option>
+
+</select>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- BEHAVIOR -->
+
+<div class="category">
+
+<button class="category-title">
+    <span>⚙️ Behavior</span>
+    <span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+
+<label>Enter to send</label>
+
+<select id="enterToSend">
+
+<option value="true">On</option>
+<option value="false">Off</option>
+
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Auto-scroll</label>
+
+<select id="autoScroll">
+
+<option value="true">On</option>
+<option value="false">Off</option>
+
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Confirm before deleting</label>
+
+<select id="confirmDelete">
+
+<option value="true">On</option>
+<option value="false">Off</option>
+
+</select>
+
+</div>
+
+</div>
+</div>
+
 
 <button
     class="save-btn"
@@ -602,15 +964,18 @@ textarea::placeholder{
 Save settings
 </button>
 
+
+<!-- DANGER -->
+
 <div class="danger-zone">
 
 <div class="danger-title">
-Danger zone
+    ⚠ Danger Zone
 </div>
 
 <p>
-This completely wipes the chat. Every message
-from every user is permanently removed.
+Remove every message from the chat permanently.
+This affects everyone using the chat.
 </p>
 
 <button
@@ -629,17 +994,20 @@ Remove everything
 
 <!-- CONTEXT MENU -->
 
-<div class="context-menu" id="contextMenu">
+<div
+    class="context-menu"
+    id="contextMenu"
+>
 
 <button id="editMessage">
-Edit
+    Edit
 </button>
 
 <button
     class="delete-option"
     id="deleteMessage"
 >
-Delete
+    Delete
 </button>
 
 </div>
@@ -647,7 +1015,10 @@ Delete
 
 <!-- IMAGE VIEWER -->
 
-<div class="image-viewer" id="imageViewer">
+<div
+    class="image-viewer"
+    id="imageViewer"
+>
 
 <button
     class="back-image"
@@ -665,13 +1036,18 @@ Delete
 </div>
 
 
-<!-- CONFIRM -->
+<!-- DIALOG -->
 
-<div class="overlay" id="dialogOverlay">
+<div
+    class="overlay"
+    id="dialogOverlay"
+>
 
 <div class="dialog">
 
-<h2 id="dialogTitle">Confirm</h2>
+<h2 id="dialogTitle">
+Confirm
+</h2>
 
 <p id="dialogText"></p>
 
@@ -691,7 +1067,6 @@ Yes
 </div>
 
 </div>
-
 </div>
 
 
@@ -701,127 +1076,169 @@ const API_URL="/api/messages";
 const CHANNEL="general";
 
 
-/* DEVICE ID */
+/* DEVICE */
 
 let deviceId=localStorage.getItem("chat_device_id");
 
 if(!deviceId){
-
     deviceId=crypto.randomUUID();
-
-    localStorage.setItem(
-        "chat_device_id",
-        deviceId
-    );
-
+    localStorage.setItem("chat_device_id",deviceId);
 }
 
 
-/* SETTINGS */
+/* SETTINGS DEFAULTS */
 
-let username=
-    localStorage.getItem("chat_username")||"";
+const defaults={
+    username:"",
+    theme:"dark",
+    refreshRate:500,
+    showTimestamps:true,
+    compactMessages:false,
+    textSize:16,
+    wordSpacing:0,
+    lineSpacing:1.45,
+    cornerRadius:12,
+    uiScale:1,
+    notificationSound:false,
+    desktopNotifications:false,
+    mentionNotifications:false,
+    enterToSend:true,
+    autoScroll:true,
+    confirmDelete:true
+};
 
-let theme=
-    localStorage.getItem("chat_theme")||"dark";
+function getSetting(key){
+    const value=localStorage.getItem("chat_"+key);
 
-/*
-   DEFAULT = 0.5 SECOND
-*/
+    if(value===null){
+        return defaults[key];
+    }
 
-let refreshRate=
-    Number(
-        localStorage.getItem("chat_refresh")||500
-    );
+    if(
+        value==="true"||
+        value==="false"
+    ){
+        return value==="true";
+    }
+
+    const number=Number(value);
+
+    return Number.isNaN(number)
+        ? value
+        : number;
+}
+
+let settings={};
+
+Object.keys(defaults).forEach(
+    key=>{
+        settings[key]=getSetting(key);
+    }
+);
 
 
 /* ELEMENTS */
 
-const messagesEl=
-    document.getElementById("messages");
+const messagesEl=document.getElementById("messages");
+const messageInput=document.getElementById("messageInput");
+const sendBtn=document.getElementById("sendBtn");
+const imageInput=document.getElementById("imageInput");
+const attachBtn=document.getElementById("attachBtn");
 
-const messageInput=
-    document.getElementById("messageInput");
+const settingsBtn=document.getElementById("settingsBtn");
+const settingsOverlay=document.getElementById("settingsOverlay");
+const closeSettings=document.getElementById("closeSettings");
+const saveSettings=document.getElementById("saveSettings");
 
-const sendBtn=
-    document.getElementById("sendBtn");
+const usernameInput=document.getElementById("usernameInput");
+const deviceIdInput=document.getElementById("deviceIdInput");
 
-const imageInput=
-    document.getElementById("imageInput");
+const themeSelect=document.getElementById("themeSelect");
+const refreshRate=document.getElementById("refreshRate");
+const showTimestamps=document.getElementById("showTimestamps");
+const compactMessages=document.getElementById("compactMessages");
 
-const attachBtn=
-    document.getElementById("attachBtn");
+const textSize=document.getElementById("textSize");
+const wordSpacing=document.getElementById("wordSpacing");
+const lineSpacing=document.getElementById("lineSpacing");
 
-const settingsBtn=
-    document.getElementById("settingsBtn");
+const cornerRadius=document.getElementById("cornerRadius");
+const uiScale=document.getElementById("uiScale");
 
-const settingsOverlay=
-    document.getElementById("settingsOverlay");
+const notificationSound=document.getElementById("notificationSound");
+const desktopNotifications=document.getElementById("desktopNotifications");
+const mentionNotifications=document.getElementById("mentionNotifications");
 
-const closeSettings=
-    document.getElementById("closeSettings");
+const enterToSend=document.getElementById("enterToSend");
+const autoScroll=document.getElementById("autoScroll");
+const confirmDelete=document.getElementById("confirmDelete");
 
-const usernameInput=
-    document.getElementById("usernameInput");
+const contextMenu=document.getElementById("contextMenu");
+const editMessageBtn=document.getElementById("editMessage");
+const deleteMessageBtn=document.getElementById("deleteMessage");
 
-const themeSelect=
-    document.getElementById("themeSelect");
+const imageViewer=document.getElementById("imageViewer");
+const fullImage=document.getElementById("fullImage");
+const backImage=document.getElementById("backImage");
 
-const refreshSelect=
-    document.getElementById("refreshSelect");
+const dialogOverlay=document.getElementById("dialogOverlay");
+const dialogTitle=document.getElementById("dialogTitle");
+const dialogText=document.getElementById("dialogText");
+const dialogCancel=document.getElementById("dialogCancel");
+const dialogConfirm=document.getElementById("dialogConfirm");
 
-const saveSettings=
-    document.getElementById("saveSettings");
-
-const removeEverything=
-    document.getElementById("removeEverything");
-
-const contextMenu=
-    document.getElementById("contextMenu");
-
-const editMessageBtn=
-    document.getElementById("editMessage");
-
-const deleteMessageBtn=
-    document.getElementById("deleteMessage");
-
-const imageViewer=
-    document.getElementById("imageViewer");
-
-const fullImage=
-    document.getElementById("fullImage");
-
-const backImage=
-    document.getElementById("backImage");
-
-const dialogOverlay=
-    document.getElementById("dialogOverlay");
-
-const dialogTitle=
-    document.getElementById("dialogTitle");
-
-const dialogText=
-    document.getElementById("dialogText");
-
-const dialogCancel=
-    document.getElementById("dialogCancel");
-
-const dialogConfirm=
-    document.getElementById("dialogConfirm");
+const removeEverything=document.getElementById("removeEverything");
 
 
 let selectedFile=null;
 let selectedMessage=null;
 let currentMessages=[];
 let confirmCallback=null;
+let refreshTimer=null;
 
 
-/* THEME */
+/* APPLY SETTINGS */
+
+function applySettings(){
+
+    document.documentElement.style.setProperty(
+        "--text-size",
+        settings.textSize+"px"
+    );
+
+    document.documentElement.style.setProperty(
+        "--word-spacing",
+        settings.wordSpacing+"px"
+    );
+
+    document.documentElement.style.setProperty(
+        "--line-spacing",
+        settings.lineSpacing
+    );
+
+    document.documentElement.style.setProperty(
+        "--radius",
+        settings.cornerRadius+"px"
+    );
+
+    document.documentElement.style.setProperty(
+        "--ui-scale",
+        settings.uiScale
+    );
+
+    applyTheme(settings.theme);
+
+    renderMessages();
+
+    startRefreshTimer();
+}
+
+
+/* THEMES */
 
 function applyTheme(name){
 
     const themes={
-
         dark:["#0b0d10","#111419"],
         midnight:["#080b14","#101522"],
         slate:["#101418","#171d22"],
@@ -831,110 +1248,167 @@ function applyTheme(name){
         green:["#09120d","#101b15"],
         red:["#140b0b","#1e1111"],
         gray:["#151515","#202020"],
-        light:["#eeeeee","#ffffff"],
+        light:["#eeeeee","#fff"],
         oled:["#000","#000"]
-
     };
 
     const t=themes[name]||themes.dark;
 
-    document.documentElement.style
-        .setProperty("--bg",t[0]);
+    document.documentElement.style.setProperty(
+        "--bg",t[0]
+    );
 
-    document.documentElement.style
-        .setProperty("--panel",t[1]);
+    document.documentElement.style.setProperty(
+        "--panel",t[1]
+    );
 
+    document.body.style.background=t[0];
 }
 
-applyTheme(theme);
 
-usernameInput.value=username;
-themeSelect.value=theme;
-refreshSelect.value=String(refreshRate);
+/* LOAD SETTINGS UI */
+
+function loadSettingsUI(){
+
+    usernameInput.value=settings.username;
+    deviceIdInput.value=deviceId;
+
+    themeSelect.value=settings.theme;
+    refreshRate.value=settings.refreshRate;
+    showTimestamps.value=String(settings.showTimestamps);
+    compactMessages.value=String(settings.compactMessages);
+
+    textSize.value=settings.textSize;
+    wordSpacing.value=settings.wordSpacing;
+    lineSpacing.value=settings.lineSpacing;
+
+    cornerRadius.value=settings.cornerRadius;
+    uiScale.value=settings.uiScale;
+
+    notificationSound.value=String(settings.notificationSound);
+    desktopNotifications.value=String(settings.desktopNotifications);
+    mentionNotifications.value=String(settings.mentionNotifications);
+
+    enterToSend.value=String(settings.enterToSend);
+    autoScroll.value=String(settings.autoScroll);
+    confirmDelete.value=String(settings.confirmDelete);
+
+    updateRangeLabels();
+}
 
 
-/* SETTINGS */
+function updateRangeLabels(){
+
+    textSizeValue.textContent=settings.textSize+"px";
+    wordSpacingValue.textContent=settings.wordSpacing+"px";
+    lineSpacingValue.textContent=settings.lineSpacing;
+
+    cornerRadiusValue.textContent=settings.cornerRadius+"px";
+    uiScaleValue.textContent=Math.round(settings.uiScale*100)+"%";
+}
+
+const textSizeValue=document.getElementById("textSizeValue");
+const wordSpacingValue=document.getElementById("wordSpacingValue");
+const lineSpacingValue=document.getElementById("lineSpacingValue");
+const cornerRadiusValue=document.getElementById("cornerRadiusValue");
+const uiScaleValue=document.getElementById("uiScaleValue");
+
+
+/* SETTINGS PANEL */
 
 settingsBtn.onclick=()=>{
-
-    usernameInput.value=username;
-    themeSelect.value=theme;
-    refreshSelect.value=String(refreshRate);
-
+    loadSettingsUI();
     settingsOverlay.classList.add("show");
-
 };
 
 closeSettings.onclick=()=>{
-
     settingsOverlay.classList.remove("show");
-
 };
+
 
 saveSettings.onclick=()=>{
 
-    username=
-        usernameInput.value
-        .trim()
-        .substring(0,24);
+    settings.username=usernameInput.value.trim().substring(0,24);
+    settings.theme=themeSelect.value;
 
-    /*
-       Don't allow an empty name.
-       This fixes the "username required" problem
-       after opening the app again.
-    */
+    settings.refreshRate=Number(refreshRate.value);
+    settings.showTimestamps=showTimestamps.value==="true";
+    settings.compactMessages=compactMessages.value==="true";
 
-    if(!username){
+    settings.textSize=Number(textSize.value);
+    settings.wordSpacing=Number(wordSpacing.value);
+    settings.lineSpacing=Number(lineSpacing.value);
 
-        username="User";
+    settings.cornerRadius=Number(cornerRadius.value);
+    settings.uiScale=Number(uiScale.value);
 
-    }
+    settings.notificationSound=notificationSound.value==="true";
+    settings.desktopNotifications=desktopNotifications.value==="true";
+    settings.mentionNotifications=mentionNotifications.value==="true";
 
-    theme=themeSelect.value;
+    settings.enterToSend=enterToSend.value==="true";
+    settings.autoScroll=autoScroll.value==="true";
+    settings.confirmDelete=confirmDelete.value==="true";
 
-    refreshRate=
-        Number(refreshSelect.value);
+    Object.keys(settings).forEach(key=>{
+        localStorage.setItem(
+            "chat_"+key,
+            settings[key]
+        );
+    });
 
-    localStorage.setItem(
-        "chat_username",
-        username
-    );
-
-    localStorage.setItem(
-        "chat_theme",
-        theme
-    );
-
-    localStorage.setItem(
-        "chat_refresh",
-        String(refreshRate)
-    );
-
-    applyTheme(theme);
-
-    restartRefresh();
+    applySettings();
 
     settingsOverlay.classList.remove("show");
+};
 
+
+/* CATEGORY ACCORDIONS */
+
+document.querySelectorAll(".category-title").forEach(btn=>{
+
+    btn.onclick=()=>{
+
+        btn.parentElement.classList.toggle("open");
+
+    };
+
+});
+
+
+/* RANGE PREVIEW */
+
+textSize.oninput=()=>{
+    textSizeValue.textContent=textSize.value+"px";
+};
+
+wordSpacing.oninput=()=>{
+    wordSpacingValue.textContent=wordSpacing.value+"px";
+};
+
+lineSpacing.oninput=()=>{
+    lineSpacingValue.textContent=lineSpacing.value;
+};
+
+cornerRadius.oninput=()=>{
+    cornerRadiusValue.textContent=cornerRadius.value+"px";
+};
+
+uiScale.oninput=()=>{
+    uiScaleValue.textContent=Math.round(uiScale.value*100)+"%";
 };
 
 
 /* TEXTAREA */
 
-messageInput.addEventListener(
-    "input",
-    ()=>{
+messageInput.addEventListener("input",()=>{
 
-        messageInput.style.height="auto";
+    messageInput.style.height="auto";
 
-        messageInput.style.height=
-            Math.min(
-                messageInput.scrollHeight,
-                150
-            )+"px";
+    messageInput.style.height=
+        Math.min(messageInput.scrollHeight,150)+"px";
 
-    }
-);
+});
 
 
 /* IMAGE */
@@ -945,12 +1419,10 @@ attachBtn.onclick=()=>{
 
 imageInput.onchange=()=>{
 
-    selectedFile=
-        imageInput.files[0]||null;
+    selectedFile=imageInput.files[0]||null;
 
     attachBtn.textContent=
-        selectedFile?"✓":"＋";
-
+        selectedFile ? "✓" : "＋";
 };
 
 
@@ -968,39 +1440,35 @@ function resizeImage(file){
 
             img.onload=()=>{
 
-                let w=img.width;
-                let h=img.height;
+                let width=img.width;
+                let height=img.height;
 
                 const max=1500;
 
-                if(w>max||h>max){
+                if(width>max||height>max){
 
-                    const scale=
-                        Math.min(
-                            max/w,
-                            max/h
-                        );
+                    const scale=Math.min(
+                        max/width,
+                        max/height
+                    );
 
-                    w=Math.round(w*scale);
-                    h=Math.round(h*scale);
-
+                    width=Math.round(width*scale);
+                    height=Math.round(height*scale);
                 }
 
-                const canvas=
-                    document.createElement("canvas");
+                const canvas=document.createElement("canvas");
 
-                canvas.width=w;
-                canvas.height=h;
+                canvas.width=width;
+                canvas.height=height;
 
-                const ctx=
-                    canvas.getContext("2d");
+                const ctx=canvas.getContext("2d");
 
                 ctx.drawImage(
                     img,
                     0,
                     0,
-                    w,
-                    h
+                    width,
+                    height
                 );
 
                 resolve(
@@ -1009,19 +1477,16 @@ function resizeImage(file){
                         .78
                     )
                 );
-
             };
 
             img.onerror=reject;
             img.src=reader.result;
-
         };
 
         reader.onerror=reject;
         reader.readAsDataURL(file);
 
     });
-
 }
 
 
@@ -1029,46 +1494,38 @@ function resizeImage(file){
 
 sendBtn.onclick=sendMessage;
 
-messageInput.addEventListener(
-    "keydown",
-    e=>{
+messageInput.addEventListener("keydown",event=>{
 
-        if(
-            e.key==="Enter" &&
-            !e.shiftKey
-        ){
+    if(
+        event.key==="Enter" &&
+        !event.shiftKey &&
+        settings.enterToSend
+    ){
 
-            e.preventDefault();
-            sendMessage();
-
-        }
+        event.preventDefault();
+        sendMessage();
 
     }
-);
+
+});
 
 
 async function sendMessage(){
 
-    /*
-       Automatically create a usable name.
-       This prevents the previous username-required loop.
-    */
+    const text=messageInput.value.trim();
 
-    if(!username){
+    if(!settings.username){
 
-        username="User";
+        settingsBtn.click();
+        usernameInput.focus();
 
-        localStorage.setItem(
-            "chat_username",
-            username
-        );
-
+        alert("Set your name in Settings first.");
+        return;
     }
 
-    const text=
-        messageInput.value.trim();
-
-    if(!text&&!selectedFile)return;
+    if(!text&&!selectedFile){
+        return;
+    }
 
     sendBtn.disabled=true;
 
@@ -1077,46 +1534,29 @@ async function sendMessage(){
         let image=null;
 
         if(selectedFile){
-
-            image=
-                await resizeImage(
-                    selectedFile
-                );
-
+            image=await resizeImage(selectedFile);
         }
 
-        const response=
-            await fetch(API_URL,{
+        const response=await fetch(API_URL,{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                username:settings.username,
+                channel:CHANNEL,
+                message:text,
+                image:image,
+                device_id:deviceId
+            })
+        });
 
-                method:"POST",
-
-                headers:{
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body:JSON.stringify({
-
-                    username,
-                    channel:CHANNEL,
-                    message:text,
-                    image,
-                    device_id:deviceId
-
-                })
-
-            });
-
-        const data=
-            await response.json();
+        const data=await response.json();
 
         if(!response.ok){
-
             throw new Error(
-                data.error||
-                "Failed to send message."
+                data.error||"Failed to send message."
             );
-
         }
 
         messageInput.value="";
@@ -1150,26 +1590,19 @@ async function loadMessages(){
 
     try{
 
-        const response=
-            await fetch(
-                API_URL+
-                "?channel="+
-                encodeURIComponent(CHANNEL),
-                {
-                    cache:"no-store"
-                }
-            );
+        const response=await fetch(
+            API_URL+
+            "?channel="+
+            encodeURIComponent(CHANNEL)
+        );
 
-        const data=
-            await response.json();
+        const data=await response.json();
 
         if(!response.ok){
-
             throw new Error(
                 data.error||
                 "Failed to load messages."
             );
-
         }
 
         currentMessages=
@@ -1181,18 +1614,14 @@ async function loadMessages(){
 
     }catch(error){
 
-        messagesEl.innerHTML="";
-
-        const empty=
-            document.createElement("div");
-
-        empty.className="empty";
-
-        empty.textContent=
-            "Unable to load messages: "+
-            error.message;
-
-        messagesEl.appendChild(empty);
+        messagesEl.innerHTML=`
+            <div class="empty">
+                <div>
+                    <strong>Unable to load messages</strong>
+                    ${escapeHtml(error.message)}
+                </div>
+            </div>
+        `;
 
     }
 
@@ -1203,11 +1632,10 @@ async function loadMessages(){
 
 function renderMessages(){
 
-    const atBottom=
+    const wasBottom=
         messagesEl.scrollHeight-
         messagesEl.scrollTop-
-        messagesEl.clientHeight<
-        100;
+        messagesEl.clientHeight<100;
 
     if(!currentMessages.length){
 
@@ -1221,104 +1649,88 @@ function renderMessages(){
         `;
 
         return;
-
     }
 
-    const fragment=
-        document.createDocumentFragment();
+    const fragment=document.createDocumentFragment();
 
-    for(const message of currentMessages){
+    currentMessages.forEach(message=>{
 
-        const item=
-            document.createElement("div");
+        const item=document.createElement("div");
 
         item.className="message";
 
-        item.dataset.id=
-            message.id;
+        item.dataset.id=message.id;
 
-        item.dataset.deviceId=
-            message.device_id||"";
-
-        const avatar=
-            document.createElement("div");
+        const avatar=document.createElement("div");
 
         avatar.className="avatar";
 
         avatar.textContent=
-            (
-                message.username||
-                "?"
-            )
+            (message.username||"?")
             .charAt(0)
             .toUpperCase();
 
-        const content=
-            document.createElement("div");
+        const content=document.createElement("div");
 
-        content.className=
-            "message-content";
+        content.className="message-content";
 
-        const top=
-            document.createElement("div");
+        const top=document.createElement("div");
 
         top.className="message-top";
 
-        const name=
-            document.createElement("span");
+        const name=document.createElement("span");
 
         name.className="username";
 
         name.textContent=
-            message.username||
-            "User";
-
-        const time=
-            document.createElement("span");
-
-        time.className="time";
-
-        time.textContent=
-            formatTime(
-                message.created_at
-            );
+            message.username||"User";
 
         top.appendChild(name);
-        top.appendChild(time);
+
+        if(settings.showTimestamps){
+
+            const time=document.createElement("span");
+
+            time.className="time";
+
+            time.textContent=
+                formatTime(message.created_at);
+
+            top.appendChild(time);
+        }
 
         if(message.edited){
 
-            const edited=
-                document.createElement("span");
+            const edited=document.createElement("span");
 
             edited.className="edited";
+
             edited.textContent="(edited)";
 
             top.appendChild(edited);
-
         }
 
         content.appendChild(top);
 
         if(message.message){
 
-            const text=
-                document.createElement("div");
+            const text=document.createElement("div");
 
             text.className="message-text";
+
             text.textContent=message.message;
 
             content.appendChild(text);
-
         }
 
         if(message.image){
 
-            const img=
-                document.createElement("img");
+            const img=document.createElement("img");
 
             img.className="message-image";
+
             img.src=message.image;
+
             img.alt="Image";
 
             img.onclick=()=>{
@@ -1326,52 +1738,48 @@ function renderMessages(){
             };
 
             content.appendChild(img);
-
         }
 
         item.appendChild(avatar);
         item.appendChild(content);
 
-        /*
-           Context menu only appears for YOUR device ID.
-           Username is never used for ownership.
-        */
+        if(
+            message.device_id &&
+            message.device_id===deviceId
+        ){
 
-        item.addEventListener(
-            "contextmenu",
-            e=>{
+            item.addEventListener(
+                "contextmenu",
+                event=>{
 
-                e.preventDefault();
-
-                if(
-                    String(message.device_id||"")===
-                    String(deviceId)
-                ){
+                    event.preventDefault();
 
                     showContextMenu(
-                        e.clientX,
-                        e.clientY,
+                        event.clientX,
+                        event.clientY,
                         message
                     );
 
                 }
+            );
 
-            }
-        );
+        }
 
         fragment.appendChild(item);
 
-    }
+    });
 
     messagesEl.replaceChildren(fragment);
 
-    if(atBottom){
+    if(
+        wasBottom &&
+        settings.autoScroll
+    ){
 
         messagesEl.scrollTop=
             messagesEl.scrollHeight;
 
     }
-
 }
 
 
@@ -1394,76 +1802,54 @@ function showContextMenu(x,y,message){
         )+"px";
 
     contextMenu.classList.add("show");
-
 }
 
-document.addEventListener(
-    "click",
-    ()=>{
-        contextMenu.classList.remove("show");
-    }
-);
+
+document.addEventListener("click",()=>{
+
+    contextMenu.classList.remove("show");
+
+});
 
 
 /* EDIT */
 
-editMessageBtn.onclick=async e=>{
+editMessageBtn.onclick=async event=>{
 
-    e.stopPropagation();
+    event.stopPropagation();
 
     contextMenu.classList.remove("show");
 
     if(!selectedMessage)return;
 
-    if(
-        String(selectedMessage.device_id||"")!==
-        String(deviceId)
-    ){
+    const newText=prompt(
+        "Edit message:",
+        selectedMessage.message||""
+    );
 
-        return;
-
-    }
-
-    const text=
-        prompt(
-            "Edit message:",
-            selectedMessage.message||""
-        );
-
-    if(text===null)return;
+    if(newText===null)return;
 
     try{
 
-        const response=
-            await fetch(API_URL,{
+        const response=await fetch(API_URL,{
+            method:"PATCH",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                id:selectedMessage.id,
+                device_id:deviceId,
+                message:newText.trim()
+            })
+        });
 
-                method:"PATCH",
-
-                headers:{
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body:JSON.stringify({
-
-                    id:selectedMessage.id,
-                    device_id:deviceId,
-                    message:text.trim()
-
-                })
-
-            });
-
-        const data=
-            await response.json();
+        const data=await response.json();
 
         if(!response.ok){
-
             throw new Error(
                 data.error||
                 "Failed to edit message."
             );
-
         }
 
         await loadMessages();
@@ -1476,92 +1862,83 @@ editMessageBtn.onclick=async e=>{
         );
 
     }
-
 };
 
 
-/* DELETE OWN MESSAGE */
+/* DELETE */
 
-deleteMessageBtn.onclick=e=>{
+deleteMessageBtn.onclick=event=>{
 
-    e.stopPropagation();
+    event.stopPropagation();
 
     contextMenu.classList.remove("show");
 
     if(!selectedMessage)return;
 
-    if(
-        String(selectedMessage.device_id||"")!==
-        String(deviceId)
-    ){
+    if(settings.confirmDelete){
 
-        return;
+        openConfirm(
+            "Delete message?",
+            "This message will be permanently removed.",
+            deleteSelectedMessage
+        );
+
+    }else{
+
+        deleteSelectedMessage();
 
     }
-
-    openConfirm(
-        "Delete message?",
-        "Only this message will be permanently removed.",
-        async()=>{
-
-            try{
-
-                const response=
-                    await fetch(API_URL,{
-
-                        method:"DELETE",
-
-                        headers:{
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body:JSON.stringify({
-
-                            id:selectedMessage.id,
-                            device_id:deviceId
-
-                        })
-
-                    });
-
-                const data=
-                    await response.json();
-
-                if(!response.ok){
-
-                    throw new Error(
-                        data.error||
-                        "Failed to delete."
-                    );
-
-                }
-
-                await loadMessages();
-
-            }catch(error){
-
-                alert(
-                    "Failed to delete:\n\n"+
-                    error.message
-                );
-
-            }
-
-        }
-    );
-
 };
 
 
-/* IMAGE FULLSCREEN */
+async function deleteSelectedMessage(){
+
+    if(!selectedMessage)return;
+
+    try{
+
+        const response=await fetch(API_URL,{
+            method:"DELETE",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                id:selectedMessage.id,
+                device_id:deviceId
+            })
+        });
+
+        const data=await response.json();
+
+        if(!response.ok){
+            throw new Error(
+                data.error||
+                "Failed to delete message."
+            );
+        }
+
+        selectedMessage=null;
+
+        await loadMessages();
+
+    }catch(error){
+
+        alert(
+            "Failed to delete:\n\n"+
+            error.message
+        );
+
+    }
+}
+
+
+/* IMAGE VIEWER */
 
 function openImage(src){
 
     fullImage.src=src;
 
     imageViewer.classList.add("show");
-
 }
 
 function closeImage(){
@@ -1569,18 +1946,30 @@ function closeImage(){
     imageViewer.classList.remove("show");
 
     fullImage.src="";
-
 }
 
 backImage.onclick=closeImage;
 
-imageViewer.onclick=e=>{
+imageViewer.onclick=event=>{
 
-    if(e.target===imageViewer){
+    if(event.target===imageViewer){
         closeImage();
     }
 
 };
+
+document.addEventListener("keydown",event=>{
+
+    if(
+        event.key==="Escape" &&
+        imageViewer.classList.contains("show")
+    ){
+
+        closeImage();
+
+    }
+
+});
 
 
 /* CONFIRM */
@@ -1588,12 +1977,12 @@ imageViewer.onclick=e=>{
 function openConfirm(title,text,callback){
 
     dialogTitle.textContent=title;
+
     dialogText.textContent=text;
 
     confirmCallback=callback;
 
     dialogOverlay.classList.add("show");
-
 }
 
 dialogCancel.onclick=()=>{
@@ -1615,44 +2004,30 @@ dialogConfirm.onclick=async()=>{
     if(callback){
         await callback();
     }
-
 };
 
 
-/* GLOBAL WIPE */
+/* REMOVE EVERYTHING */
 
 removeEverything.onclick=()=>{
 
     openConfirm(
         "Remove everything?",
-        "This will permanently remove EVERY message from EVERY user. The chat will become completely empty.",
+        "This will permanently remove every message and image from the chat for EVERYONE.",
         ()=>{
-
             openConfirm(
                 "I know",
-                "You understand that this is a global wipe and every message will be removed for everyone.",
+                "You understand that the entire chat history will be deleted.",
                 ()=>{
-
                     openConfirm(
-                        "Are you sure?",
-                        "There is no undo button. Continue?",
-                        ()=>{
-
-                            openConfirm(
-                                "Last time",
-                                "Are you ultra sure every memory is being removed and has no evidence of existing?",
-                                permanentlyDeleteEverything
-                            );
-
-                        }
+                        "Are you ultra sure?",
+                        "Last time: every stored message and image will be permanently removed and there will be no chat history left.",
+                        permanentlyDeleteEverything
                     );
-
                 }
             );
-
         }
     );
-
 };
 
 
@@ -1660,56 +2035,54 @@ async function permanentlyDeleteEverything(){
 
     try{
 
-        const response=
-            await fetch(API_URL,{
+        const response=await fetch(API_URL,{
+            method:"DELETE",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                delete_all:true
+            })
+        });
 
-                method:"DELETE",
-
-                headers:{
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body:JSON.stringify({
-
-                    delete_all:true
-
-                })
-
-            });
-
-        const data=
-            await response.json();
+        const data=await response.json();
 
         if(!response.ok){
 
             throw new Error(
                 data.error||
-                "The server refused the global wipe."
+                "Failed to remove everything."
             );
-
         }
 
         currentMessages=[];
 
         renderMessages();
 
-        alert(
-            "The entire chat has been wiped for everyone."
-        );
-
-        await loadMessages();
+        alert("The entire chat has been wiped.");
 
     }catch(error){
 
         alert(
-            "Global wipe failed:\n\n"+
-            error.message+
-            "\n\nMake sure the DELETE policy/API setup below has been added."
+            "Failed to wipe chat:\n\n"+
+            error.message
         );
+    }
+}
 
+
+/* REFRESH */
+
+function startRefreshTimer(){
+
+    if(refreshTimer){
+        clearInterval(refreshTimer);
     }
 
+    refreshTimer=setInterval(
+        loadMessages,
+        Number(settings.refreshRate)
+    );
 }
 
 
@@ -1717,41 +2090,37 @@ async function permanentlyDeleteEverything(){
 
 function formatTime(date){
 
-    if(!date)return"";
+    if(!date)return "";
 
-    const d=new Date(date);
-
-    return d.toLocaleTimeString([],{
-        hour:"2-digit",
-        minute:"2-digit"
-    });
-
+    return new Date(date).toLocaleTimeString(
+        [],
+        {
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
 }
 
 
-/* REFRESH */
+function escapeHtml(value){
 
-let refreshTimer=null;
-
-function restartRefresh(){
-
-    if(refreshTimer){
-        clearInterval(refreshTimer);
-    }
-
-    refreshTimer=
-        setInterval(
-            loadMessages,
-            refreshRate
-        );
-
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
 }
 
+
+/* START */
+
+loadSettingsUI();
+applySettings();
 loadMessages();
-
-restartRefresh();
 
 </script>
 
 </body>
 </html>
+```
