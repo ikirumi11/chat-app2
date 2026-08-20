@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -116,7 +117,7 @@ button{
 }
 
 .message.compact{
-    margin-bottom:7px;
+    margin-bottom:6px;
 }
 
 .avatar{
@@ -161,16 +162,6 @@ button{
     line-height:var(--line-spacing);
 }
 
-.message-link{
-    color:#8ab4ff;
-    text-decoration:underline;
-    cursor:pointer;
-}
-
-.message-link:hover{
-    color:#b7d2ff;
-}
-
 .message-image{
     display:block;
     max-width:min(500px,80vw);
@@ -181,15 +172,6 @@ button{
     background:#000;
     object-fit:contain;
     cursor:pointer;
-}
-
-.link-url{
-    display:block;
-    margin-top:5px;
-    color:#8ab4ff;
-    font-size:12px;
-    overflow-wrap:anywhere;
-    text-decoration:underline;
 }
 
 /* COMPOSER */
@@ -363,29 +345,15 @@ textarea{
     margin-top:5px;
 }
 
-.save-btn,
-.test-notification-btn{
+.save-btn{
     width:100%;
     margin-top:8px;
     padding:12px;
     border:0;
     border-radius:9px;
-    font-weight:700;
-}
-
-.save-btn{
     background:var(--accent);
     color:#111;
-}
-
-.test-notification-btn{
-    background:#252b33;
-    border:1px solid var(--border);
-    color:white;
-}
-
-.test-notification-btn:hover{
-    background:#303740;
+    font-weight:700;
 }
 
 /* DANGER */
@@ -539,6 +507,79 @@ textarea{
     margin-bottom:5px;
 }
 
+/* WINDOWS NOTIFICATION PREVIEW */
+
+.windows-notification{
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    width:min(390px,calc(100vw - 30px));
+    background:#202020;
+    border:1px solid #4b4b4b;
+    border-radius:8px;
+    box-shadow:0 18px 50px #000b;
+    padding:14px;
+    z-index:1000;
+    display:none;
+    animation:notificationIn .25s ease;
+}
+
+.windows-notification.show{
+    display:block;
+}
+
+.notification-top{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:9px;
+}
+
+.notification-icon{
+    width:30px;
+    height:30px;
+    display:grid;
+    place-items:center;
+    background:#303030;
+    border-radius:5px;
+}
+
+.notification-title{
+    font-weight:700;
+    flex:1;
+}
+
+.notification-close{
+    background:none;
+    border:0;
+    color:#aaa;
+    font-size:18px;
+}
+
+.notification-body{
+    color:#e5e5e5;
+    font-size:14px;
+    line-height:1.4;
+    overflow-wrap:anywhere;
+}
+
+.notification-link{
+    color:#58a6ff;
+    text-decoration:underline;
+    cursor:pointer;
+}
+
+@keyframes notificationIn{
+    from{
+        opacity:0;
+        transform:translateY(20px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
 @media(max-width:600px){
 
     .header{
@@ -557,6 +598,10 @@ textarea{
         max-width:calc(100vw - 70px);
     }
 
+    .windows-notification{
+        right:10px;
+        bottom:10px;
+    }
 }
 </style>
 </head>
@@ -581,10 +626,7 @@ textarea{
 
 </header>
 
-<main
-    class="messages"
-    id="messages"
-></main>
+<main class="messages" id="messages"></main>
 
 <div class="composer">
 
@@ -623,10 +665,7 @@ textarea{
 
 <!-- SETTINGS -->
 
-<div
-    class="overlay"
-    id="settingsOverlay"
->
+<div class="overlay" id="settingsOverlay">
 
 <div class="panel">
 
@@ -634,15 +673,11 @@ textarea{
 
     <h2>Settings</h2>
 
-    <button
-        class="icon-btn"
-        id="closeSettings"
-    >×</button>
+    <button class="icon-btn" id="closeSettings">×</button>
 
 </div>
 
 <div class="panel-body">
-
 
 <!-- PROFILE -->
 
@@ -656,26 +691,13 @@ textarea{
 <div class="category-body">
 
 <div class="setting">
-
 <label>Your name</label>
-
-<input
-    id="usernameInput"
-    maxlength="24"
-    placeholder="Enter your name"
->
-
+<input id="usernameInput" maxlength="24" placeholder="Enter your name">
 </div>
 
 <div class="setting">
-
 <label>Device ID</label>
-
-<input
-    id="deviceIdInput"
-    readonly
->
-
+<input id="deviceIdInput" readonly>
 </div>
 
 </div>
@@ -694,51 +716,21 @@ textarea{
 <div class="category-body">
 
 <div class="setting">
-
 <label>Text size</label>
-
-<input
-    id="textSize"
-    type="range"
-    min="12"
-    max="24"
-    step="1"
->
-
+<input id="textSize" type="range" min="12" max="24" step="1">
 <div class="setting-value" id="textSizeValue"></div>
-
 </div>
 
 <div class="setting">
-
 <label>Word spacing</label>
-
-<input
-    id="wordSpacing"
-    type="range"
-    min="0"
-    max="12"
-    step="1"
->
-
+<input id="wordSpacing" type="range" min="0" max="12" step="1">
 <div class="setting-value" id="wordSpacingValue"></div>
-
 </div>
 
 <div class="setting">
-
 <label>Line spacing</label>
-
-<input
-    id="lineSpacing"
-    type="range"
-    min="1"
-    max="2"
-    step=".05"
->
-
+<input id="lineSpacing" type="range" min="1" max="2" step=".05">
 <div class="setting-value" id="lineSpacingValue"></div>
-
 </div>
 
 </div>
@@ -757,11 +749,9 @@ textarea{
 <div class="category-body">
 
 <div class="setting">
-
 <label>Refresh rate</label>
 
 <select id="refreshRate">
-
 <option value="10000">10 seconds</option>
 <option value="5000">5 seconds</option>
 <option value="3000">3 seconds</option>
@@ -769,31 +759,23 @@ textarea{
 <option value="1000">1 second</option>
 <option value="500">0.5 seconds</option>
 <option value="100">0.1 seconds</option>
-
 </select>
-
 </div>
 
 <div class="setting">
-
 <label>Show timestamps</label>
-
 <select id="showTimestamps">
 <option value="true">On</option>
 <option value="false">Off</option>
 </select>
-
 </div>
 
 <div class="setting">
-
 <label>Compact messages</label>
-
 <select id="compactMessages">
 <option value="false">Off</option>
 <option value="true">On</option>
 </select>
-
 </div>
 
 </div>
@@ -812,11 +794,9 @@ textarea{
 <div class="category-body">
 
 <div class="setting">
-
 <label>Theme</label>
 
 <select id="themeSelect">
-
 <option value="dark">Dark</option>
 <option value="midnight">Midnight</option>
 <option value="slate">Slate</option>
@@ -828,40 +808,19 @@ textarea{
 <option value="gray">Classic Gray</option>
 <option value="light">Light</option>
 <option value="oled">OLED</option>
-
 </select>
-
 </div>
 
 <div class="setting">
-
 <label>Corner roundness</label>
-
-<input
-    id="cornerRadius"
-    type="range"
-    min="0"
-    max="25"
->
-
+<input id="cornerRadius" type="range" min="0" max="25">
 <div class="setting-value" id="cornerRadiusValue"></div>
-
 </div>
 
 <div class="setting">
-
 <label>UI scale</label>
-
-<input
-    id="uiScale"
-    type="range"
-    min=".8"
-    max="1.2"
-    step=".05"
->
-
+<input id="uiScale" type="range" min=".8" max="1.2" step=".05">
 <div class="setting-value" id="uiScaleValue"></div>
-
 </div>
 
 </div>
@@ -880,50 +839,81 @@ textarea{
 <div class="category-body">
 
 <div class="setting">
-
 <label>Notification sound</label>
 
 <select id="notificationSound">
-
 <option value="false">Off</option>
 <option value="true">On</option>
-
 </select>
-
 </div>
 
 <div class="setting">
+<label>Sound</label>
 
+<select id="notificationSoundType">
+<option value="1">1 — Classic</option>
+<option value="2">2 — Soft</option>
+<option value="3">3 — Double Beep</option>
+<option value="4">4 — Digital</option>
+<option value="5">5 — Bell</option>
+<option value="6">6 — Rising</option>
+<option value="7">7 — Falling</option>
+<option value="8">8 — Pulse</option>
+<option value="9">9 — Alert</option>
+<option value="10">10 — Deep</option>
+<option value="11">11 — Nuclear Alarm</option>
+<option value="12">12 — Opera</option>
+</select>
+</div>
+
+<div class="setting">
+<label>Sound volume</label>
+<input id="notificationVolume" type="range" min="0" max="100" value="70">
+<div class="setting-value" id="notificationVolumeValue">70%</div>
+</div>
+
+<div class="setting">
+<label>Sound duration</label>
+
+<select id="notificationDuration">
+<option value="500">0.5 second</option>
+<option value="1000">1 second</option>
+<option value="2000">2 seconds</option>
+<option value="3000">3 seconds</option>
+<option value="5000">5 seconds</option>
+<option value="10000">10 seconds</option>
+</select>
+</div>
+
+<div class="setting">
 <label>Desktop notifications</label>
 
 <select id="desktopNotifications">
-
 <option value="false">Off</option>
 <option value="true">On</option>
-
 </select>
+</div>
 
+<div class="setting">
+<label>Mention notifications</label>
+
+<select id="mentionNotifications">
+<option value="false">Off</option>
+<option value="true">On</option>
+</select>
 </div>
 
 <div class="setting">
 
-<label>Mention notifications</label>
-
-<select id="mentionNotifications">
-
-<option value="false">Off</option>
-<option value="true">On</option>
-
-</select>
+<button
+    class="save-btn"
+    id="testNotification"
+    type="button"
+>
+Test Windows notification
+</button>
 
 </div>
-
-<button
-    class="test-notification-btn"
-    id="testNotification"
->
-🔔 Test Windows Notification
-</button>
 
 </div>
 </div>
@@ -941,52 +931,34 @@ textarea{
 <div class="category-body">
 
 <div class="setting">
-
 <label>Enter to send</label>
-
 <select id="enterToSend">
-
 <option value="true">On</option>
 <option value="false">Off</option>
-
 </select>
-
 </div>
 
 <div class="setting">
-
 <label>Auto-scroll</label>
-
 <select id="autoScroll">
-
 <option value="true">On</option>
 <option value="false">Off</option>
-
 </select>
-
 </div>
 
 <div class="setting">
-
 <label>Confirm before deleting</label>
-
 <select id="confirmDelete">
-
 <option value="true">On</option>
 <option value="false">Off</option>
-
 </select>
-
 </div>
 
 </div>
 </div>
 
 
-<button
-    class="save-btn"
-    id="saveSettings"
->
+<button class="save-btn" id="saveSettings">
 Save settings
 </button>
 
@@ -1004,10 +976,7 @@ Remove every message from the chat permanently.
 This affects everyone using the chat.
 </p>
 
-<button
-    class="danger-btn"
-    id="removeEverything"
->
+<button class="danger-btn" id="removeEverything">
 Remove everything
 </button>
 
@@ -1020,20 +989,14 @@ Remove everything
 
 <!-- CONTEXT MENU -->
 
-<div
-    class="context-menu"
-    id="contextMenu"
->
+<div class="context-menu" id="contextMenu">
 
 <button id="editMessage">
-    Edit
+Edit
 </button>
 
-<button
-    class="delete-option"
-    id="deleteMessage"
->
-    Delete
+<button class="delete-option" id="deleteMessage">
+Delete
 </button>
 
 </div>
@@ -1041,33 +1004,20 @@ Remove everything
 
 <!-- IMAGE VIEWER -->
 
-<div
-    class="image-viewer"
-    id="imageViewer"
->
+<div class="image-viewer" id="imageViewer">
 
-<button
-    class="back-image"
-    id="backImage"
->
+<button class="back-image" id="backImage">
 ← Back
 </button>
 
-<img
-    class="full-image"
-    id="fullImage"
-    alt="Full image"
->
+<img class="full-image" id="fullImage" alt="Full image">
 
 </div>
 
 
 <!-- DIALOG -->
 
-<div
-    class="overlay"
-    id="dialogOverlay"
->
+<div class="overlay" id="dialogOverlay">
 
 <div class="dialog">
 
@@ -1081,10 +1031,7 @@ Remove everything
 Cancel
 </button>
 
-<button
-    class="danger"
-    id="dialogConfirm"
->
+<button class="danger" id="dialogConfirm">
 Yes
 </button>
 
@@ -1094,54 +1041,107 @@ Yes
 </div>
 
 
+<!-- WINDOWS STYLE NOTIFICATION -->
+
+<div
+    class="windows-notification"
+    id="windowsNotification"
+>
+
+<div class="notification-top">
+
+<div class="notification-icon">
+💬
+</div>
+
+<div class="notification-title">
+Chat
+</div>
+
+<button
+    class="notification-close"
+    id="notificationClose"
+>
+×
+</button>
+
+</div>
+
+<div
+    class="notification-body"
+    id="notificationBody"
+>
+New message
+</div>
+
+</div>
+
+
 <script>
 
 const API_URL="/api/messages";
 const CHANNEL="general";
 
 
-/* DEVICE */
+/* =========================================================
+DEVICE
+========================================================= */
 
 let deviceId=localStorage.getItem("chat_device_id");
 
 if(!deviceId){
 
-    deviceId=
-        crypto.randomUUID();
+    deviceId=crypto.randomUUID();
 
     localStorage.setItem(
         "chat_device_id",
         deviceId
     );
-
 }
 
 
-/* SETTINGS */
+/* =========================================================
+SETTINGS
+========================================================= */
 
 const defaults={
 
     username:"",
+
     theme:"dark",
 
     refreshRate:500,
 
     showTimestamps:true,
+
     compactMessages:false,
 
     textSize:16,
+
     wordSpacing:0,
+
     lineSpacing:1.45,
 
     cornerRadius:12,
+
     uiScale:1,
 
-    notificationSound:false,
-    desktopNotifications:false,
-    mentionNotifications:false,
+    notificationSound:true,
+
+    notificationSoundType:1,
+
+    notificationVolume:70,
+
+    notificationDuration:1000,
+
+    desktopNotifications:true,
+
+    mentionNotifications:true,
 
     enterToSend:true,
+
     autoScroll:true,
+
     confirmDelete:true
 
 };
@@ -1159,7 +1159,7 @@ function getSetting(key){
     }
 
     if(
-        value==="true" ||
+        value==="true"||
         value==="false"
     ){
         return value==="true";
@@ -1170,21 +1170,21 @@ function getSetting(key){
     return Number.isNaN(number)
         ?value
         :number;
-
 }
 
 
 let settings={};
 
-Object.keys(defaults).forEach(key=>{
+Object.keys(defaults).forEach(
+    key=>{
+        settings[key]=getSetting(key);
+    }
+);
 
-    settings[key]=
-        getSetting(key);
 
-});
-
-
-/* ELEMENTS */
+/* =========================================================
+ELEMENTS
+========================================================= */
 
 const messagesEl=
     document.getElementById("messages");
@@ -1201,7 +1201,6 @@ const imageInput=
 const attachBtn=
     document.getElementById("attachBtn");
 
-
 const settingsBtn=
     document.getElementById("settingsBtn");
 
@@ -1214,13 +1213,11 @@ const closeSettings=
 const saveSettings=
     document.getElementById("saveSettings");
 
-
 const usernameInput=
     document.getElementById("usernameInput");
 
 const deviceIdInput=
     document.getElementById("deviceIdInput");
-
 
 const themeSelect=
     document.getElementById("themeSelect");
@@ -1234,7 +1231,6 @@ const showTimestamps=
 const compactMessages=
     document.getElementById("compactMessages");
 
-
 const textSize=
     document.getElementById("textSize");
 
@@ -1244,26 +1240,44 @@ const wordSpacing=
 const lineSpacing=
     document.getElementById("lineSpacing");
 
-
 const cornerRadius=
     document.getElementById("cornerRadius");
 
 const uiScale=
     document.getElementById("uiScale");
 
-
 const notificationSound=
     document.getElementById("notificationSound");
 
+const notificationSoundType=
+    document.getElementById(
+        "notificationSoundType"
+    );
+
+const notificationVolume=
+    document.getElementById(
+        "notificationVolume"
+    );
+
+const notificationDuration=
+    document.getElementById(
+        "notificationDuration"
+    );
+
 const desktopNotifications=
-    document.getElementById("desktopNotifications");
+    document.getElementById(
+        "desktopNotifications"
+    );
 
 const mentionNotifications=
-    document.getElementById("mentionNotifications");
+    document.getElementById(
+        "mentionNotifications"
+    );
 
 const testNotification=
-    document.getElementById("testNotification");
-
+    document.getElementById(
+        "testNotification"
+    );
 
 const enterToSend=
     document.getElementById("enterToSend");
@@ -1274,7 +1288,6 @@ const autoScroll=
 const confirmDelete=
     document.getElementById("confirmDelete");
 
-
 const contextMenu=
     document.getElementById("contextMenu");
 
@@ -1284,7 +1297,6 @@ const editMessageBtn=
 const deleteMessageBtn=
     document.getElementById("deleteMessage");
 
-
 const imageViewer=
     document.getElementById("imageViewer");
 
@@ -1293,7 +1305,6 @@ const fullImage=
 
 const backImage=
     document.getElementById("backImage");
-
 
 const dialogOverlay=
     document.getElementById("dialogOverlay");
@@ -1310,25 +1321,55 @@ const dialogCancel=
 const dialogConfirm=
     document.getElementById("dialogConfirm");
 
-
 const removeEverything=
-    document.getElementById("removeEverything");
+    document.getElementById(
+        "removeEverything"
+    );
 
+const windowsNotification=
+    document.getElementById(
+        "windowsNotification"
+    );
+
+const notificationBody=
+    document.getElementById(
+        "notificationBody"
+    );
+
+const notificationClose=
+    document.getElementById(
+        "notificationClose"
+    );
 
 const textSizeValue=
-    document.getElementById("textSizeValue");
+    document.getElementById(
+        "textSizeValue"
+    );
 
 const wordSpacingValue=
-    document.getElementById("wordSpacingValue");
+    document.getElementById(
+        "wordSpacingValue"
+    );
 
 const lineSpacingValue=
-    document.getElementById("lineSpacingValue");
+    document.getElementById(
+        "lineSpacingValue"
+    );
 
 const cornerRadiusValue=
-    document.getElementById("cornerRadiusValue");
+    document.getElementById(
+        "cornerRadiusValue"
+    );
 
 const uiScaleValue=
-    document.getElementById("uiScaleValue");
+    document.getElementById(
+        "uiScaleValue"
+    );
+
+const notificationVolumeValue=
+    document.getElementById(
+        "notificationVolumeValue"
+    );
 
 
 let selectedFile=null;
@@ -1337,250 +1378,17 @@ let currentMessages=[];
 let confirmCallback=null;
 let refreshTimer=null;
 
+let lastKnownMessageIds=
+    new Set();
 
-/* =========================================================
-   NOTIFICATIONS
-   ========================================================= */
+let firstMessageLoad=true;
 
-let notificationAudioContext=null;
-
-function getAudioContext(){
-
-    if(!notificationAudioContext){
-
-        const AudioContextClass=
-            window.AudioContext ||
-            window.webkitAudioContext;
-
-        if(!AudioContextClass){
-            return null;
-        }
-
-        notificationAudioContext=
-            new AudioContextClass();
-
-    }
-
-    return notificationAudioContext;
-}
-
-
-function playNotificationSound(){
-
-    if(!settings.notificationSound){
-        return;
-    }
-
-    const ctx=getAudioContext();
-
-    if(!ctx){
-        return;
-    }
-
-    if(ctx.state==="suspended"){
-        ctx.resume();
-    }
-
-    const now=ctx.currentTime;
-
-    const oscillator=
-        ctx.createOscillator();
-
-    const gain=
-        ctx.createGain();
-
-    oscillator.type="sine";
-
-    oscillator.frequency.setValueAtTime(
-        740,
-        now
-    );
-
-    oscillator.frequency.exponentialRampToValueAtTime(
-        520,
-        now+0.16
-    );
-
-    gain.gain.setValueAtTime(
-        0.0001,
-        now
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        0.12,
-        now+0.015
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        0.0001,
-        now+0.18
-    );
-
-    oscillator.connect(gain);
-    gain.connect(ctx.destination);
-
-    oscillator.start(now);
-    oscillator.stop(now+0.2);
-
-}
-
-
-async function requestNotificationPermission(){
-
-    if(!("Notification" in window)){
-
-        alert(
-            "Desktop notifications are not supported by this browser."
-        );
-
-        return false;
-    }
-
-    if(Notification.permission==="granted"){
-        return true;
-    }
-
-    if(Notification.permission==="denied"){
-
-        alert(
-            "Notifications are blocked for this site. " +
-            "Allow notifications in your browser's site settings."
-        );
-
-        return false;
-    }
-
-    const permission=
-        await Notification.requestPermission();
-
-    return permission==="granted";
-
-}
-
-
-async function showDesktopNotification(
-    title,
-    body,
-    image=null
-){
-
-    if(!settings.desktopNotifications){
-        return;
-    }
-
-    if(
-        !("Notification" in window)
-    ){
-        return;
-    }
-
-    const allowed=
-        await requestNotificationPermission();
-
-    if(!allowed){
-        return;
-    }
-
-    try{
-
-        const options={
-            body:body,
-            icon:"data:image/svg+xml,"+
-            encodeURIComponent(`
-                <svg xmlns="http://www.w3.org/2000/svg"
-                     width="128"
-                     height="128">
-                    <rect width="128"
-                          height="128"
-                          rx="25"
-                          fill="#181c22"/>
-                    <text x="64"
-                          y="78"
-                          text-anchor="middle"
-                          font-size="65">
-                        💬
-                    </text>
-                </svg>
-            `),
-            tag:"chat-message",
-            renotify:true
-        };
-
-        if(image){
-            options.image=image;
-        }
-
-        const notification=
-            new Notification(
-                title,
-                options
-            );
-
-        notification.onclick=()=>{
-
-            window.focus();
-
-            notification.close();
-
-        };
-
-    }catch(error){
-
-        console.error(
-            "Notification error:",
-            error
-        );
-
-    }
-
-}
-
-
-testNotification.onclick=async()=>{
-
-    playNotificationSound();
-
-    const allowed=
-        await requestNotificationPermission();
-
-    if(!allowed){
-        return;
-    }
-
-    try{
-
-        const notification=
-            new Notification(
-                "Chat",
-                {
-                    body:"This is a test Windows notification.",
-                    tag:"chat-test-notification",
-                    renotify:true
-                }
-            );
-
-        notification.onclick=()=>{
-
-            window.focus();
-            notification.close();
-
-        };
-
-    }catch(error){
-
-        alert(
-            "Could not create notification:\n\n"+
-            error.message
-        );
-
-    }
-
-};
+let notificationTimeout=null;
 
 
 /* =========================================================
-   SETTINGS
-   ========================================================= */
+SETTINGS APPLY
+========================================================= */
 
 function applySettings(){
 
@@ -1609,31 +1417,42 @@ function applySettings(){
         settings.uiScale
     );
 
-    applyTheme(
-        settings.theme
-    );
+    applyTheme(settings.theme);
 
     renderMessages();
 
     startRefreshTimer();
-
 }
 
+
+/* =========================================================
+THEMES
+========================================================= */
 
 function applyTheme(name){
 
     const themes={
 
         dark:["#0b0d10","#111419"],
+
         midnight:["#080b14","#101522"],
+
         slate:["#101418","#171d22"],
+
         black:["#000","#090909"],
+
         blue:["#091018","#101c29"],
+
         purple:["#100b17","#191021"],
+
         green:["#09120d","#101b15"],
+
         red:["#140b0b","#1e1111"],
+
         gray:["#151515","#202020"],
+
         light:["#eeeeee","#fff"],
+
         oled:["#000","#000"]
 
     };
@@ -1652,11 +1471,13 @@ function applyTheme(name){
         t[1]
     );
 
-    document.body.style.background=
-        t[0];
-
+    document.body.style.background=t[0];
 }
 
+
+/* =========================================================
+LOAD SETTINGS UI
+========================================================= */
 
 function loadSettingsUI(){
 
@@ -1670,14 +1491,13 @@ function loadSettingsUI(){
         settings.theme;
 
     refreshRate.value=
-        String(settings.refreshRate);
+        settings.refreshRate;
 
     showTimestamps.value=
         String(settings.showTimestamps);
 
     compactMessages.value=
         String(settings.compactMessages);
-
 
     textSize.value=
         settings.textSize;
@@ -1688,23 +1508,29 @@ function loadSettingsUI(){
     lineSpacing.value=
         settings.lineSpacing;
 
-
     cornerRadius.value=
         settings.cornerRadius;
 
     uiScale.value=
         settings.uiScale;
 
-
     notificationSound.value=
         String(settings.notificationSound);
+
+    notificationSoundType.value=
+        settings.notificationSoundType;
+
+    notificationVolume.value=
+        settings.notificationVolume;
+
+    notificationDuration.value=
+        settings.notificationDuration;
 
     desktopNotifications.value=
         String(settings.desktopNotifications);
 
     mentionNotifications.value=
         String(settings.mentionNotifications);
-
 
     enterToSend.value=
         String(settings.enterToSend);
@@ -1715,9 +1541,7 @@ function loadSettingsUI(){
     confirmDelete.value=
         String(settings.confirmDelete);
 
-
     updateRangeLabels();
-
 }
 
 
@@ -1740,17 +1564,20 @@ function updateRangeLabels(){
             settings.uiScale*100
         )+"%";
 
+    notificationVolumeValue.textContent=
+        notificationVolume.value+"%";
 }
 
+
+/* =========================================================
+SETTINGS PANEL
+========================================================= */
 
 settingsBtn.onclick=()=>{
 
     loadSettingsUI();
 
-    settingsOverlay.classList.add(
-        "show"
-    );
-
+    settingsOverlay.classList.add("show");
 };
 
 
@@ -1759,11 +1586,10 @@ closeSettings.onclick=()=>{
     settingsOverlay.classList.remove(
         "show"
     );
-
 };
 
 
-saveSettings.onclick=async()=>{
+saveSettings.onclick=()=>{
 
     settings.username=
         usernameInput.value
@@ -1782,7 +1608,6 @@ saveSettings.onclick=async()=>{
     settings.compactMessages=
         compactMessages.value==="true";
 
-
     settings.textSize=
         Number(textSize.value);
 
@@ -1792,23 +1617,35 @@ saveSettings.onclick=async()=>{
     settings.lineSpacing=
         Number(lineSpacing.value);
 
-
     settings.cornerRadius=
         Number(cornerRadius.value);
 
     settings.uiScale=
         Number(uiScale.value);
 
-
     settings.notificationSound=
         notificationSound.value==="true";
+
+    settings.notificationSoundType=
+        Number(
+            notificationSoundType.value
+        );
+
+    settings.notificationVolume=
+        Number(
+            notificationVolume.value
+        );
+
+    settings.notificationDuration=
+        Number(
+            notificationDuration.value
+        );
 
     settings.desktopNotifications=
         desktopNotifications.value==="true";
 
     settings.mentionNotifications=
         mentionNotifications.value==="true";
-
 
     settings.enterToSend=
         enterToSend.value==="true";
@@ -1819,32 +1656,28 @@ saveSettings.onclick=async()=>{
     settings.confirmDelete=
         confirmDelete.value==="true";
 
+    Object.keys(settings).forEach(
+        key=>{
 
-    Object.keys(settings).forEach(key=>{
+            localStorage.setItem(
+                "chat_"+key,
+                settings[key]
+            );
 
-        localStorage.setItem(
-            "chat_"+key,
-            settings[key]
-        );
-
-    });
-
+        }
+    );
 
     applySettings();
 
     settingsOverlay.classList.remove(
         "show"
     );
-
-
-    if(settings.desktopNotifications){
-
-        await requestNotificationPermission();
-
-    }
-
 };
 
+
+/* =========================================================
+ACCORDIONS
+========================================================= */
 
 document
 .querySelectorAll(".category-title")
@@ -1853,13 +1686,17 @@ document
     btn.onclick=()=>{
 
         btn.parentElement
-            .classList
-            .toggle("open");
+        .classList
+        .toggle("open");
 
     };
 
 });
 
+
+/* =========================================================
+RANGE PREVIEW
+========================================================= */
 
 textSize.oninput=()=>{
 
@@ -1898,10 +1735,17 @@ uiScale.oninput=()=>{
 
 };
 
+notificationVolume.oninput=()=>{
+
+    notificationVolumeValue.textContent=
+        notificationVolume.value+"%";
+
+};
+
 
 /* =========================================================
-   TEXTAREA
-   ========================================================= */
+TEXTAREA
+========================================================= */
 
 messageInput.addEventListener(
     "input",
@@ -1921,27 +1765,32 @@ messageInput.addEventListener(
 
 
 /* =========================================================
-   IMAGE UPLOAD
-   ========================================================= */
+IMAGE
+========================================================= */
 
 attachBtn.onclick=()=>{
+
     imageInput.click();
+
 };
 
 
 imageInput.onchange=()=>{
 
     selectedFile=
-        imageInput.files[0]||
-        null;
+        imageInput.files[0]||null;
 
     attachBtn.textContent=
         selectedFile
-        ? "✓"
-        : "＋";
+        ?"✓"
+        :"＋";
 
 };
 
+
+/* =========================================================
+IMAGE RESIZE
+========================================================= */
 
 function resizeImage(file){
 
@@ -1967,7 +1816,7 @@ function resizeImage(file){
                     const max=1500;
 
                     if(
-                        width>max ||
+                        width>max||
                         height>max
                     ){
 
@@ -1986,9 +1835,7 @@ function resizeImage(file){
                             Math.round(
                                 height*scale
                             );
-
                     }
-
 
                     const canvas=
                         document.createElement(
@@ -2027,24 +1874,20 @@ function resizeImage(file){
 
                 img.src=
                     reader.result;
-
             };
 
             reader.onerror=reject;
 
-            reader.readAsDataURL(
-                file
-            );
+            reader.readAsDataURL(file);
 
         }
     );
-
 }
 
 
 /* =========================================================
-   SEND
-   ========================================================= */
+SEND
+========================================================= */
 
 sendBtn.onclick=
     sendMessage;
@@ -2075,7 +1918,6 @@ async function sendMessage(){
     const text=
         messageInput.value.trim();
 
-
     if(!settings.username){
 
         settingsBtn.click();
@@ -2087,22 +1929,13 @@ async function sendMessage(){
         );
 
         return;
-
     }
 
-
-    if(
-        !text &&
-        !selectedFile
-    ){
-
+    if(!text&&!selectedFile){
         return;
-
     }
-
 
     sendBtn.disabled=true;
-
 
     try{
 
@@ -2114,19 +1947,19 @@ async function sendMessage(){
                 await resizeImage(
                     selectedFile
                 );
-
         }
-
 
         const response=
             await fetch(
                 API_URL,
                 {
                     method:"POST",
+
                     headers:{
                         "Content-Type":
                             "application/json"
                     },
+
                     body:JSON.stringify({
 
                         username:
@@ -2148,10 +1981,8 @@ async function sendMessage(){
                 }
             );
 
-
         const data=
             await response.json();
-
 
         if(!response.ok){
 
@@ -2159,9 +1990,7 @@ async function sendMessage(){
                 data.error||
                 "Failed to send message."
             );
-
         }
-
 
         messageInput.value="";
 
@@ -2174,9 +2003,7 @@ async function sendMessage(){
 
         attachBtn.textContent="＋";
 
-
         await loadMessages();
-
 
     }catch(error){
 
@@ -2190,297 +2017,12 @@ async function sendMessage(){
         sendBtn.disabled=false;
 
     }
-
 }
 
 
 /* =========================================================
-   LINK HELPERS
-   ========================================================= */
-
-const IMAGE_EXTENSIONS=
-    /\.(?:png|jpe?g|gif|webp|bmp|svg|avif)(?:\?.*)?(?:#.*)?$/i;
-
-
-function cleanUrl(raw){
-
-    let value=
-        raw.trim();
-
-    value=
-        value.replace(
-            /^[<(\[{]+/,
-            ""
-        );
-
-    value=
-        value.replace(
-            /[>,.;:!?)}\]]+$/,
-            ""
-        );
-
-    return value;
-
-}
-
-
-function isImageUrl(url){
-
-    try{
-
-        const parsed=
-            new URL(url);
-
-        return IMAGE_EXTENSIONS.test(
-            parsed.pathname+
-            parsed.search+
-            parsed.hash
-        );
-
-    }catch{
-
-        return false;
-
-    }
-
-}
-
-
-function makeSafeUrl(url){
-
-    try{
-
-        const parsed=
-            new URL(url);
-
-        if(
-            parsed.protocol!=="http:" &&
-            parsed.protocol!=="https:"
-        ){
-
-            return null;
-
-        }
-
-        return parsed.href;
-
-    }catch{
-
-        return null;
-
-    }
-
-}
-
-
-function appendLinkedText(
-    parent,
-    text
-){
-
-    const urlRegex=
-        /https?:\/\/[^\s<>"']+/gi;
-
-    let lastIndex=0;
-
-    let match;
-
-
-    while(
-        (match=
-            urlRegex.exec(text))
-        !==null
-    ){
-
-        const before=
-            text.slice(
-                lastIndex,
-                match.index
-            );
-
-        if(before){
-            parent.appendChild(
-                document.createTextNode(
-                    before
-                )
-            );
-        }
-
-
-        const rawUrl=
-            cleanUrl(
-                match[0]
-            );
-
-        const safeUrl=
-            makeSafeUrl(
-                rawUrl
-            );
-
-
-        if(!safeUrl){
-
-            parent.appendChild(
-                document.createTextNode(
-                    match[0]
-                )
-            );
-
-            lastIndex=
-                match.index+
-                match[0].length;
-
-            continue;
-
-        }
-
-
-        const link=
-            document.createElement(
-                "a"
-            );
-
-        link.className=
-            "message-link";
-
-        link.href=
-            safeUrl;
-
-        link.target=
-            "_blank";
-
-        link.rel=
-            "noopener noreferrer";
-
-        link.textContent=
-            rawUrl;
-
-
-        parent.appendChild(link);
-
-
-        if(
-            isImageUrl(
-                safeUrl
-            )
-        ){
-
-            appendImagePreview(
-                parent,
-                safeUrl,
-                rawUrl
-            );
-
-        }
-
-
-        lastIndex=
-            match.index+
-            match[0].length;
-
-    }
-
-
-    const remaining=
-        text.slice(
-            lastIndex
-        );
-
-    if(remaining){
-
-        parent.appendChild(
-            document.createTextNode(
-                remaining
-            )
-        );
-
-    }
-
-}
-
-
-function appendImagePreview(
-    parent,
-    src,
-    urlText
-){
-
-    const img=
-        document.createElement(
-            "img"
-        );
-
-    img.className=
-        "message-image";
-
-    img.src=
-        src;
-
-    img.alt=
-        "Linked image";
-
-    img.loading=
-        "lazy";
-
-    img.referrerPolicy=
-        "no-referrer";
-
-    img.onclick=()=>{
-        openImage(src);
-    };
-
-
-    img.onerror=()=>{
-
-        img.remove();
-
-        if(
-            img.nextElementSibling &&
-            img.nextElementSibling
-                .classList
-                .contains("link-url")
-        ){
-
-            img.nextElementSibling.remove();
-
-        }
-
-    };
-
-
-    parent.appendChild(img);
-
-
-    const link=
-        document.createElement(
-            "a"
-        );
-
-    link.className=
-        "link-url";
-
-    link.href=
-        src;
-
-    link.target=
-        "_blank";
-
-    link.rel=
-        "noopener noreferrer";
-
-    link.textContent=
-        urlText;
-
-    parent.appendChild(link);
-
-}
-
-
-/* =========================================================
-   LOAD
-   ========================================================= */
-
-let firstMessageLoad=true;
+LOAD
+========================================================= */
 
 async function loadMessages(){
 
@@ -2498,10 +2040,8 @@ async function loadMessages(){
                 }
             );
 
-
         const data=
             await response.json();
-
 
         if(!response.ok){
 
@@ -2509,158 +2049,71 @@ async function loadMessages(){
                 data.error||
                 "Failed to load messages."
             );
-
         }
 
-
         const newMessages=
-            Array.isArray(
-                data.messages
-            )
+            Array.isArray(data.messages)
             ?data.messages
             :[];
 
-
         /*
-         * Find messages that weren't present
-         * during the previous refresh.
+         * Detect messages that appeared since
+         * the previous refresh.
          */
 
-        if(
-            !firstMessageLoad &&
-            newMessages.length >
-                currentMessages.length
-        ){
+        if(!firstMessageLoad){
 
-            const oldIds=
-                new Set(
-                    currentMessages.map(
-                        m=>String(m.id)
-                    )
-                );
-
-
-            const added=
+            const newOnes=
                 newMessages.filter(
-                    m=>
-                        !oldIds.has(
-                            String(m.id)
+                    msg=>
+                        msg.id &&
+                        !lastKnownMessageIds.has(
+                            msg.id
                         )
                 );
-
 
             for(
-                const message of added
+                const message
+                of newOnes
             ){
 
-                if(
-                    message.device_id===
-                    deviceId
-                ){
-
-                    continue;
-
-                }
-
-
-                playNotificationSound();
-
-
-                const shouldNotifyMention=
-                    settings.mentionNotifications &&
-                    settings.username &&
-                    typeof message.message==="string" &&
-                    message.message
-                        .toLowerCase()
-                        .includes(
-                            "@"+
-                            settings.username
-                                .toLowerCase()
-                        );
-
-
-                const shouldNotifyAll=
-                    settings.desktopNotifications;
-
-
-                if(
-                    shouldNotifyAll ||
-                    shouldNotifyMention
-                ){
-
-                    await showDesktopNotification(
-                        message.username||
-                            "New message",
-                        message.message||
-                            "Sent an image.",
-                        isImageUrl(
-                            message.image||
-                            ""
-                        )
-                            ?message.image
-                            :null
-                    );
-
-                }
+                handleIncomingMessage(
+                    message
+                );
 
             }
-
         }
-
 
         currentMessages=
             newMessages;
+
+        lastKnownMessageIds=
+            new Set(
+                currentMessages
+                .map(
+                    message=>message.id
+                )
+                .filter(Boolean)
+            );
 
         firstMessageLoad=false;
 
         renderMessages();
 
-
     }catch(error){
 
-        messagesEl.innerHTML="";
-
-        const empty=
-            document.createElement(
-                "div"
-            );
-
-        empty.className="empty";
-
-
-        const inner=
-            document.createElement(
-                "div"
-            );
-
-
-        const strong=
-            document.createElement(
-                "strong"
-            );
-
-        strong.textContent=
-            "Unable to load messages";
-
-
-        inner.appendChild(
-            strong
-        );
-
-        inner.appendChild(
-            document.createTextNode(
-                error.message
-            )
-        );
-
-
-        empty.appendChild(
-            inner
-        );
-
-        messagesEl.appendChild(
-            empty
-        );
+        messagesEl.innerHTML=`
+            <div class="empty">
+                <div>
+                    <strong>
+                        Unable to load messages
+                    </strong>
+                    ${escapeHtml(
+                        error.message
+                    )}
+                </div>
+            </div>
+        `;
 
     }
 
@@ -2668,74 +2121,888 @@ async function loadMessages(){
 
 
 /* =========================================================
-   RENDER
-   ========================================================= */
+INCOMING MESSAGE
+========================================================= */
+
+function handleIncomingMessage(
+    message
+){
+
+    /*
+     * Do not notify for your own messages.
+     */
+
+    if(
+        message.device_id &&
+        message.device_id===deviceId
+    ){
+
+        return;
+    }
+
+    /*
+     * IMPORTANT:
+     *
+     * When the user is actively looking at
+     * the page, don't play a sound and don't
+     * show a desktop notification.
+     */
+
+    if(
+        document.visibilityState==="visible" &&
+        document.hasFocus()
+    ){
+
+        return;
+    }
+
+    /*
+     * Mention filtering.
+     */
+
+    if(
+        settings.mentionNotifications &&
+        settings.username &&
+        message.message
+    ){
+
+        const escaped=
+            settings.username
+            .replace(
+                /[.*+?^${}()|[\]\\]/g,
+                "\\$&"
+            );
+
+        const mentionRegex=
+            new RegExp(
+                "(^|\\s)@?"+
+                escaped+
+                "(\\s|$)",
+                "i"
+            );
+
+        if(
+            !mentionRegex.test(
+                message.message
+            )
+        ){
+
+            /*
+             * If mention notifications
+             * are specifically enabled,
+             * normal messages still notify.
+             *
+             * This intentionally does not
+             * suppress normal messages.
+             */
+
+        }
+    }
+
+    const preview=
+        message.message||
+        (
+            message.image
+            ?"📷 Image"
+            :"New message"
+        );
+
+    showWindowsNotification(
+        message.username||
+        "Chat",
+        preview
+    );
+
+    if(
+        settings.notificationSound
+    ){
+
+        playNotificationSound(
+            settings.notificationSoundType,
+            settings.notificationVolume/100,
+            settings.notificationDuration
+        );
+
+    }
+}
+
+
+/* =========================================================
+WINDOWS STYLE NOTIFICATION
+========================================================= */
+
+function showWindowsNotification(
+    title,
+    body
+){
+
+    if(
+        settings.desktopNotifications
+    ){
+
+        requestDesktopPermission()
+        .then(permission=>{
+
+            if(
+                permission==="granted" &&
+                "Notification" in window
+            ){
+
+                try{
+
+                    const notification=
+                        new Notification(
+                            title,
+                            {
+                                body:
+                                    stripHtml(
+                                        body
+                                    ),
+                                icon:
+                                    "data:image/svg+xml,"+
+                                    encodeURIComponent(
+                                        `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+                                        <rect width="64" height="64" rx="12" fill="#202020"/>
+                                        <text x="32" y="43" text-anchor="middle" font-size="32">💬</text>
+                                        </svg>`
+                                    ),
+                                tag:"chat-message"
+                            }
+                        );
+
+                    notification.onclick=()=>{
+                        window.focus();
+                        notification.close();
+                    };
+
+                }catch(error){
+
+                    console.warn(
+                        "Desktop notification failed:",
+                        error
+                    );
+
+                }
+
+            }
+
+        });
+
+    }
+
+
+    /*
+     * Also show our custom Windows-style
+     * notification while the page exists.
+     */
+
+    notificationBody.textContent=
+        body;
+
+    windowsNotification
+        .classList
+        .add("show");
+
+    if(notificationTimeout){
+
+        clearTimeout(
+            notificationTimeout
+        );
+
+    }
+
+    notificationTimeout=
+        setTimeout(
+            ()=>{
+                windowsNotification
+                    .classList
+                    .remove("show");
+            },
+            Math.max(
+                3000,
+                settings.notificationDuration
+            )
+        );
+}
+
+
+notificationClose.onclick=()=>{
+
+    windowsNotification
+        .classList
+        .remove("show");
+
+};
+
+
+async function requestDesktopPermission(){
+
+    if(
+        !("Notification" in window)
+    ){
+
+        return "denied";
+    }
+
+    if(
+        Notification.permission===
+        "granted"
+    ){
+
+        return "granted";
+    }
+
+    if(
+        Notification.permission===
+        "denied"
+    ){
+
+        return "denied";
+    }
+
+    try{
+
+        return await Notification.requestPermission();
+
+    }catch{
+
+        return "denied";
+    }
+}
+
+
+/* =========================================================
+NOTIFICATION LINKS
+========================================================= */
+
+function linkifyNotificationText(
+    text
+){
+
+    const escaped=
+        escapeHtml(text);
+
+    return escaped.replace(
+        /(https?:\/\/[^\s<]+)/gi,
+        match=>{
+
+            return `
+                <a
+                    class="notification-link"
+                    href="${match}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >${match}</a>
+            `;
+
+        }
+    );
+}
+
+
+/* =========================================================
+AUDIO ENGINE
+========================================================= */
+
+let audioContext=null;
+
+
+function getAudioContext(){
+
+    if(!audioContext){
+
+        const AudioCtx=
+            window.AudioContext||
+            window.webkitAudioContext;
+
+        if(!AudioCtx){
+            return null;
+        }
+
+        audioContext=
+            new AudioCtx();
+    }
+
+    if(
+        audioContext.state==="suspended"
+    ){
+
+        audioContext.resume()
+        .catch(()=>{});
+
+    }
+
+    return audioContext;
+}
+
+
+/*
+ * Creates one synthesized note.
+ */
+
+function playTone(
+    frequency,
+    startTime,
+    duration,
+    volume,
+    type="sine"
+){
+
+    const ctx=
+        getAudioContext();
+
+    if(!ctx){
+        return;
+    }
+
+    const oscillator=
+        ctx.createOscillator();
+
+    const gain=
+        ctx.createGain();
+
+    oscillator.type=type;
+
+    oscillator.frequency.setValueAtTime(
+        frequency,
+        startTime
+    );
+
+    gain.gain.setValueAtTime(
+        0,
+        startTime
+    );
+
+    gain.gain.linearRampToValueAtTime(
+        volume,
+        startTime+0.015
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        startTime+duration
+    );
+
+    oscillator.connect(gain);
+
+    gain.connect(ctx.destination);
+
+    oscillator.start(startTime);
+
+    oscillator.stop(
+        startTime+duration+0.03
+    );
+}
+
+
+/* =========================================================
+12 NOTIFICATION SOUNDS
+========================================================= */
+
+function playNotificationSound(
+    type,
+    volume,
+    duration
+){
+
+    const ctx=
+        getAudioContext();
+
+    if(!ctx){
+        return;
+    }
+
+    const now=
+        ctx.currentTime+0.02;
+
+    const maxDuration=
+        Math.max(
+            0.1,
+            duration/1000
+        );
+
+    /*
+     * 1 Classic
+     */
+
+    if(type===1){
+
+        playTone(
+            880,
+            now,
+            maxDuration*.45,
+            volume*.35,
+            "sine"
+        );
+
+        playTone(
+            1175,
+            now+maxDuration*.45,
+            maxDuration*.45,
+            volume*.3,
+            "sine"
+        );
+
+    }
+
+
+    /*
+     * 2 Soft
+     */
+
+    else if(type===2){
+
+        playTone(
+            523.25,
+            now,
+            maxDuration*.8,
+            volume*.22,
+            "sine"
+        );
+
+    }
+
+
+    /*
+     * 3 Double beep
+     */
+
+    else if(type===3){
+
+        playTone(
+            740,
+            now,
+            maxDuration*.25,
+            volume*.35,
+            "square"
+        );
+
+        playTone(
+            740,
+            now+maxDuration*.35,
+            maxDuration*.25,
+            volume*.35,
+            "square"
+        );
+
+    }
+
+
+    /*
+     * 4 Digital
+     */
+
+    else if(type===4){
+
+        playTone(
+            1000,
+            now,
+            maxDuration*.18,
+            volume*.28,
+            "square"
+        );
+
+        playTone(
+            1500,
+            now+maxDuration*.22,
+            maxDuration*.18,
+            volume*.25,
+            "square"
+        );
+
+        playTone(
+            2000,
+            now+maxDuration*.44,
+            maxDuration*.18,
+            volume*.2,
+            "square"
+        );
+
+    }
+
+
+    /*
+     * 5 Bell
+     */
+
+    else if(type===5){
+
+        playTone(
+            784,
+            now,
+            maxDuration*.9,
+            volume*.3,
+            "sine"
+        );
+
+        playTone(
+            1174,
+            now,
+            maxDuration*.7,
+            volume*.13,
+            "sine"
+        );
+
+    }
+
+
+    /*
+     * 6 Rising
+     */
+
+    else if(type===6){
+
+        const notes=[
+            440,
+            554,
+            659,
+            880
+        ];
+
+        notes.forEach(
+            (freq,i)=>{
+
+                playTone(
+                    freq,
+                    now+
+                    i*
+                    Math.min(
+                        .16,
+                        maxDuration/
+                        notes.length
+                    ),
+                    maxDuration*.3,
+                    volume*.22,
+                    "sine"
+                );
+
+            }
+        );
+
+    }
+
+
+    /*
+     * 7 Falling
+     */
+
+    else if(type===7){
+
+        const notes=[
+            880,
+            659,
+            554,
+            440
+        ];
+
+        notes.forEach(
+            (freq,i)=>{
+
+                playTone(
+                    freq,
+                    now+
+                    i*
+                    Math.min(
+                        .16,
+                        maxDuration/
+                        notes.length
+                    ),
+                    maxDuration*.3,
+                    volume*.22,
+                    "sine"
+                );
+
+            }
+        );
+
+    }
+
+
+    /*
+     * 8 Pulse
+     */
+
+    else if(type===8){
+
+        for(
+            let i=0;
+            i<5;
+            i++
+        ){
+
+            playTone(
+                600,
+                now+i*.13,
+                .08,
+                volume*.3,
+                "square"
+            );
+
+        }
+
+    }
+
+
+    /*
+     * 9 Alert
+     */
+
+    else if(type===9){
+
+        for(
+            let i=0;
+            i<4;
+            i++
+        ){
+
+            playTone(
+                i%2===0
+                ?900
+                :650,
+                now+i*.18,
+                .14,
+                volume*.35,
+                "square"
+            );
+
+        }
+
+    }
+
+
+    /*
+     * 10 Deep
+     */
+
+    else if(type===10){
+
+        playTone(
+            130,
+            now,
+            maxDuration*.85,
+            volume*.35,
+            "sine"
+        );
+
+        playTone(
+            196,
+            now+maxDuration*.25,
+            maxDuration*.55,
+            volume*.18,
+            "triangle"
+        );
+
+    }
+
+
+    /*
+     * 11 Nuclear alarm
+     *
+     * Fast alternating alarm pattern.
+     */
+
+    else if(type===11){
+
+        const end=
+            now+maxDuration;
+
+        let t=now;
+
+        let high=false;
+
+        while(t<end){
+
+            const frequency=
+                high
+                ?1050
+                :620;
+
+            playTone(
+                frequency,
+                t,
+                .38,
+                volume*.32,
+                "sawtooth"
+            );
+
+            t+=.42;
+
+            high=!high;
+        }
+
+    }
+
+
+    /*
+     * 12 Opera
+     *
+     * A completely synthesized original
+     * vocal-like melody made from many notes.
+     */
+
+    else if(type===12){
+
+        /*
+         * Notes are based on a dramatic
+         * original melody.
+         */
+
+        const melody=[
+
+            [392,.20],
+            [440,.20],
+            [523.25,.25],
+            [587.33,.28],
+
+            [659.25,.30],
+            [587.33,.20],
+            [523.25,.20],
+            [440,.30],
+
+            [392,.20],
+            [523.25,.20],
+            [659.25,.28],
+            [783.99,.35],
+
+            [659.25,.22],
+            [587.33,.22],
+            [523.25,.28],
+            [440,.35],
+
+            [392,.22],
+            [440,.22],
+            [493.88,.25],
+            [587.33,.30],
+
+            [659.25,.25],
+            [783.99,.30],
+            [659.25,.20],
+            [587.33,.30],
+
+            [523.25,.25],
+            [440,.25],
+            [392,.45]
+
+        ];
+
+        let position=now;
+
+        const scale=
+            Math.min(
+                1,
+                maxDuration/4
+            );
+
+        melody.forEach(
+            ([frequency,length])=>{
+
+                if(
+                    position>
+                    now+maxDuration
+                ){
+
+                    return;
+                }
+
+                const actual=
+                    Math.min(
+                        length*scale,
+                        now+
+                        maxDuration-
+                        position
+                    );
+
+                if(actual<=0){
+                    return;
+                }
+
+                /*
+                 * Main "voice"
+                 */
+
+                playTone(
+                    frequency,
+                    position,
+                    actual,
+                    volume*.16,
+                    "triangle"
+                );
+
+                /*
+                 * Harmonic voice.
+                 */
+
+                playTone(
+                    frequency*2,
+                    position,
+                    actual*.8,
+                    volume*.055,
+                    "sine"
+                );
+
+                position+=
+                    length*scale;
+            }
+        );
+
+    }
+}
+
+
+/* =========================================================
+TEST NOTIFICATION
+========================================================= */
+
+testNotification.onclick=async()=>{
+
+    await requestDesktopPermission();
+
+    showWindowsNotification(
+        "Chat",
+        "This is a test Windows notification."
+    );
+
+    if(settings.notificationSound){
+
+        playNotificationSound(
+            settings.notificationSoundType,
+            settings.notificationVolume/100,
+            settings.notificationDuration
+        );
+
+    }
+
+};
+
+
+/* =========================================================
+RENDER
+========================================================= */
 
 function renderMessages(){
 
     const wasBottom=
         messagesEl.scrollHeight-
         messagesEl.scrollTop-
-        messagesEl.clientHeight
-        <100;
-
+        messagesEl.clientHeight<
+        100;
 
     if(!currentMessages.length){
 
-        messagesEl.innerHTML="";
-
-
-        const empty=
-            document.createElement(
-                "div"
-            );
-
-        empty.className=
-            "empty";
-
-
-        const inner=
-            document.createElement(
-                "div"
-            );
-
-
-        const strong=
-            document.createElement(
-                "strong"
-            );
-
-        strong.textContent=
-            "No messages yet";
-
-
-        inner.appendChild(
-            strong
-        );
-
-        inner.appendChild(
-            document.createTextNode(
-                "Be the first to send something."
-            )
-        );
-
-
-        empty.appendChild(
-            inner
-        );
-
-        messagesEl.appendChild(
-            empty
-        );
+        messagesEl.innerHTML=`
+            <div class="empty">
+                <div>
+                    <strong>No messages yet</strong>
+                    Be the first to send something.
+                </div>
+            </div>
+        `;
 
         return;
-
     }
-
 
     const fragment=
         document.createDocumentFragment();
-
 
     currentMessages.forEach(
         message=>{
@@ -2746,32 +3013,22 @@ function renderMessages(){
                 );
 
             item.className=
-                "message";
-
-
-            if(
-                settings.compactMessages
-            ){
-
-                item.classList.add(
-                    "compact"
+                "message"+
+                (
+                    settings.compactMessages
+                    ?" compact"
+                    :""
                 );
-
-            }
-
 
             item.dataset.id=
                 message.id;
-
 
             const avatar=
                 document.createElement(
                     "div"
                 );
 
-            avatar.className=
-                "avatar";
-
+            avatar.className="avatar";
 
             avatar.textContent=
                 (
@@ -2781,7 +3038,6 @@ function renderMessages(){
                 .charAt(0)
                 .toUpperCase();
 
-
             const content=
                 document.createElement(
                     "div"
@@ -2790,7 +3046,6 @@ function renderMessages(){
             content.className=
                 "message-content";
 
-
             const top=
                 document.createElement(
                     "div"
@@ -2798,7 +3053,6 @@ function renderMessages(){
 
             top.className=
                 "message-top";
-
 
             const name=
                 document.createElement(
@@ -2812,33 +3066,24 @@ function renderMessages(){
                 message.username||
                 "User";
 
-
             top.appendChild(name);
 
-
-            if(
-                settings.showTimestamps
-            ){
+            if(settings.showTimestamps){
 
                 const time=
                     document.createElement(
                         "span"
                     );
 
-                time.className=
-                    "time";
+                time.className="time";
 
                 time.textContent=
                     formatTime(
                         message.created_at
                     );
 
-                top.appendChild(
-                    time
-                );
-
+                top.appendChild(time);
             }
-
 
             if(message.edited){
 
@@ -2853,17 +3098,10 @@ function renderMessages(){
                 edited.textContent=
                     "(edited)";
 
-                top.appendChild(
-                    edited
-                );
-
+                top.appendChild(edited);
             }
 
-
-            content.appendChild(
-                top
-            );
-
+            content.appendChild(top);
 
             if(message.message){
 
@@ -2875,84 +3113,43 @@ function renderMessages(){
                 text.className=
                     "message-text";
 
+                text.textContent=
+                    message.message;
 
-                /*
-                 * This safely creates clickable
-                 * links without injecting HTML.
-                 */
-
-                appendLinkedText(
-                    text,
-                    message.message
-                );
-
-
-                content.appendChild(
-                    text
-                );
-
+                content.appendChild(text);
             }
-
-
-            /*
-             * Uploaded image.
-             */
 
             if(message.image){
 
-                const image=
+                const img=
                     document.createElement(
                         "img"
                     );
 
-                image.className=
+                img.className=
                     "message-image";
 
-                image.src=
+                img.src=
                     message.image;
 
-                image.alt=
-                    "Image";
+                img.alt="Image";
 
-                image.loading=
-                    "lazy";
-
-                image.onclick=()=>{
-
+                img.onclick=()=>{
                     openImage(
                         message.image
                     );
-
                 };
 
-
-                image.onerror=()=>{
-
-                    image.remove();
-
-                };
-
-
-                content.appendChild(
-                    image
-                );
-
+                content.appendChild(img);
             }
 
+            item.appendChild(avatar);
 
-            item.appendChild(
-                avatar
-            );
-
-            item.appendChild(
-                content
-            );
-
+            item.appendChild(content);
 
             if(
                 message.device_id &&
-                message.device_id===
-                    deviceId
+                message.device_id===deviceId
             ){
 
                 item.addEventListener(
@@ -2972,19 +3169,14 @@ function renderMessages(){
 
             }
 
-
-            fragment.appendChild(
-                item
-            );
+            fragment.appendChild(item);
 
         }
     );
 
-
     messagesEl.replaceChildren(
         fragment
     );
-
 
     if(
         wasBottom &&
@@ -2995,13 +3187,12 @@ function renderMessages(){
             messagesEl.scrollHeight;
 
     }
-
 }
 
 
 /* =========================================================
-   CONTEXT MENU
-   ========================================================= */
+CONTEXT MENU
+========================================================= */
 
 function showContextMenu(
     x,
@@ -3012,13 +3203,11 @@ function showContextMenu(
     selectedMessage=
         message;
 
-
     contextMenu.style.left=
         Math.min(
             x,
             window.innerWidth-170
         )+"px";
-
 
     contextMenu.style.top=
         Math.min(
@@ -3026,11 +3215,9 @@ function showContextMenu(
             window.innerHeight-100
         )+"px";
 
-
     contextMenu.classList.add(
         "show"
     );
-
 }
 
 
@@ -3045,127 +3232,116 @@ document.addEventListener(
 
 
 /* =========================================================
-   EDIT
-   ========================================================= */
+EDIT
+========================================================= */
 
 editMessageBtn.onclick=
-async event=>{
+    async event=>{
 
-    event.stopPropagation();
+        event.stopPropagation();
 
-    contextMenu.classList.remove(
-        "show"
-    );
-
-
-    if(!selectedMessage){
-        return;
-    }
-
-
-    const newText=
-        prompt(
-            "Edit message:",
-            selectedMessage.message||
-                ""
+        contextMenu.classList.remove(
+            "show"
         );
 
+        if(!selectedMessage){
+            return;
+        }
 
-    if(newText===null){
-        return;
-    }
-
-
-    try{
-
-        const response=
-            await fetch(
-                API_URL,
-                {
-                    method:"PATCH",
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-                    body:JSON.stringify({
-
-                        id:
-                            selectedMessage.id,
-
-                        device_id:
-                            deviceId,
-
-                        message:
-                            newText.trim()
-
-                    })
-                }
+        const newText=
+            prompt(
+                "Edit message:",
+                selectedMessage.message||
+                ""
             );
 
+        if(newText===null){
+            return;
+        }
 
-        const data=
-            await response.json();
+        try{
 
+            const response=
+                await fetch(
+                    API_URL,
+                    {
+                        method:"PATCH",
 
-        if(!response.ok){
+                        headers:{
+                            "Content-Type":
+                                "application/json"
+                        },
 
-            throw new Error(
-                data.error||
-                "Failed to edit message."
+                        body:JSON.stringify({
+
+                            id:
+                                selectedMessage.id,
+
+                            device_id:
+                                deviceId,
+
+                            message:
+                                newText.trim()
+
+                        })
+                    }
+                );
+
+            const data=
+                await response.json();
+
+            if(!response.ok){
+
+                throw new Error(
+                    data.error||
+                    "Failed to edit message."
+                );
+            }
+
+            await loadMessages();
+
+        }catch(error){
+
+            alert(
+                "Failed to edit:\n\n"+
+                error.message
             );
 
         }
-
-
-        await loadMessages();
-
-
-    }catch(error){
-
-        alert(
-            "Failed to edit:\n\n"+
-            error.message
-        );
-
-    }
-
-};
+    };
 
 
 /* =========================================================
-   DELETE
-   ========================================================= */
+DELETE
+========================================================= */
 
 deleteMessageBtn.onclick=
-event=>{
+    event=>{
 
-    event.stopPropagation();
+        event.stopPropagation();
 
-    contextMenu.classList.remove(
-        "show"
-    );
-
-
-    if(!selectedMessage){
-        return;
-    }
-
-
-    if(settings.confirmDelete){
-
-        openConfirm(
-            "Delete message?",
-            "This message will be permanently removed.",
-            deleteSelectedMessage
+        contextMenu.classList.remove(
+            "show"
         );
 
-    }else{
+        if(!selectedMessage){
+            return;
+        }
 
-        deleteSelectedMessage();
+        if(settings.confirmDelete){
 
-    }
+            openConfirm(
+                "Delete message?",
+                "This message will be permanently removed.",
+                deleteSelectedMessage
+            );
 
-};
+        }else{
+
+            deleteSelectedMessage();
+
+        }
+    };
 
 
 async function deleteSelectedMessage(){
@@ -3174,7 +3350,6 @@ async function deleteSelectedMessage(){
         return;
     }
 
-
     try{
 
         const response=
@@ -3182,10 +3357,12 @@ async function deleteSelectedMessage(){
                 API_URL,
                 {
                     method:"DELETE",
+
                     headers:{
                         "Content-Type":
                             "application/json"
                     },
+
                     body:JSON.stringify({
 
                         id:
@@ -3198,10 +3375,8 @@ async function deleteSelectedMessage(){
                 }
             );
 
-
         const data=
             await response.json();
-
 
         if(!response.ok){
 
@@ -3209,14 +3384,11 @@ async function deleteSelectedMessage(){
                 data.error||
                 "Failed to delete message."
             );
-
         }
-
 
         selectedMessage=null;
 
         await loadMessages();
-
 
     }catch(error){
 
@@ -3226,13 +3398,12 @@ async function deleteSelectedMessage(){
         );
 
     }
-
 }
 
 
 /* =========================================================
-   IMAGE VIEWER
-   ========================================================= */
+IMAGE VIEWER
+========================================================= */
 
 function openImage(src){
 
@@ -3242,7 +3413,6 @@ function openImage(src){
     imageViewer.classList.add(
         "show"
     );
-
 }
 
 
@@ -3252,9 +3422,7 @@ function closeImage(){
         "show"
     );
 
-    fullImage.src=
-        "";
-
+    fullImage.src="";
 }
 
 
@@ -3263,18 +3431,18 @@ backImage.onclick=
 
 
 imageViewer.onclick=
-event=>{
+    event=>{
 
-    if(
-        event.target===
-        imageViewer
-    ){
+        if(
+            event.target===
+            imageViewer
+        ){
 
-        closeImage();
+            closeImage();
 
-    }
+        }
 
-};
+    };
 
 
 document.addEventListener(
@@ -3297,8 +3465,8 @@ document.addEventListener(
 
 
 /* =========================================================
-   CONFIRM
-   ========================================================= */
+CONFIRM
+========================================================= */
 
 function openConfirm(
     title,
@@ -3318,7 +3486,6 @@ function openConfirm(
     dialogOverlay.classList.add(
         "show"
     );
-
 }
 
 
@@ -3334,30 +3501,29 @@ dialogCancel.onclick=()=>{
 
 
 dialogConfirm.onclick=
-async()=>{
+    async()=>{
 
-    const callback=
-        confirmCallback;
+        const callback=
+            confirmCallback;
 
-    dialogOverlay.classList.remove(
-        "show"
-    );
+        dialogOverlay.classList.remove(
+            "show"
+        );
 
-    confirmCallback=null;
+        confirmCallback=null;
 
+        if(callback){
 
-    if(callback){
+            await callback();
 
-        await callback();
+        }
 
-    }
-
-};
+    };
 
 
 /* =========================================================
-   REMOVE EVERYTHING
-   ========================================================= */
+REMOVE EVERYTHING
+========================================================= */
 
 removeEverything.onclick=()=>{
 
@@ -3371,7 +3537,7 @@ removeEverything.onclick=()=>{
                 ()=>{
                     openConfirm(
                         "Are you ultra sure?",
-                        "Last time: every stored message and image will be permanently removed and there will be no chat history left.",
+                        "Last time: every stored message and image will be permanently removed.",
                         permanentlyDeleteEverything
                     );
                 }
@@ -3391,20 +3557,20 @@ async function permanentlyDeleteEverything(){
                 API_URL,
                 {
                     method:"DELETE",
+
                     headers:{
                         "Content-Type":
                             "application/json"
                     },
+
                     body:JSON.stringify({
                         delete_all:true
                     })
                 }
             );
 
-
         const data=
             await response.json();
-
 
         if(!response.ok){
 
@@ -3412,18 +3578,18 @@ async function permanentlyDeleteEverything(){
                 data.error||
                 "Failed to remove everything."
             );
-
         }
 
-
         currentMessages=[];
+
+        lastKnownMessageIds=
+            new Set();
 
         renderMessages();
 
         alert(
             "The entire chat has been wiped."
         );
-
 
     }catch(error){
 
@@ -3433,13 +3599,12 @@ async function permanentlyDeleteEverything(){
         );
 
     }
-
 }
 
 
 /* =========================================================
-   REFRESH
-   ========================================================= */
+REFRESH
+========================================================= */
 
 function startRefreshTimer(){
 
@@ -3451,7 +3616,6 @@ function startRefreshTimer(){
 
     }
 
-
     refreshTimer=
         setInterval(
             loadMessages,
@@ -3459,20 +3623,18 @@ function startRefreshTimer(){
                 settings.refreshRate
             )
         );
-
 }
 
 
 /* =========================================================
-   HELPERS
-   ========================================================= */
+HELPERS
+========================================================= */
 
 function formatTime(date){
 
     if(!date){
         return "";
     }
-
 
     return new Date(date)
         .toLocaleTimeString(
@@ -3482,13 +3644,101 @@ function formatTime(date){
                 minute:"2-digit"
             }
         );
+}
 
+
+function escapeHtml(value){
+
+    return String(value)
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+}
+
+
+function stripHtml(value){
+
+    const div=
+        document.createElement(
+            "div"
+        );
+
+    div.textContent=
+        value;
+
+    return div.textContent;
 }
 
 
 /* =========================================================
-   START
-   ========================================================= */
+AUDIO UNLOCK
+========================================================= */
+
+function unlockAudio(){
+
+    const ctx=
+        getAudioContext();
+
+    if(ctx){
+
+        if(
+            ctx.state===
+            "suspended"
+        ){
+
+            ctx.resume()
+            .catch(()=>{});
+
+        }
+
+    }
+}
+
+
+/*
+ * Browsers require a user interaction before
+ * audio can normally start.
+ */
+
+document.addEventListener(
+    "click",
+    unlockAudio,
+    {
+        once:false,
+        passive:true
+    }
+);
+
+document.addEventListener(
+    "keydown",
+    unlockAudio,
+    {
+        once:false,
+        passive:true
+    }
+);
+
+
+/* =========================================================
+START
+========================================================= */
 
 loadSettingsUI();
 
@@ -3496,35 +3746,8 @@ applySettings();
 
 loadMessages();
 
-
-/*
- * Unlock audio after the first user interaction.
- * Browsers block automatic audio until the user
- * interacts with the page.
- */
-
-document.addEventListener(
-    "click",
-    ()=>{
-        const ctx=
-            getAudioContext();
-
-        if(
-            ctx &&
-            ctx.state==="suspended"
-        ){
-
-            ctx.resume();
-
-        }
-
-    },
-    {
-        once:false
-    }
-);
-
 </script>
 
 </body>
 </html>
+```
