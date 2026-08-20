@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Chat</title>
+<title>Chat - Multiplayer Games</title>
 
 <style>
 *{
@@ -170,18 +170,6 @@ button{
     font-size:var(--text-size);
     word-spacing:var(--word-spacing);
     line-height:var(--line-spacing);
-}
-
-.message-image{
-    display:block;
-    max-width:min(500px,80vw);
-    max-height:500px;
-    margin-top:8px;
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    background:#000;
-    object-fit:contain;
-    cursor:pointer;
 }
 
 /* GAME CARDS */
@@ -446,6 +434,342 @@ button{
     font-size:25px;
 }
 
+/* MASTERMIND */
+
+.mastermind-row{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin:8px 0;
+    align-items:center;
+}
+
+.mastermind-peg{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    border:2px solid var(--border);
+    background:#1a1f26;
+    cursor:pointer;
+    transition:0.15s;
+}
+
+.mastermind-peg:hover{
+    transform:scale(1.05);
+}
+
+.mastermind-peg.colored{
+    border-color:#555;
+}
+
+.mastermind-feedback{
+    display:flex;
+    gap:4px;
+    margin-left:10px;
+}
+
+.mastermind-feedback-peg{
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    background:#1a1f26;
+    border:1px solid var(--border);
+}
+
+.mastermind-feedback-peg.black{
+    background:#222;
+    border-color:#555;
+}
+
+.mastermind-feedback-peg.white{
+    background:#ddd;
+    border-color:#999;
+}
+
+/* MEMORY MATCH */
+
+.memory-grid{
+    display:grid;
+    gap:8px;
+    justify-content:center;
+    margin:15px auto;
+    max-width:100%;
+}
+
+.memory-card{
+    width:70px;
+    height:70px;
+    border-radius:10px;
+    border:2px solid var(--border);
+    background:#1a1f26;
+    display:grid;
+    place-items:center;
+    font-size:30px;
+    cursor:pointer;
+    transition:0.2s;
+    color:transparent;
+    user-select:none;
+}
+
+.memory-card.flipped{
+    background:#2a303a;
+    color:white;
+}
+
+.memory-card.matched{
+    background:#1a3a2a;
+    border-color:#2a6a4a;
+    color:#7affb0;
+    cursor:default;
+}
+
+.memory-card:hover:not(.flipped):not(.matched){
+    transform:scale(1.05);
+}
+
+/* HANGMAN */
+
+.hangman-word{
+    font-size:28px;
+    letter-spacing:8px;
+    text-align:center;
+    margin:15px 0;
+    font-weight:700;
+    color:white;
+}
+
+.hangman-letters{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    justify-content:center;
+    max-width:500px;
+    margin:10px auto;
+}
+
+.hangman-letter-btn{
+    width:40px;
+    height:40px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#1a1f26;
+    color:white;
+    font-weight:700;
+    font-size:16px;
+}
+
+.hangman-letter-btn:disabled{
+    opacity:0.3;
+    cursor:not-allowed;
+}
+
+.hangman-letter-btn:hover:not(:disabled){
+    background:#2a303a;
+}
+
+.hangman-body{
+    text-align:center;
+    font-size:42px;
+    margin:10px 0;
+    font-family:monospace;
+    white-space:pre;
+}
+
+/* DOTS AND BOXES */
+
+.dots-board{
+    display:grid;
+    gap:0;
+    margin:15px auto;
+    max-width:100%;
+    overflow:auto;
+}
+
+.dots-cell{
+    display:grid;
+    place-items:center;
+    position:relative;
+}
+
+.dots-dot{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:var(--text);
+}
+
+.dots-line{
+    position:absolute;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.dots-line:hover{
+    filter:brightness(1.3);
+}
+
+.dots-line.horizontal{
+    width:40px;
+    height:4px;
+    background:var(--border);
+    left:6px;
+    top:50%;
+    transform:translateY(-50%);
+}
+
+.dots-line.vertical{
+    width:4px;
+    height:40px;
+    background:var(--border);
+    top:6px;
+    left:50%;
+    transform:translateX(-50%);
+}
+
+.dots-line.claimed{
+    background:#4a7a4a;
+}
+
+.dots-line.claimed.player1{
+    background:#d65353;
+}
+
+.dots-line.claimed.player2{
+    background:#e0c454;
+}
+
+.dots-box{
+    position:absolute;
+    inset:4px;
+    border-radius:4px;
+    pointer-events:none;
+    opacity:0.3;
+}
+
+.dots-box.claimed.player1{
+    background:#d65353;
+}
+
+.dots-box.claimed.player2{
+    background:#e0c454;
+}
+
+/* OTHELLO */
+
+.othello-board{
+    display:grid;
+    gap:2px;
+    margin:15px auto;
+    background:#1a6a3a;
+    padding:8px;
+    border-radius:12px;
+    max-width:100%;
+    overflow:auto;
+}
+
+.othello-cell{
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    background:#1a6a3a;
+    display:grid;
+    place-items:center;
+    cursor:pointer;
+}
+
+.othello-cell.disc{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#222;
+    border:2px solid #333;
+}
+
+.othello-cell.disc.white{
+    background:#f0f0f0;
+    border-color:#ddd;
+}
+
+.othello-cell.disc.black{
+    background:#111;
+    border-color:#333;
+}
+
+.othello-cell.valid-move{
+    cursor:pointer;
+}
+
+.othello-cell.valid-move::after{
+    content:'';
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.2);
+}
+
+/* CHECKERS */
+
+.checkers-board{
+    display:grid;
+    gap:0;
+    margin:15px auto;
+    border:4px solid #8B6B4A;
+    border-radius:8px;
+    max-width:100%;
+    overflow:auto;
+}
+
+.checkers-cell{
+    width:60px;
+    height:60px;
+    display:grid;
+    place-items:center;
+}
+
+.checkers-cell.light{
+    background:#f0d9b5;
+}
+
+.checkers-cell.dark{
+    background:#b58863;
+}
+
+.checkers-piece{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    cursor:pointer;
+    transition:0.15s;
+    border:2px solid rgba(255,255,255,0.2);
+}
+
+.checkers-piece:hover{
+    transform:scale(1.05);
+}
+
+.checkers-piece.black{
+    background:#1a1a1a;
+    border-color:#444;
+}
+
+.checkers-piece.red{
+    background:#cc3333;
+    border-color:#ff6666;
+}
+
+.checkers-piece.king{
+    border:3px solid #ffd700;
+}
+
+.checkers-piece.selected{
+    transform:scale(1.1);
+    box-shadow:0 0 20px rgba(255,255,255,0.3);
+}
+
+.checkers-cell.valid-move{
+    background:rgba(0,255,0,0.3);
+}
+
 /* COMPOSER */
 
 .composer{
@@ -478,21 +802,10 @@ textarea{
     padding:10px;
 }
 
-.attach-btn,
 .send-btn{
     height:42px;
     border:0;
     border-radius:9px;
-}
-
-.attach-btn{
-    width:42px;
-    background:transparent;
-    color:#adb5c0;
-    font-size:20px;
-}
-
-.send-btn{
     padding:0 18px;
     background:var(--accent);
     color:#111;
@@ -520,7 +833,7 @@ textarea{
 }
 
 .panel{
-    width:min(560px,calc(100vw - 25px));
+    width:min(620px,calc(100vw - 25px));
     max-height:calc(100vh - 25px);
     overflow-y:auto;
     background:var(--panel);
@@ -628,13 +941,14 @@ textarea{
 }
 
 .game-choice{
-    min-height:100px;
+    min-height:80px;
     padding:13px;
     text-align:left;
     border-radius:12px;
     border:1px solid var(--border);
     background:#151a20;
     color:white;
+    font-size:13px;
 }
 
 .game-choice:hover{
@@ -643,12 +957,23 @@ textarea{
 
 .game-choice strong{
     display:block;
-    margin-bottom:5px;
+    margin-bottom:3px;
+    font-size:15px;
 }
 
 .game-choice span{
     color:#818b97;
-    font-size:12px;
+    font-size:11px;
+}
+
+.game-choice .game-players{
+    display:inline-block;
+    background:#1a1f26;
+    padding:1px 8px;
+    border-radius:10px;
+    color:#aab2bd;
+    font-size:10px;
+    margin-top:4px;
 }
 
 /* DANGER */
@@ -679,37 +1004,6 @@ textarea{
     color:#ff8585;
 }
 
-/* CONTEXT MENU */
-
-.context-menu{
-    position:fixed;
-    display:none;
-    width:160px;
-    padding:5px;
-    z-index:200;
-    background:var(--panel2);
-    border:1px solid var(--border);
-    border-radius:9px;
-}
-
-.context-menu.show{
-    display:block;
-}
-
-.context-menu button{
-    width:100%;
-    padding:9px 10px;
-    text-align:left;
-    border:0;
-    border-radius:6px;
-    background:transparent;
-    color:white;
-}
-
-.delete-option{
-    color:#ff7777!important;
-}
-
 /* EMPTY */
 
 .empty{
@@ -725,6 +1019,43 @@ textarea{
     display:block;
     color:#aab2bd;
     margin-bottom:5px;
+}
+
+/* GAME OPTIONS */
+
+.game-options{
+    background:#0d1015;
+    border-radius:10px;
+    padding:12px;
+    margin:10px 0;
+}
+
+.game-options-row{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin:5px 0;
+}
+
+.game-options-row label{
+    color:#aab2bd;
+    font-size:12px;
+    min-width:60px;
+}
+
+.game-options-row select,
+.game-options-row input[type=number]{
+    background:#1a1f26;
+    border:1px solid var(--border);
+    border-radius:6px;
+    color:white;
+    padding:5px 10px;
+    font-size:12px;
+}
+
+.game-options-row input[type=number]{
+    width:60px;
 }
 
 @media(max-width:600px){
@@ -750,21 +1081,56 @@ textarea{
     }
 
     .ttt{
-        grid-template-columns:repeat(3,62px);
+        grid-template-columns:repeat(3,55px);
     }
 
     .ttt button{
-        width:62px;
-        height:62px;
+        width:55px;
+        height:55px;
+        font-size:22px;
     }
 
     .connect-board{
-        grid-template-columns:repeat(7,36px);
+        grid-template-columns:repeat(7,32px);
     }
 
     .connect-cell{
-        width:36px;
-        height:36px;
+        width:32px;
+        height:32px;
+    }
+
+    .memory-card{
+        width:55px;
+        height:55px;
+        font-size:24px;
+    }
+
+    .checkers-cell{
+        width:45px;
+        height:45px;
+    }
+
+    .checkers-piece{
+        width:34px;
+        height:34px;
+    }
+
+    .othello-cell{
+        width:38px;
+        height:38px;
+    }
+
+    .othello-cell.disc{
+        width:32px;
+        height:32px;
+    }
+
+    .dots-line.horizontal{
+        width:30px;
+    }
+
+    .dots-line.vertical{
+        height:30px;
     }
 }
 </style>
@@ -777,8 +1143,8 @@ textarea{
 <header class="header">
 
     <div class="logo">
-        <div class="logo-icon">💬</div>
-        <span>Chat</span>
+        <div class="logo-icon">🎮</div>
+        <span>Game Chat</span>
         <span class="channel"># general</span>
     </div>
 
@@ -838,7 +1204,7 @@ textarea{
 
 <div class="panel-header">
 
-    <h2>🎮 Games</h2>
+    <h2>🎮 Create Game</h2>
 
     <button
         class="icon-btn"
@@ -850,51 +1216,83 @@ textarea{
 <div class="panel-body">
 
 <p style="color:#929aa5;line-height:1.5">
-Choose a game to create a lobby. Other people can spectate,
-but only people who press <b>Join</b> before you press
-<b>Start</b> become players.
+Choose a game to create a lobby. Others can join before you start.
 </p>
 
 <div class="game-grid">
 
-<button
-    class="game-choice"
-    data-game="ttt"
->
+<!-- Classics -->
+<button class="game-choice" data-game="ttt">
     <strong>⭕ Tic-Tac-Toe</strong>
-    <span>2 players</span>
+    <span>Classic 3x3</span>
+    <div class="game-players">2 players</div>
 </button>
 
-<button
-    class="game-choice"
-    data-game="connect4"
->
+<button class="game-choice" data-game="connect4">
     <strong>🔴 Connect Four</strong>
-    <span>2 players</span>
+    <span>Drop discs, get 4 in a row</span>
+    <div class="game-players">2-4 players</div>
 </button>
 
-<button
-    class="game-choice"
-    data-game="dice"
->
-    <strong>🎲 Dice Duel</strong>
-    <span>2–6 players</span>
-</button>
-
-<button
-    class="game-choice"
-    data-game="higher"
->
-    <strong>🃏 Higher or Lower</strong>
-    <span>2–6 players</span>
-</button>
-
-<button
-    class="game-choice"
-    data-game="rps"
->
+<button class="game-choice" data-game="rps">
     <strong>✊ Rock Paper Scissors</strong>
-    <span>2–6 players</span>
+    <span>Classic showdown</span>
+    <div class="game-players">2-6 players</div>
+</button>
+
+<!-- New Games -->
+<button class="game-choice" data-game="mastermind">
+    <strong>🎯 Mastermind</strong>
+    <span>Break the secret code</span>
+    <div class="game-players">2-6 players</div>
+</button>
+
+<button class="game-choice" data-game="memory">
+    <strong>🧠 Memory Match</strong>
+    <span>Find matching pairs</span>
+    <div class="game-players">2-6 players</div>
+</button>
+
+<button class="game-choice" data-game="hangman">
+    <strong>🪢 Hangman</strong>
+    <span>Guess the word</span>
+    <div class="game-players">2-6 players</div>
+</button>
+
+<button class="game-choice" data-game="dots">
+    <strong>📦 Dots and Boxes</strong>
+    <span>Claim boxes by drawing lines</span>
+    <div class="game-players">2-6 players</div>
+</button>
+
+<button class="game-choice" data-game="othello">
+    <strong>⬛ Othello</strong>
+    <span>Flip discs to dominate</span>
+    <div class="game-players">2-4 players</div>
+</button>
+
+<button class="game-choice" data-game="checkers">
+    <strong>🔴 Checkers</strong>
+    <span>Jump and capture</span>
+    <div class="game-players">2-4 players</div>
+</button>
+
+<button class="game-choice" data-game="gomoku">
+    <strong>⚫ Gomoku</strong>
+    <span>Five in a row</span>
+    <div class="game-players">2-4 players</div>
+</button>
+
+<button class="game-choice" data-game="sos">
+    <strong>📝 SOS</strong>
+    <span>Build SOS chains</span>
+    <div class="game-players">2-6 players</div>
+</button>
+
+<button class="game-choice" data-game="ttt_tournament">
+    <strong>🏆 Tic-Tac-Toe Tournament</strong>
+    <span>Round-robin matches</span>
+    <div class="game-players">2-6 players</div>
 </button>
 
 </div>
@@ -1067,17 +1465,6 @@ but only people who press <b>Join</b> before you press
 <select id="showTimestamps">
 <option value="true">On</option>
 <option value="false">Off</option>
-</select>
-
-</div>
-
-<div class="setting">
-
-<label>Compact messages</label>
-
-<select id="compactMessages">
-<option value="false">Off</option>
-<option value="true">On</option>
 </select>
 
 </div>
@@ -1284,12 +1671,6 @@ Confirm
 const API_URL="/api/messages";
 const CHANNEL="general";
 
-/*
-    Special messages begin with this marker.
-
-    They are normal Supabase messages underneath,
-    but this HTML never renders them as chat messages.
-*/
 const GAME_PREFIX="__CHAT_GAME_STATE__:";
 
 
@@ -1326,7 +1707,6 @@ const defaults={
     refreshRate:500,
 
     showTimestamps:true,
-    compactMessages:false,
 
     textSize:16,
     wordSpacing:0,
@@ -1419,9 +1799,6 @@ const refreshRate=
 const showTimestamps=
     document.getElementById("showTimestamps");
 
-const compactMessages=
-    document.getElementById("compactMessages");
-
 const themeSelect=
     document.getElementById("themeSelect");
 
@@ -1489,11 +1866,7 @@ let games=[];
 let refreshTimer=null;
 let syncing=false;
 let confirmCallback=null;
-
-// Track rendered elements by ID
 let renderedElements=new Map();
-
-// Track message IDs we've already seen for auto-scroll detection
 let seenMessageIds=new Set();
 let seenGameIds=new Set();
 
@@ -1504,39 +1877,92 @@ let seenGameIds=new Set();
 
 const GAME_TYPES={
 
+    // Classics
     ttt:{
         name:"Tic-Tac-Toe",
         icon:"⭕",
         min:2,
-        max:2
+        max:2,
+        desc:"Classic 3x3"
     },
-
     connect4:{
         name:"Connect Four",
         icon:"🔴",
         min:2,
-        max:2
+        max:4,
+        desc:"Drop discs, get 4 in a row"
     },
-
-    dice:{
-        name:"Dice Duel",
-        icon:"🎲",
-        min:2,
-        max:6
-    },
-
-    higher:{
-        name:"Higher or Lower",
-        icon:"🃏",
-        min:2,
-        max:6
-    },
-
     rps:{
         name:"Rock Paper Scissors",
         icon:"✊",
         min:2,
-        max:6
+        max:6,
+        desc:"Classic showdown"
+    },
+    
+    // New games
+    mastermind:{
+        name:"Mastermind",
+        icon:"🎯",
+        min:2,
+        max:6,
+        desc:"Break the secret code"
+    },
+    memory:{
+        name:"Memory Match",
+        icon:"🧠",
+        min:2,
+        max:6,
+        desc:"Find matching pairs"
+    },
+    hangman:{
+        name:"Hangman",
+        icon:"🪢",
+        min:2,
+        max:6,
+        desc:"Guess the word"
+    },
+    dots:{
+        name:"Dots and Boxes",
+        icon:"📦",
+        min:2,
+        max:6,
+        desc:"Claim boxes by drawing lines"
+    },
+    othello:{
+        name:"Othello",
+        icon:"⬛",
+        min:2,
+        max:4,
+        desc:"Flip discs to dominate"
+    },
+    checkers:{
+        name:"Checkers",
+        icon:"🔴",
+        min:2,
+        max:4,
+        desc:"Jump and capture"
+    },
+    gomoku:{
+        name:"Gomoku",
+        icon:"⚫",
+        min:2,
+        max:4,
+        desc:"Five in a row"
+    },
+    sos:{
+        name:"SOS",
+        icon:"📝",
+        min:2,
+        max:6,
+        desc:"Build SOS chains"
+    },
+    ttt_tournament:{
+        name:"Tic-Tac-Toe Tournament",
+        icon:"🏆",
+        min:2,
+        max:6,
+        desc:"Round-robin matches"
     }
 };
 
@@ -1558,9 +1984,6 @@ function loadSettingsUI(){
 
     showTimestamps.value=
         String(settings.showTimestamps);
-
-    compactMessages.value=
-        String(settings.compactMessages);
 
     themeSelect.value=
         settings.theme;
@@ -1642,7 +2065,6 @@ function applySettings(){
         settings.theme
     );
 
-    // Re-render everything when settings change
     renderedElements.clear();
     seenMessageIds.clear();
     seenGameIds.clear();
@@ -1734,9 +2156,6 @@ saveSettings.onclick=()=>{
 
     settings.showTimestamps=
         showTimestamps.value==="true";
-
-    settings.compactMessages=
-        compactMessages.value==="true";
 
     settings.theme=
         themeSelect.value;
@@ -2069,14 +2488,9 @@ async function loadMessages(){
             ?data.messages
             :[];
 
-        // Check if messages changed before updating
         const changeInfo = getMessageChanges(currentMessages, newMessages);
         
         if (changeInfo.changed) {
-            const oldIds = new Set(currentMessages.map(m => m.id));
-            const newIds = new Set(newMessages.map(m => m.id));
-            
-            // Detect new messages (ones we haven't seen before)
             let hasNewMessages = false;
             let hasNewGames = false;
             
@@ -2085,13 +2499,10 @@ async function loadMessages(){
                     if (!isGameMessage(msg)) {
                         hasNewMessages = true;
                     }
-                    // Mark as seen for future
                     seenMessageIds.add(msg.id);
                 }
             }
             
-            // Check for new games
-            // We need to process games first to know what's new
             const oldGames = [...games];
             currentMessages = newMessages;
             processGameMessages();
@@ -2103,7 +2514,6 @@ async function loadMessages(){
                 }
             }
             
-            // Also check if games were removed
             const oldGameIds = new Set(oldGames.map(g => g.id));
             const newGameIds = new Set(games.map(g => g.id));
             for (const id of oldGameIds) {
@@ -2112,10 +2522,7 @@ async function loadMessages(){
                 }
             }
             
-            // Store whether we should auto-scroll
             const shouldScroll = settings.autoScroll && (hasNewMessages || hasNewGames);
-            
-            // Store the previous scroll position and whether user is at bottom
             const wasNearBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight < 100;
             
             renderMessages(shouldScroll || (wasNearBottom && settings.autoScroll));
@@ -2145,10 +2552,9 @@ async function loadMessages(){
     }
 }
 
-// Get detailed change information
 function getMessageChanges(oldMessages, newMessages) {
     if (oldMessages.length !== newMessages.length) {
-        return { changed: true, added: [], removed: [], updated: [] };
+        return { changed: true };
     }
     
     let changed = false;
@@ -2156,23 +2562,10 @@ function getMessageChanges(oldMessages, newMessages) {
         const oldMsg = oldMessages[i];
         const newMsg = newMessages[i];
         
-        if (oldMsg.id !== newMsg.id) {
-            changed = true;
-            break;
-        }
-        if (oldMsg.message !== newMsg.message) {
-            changed = true;
-            break;
-        }
-        if (oldMsg.username !== newMsg.username) {
-            changed = true;
-            break;
-        }
-        if (oldMsg.edited !== newMsg.edited) {
-            changed = true;
-            break;
-        }
-        if (oldMsg.image !== newMsg.image) {
+        if (oldMsg.id !== newMsg.id || 
+            oldMsg.message !== newMsg.message || 
+            oldMsg.username !== newMsg.username || 
+            oldMsg.edited !== newMsg.edited) {
             changed = true;
             break;
         }
@@ -2242,10 +2635,6 @@ function processGameMessages(){
             continue;
         }
 
-        /*
-            Only the latest message for a
-            game ID is used.
-        */
         map.set(
             state.id,
             {
@@ -2267,19 +2656,17 @@ function processGameMessages(){
 
 
 /* =====================================================
-   RENDER MESSAGES - SMART UPDATE WITH AUTO-SCROLL
+   RENDER MESSAGES
 ===================================================== */
 
 function renderMessages(shouldAutoScroll){
 
-    // Get all normal messages (non-game)
     const normal =
         currentMessages.filter(
             message =>
                 !isGameMessage(message)
         );
 
-    // Get active games
     const activeGames =
         games.filter(
             game =>
@@ -2287,7 +2674,6 @@ function renderMessages(shouldAutoScroll){
                 game.status !== "forcequit"
         );
 
-    // If no messages and no games, show empty state
     if (!normal.length && !activeGames.length) {
         messagesEl.innerHTML = `
             <div class="empty">
@@ -2301,50 +2687,40 @@ function renderMessages(shouldAutoScroll){
         return;
     }
 
-    // Build the desired DOM structure as a document fragment
     const fragment = document.createDocumentFragment();
     const elementIds = [];
 
-    // Add normal messages first (top)
     for (const message of normal) {
         const item = createMessageElement(message);
         fragment.appendChild(item);
         elementIds.push('msg_' + message.id);
     }
 
-    // Add game messages last (bottom)
     for (const game of activeGames) {
         const gameEl = createGameElement(game);
         fragment.appendChild(gameEl);
         elementIds.push('game_' + game.id);
     }
 
-    // Get current children
     const currentChildren = messagesEl.children;
     const currentIds = [];
 
-    // Build list of current element IDs
     for (let i = 0; i < currentChildren.length; i++) {
         const child = currentChildren[i];
         if (child.dataset && child.dataset.id) {
             currentIds.push(child.dataset.id);
         } else {
-            // If no data-id, treat it as a temporary element that should be replaced
             currentIds.push('__temp_' + i);
         }
     }
 
-    // Compare and update
     const newChildren = Array.from(fragment.children);
     
-    // If the structure is completely different, replace everything
     if (currentIds.length !== elementIds.length || 
         currentIds.some((id, idx) => id !== elementIds[idx])) {
         
-        // Replace all children
         messagesEl.replaceChildren(fragment);
         
-        // Store references
         renderedElements.clear();
         for (let i = 0; i < newChildren.length; i++) {
             const el = newChildren[i];
@@ -2353,7 +2729,6 @@ function renderMessages(shouldAutoScroll){
             }
         }
         
-        // Auto-scroll to bottom if new items were added
         if (shouldAutoScroll && settings.autoScroll) {
             requestAnimationFrame(() => {
                 messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -2363,25 +2738,20 @@ function renderMessages(shouldAutoScroll){
         return;
     }
 
-    // Update existing elements in place
     let hasNewElement = false;
     
     for (let i = 0; i < newChildren.length; i++) {
         const newEl = newChildren[i];
         const oldEl = currentChildren[i];
         
-        // Check if this is a new element (different ID)
         if (newEl.dataset && newEl.dataset.id !== oldEl.dataset.id) {
             hasNewElement = true;
         }
         
-        // If the element ID matches, update its content
         if (newEl.dataset && newEl.dataset.id === oldEl.dataset.id) {
-            // Replace the old element's content with the new element's content
             oldEl.replaceWith(newEl);
             renderedElements.set(newEl.dataset.id, newEl);
         } else {
-            // IDs don't match, replace the whole thing
             oldEl.replaceWith(newEl);
             if (newEl.dataset && newEl.dataset.id) {
                 renderedElements.set(newEl.dataset.id, newEl);
@@ -2390,7 +2760,6 @@ function renderMessages(shouldAutoScroll){
         }
     }
 
-    // Clean up any stale references
     const validIds = new Set(elementIds);
     for (const [id, el] of renderedElements) {
         if (!validIds.has(id)) {
@@ -2398,7 +2767,6 @@ function renderMessages(shouldAutoScroll){
         }
     }
 
-    // Auto-scroll to bottom if new elements were added and auto-scroll is enabled
     if (shouldAutoScroll && settings.autoScroll) {
         requestAnimationFrame(() => {
             messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -2538,9 +2906,6 @@ async function createGame(gameType){
         return;
     }
 
-    /*
-        One host can only own one game.
-    */
     const existing=
         games.find(
             game=>
@@ -2613,8 +2978,6 @@ async function createGame(gameType){
         maxPlayers:
             info.max,
 
-        turn:0,
-
         turnIndex:0,
 
         createdAt:
@@ -2630,10 +2993,6 @@ async function createGame(gameType){
         data:{}
     };
 
-    /*
-        The game state is stored as a
-        special message created by the host.
-    */
     try{
 
         await writeGameState(
@@ -2662,12 +3021,38 @@ async function createGame(gameType){
 
 function createInitialBoard(type){
 
-    if(type==="ttt"){
+    if(type==="ttt" || type==="ttt_tournament"){
         return Array(9).fill("");
     }
-
     if(type==="connect4"){
         return Array(42).fill("");
+    }
+    if(type==="mastermind"){
+        return [];
+    }
+    if(type==="memory"){
+        return [];
+    }
+    if(type==="hangman"){
+        return [];
+    }
+    if(type==="dots"){
+        return [];
+    }
+    if(type==="othello"){
+        return Array(64).fill("");
+    }
+    if(type==="checkers"){
+        return Array(64).fill("");
+    }
+    if(type==="gomoku"){
+        return Array(225).fill("");
+    }
+    if(type==="sos"){
+        return Array(100).fill("");
+    }
+    if(type==="rps"){
+        return [];
     }
 
     return [];
@@ -2679,15 +3064,6 @@ function createInitialBoard(type){
 ===================================================== */
 
 async function writeGameState(game){
-
-    /*
-        IMPORTANT:
-        The state message uses the HOST device ID.
-
-        That allows the host browser to request
-        deletion of its game-state messages through
-        the existing API.
-    */
 
     const payload=
         GAME_PREFIX+
@@ -2713,469 +3089,142 @@ async function writeGameState(game){
 
 
 /* =====================================================
-   GAME ACTION MESSAGES
-===================================================== */
-
-/*
-    Instead of making every player create permanent
-    visible chat messages, player actions are sent as
-    special game messages.
-
-    The host can then update the state.
-
-    These are hidden from the normal chat.
-*/
-
-async function sendGameAction(
-    game,
-    action
-){
-
-    await apiPost({
-
-        username:
-            "__GAME_ACTION__",
-
-        channel:
-            CHANNEL,
-
-        message:
-            GAME_PREFIX+
-            JSON.stringify({
-
-                type:"action",
-
-                gameId:
-                    game.id,
-
-                action,
-
-                from:
-                    deviceId,
-
-                username:
-                    settings.username,
-
-                time:
-                    Date.now()
-            }),
-
-        image:null,
-
-        /*
-            Use host ID so the host can clean
-            up the temporary action message.
-        */
-        device_id:
-            game.hostDeviceId
-    });
-}
-
-
-/* =====================================================
-   GAME ELEMENT
+   CREATE GAME ELEMENT - DISPATCHER
 ===================================================== */
 
 function createGameElement(game){
-
-    const wrapper=
-        document.createElement("div");
-
-    wrapper.className=
-        "game-message";
+    const wrapper = document.createElement("div");
+    wrapper.className = "game-message";
     wrapper.dataset.id = 'game_' + game.id;
 
-    const card=
-        document.createElement("div");
+    const card = document.createElement("div");
+    card.className = "game-card";
 
-    card.className=
-        "game-card";
+    // Header
+    const header = document.createElement("div");
+    header.className = "game-header";
 
-    const header=
-        document.createElement("div");
+    const title = document.createElement("div");
+    title.className = "game-title";
+    title.textContent = game.icon + " " + game.name;
 
-    header.className=
-        "game-header";
-
-    const title=
-        document.createElement("div");
-
-    title.className=
-        "game-title";
-
-    title.textContent=
-        game.icon+
-        " "+
-        game.name;
-
-    const status=
-        document.createElement("div");
-
-    status.className=
-        "game-status";
-
-    status.textContent=
-        game.status==="lobby"
-            ?"WAITING"
-            :"PLAYING";
+    const status = document.createElement("div");
+    status.className = "game-status";
+    status.textContent = game.status === "lobby" ? "WAITING" : "PLAYING";
 
     header.appendChild(title);
     header.appendChild(status);
 
-    const body=
-        document.createElement("div");
+    // Body
+    const body = document.createElement("div");
+    body.className = "game-body";
 
-    body.className=
-        "game-body";
-
-    const info=
-        document.createElement("div");
-
-    info.className=
-        "game-info";
-
-    info.innerHTML=`
+    // Info
+    const info = document.createElement("div");
+    info.className = "game-info";
+    info.innerHTML = `
         <div class="game-pill">
-            Host:
-            <strong>
-                ${escapeHtml(
-                    game.host
-                )}
-            </strong>
+            Host: <strong>${escapeHtml(game.host)}</strong>
         </div>
-
         <div class="game-pill">
-            Players:
-            <strong>
-                ${game.players.length}/${game.maxPlayers}
-            </strong>
+            Players: <strong>${game.players.length}/${game.maxPlayers}</strong>
         </div>
     `;
-
     body.appendChild(info);
 
-    const description=
-        document.createElement("div");
+    // Description
+    const desc = document.createElement("div");
+    desc.className = "game-description";
+    desc.textContent = game.status === "lobby" 
+        ? "Join before the host starts. Everyone else can spectate."
+        : getGameDescription(game);
+    body.appendChild(desc);
 
-    description.className=
-        "game-description";
-
-    if(game.status==="lobby"){
-
-        description.textContent=
-            "Join before the host starts. Everyone else can spectate.";
-
-    }else{
-
-        description.textContent=
-            getGameDescription(
-                game
-            );
-    }
-
-    body.appendChild(description);
-
-
-    /* PLAYERS */
-
-    const players=
-        document.createElement("div");
-
-    players.className=
-        "players-list";
-
-    game.players.forEach(
-        (player,index)=>{
-
-            const chip=
-                document.createElement("div");
-
-            chip.className=
-                "player-chip";
-
-            if(
-                player.deviceId===
-                game.hostDeviceId
-            ){
-
-                chip.classList.add(
-                    "host"
-                );
-            }
-
-            chip.textContent=
-                player.username+
-                (
-                    player.deviceId===
-                    game.hostDeviceId
-                    ?" 👑"
-                    :""
-                );
-
-            players.appendChild(chip);
-        }
-    );
-
+    // Players
+    const players = document.createElement("div");
+    players.className = "players-list";
+    game.players.forEach(player => {
+        const chip = document.createElement("div");
+        chip.className = "player-chip";
+        if (player.deviceId === game.hostDeviceId) chip.classList.add("host");
+        chip.textContent = player.username + (player.deviceId === game.hostDeviceId ? " 👑" : "");
+        players.appendChild(chip);
+    });
     body.appendChild(players);
 
-
-    /* TURN */
-
-    if(
-        game.status==="playing"
-    ){
-
-        const turn=
-            document.createElement("div");
-
-        turn.className=
-            "turn-banner";
-
-        const current=
-            game.players[
-                game.turnIndex %
-                Math.max(
-                    game.players.length,
-                    1
-                )
-            ];
-
-        if(current){
-
-            turn.innerHTML=
-                "Current turn: <strong>"+
-                escapeHtml(
-                    current.username
-                )+
-                "</strong>";
+    // Turn banner
+    if (game.status === "playing") {
+        const turn = document.createElement("div");
+        turn.className = "turn-banner";
+        const current = game.players[game.turnIndex % Math.max(game.players.length, 1)];
+        if (current) {
+            turn.innerHTML = "Current turn: <strong>" + escapeHtml(current.username) + "</strong>";
         }
-
         body.appendChild(turn);
     }
 
+    // Game board
+    const board = createGameBoard(game);
+    if (board) body.appendChild(board);
 
-    /* GAME BOARD */
+    // Actions
+    const actions = document.createElement("div");
+    actions.className = "game-actions";
 
-    const board=
-        createGameBoard(
-            game
-        );
-
-    if(board){
-        body.appendChild(board);
-    }
-
-
-    /* ACTIONS */
-
-    const actions=
-        document.createElement("div");
-
-    actions.className=
-        "game-actions";
-
-
-    if(game.status==="lobby"){
-
-        const joined=
-            game.players.some(
-                p=>
-                    p.deviceId===
-                    deviceId
-            );
-
-        if(!joined){
-
-            if(
-                game.players.length<
-                game.maxPlayers
-            ){
-
-                const join=
-                    document.createElement(
-                        "button"
-                    );
-
-                join.className=
-                    "game-btn green";
-
-                join.textContent=
-                    "Join game";
-
-                join.onclick=async()=>{
-
-                    await joinGame(
-                        game
-                    );
-                };
-
-                actions.appendChild(
-                    join
-                );
-            }
-
-        }else{
-
-            const leave=
-                document.createElement(
-                    "button"
-                );
-
-            leave.className=
-                "game-btn";
-
-            leave.textContent=
-                "Leave";
-
-            leave.onclick=async()=>{
-
-                await leaveGame(
-                    game
-                );
-            };
-
-            actions.appendChild(
-                leave
-            );
+    if (game.status === "lobby") {
+        const joined = game.players.some(p => p.deviceId === deviceId);
+        
+        if (!joined && game.players.length < game.maxPlayers) {
+            const join = document.createElement("button");
+            join.className = "game-btn green";
+            join.textContent = "Join game";
+            join.onclick = async () => await joinGame(game);
+            actions.appendChild(join);
+        } else if (joined) {
+            const leave = document.createElement("button");
+            leave.className = "game-btn";
+            leave.textContent = "Leave";
+            leave.onclick = async () => await leaveGame(game);
+            actions.appendChild(leave);
         }
 
+        if (game.hostDeviceId === deviceId) {
+            const start = document.createElement("button");
+            start.className = "game-btn primary";
+            start.textContent = "Start game";
+            start.disabled = game.players.length < GAME_TYPES[game.gameType].min;
+            start.onclick = async () => await startGame(game);
+            actions.appendChild(start);
 
-        if(
-            game.hostDeviceId===
-            deviceId
-        ){
-
-            const start=
-                document.createElement(
-                    "button"
-                );
-
-            start.className=
-                "game-btn primary";
-
-            start.textContent=
-                "Start game";
-
-            start.disabled=
-                game.players.length<
-                GAME_TYPES[
-                    game.gameType
-                ].min;
-
-            start.onclick=async()=>{
-
-                await startGame(
-                    game
-                );
-            };
-
-            actions.appendChild(
-                start
-            );
-
-            const quit=
-                document.createElement(
-                    "button"
-                );
-
-            quit.className=
-                "game-btn danger";
-
-            quit.textContent=
-                "Force quit";
-
-            quit.onclick=async()=>{
-
-                openConfirm(
-                    "Force quit game?",
-                    "Everyone will be removed from this game.",
-                    ()=>forceQuitGame(
-                        game
-                    )
-                );
-            };
-
-            actions.appendChild(
-                quit
-            );
+            const quit = document.createElement("button");
+            quit.className = "game-btn danger";
+            quit.textContent = "Force quit";
+            quit.onclick = () => openConfirm("Force quit game?", "Everyone will be removed from this game.", () => forceQuitGame(game));
+            actions.appendChild(quit);
+        }
+    } else if (game.status === "playing") {
+        const mine = game.players.some(p => p.deviceId === deviceId);
+        
+        if (mine) {
+            const leave = document.createElement("button");
+            leave.className = "game-btn";
+            leave.textContent = "Leave game";
+            leave.onclick = async () => await leaveGame(game);
+            actions.appendChild(leave);
         }
 
-    }else if(
-        game.status==="playing"
-    ){
-
-        const mine=
-            game.players.some(
-                p=>
-                    p.deviceId===
-                    deviceId
-            );
-
-        if(mine){
-
-            const leave=
-                document.createElement(
-                    "button"
-                );
-
-            leave.className=
-                "game-btn";
-
-            leave.textContent=
-                "Leave game";
-
-            leave.onclick=async()=>{
-
-                await leaveGame(
-                    game
-                );
-            };
-
-            actions.appendChild(
-                leave
-            );
-        }
-
-
-        if(
-            game.hostDeviceId===
-            deviceId
-        ){
-
-            const quit=
-                document.createElement(
-                    "button"
-                );
-
-            quit.className=
-                "game-btn danger";
-
-            quit.textContent=
-                "Force quit";
-
-            quit.onclick=async()=>{
-
-                openConfirm(
-                    "Force quit game?",
-                    "Everyone will be removed and the temporary game data will be deleted.",
-                    ()=>forceQuitGame(
-                        game
-                    )
-                );
-            };
-
-            actions.appendChild(
-                quit
-            );
+        if (game.hostDeviceId === deviceId) {
+            const quit = document.createElement("button");
+            quit.className = "game-btn danger";
+            quit.textContent = "Force quit";
+            quit.onclick = () => openConfirm("Force quit game?", "Everyone will be removed.", () => forceQuitGame(game));
+            actions.appendChild(quit);
         }
     }
-
 
     body.appendChild(actions);
-
     card.appendChild(header);
     card.appendChild(body);
-
     wrapper.appendChild(card);
 
     return wrapper;
@@ -3183,65 +3232,51 @@ function createGameElement(game){
 
 
 /* =====================================================
-   GAME DESCRIPTION
+   GAME DESCRIPTIONS
 ===================================================== */
 
 function getGameDescription(game){
-
-    switch(game.gameType){
-
-        case "ttt":
-            return "Take turns placing your symbol. Get three in a row.";
-
-        case "connect4":
-            return "Drop pieces into the board. Get four in a row.";
-
-        case "dice":
-            return "Roll the dice when it is your turn. Highest total wins.";
-
-        case "higher":
-            return "Guess whether the next card will be higher or lower.";
-
-        case "rps":
-            return "Choose rock, paper or scissors when it is your turn.";
-
-        default:
-            return "Game in progress.";
-    }
+    const descs = {
+        ttt: "Take turns placing X and O. Get three in a row to win.",
+        connect4: "Drop discs into columns. First to get 4 in a row wins!",
+        rps: "Rock beats scissors, scissors beats paper, paper beats rock.",
+        mastermind: "Break the secret code. Get feedback on each guess.",
+        memory: "Flip cards and find matching pairs. Most pairs wins.",
+        hangman: "Guess letters to reveal the secret word. Don't hang the man!",
+        dots: "Draw lines between dots. Complete a box to claim it!",
+        othello: "Place discs to flip opponent's pieces. Most discs wins.",
+        checkers: "Move diagonally and jump to capture. King me!",
+        gomoku: "Place stones on the grid. First to get 5 in a row wins.",
+        sos: "Draw S or O to spell SOS. Score points and go again!",
+        ttt_tournament: "Round-robin Tic-Tac-Toe matches. Most points wins!"
+    };
+    return descs[game.gameType] || "Game in progress.";
 }
 
 
 /* =====================================================
-   GAME BOARD
+   GAME BOARD - DISPATCHER
 ===================================================== */
 
 function createGameBoard(game){
-
-    if(game.status!=="playing"){
-        return null;
-    }
-
-    if(game.gameType==="ttt"){
-        return createTTT(game);
-    }
-
-    if(game.gameType==="connect4"){
-        return createConnect4(game);
-    }
-
-    if(game.gameType==="dice"){
-        return createDice(game);
-    }
-
-    if(game.gameType==="higher"){
-        return createHigher(game);
-    }
-
-    if(game.gameType==="rps"){
-        return createRPS(game);
-    }
-
-    return null;
+    if (game.status !== "playing") return null;
+    
+    const boards = {
+        ttt: createTTT,
+        ttt_tournament: createTTT,
+        connect4: createConnect4,
+        rps: createRPS,
+        mastermind: createMastermind,
+        memory: createMemory,
+        hangman: createHangman,
+        dots: createDots,
+        othello: createOthello,
+        checkers: createCheckers,
+        gomoku: createGomoku,
+        sos: createSOS
+    };
+    
+    return boards[game.gameType] ? boards[game.gameType](game) : null;
 }
 
 
@@ -3250,151 +3285,36 @@ function createGameBoard(game){
 ===================================================== */
 
 function createTTT(game){
+    const board = document.createElement("div");
+    board.className = "ttt";
 
-    const board=
-        document.createElement("div");
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
 
-    board.className="ttt";
-
-    const mine=
-        game.players.some(
-            p=>
-                p.deviceId===
-                deviceId
-        );
-
-    const current=
-        game.players[
-            game.turnIndex %
-            game.players.length
-        ];
-
-    const myTurn=
-        mine &&
-        current &&
-        current.deviceId===
-        deviceId;
-
-    for(let i=0;i<9;i++){
-
-        const button=
-            document.createElement(
-                "button"
-            );
-
-        button.textContent=
-            game.board[i] || "";
-
-        button.disabled=
-            !myTurn ||
-            !!game.board[i] ||
-            !!game.winner;
-
-        button.onclick=async()=>{
-
-            await performTTTMove(
-                game,
-                i
-            );
+    for (let i = 0; i < 9; i++) {
+        const button = document.createElement("button");
+        button.textContent = game.board[i] || "";
+        button.disabled = !myTurn || !!game.board[i] || !!game.winner;
+        button.onclick = async () => {
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.board[i] = game.turnIndex % 2 === 0 ? "X" : "O";
+            const result = checkTTT(copy.board);
+            if (result) { copy.winner = result; copy.status = "finished"; }
+            else { copy.turnIndex++; }
+            await publishGameAndCleanup(game, copy);
         };
-
         board.appendChild(button);
     }
-
     return board;
 }
 
-
-async function performTTTMove(
-    game,
-    index
-){
-
-    const current=
-        game.players[
-            game.turnIndex %
-            game.players.length
-        ];
-
-    if(
-        !current ||
-        current.deviceId!==deviceId ||
-        game.board[index]
-    ){
-        return;
-    }
-
-    const copy=
-        JSON.parse(
-            JSON.stringify(game)
-        );
-
-    copy.board[index]=
-        game.turnIndex%2===0
-            ?"X"
-            :"O";
-
-    const result=
-        checkTTT(
-            copy.board
-        );
-
-    if(result){
-
-        copy.winner=
-            result;
-
-        copy.status=
-            "finished";
-
-    }else{
-
-        copy.turnIndex++;
-    }
-
-    await publishGameAndCleanup(
-        game,
-        copy
-    );
-}
-
-
 function checkTTT(board){
-
-    const wins=[
-
-        [0,1,2],
-        [3,4,5],
-        [6,7,8],
-
-        [0,3,6],
-        [1,4,7],
-        [2,5,8],
-
-        [0,4,8],
-        [2,4,6]
-    ];
-
-    for(const line of wins){
-
-        const [a,b,c]=line;
-
-        if(
-            board[a] &&
-            board[a]===board[b] &&
-            board[a]===board[c]
-        ){
-
-            return board[a];
-        }
+    const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for (const [a,b,c] of wins) {
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
     }
-
-    if(
-        board.every(Boolean)
-    ){
-        return "draw";
-    }
-
+    if (board.every(Boolean)) return "draw";
     return null;
 }
 
@@ -3404,591 +3324,68 @@ function checkTTT(board){
 ===================================================== */
 
 function createConnect4(game){
+    const board = document.createElement("div");
+    board.className = "connect-board";
 
-    const board=
-        document.createElement("div");
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
+    
+    const playerColors = game.data.playerColors || {};
+    const myColor = playerColors[deviceId] || (game.turnIndex % 2 === 0 ? "R" : "Y");
 
-    board.className=
-        "connect-board";
-
-    const mine=
-        game.players.some(
-            p=>
-                p.deviceId===
-                deviceId
-        );
-
-    const current=
-        game.players[
-            game.turnIndex %
-            game.players.length
-        ];
-
-    const myTurn=
-        mine &&
-        current &&
-        current.deviceId===
-        deviceId;
-
-    for(let row=0;row<6;row++){
-
-        for(
-            let col=0;
-            col<7;
-            col++
-        ){
-
-            const index=
-                row*7+col;
-
-            const cell=
-                document.createElement(
-                    "button"
-                );
-
-            cell.className=
-                "connect-cell";
-
-            if(
-                game.board[index]==="R"
-            ){
-                cell.classList.add(
-                    "red"
-                );
-            }
-
-            if(
-                game.board[index]==="Y"
-            ){
-                cell.classList.add(
-                    "yellow"
-                );
-            }
-
-            cell.disabled=
-                !myTurn;
-
-            cell.onclick=async()=>{
-
-                await performConnectMove(
-                    game,
-                    col
-                );
+    for (let row = 0; row < 6; row++) {
+        for (let col = 0; col < 7; col++) {
+            const index = row * 7 + col;
+            const cell = document.createElement("button");
+            cell.className = "connect-cell";
+            if (game.board[index] === "R") cell.classList.add("red");
+            if (game.board[index] === "Y") cell.classList.add("yellow");
+            cell.disabled = !myTurn;
+            cell.onclick = async () => {
+                const copy = JSON.parse(JSON.stringify(game));
+                const piece = copy.turnIndex % 2 === 0 ? "R" : "Y";
+                let placed = -1;
+                for (let r = 5; r >= 0; r--) {
+                    const idx = r * 7 + col;
+                    if (!copy.board[idx]) { copy.board[idx] = piece; placed = idx; break; }
+                }
+                if (placed === -1) return;
+                if (checkConnectWin(copy.board, placed)) {
+                    copy.winner = current.username;
+                    copy.status = "finished";
+                } else if (copy.board.every(Boolean)) {
+                    copy.winner = "draw";
+                    copy.status = "finished";
+                } else {
+                    copy.turnIndex++;
+                }
+                await publishGameAndCleanup(game, copy);
             };
-
             board.appendChild(cell);
         }
     }
-
     return board;
 }
 
-
-async function performConnectMove(
-    game,
-    column
-){
-
-    const current=
-        game.players[
-            game.turnIndex %
-            game.players.length
-        ];
-
-    if(
-        !current ||
-        current.deviceId!==deviceId
-    ){
-        return;
-    }
-
-    const copy=
-        JSON.parse(
-            JSON.stringify(game)
-        );
-
-    const piece=
-        game.turnIndex%2===0
-            ?"R"
-            :"Y";
-
-    let placed=-1;
-
-    for(
-        let row=5;
-        row>=0;
-        row--
-    ){
-
-        const index=
-            row*7+column;
-
-        if(!copy.board[index]){
-
-            copy.board[index]=piece;
-
-            placed=index;
-
-            break;
-        }
-    }
-
-    if(placed===-1){
-        return;
-    }
-
-    if(
-        checkConnectWin(
-            copy.board,
-            placed
-        )
-    ){
-
-        copy.winner=
-            current.username;
-
-        copy.status=
-            "finished";
-
-    }else if(
-        copy.board.every(Boolean)
-    ){
-
-        copy.winner=
-            "draw";
-
-        copy.status=
-            "finished";
-
-    }else{
-
-        copy.turnIndex++;
-    }
-
-    await publishGameAndCleanup(
-        game,
-        copy
-    );
-}
-
-
-function checkConnectWin(
-    board,
-    index
-){
-
-    const row=
-        Math.floor(index/7);
-
-    const col=
-        index%7;
-
-    const value=
-        board[index];
-
-    const dirs=[
-        [1,0],
-        [0,1],
-        [1,1],
-        [1,-1]
-    ];
-
-    for(const [dr,dc] of dirs){
-
-        let count=1;
-
-        for(
-            let direction of [-1,1]
-        ){
-
-            let r=row+
-                dr*direction;
-
-            let c=col+
-                dc*direction;
-
-            while(
-                r>=0 &&
-                r<6 &&
-                c>=0 &&
-                c<7 &&
-                board[r*7+c]===value
-            ){
-
+function checkConnectWin(board, index){
+    const row = Math.floor(index / 7);
+    const col = index % 7;
+    const value = board[index];
+    const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+    for (const [dr,dc] of dirs) {
+        let count = 1;
+        for (const dir of [-1,1]) {
+            let r = row + dr * dir, c = col + dc * dir;
+            while (r >= 0 && r < 6 && c >= 0 && c < 7 && board[r * 7 + c] === value) {
                 count++;
-
-                r+=dr*direction;
-                c+=dc*direction;
+                r += dr * dir;
+                c += dc * dir;
             }
         }
-
-        if(count>=4){
-            return true;
-        }
+        if (count >= 4) return true;
     }
-
     return false;
-}
-
-
-/* =====================================================
-   DICE
-===================================================== */
-
-function createDice(game){
-
-    const area=
-        document.createElement("div");
-
-    area.className=
-        "dice-area";
-
-    const dice=
-        document.createElement("div");
-
-    dice.className="dice";
-
-    dice.textContent=
-        game.data.lastRoll ||
-        "🎲";
-
-    area.appendChild(dice);
-
-    const mine=
-        game.players.some(
-            p=>
-                p.deviceId===
-                deviceId
-        );
-
-    const current=
-        game.players[
-            game.turnIndex %
-            game.players.length
-        ];
-
-    const myTurn=
-        mine &&
-        current &&
-        current.deviceId===
-        deviceId;
-
-    const button=
-        document.createElement(
-            "button"
-        );
-
-    button.className=
-        "game-btn primary";
-
-    button.textContent=
-        myTurn
-            ?"Roll dice"
-            :"Waiting...";
-
-    button.disabled=
-        !myTurn;
-
-    button.onclick=async()=>{
-
-        const roll=
-            Math.floor(
-                Math.random()*6
-            )+1;
-
-        const copy=
-            JSON.parse(
-                JSON.stringify(game)
-            );
-
-        copy.data.lastRoll=
-            roll;
-
-        copy.data.scores=
-            copy.data.scores || {};
-
-        copy.data.scores[
-            current.deviceId
-        ]=
-            (
-                copy.data.scores[
-                    current.deviceId
-                ] || 0
-            )+
-            roll;
-
-        copy.turnIndex++;
-
-        if(
-            copy.turnIndex>=
-            copy.players.length*3
-        ){
-
-            let winner=
-                null;
-
-            let highest=-1;
-
-            for(
-                const player
-                of copy.players
-            ){
-
-                const score=
-                    copy.data.scores[
-                        player.deviceId
-                    ] || 0;
-
-                if(score>highest){
-
-                    highest=score;
-
-                    winner=
-                        player.username;
-                }
-            }
-
-            copy.winner=
-                winner;
-
-            copy.status=
-                "finished";
-        }
-
-        await publishGameAndCleanup(
-            game,
-            copy
-        );
-    };
-
-    area.appendChild(button);
-
-    if(game.data.scores){
-
-        const scores=
-            document.createElement(
-                "div"
-            );
-
-        scores.style.marginTop=
-            "15px";
-
-        scores.style.color=
-            "#9da5b0";
-
-        scores.innerHTML=
-            game.players.map(
-                player=>
-                    escapeHtml(
-                        player.username
-                    )+
-                    ": "+
-                    (
-                        game.data.scores[
-                            player.deviceId
-                        ] || 0
-                    )
-            ).join(" · ");
-
-        area.appendChild(scores);
-    }
-
-    return area;
-}
-
-
-/* =====================================================
-   HIGHER / LOWER
-===================================================== */
-
-function createHigher(game){
-
-    const area=
-        document.createElement("div");
-
-    area.style.textAlign=
-        "center";
-
-    const card=
-        document.createElement(
-            "div"
-        );
-
-    card.className=
-        "card-number";
-
-    card.textContent=
-        game.data.currentCard ||
-        "?";
-
-    area.appendChild(card);
-
-    const mine=
-        game.players.some(
-            p=>
-                p.deviceId===
-                deviceId
-        );
-
-    const current=
-        game.players[
-            game.turnIndex %
-            game.players.length
-        ];
-
-    const myTurn=
-        mine &&
-        current &&
-        current.deviceId===
-        deviceId;
-
-    const buttons=
-        document.createElement(
-            "div"
-        );
-
-    buttons.className=
-        "game-actions";
-
-    buttons.style.justifyContent=
-        "center";
-
-    ["higher","lower"].forEach(
-        choice=>{
-
-            const button=
-                document.createElement(
-                    "button"
-                );
-
-            button.className=
-                "game-btn primary";
-
-            button.textContent=
-                choice==="higher"
-                    ?"⬆ Higher"
-                    :"⬇ Lower";
-
-            button.disabled=
-                !myTurn;
-
-            button.onclick=async()=>{
-
-                await performHigher(
-                    game,
-                    choice
-                );
-            };
-
-            buttons.appendChild(
-                button
-            );
-        }
-    );
-
-    area.appendChild(buttons);
-
-    return area;
-}
-
-
-async function performHigher(
-    game,
-    choice
-){
-
-    const current=
-        game.players[
-            game.turnIndex %
-            game.players.length
-        ];
-
-    if(
-        !current ||
-        current.deviceId!==deviceId
-    ){
-        return;
-    }
-
-    const copy=
-        JSON.parse(
-            JSON.stringify(game)
-        );
-
-    const old=
-        copy.data.currentCard ||
-        Math.floor(
-            Math.random()*13
-        )+1;
-
-    const next=
-        Math.floor(
-            Math.random()*13
-        )+1;
-
-    copy.data.currentCard=
-        next;
-
-    copy.data.points=
-        copy.data.points || {};
-
-    const correct=
-        choice==="higher"
-            ?next>old
-            :next<old;
-
-    if(correct){
-
-        copy.data.points[
-            current.deviceId
-        ]=
-            (
-                copy.data.points[
-                    current.deviceId
-                ]||0
-            )+1;
-    }
-
-    copy.turnIndex++;
-
-    if(
-        copy.turnIndex>=
-        copy.players.length*3
-    ){
-
-        let winner=null;
-        let highest=-1;
-
-        for(
-            const player
-            of copy.players
-        ){
-
-            const points=
-                copy.data.points[
-                    player.deviceId
-                ]||0;
-
-            if(points>highest){
-
-                highest=points;
-
-                winner=
-                    player.username;
-            }
-        }
-
-        copy.winner=
-            winner;
-
-        copy.status=
-            "finished";
-    }
-
-    await publishGameAndCleanup(
-        game,
-        copy
-    );
 }
 
 
@@ -3997,571 +3394,1322 @@ async function performHigher(
 ===================================================== */
 
 function createRPS(game){
+    const area = document.createElement("div");
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
 
-    const area=
-        document.createElement("div");
+    const buttons = document.createElement("div");
+    buttons.className = "rps-buttons";
 
-    const mine=
-        game.players.some(
-            p=>
-                p.deviceId===
-                deviceId
-        );
-
-    const current=
-        game.players[
-            game.turnIndex %
-            game.players.length
-        ];
-
-    const myTurn=
-        mine &&
-        current &&
-        current.deviceId===
-        deviceId;
-
-    const buttons=
-        document.createElement(
-            "div"
-        );
-
-    buttons.className=
-        "rps-buttons";
-
-    const choices=[
-
-        ["rock","✊"],
-        ["paper","✋"],
-        ["scissors","✌️"]
-    ];
-
-    choices.forEach(
-        ([choice,icon])=>{
-
-            const button=
-                document.createElement(
-                    "button"
-                );
-
-            button.className=
-                "rps-btn";
-
-            button.textContent=
-                icon;
-
-            button.title=
-                choice;
-
-            button.disabled=
-                !myTurn;
-
-            button.onclick=async()=>{
-
-                await performRPS(
-                    game,
-                    choice
-                );
-            };
-
-            buttons.appendChild(
-                button
-            );
-        }
-    );
-
+    const choices = [["rock","✊"],["paper","✋"],["scissors","✌️"]];
+    choices.forEach(([choice, icon]) => {
+        const btn = document.createElement("button");
+        btn.className = "rps-btn";
+        btn.textContent = icon;
+        btn.title = choice;
+        btn.disabled = !myTurn;
+        btn.onclick = async () => {
+            const copy = JSON.parse(JSON.stringify(game));
+            const options = ["rock","paper","scissors"];
+            const computer = options[Math.floor(Math.random() * options.length)];
+            let result;
+            if (choice === computer) result = "Draw";
+            else if ((choice === "rock" && computer === "scissors") ||
+                     (choice === "paper" && computer === "rock") ||
+                     (choice === "scissors" && computer === "paper")) {
+                result = current.username + " wins!";
+            } else {
+                result = "Computer wins.";
+            }
+            copy.data.lastResult = current.username + " chose " + choice + ". Computer chose " + computer + ". " + result;
+            copy.turnIndex++;
+            if (copy.turnIndex >= copy.players.length * 3) {
+                copy.winner = current.username;
+                copy.status = "finished";
+            }
+            await publishGameAndCleanup(game, copy);
+        };
+        buttons.appendChild(btn);
+    });
     area.appendChild(buttons);
 
-    if(game.data.lastResult){
-
-        const result=
-            document.createElement(
-                "div"
-            );
-
-        result.className=
-            "turn-banner";
-
-        result.style.textAlign=
-            "center";
-
-        result.textContent=
-            game.data.lastResult;
-
+    if (game.data.lastResult) {
+        const result = document.createElement("div");
+        result.className = "turn-banner";
+        result.style.textAlign = "center";
+        result.textContent = game.data.lastResult;
         area.appendChild(result);
     }
+    return area;
+}
+
+
+/* =====================================================
+   MASTERMIND
+===================================================== */
+
+function createMastermind(game){
+    const area = document.createElement("div");
+    area.style.textAlign = "center";
+
+    const colors = ["red","blue","green","yellow","purple","orange","pink","white"];
+    const pegColors = {
+        red: "#cc3333",
+        blue: "#3366cc",
+        green: "#33aa33",
+        yellow: "#ddcc33",
+        purple: "#8833aa",
+        orange: "#dd8833",
+        pink: "#dd66aa",
+        white: "#eeeeee"
+    };
+
+    // If code setter hasn't chosen a code yet
+    if (!game.data.code && game.data.codeSetter === deviceId) {
+        const codeTitle = document.createElement("div");
+        codeTitle.className = "turn-banner";
+        codeTitle.textContent = "👑 Set the secret code (4 colors)";
+        area.appendChild(codeTitle);
+
+        const row = document.createElement("div");
+        row.className = "mastermind-row";
+        const code = [];
+
+        for (let i = 0; i < 4; i++) {
+            const peg = document.createElement("div");
+            peg.className = "mastermind-peg";
+            let colorIndex = 0;
+            peg.onclick = () => {
+                colorIndex = (colorIndex + 1) % colors.length;
+                peg.style.background = pegColors[colors[colorIndex]];
+                peg.dataset.color = colors[colorIndex];
+                peg.classList.add("colored");
+                code[i] = colors[colorIndex];
+                if (code.length === 4 && code.every(c => c)) {
+                    confirmBtn.disabled = false;
+                }
+            };
+            row.appendChild(peg);
+        }
+        area.appendChild(row);
+
+        const confirmBtn = document.createElement("button");
+        confirmBtn.className = "game-btn primary";
+        confirmBtn.textContent = "Set Code";
+        confirmBtn.disabled = true;
+        confirmBtn.onclick = async () => {
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.code = code;
+            copy.data.codeSetter = game.data.codeSetter;
+            copy.turnIndex = 0;
+            await publishGameAndCleanup(game, copy);
+        };
+        area.appendChild(confirmBtn);
+        return area;
+    }
+
+    // Guessing phase
+    if (!game.data.code) {
+        const waiting = document.createElement("div");
+        waiting.className = "turn-banner";
+        waiting.textContent = "Waiting for code setter...";
+        area.appendChild(waiting);
+        return area;
+    }
+
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
+    const isCodeSetter = game.data.codeSetter === deviceId;
+
+    // Show previous guesses
+    if (game.data.guesses) {
+        for (const guess of game.data.guesses) {
+            const row = document.createElement("div");
+            row.className = "mastermind-row";
+            for (const c of guess.colors) {
+                const peg = document.createElement("div");
+                peg.className = "mastermind-peg colored";
+                peg.style.background = pegColors[c] || "#333";
+                row.appendChild(peg);
+            }
+            const feedback = document.createElement("div");
+            feedback.className = "mastermind-feedback";
+            for (let i = 0; i < guess.black; i++) {
+                const f = document.createElement("div");
+                f.className = "mastermind-feedback-peg black";
+                feedback.appendChild(f);
+            }
+            for (let i = 0; i < guess.white; i++) {
+                const f = document.createElement("div");
+                f.className = "mastermind-feedback-peg white";
+                feedback.appendChild(f);
+            }
+            row.appendChild(feedback);
+            area.appendChild(row);
+        }
+    }
+
+    if (game.winner) {
+        const win = document.createElement("div");
+        win.className = "turn-banner";
+        win.textContent = "🎉 " + game.winner + " won!";
+        area.appendChild(win);
+        return area;
+    }
+
+    if (!myTurn || isCodeSetter) {
+        const waiting = document.createElement("div");
+        waiting.className = "turn-banner";
+        waiting.textContent = isCodeSetter ? "The code setter spectates this round." : "Waiting for " + current.username + "...";
+        area.appendChild(waiting);
+        return area;
+    }
+
+    // Guess input
+    const guessTitle = document.createElement("div");
+    guessTitle.className = "turn-banner";
+    guessTitle.textContent = "🔍 Enter your guess (4 colors)";
+    area.appendChild(guessTitle);
+
+    const row = document.createElement("div");
+    row.className = "mastermind-row";
+    const guess = [];
+
+    for (let i = 0; i < 4; i++) {
+        const peg = document.createElement("div");
+        peg.className = "mastermind-peg";
+        let colorIndex = 0;
+        peg.onclick = () => {
+            colorIndex = (colorIndex + 1) % colors.length;
+            peg.style.background = pegColors[colors[colorIndex]];
+            peg.dataset.color = colors[colorIndex];
+            peg.classList.add("colored");
+            guess[i] = colors[colorIndex];
+            if (guess.length === 4 && guess.every(c => c)) {
+                submitBtn.disabled = false;
+            }
+        };
+        row.appendChild(peg);
+    }
+    area.appendChild(row);
+
+    const submitBtn = document.createElement("button");
+    submitBtn.className = "game-btn primary";
+    submitBtn.textContent = "Submit Guess";
+    submitBtn.disabled = true;
+    submitBtn.onclick = async () => {
+        const copy = JSON.parse(JSON.stringify(game));
+        const code = copy.data.code;
+        let black = 0, white = 0;
+        const codeCopy = [...code];
+        const guessCopy = [...guess];
+        
+        for (let i = 0; i < 4; i++) {
+            if (guessCopy[i] === codeCopy[i]) {
+                black++;
+                codeCopy[i] = null;
+                guessCopy[i] = null;
+            }
+        }
+        for (let i = 0; i < 4; i++) {
+            if (guessCopy[i] !== null) {
+                const idx = codeCopy.indexOf(guessCopy[i]);
+                if (idx !== -1) {
+                    white++;
+                    codeCopy[idx] = null;
+                }
+            }
+        }
+        
+        copy.data.guesses = copy.data.guesses || [];
+        copy.data.guesses.push({ colors: guess, black, white });
+        
+        if (black === 4) {
+            copy.winner = current.username;
+            copy.status = "finished";
+        } else {
+            copy.turnIndex++;
+            if (copy.turnIndex >= copy.players.length * 3) {
+                copy.winner = "No one cracked the code!";
+                copy.status = "finished";
+            }
+            // Rotate code setter
+            copy.data.codeSetter = copy.players[copy.turnIndex % copy.players.length].deviceId;
+            copy.data.code = null;
+        }
+        await publishGameAndCleanup(game, copy);
+    };
+    area.appendChild(submitBtn);
 
     return area;
 }
 
 
-async function performRPS(
-    game,
-    choice
-){
+/* =====================================================
+   MEMORY MATCH
+===================================================== */
 
-    const current=
-        game.players[
-            game.turnIndex %
-            game.players.length
-        ];
-
-    if(
-        !current ||
-        current.deviceId!==deviceId
-    ){
-        return;
+function createMemory(game){
+    const area = document.createElement("div");
+    const emojis = ["🍎","🍊","🍋","🍇","🍉","🍓","🍑","🍒","🥝","🍍","🥭","🍌","🍈","🫐","🍐","🥥"];
+    
+    const gridSize = game.data.gridSize || 4;
+    const totalCards = gridSize * gridSize;
+    const pairs = totalCards / 2;
+    const usedEmojis = emojis.slice(0, pairs);
+    let cards = [...usedEmojis, ...usedEmojis];
+    
+    // Shuffle if first time
+    if (!game.data.cards) {
+        for (let i = cards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [cards[i], cards[j]] = [cards[j], cards[i]];
+        }
+        game.data.cards = cards;
+        game.data.flipped = [];
+        game.data.matched = [];
     }
 
-    const copy=
-        JSON.parse(
-            JSON.stringify(game)
-        );
+    const grid = document.createElement("div");
+    grid.className = "memory-grid";
+    grid.style.gridTemplateColumns = `repeat(${gridSize}, 70px)`;
 
-    const options=[
-        "rock",
-        "paper",
-        "scissors"
-    ];
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
 
-    const computer=
-        options[
-            Math.floor(
-                Math.random()*
-                options.length
-            )
-        ];
+    const flipped = game.data.flipped || [];
+    const matched = game.data.matched || [];
 
-    let result;
-
-    if(choice===computer){
-
-        result="Draw";
-
-    }else if(
-
-        (
-            choice==="rock" &&
-            computer==="scissors"
-        ) ||
-        (
-            choice==="paper" &&
-            computer==="rock"
-        ) ||
-        (
-            choice==="scissors" &&
-            computer==="paper"
-        )
-
-    ){
-
-        result=
-            current.username+
-            " wins this round!";
-    }else{
-
-        result=
-            "Computer wins this round.";
+    for (let i = 0; i < game.data.cards.length; i++) {
+        const card = document.createElement("div");
+        card.className = "memory-card";
+        if (matched.includes(i)) {
+            card.classList.add("matched");
+            card.textContent = game.data.cards[i];
+        } else if (flipped.includes(i)) {
+            card.classList.add("flipped");
+            card.textContent = game.data.cards[i];
+        }
+        
+        if (!matched.includes(i) && myTurn && !flipped.includes(i) && flipped.length < 2) {
+            card.onclick = async () => {
+                const copy = JSON.parse(JSON.stringify(game));
+                const flips = copy.data.flipped || [];
+                if (flips.includes(i) || flips.length >= 2) return;
+                flips.push(i);
+                copy.data.flipped = flips;
+                
+                if (flips.length === 2) {
+                    const cardsData = copy.data.cards;
+                    if (cardsData[flips[0]] === cardsData[flips[1]]) {
+                        copy.data.matched = (copy.data.matched || []).concat(flips);
+                        copy.data.flipped = [];
+                        // Check win
+                        if (copy.data.matched.length === copy.data.cards.length) {
+                            copy.winner = current.username;
+                            copy.status = "finished";
+                        }
+                    } else {
+                        // Wrong match, next player
+                        copy.turnIndex++;
+                        // Reset after delay
+                        setTimeout(async () => {
+                            const resetCopy = JSON.parse(JSON.stringify(copy));
+                            resetCopy.data.flipped = [];
+                            await publishGameAndCleanup(game, resetCopy);
+                        }, 800);
+                        await publishGameAndCleanup(game, copy);
+                        return;
+                    }
+                }
+                await publishGameAndCleanup(game, copy);
+            };
+        }
+        grid.appendChild(card);
     }
+    area.appendChild(grid);
 
-    copy.data.lastResult=
-        current.username+
-        " chose "+
-        choice+
-        ". Computer chose "+
-        computer+
-        ". "+
-        result;
+    // Score display
+    const scoreDiv = document.createElement("div");
+    scoreDiv.style.cssText = "text-align:center;margin-top:10px;color:#9da5b0;";
+    const scores = game.data.scores || {};
+    scoreDiv.textContent = game.players.map(p => 
+        escapeHtml(p.username) + ": " + (scores[p.deviceId] || 0)
+    ).join(" · ");
+    area.appendChild(scoreDiv);
 
-    copy.turnIndex++;
-
-    if(
-        copy.turnIndex>=
-        copy.players.length*3
-    ){
-
-        copy.winner=
-            current.username;
-
-        copy.status=
-            "finished";
-    }
-
-    await publishGameAndCleanup(
-        game,
-        copy
-    );
+    return area;
 }
 
 
 /* =====================================================
-   JOIN
+   HANGMAN
+===================================================== */
+
+function createHangman(game){
+    const area = document.createElement("div");
+    area.style.textAlign = "center";
+
+    const bodyParts = ["","O","O\n|","O\n/|","O\n/|\\","O\n/|\\\n/","O\n/|\\\n/ \\"];
+
+    if (!game.data.word && game.data.wordSetter === deviceId) {
+        // Word setter
+        const title = document.createElement("div");
+        title.className = "turn-banner";
+        title.textContent = "📝 Set the secret word";
+        area.appendChild(title);
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.maxLength = 10;
+        input.placeholder = "Enter word...";
+        input.style.cssText = "padding:10px;border-radius:8px;border:1px solid var(--border);background:#1a1f26;color:white;width:200px;";
+        area.appendChild(input);
+
+        const setBtn = document.createElement("button");
+        setBtn.className = "game-btn primary";
+        setBtn.textContent = "Set Word";
+        setBtn.onclick = async () => {
+            const word = input.value.trim().toUpperCase();
+            if (word.length < 3) return;
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.word = word;
+            copy.data.guessed = [];
+            copy.data.wrong = 0;
+            copy.turnIndex = 0;
+            await publishGameAndCleanup(game, copy);
+        };
+        area.appendChild(setBtn);
+        return area;
+    }
+
+    if (!game.data.word) {
+        const waiting = document.createElement("div");
+        waiting.className = "turn-banner";
+        waiting.textContent = "Waiting for word setter...";
+        area.appendChild(waiting);
+        return area;
+    }
+
+    const word = game.data.word;
+    const guessed = game.data.guessed || [];
+    const wrong = game.data.wrong || 0;
+    const maxWrong = game.data.maxWrong || 6;
+
+    // Hangman display
+    const body = document.createElement("div");
+    body.className = "hangman-body";
+    body.textContent = bodyParts[Math.min(wrong, bodyParts.length - 1)] || "";
+    area.appendChild(body);
+
+    // Word display
+    const wordDisplay = document.createElement("div");
+    wordDisplay.className = "hangman-word";
+    wordDisplay.textContent = word.split("").map(l => guessed.includes(l) ? l : "_").join(" ");
+    area.appendChild(wordDisplay);
+
+    // Check win/lose
+    const allGuessed = word.split("").every(l => guessed.includes(l));
+    if (allGuessed) {
+        const win = document.createElement("div");
+        win.className = "turn-banner";
+        win.textContent = "🎉 " + game.players[game.turnIndex % game.players.length].username + " guessed it!";
+        area.appendChild(win);
+        return area;
+    }
+    if (wrong >= maxWrong) {
+        const lose = document.createElement("div");
+        lose.className = "turn-banner";
+        lose.textContent = "💀 Game over! The word was: " + word;
+        area.appendChild(lose);
+        return area;
+    }
+
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
+    const isWordSetter = game.data.wordSetter === deviceId;
+
+    if (!myTurn || isWordSetter) {
+        const waiting = document.createElement("div");
+        waiting.className = "turn-banner";
+        waiting.textContent = isWordSetter ? "Word setter spectates." : "Waiting for " + current.username + "...";
+        area.appendChild(waiting);
+        return area;
+    }
+
+    // Letter buttons
+    const letters = document.createElement("div");
+    letters.className = "hangman-letters";
+    for (let i = 65; i <= 90; i++) {
+        const l = String.fromCharCode(i);
+        const btn = document.createElement("button");
+        btn.className = "hangman-letter-btn";
+        btn.textContent = l;
+        btn.disabled = guessed.includes(l) || !myTurn;
+        btn.onclick = async () => {
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.guessed = (copy.data.guessed || []).concat(l);
+            if (!copy.data.word.includes(l)) {
+                copy.data.wrong = (copy.data.wrong || 0) + 1;
+            }
+            copy.turnIndex++;
+            // Check win
+            const allG = copy.data.word.split("").every(letter => copy.data.guessed.includes(letter));
+            if (allG) {
+                copy.winner = current.username;
+                copy.status = "finished";
+            } else if (copy.data.wrong >= maxWrong) {
+                copy.winner = "The word was: " + copy.data.word;
+                copy.status = "finished";
+            }
+            await publishGameAndCleanup(game, copy);
+        };
+        letters.appendChild(btn);
+    }
+    area.appendChild(letters);
+
+    return area;
+}
+
+
+/* =====================================================
+   DOTS AND BOXES
+===================================================== */
+
+function createDots(game){
+    const area = document.createElement("div");
+    const gridSize = game.data.gridSize || 4;
+    const size = gridSize;
+
+    const board = document.createElement("div");
+    board.className = "dots-board";
+    board.style.gridTemplateColumns = `repeat(${size * 2 - 1}, 40px)`;
+    board.style.gridTemplateRows = `repeat(${size * 2 - 1}, 40px)`;
+
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
+
+    const lines = game.data.lines || {};
+    const boxes = game.data.boxes || {};
+
+    for (let row = 0; row < size * 2 - 1; row++) {
+        for (let col = 0; col < size * 2 - 1; col++) {
+            const cell = document.createElement("div");
+            cell.className = "dots-cell";
+            cell.style.width = "40px";
+            cell.style.height = "40px";
+
+            const isDot = row % 2 === 0 && col % 2 === 0;
+            const isHorizontal = row % 2 === 0 && col % 2 === 1;
+            const isVertical = row % 2 === 1 && col % 2 === 0;
+
+            if (isDot) {
+                const dot = document.createElement("div");
+                dot.className = "dots-dot";
+                cell.appendChild(dot);
+            } else if (isHorizontal) {
+                const key = `h_${row/2}_${Math.floor(col/2)}`;
+                const line = document.createElement("div");
+                line.className = "dots-line horizontal";
+                if (lines[key]) {
+                    line.style.background = lines[key] === 1 ? "#d65353" : "#e0c454";
+                    line.style.cursor = "default";
+                } else if (myTurn && !game.winner) {
+                    line.onclick = async () => {
+                        const copy = JSON.parse(JSON.stringify(game));
+                        copy.data.lines = copy.data.lines || {};
+                        copy.data.lines[key] = copy.turnIndex % 2 === 0 ? 1 : 2;
+                        // Check for completed boxes
+                        const completed = checkDotsBoxes(copy.data.lines, size);
+                        let scored = false;
+                        for (const box of completed) {
+                            if (!copy.data.boxes[box]) {
+                                copy.data.boxes[box] = copy.turnIndex % 2 === 0 ? 1 : 2;
+                                scored = true;
+                            }
+                        }
+                        if (!scored) {
+                            copy.turnIndex++;
+                        }
+                        if (Object.keys(copy.data.boxes).length === (size-1)*(size-1)) {
+                            // Count boxes
+                            const scores = {};
+                            for (const [box, player] of Object.entries(copy.data.boxes)) {
+                                scores[player] = (scores[player] || 0) + 1;
+                            }
+                            let winner = null, max = -1;
+                            for (const [player, count] of Object.entries(scores)) {
+                                if (count > max) { max = count; winner = copy.players[player-1]?.username; }
+                            }
+                            copy.winner = winner || "draw";
+                            copy.status = "finished";
+                        }
+                        await publishGameAndCleanup(game, copy);
+                    };
+                }
+                cell.appendChild(line);
+            } else if (isVertical) {
+                const key = `v_${Math.floor(row/2)}_${col/2}`;
+                const line = document.createElement("div");
+                line.className = "dots-line vertical";
+                if (lines[key]) {
+                    line.style.background = lines[key] === 1 ? "#d65353" : "#e0c454";
+                    line.style.cursor = "default";
+                } else if (myTurn && !game.winner) {
+                    line.onclick = async () => {
+                        const copy = JSON.parse(JSON.stringify(game));
+                        copy.data.lines = copy.data.lines || {};
+                        copy.data.lines[key] = copy.turnIndex % 2 === 0 ? 1 : 2;
+                        const completed = checkDotsBoxes(copy.data.lines, size);
+                        let scored = false;
+                        for (const box of completed) {
+                            if (!copy.data.boxes[box]) {
+                                copy.data.boxes[box] = copy.turnIndex % 2 === 0 ? 1 : 2;
+                                scored = true;
+                            }
+                        }
+                        if (!scored) copy.turnIndex++;
+                        if (Object.keys(copy.data.boxes).length === (size-1)*(size-1)) {
+                            const scores = {};
+                            for (const [box, player] of Object.entries(copy.data.boxes)) {
+                                scores[player] = (scores[player] || 0) + 1;
+                            }
+                            let winner = null, max = -1;
+                            for (const [player, count] of Object.entries(scores)) {
+                                if (count > max) { max = count; winner = copy.players[player-1]?.username; }
+                            }
+                            copy.winner = winner || "draw";
+                            copy.status = "finished";
+                        }
+                        await publishGameAndCleanup(game, copy);
+                    };
+                }
+                cell.appendChild(line);
+            }
+
+            // Show claimed boxes
+            if (row % 2 === 1 && col % 2 === 1) {
+                const boxKey = `${Math.floor(row/2)}_${Math.floor(col/2)}`;
+                if (boxes[boxKey]) {
+                    const box = document.createElement("div");
+                    box.className = "dots-box claimed player" + boxes[boxKey];
+                    cell.appendChild(box);
+                }
+            }
+
+            board.appendChild(cell);
+        }
+    }
+    area.appendChild(board);
+
+    // Score
+    const scoreDiv = document.createElement("div");
+    scoreDiv.style.cssText = "text-align:center;margin-top:10px;color:#9da5b0;";
+    const scores = {};
+    for (const [box, player] of Object.entries(boxes)) {
+        scores[player] = (scores[player] || 0) + 1;
+    }
+    scoreDiv.textContent = game.players.map(p => 
+        escapeHtml(p.username) + ": " + (scores[game.players.indexOf(p) + 1] || 0)
+    ).join(" · ");
+    area.appendChild(scoreDiv);
+
+    return area;
+}
+
+function checkDotsBoxes(lines, size){
+    const completed = [];
+    for (let r = 0; r < size - 1; r++) {
+        for (let c = 0; c < size - 1; c++) {
+            const top = `h_${r}_${c}`;
+            const bottom = `h_${r+1}_${c}`;
+            const left = `v_${r}_${c}`;
+            const right = `v_${r}_${c+1}`;
+            if (lines[top] && lines[bottom] && lines[left] && lines[right]) {
+                completed.push(`${r}_${c}`);
+            }
+        }
+    }
+    return completed;
+}
+
+
+/* =====================================================
+   OTHELLO (Reversi)
+===================================================== */
+
+function createOthello(game){
+    const area = document.createElement("div");
+    const size = game.data.boardSize || 8;
+    const board = document.createElement("div");
+    board.className = "othello-board";
+    board.style.gridTemplateColumns = `repeat(${size}, 50px)`;
+    board.style.gridTemplateRows = `repeat(${size}, 50px)`;
+
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
+
+    // Initialize board if empty
+    if (!game.data.board) {
+        game.data.board = Array(size * size).fill("");
+        const mid = size / 2;
+        game.data.board[(mid-1)*size + (mid-1)] = "white";
+        game.data.board[(mid-1)*size + mid] = "black";
+        game.data.board[mid*size + (mid-1)] = "black";
+        game.data.board[mid*size + mid] = "white";
+        game.data.currentPlayer = "black";
+    }
+
+    const boardData = game.data.board;
+    const currentPlayer = game.data.currentPlayer || "black";
+    const validMoves = getOthelloMoves(boardData, size, currentPlayer);
+
+    for (let i = 0; i < boardData.length; i++) {
+        const cell = document.createElement("div");
+        cell.className = "othello-cell";
+        const disc = boardData[i];
+        if (disc) {
+            const d = document.createElement("div");
+            d.className = "othello-cell disc " + disc;
+            cell.appendChild(d);
+        } else if (validMoves.includes(i) && myTurn && !game.winner) {
+            cell.classList.add("valid-move");
+            cell.onclick = async () => {
+                const copy = JSON.parse(JSON.stringify(game));
+                const newBoard = [...copy.data.board];
+                const flipped = othelloFlip(newBoard, size, i, currentPlayer);
+                if (flipped.length > 0) {
+                    newBoard[i] = currentPlayer;
+                    for (const idx of flipped) newBoard[idx] = currentPlayer;
+                    copy.data.board = newBoard;
+                    const next = currentPlayer === "black" ? "white" : "black";
+                    // Check if next player has moves
+                    const nextMoves = getOthelloMoves(newBoard, size, next);
+                    if (nextMoves.length > 0) {
+                        copy.data.currentPlayer = next;
+                    } else {
+                        // Skip turn
+                        const skipNext = currentPlayer === "black" ? "white" : "black";
+                        const skipMoves = getOthelloMoves(newBoard, size, skipNext);
+                        if (skipMoves.length > 0) {
+                            copy.data.currentPlayer = skipNext;
+                        } else {
+                            // Game over
+                            const count = countOthello(newBoard);
+                            copy.winner = count.black > count.white ? "Black" : count.white > count.black ? "White" : "draw";
+                            copy.status = "finished";
+                        }
+                    }
+                    copy.turnIndex++;
+                    await publishGameAndCleanup(game, copy);
+                }
+            };
+        }
+        board.appendChild(cell);
+    }
+    area.appendChild(board);
+
+    // Score
+    const scoreDiv = document.createElement("div");
+    scoreDiv.style.cssText = "text-align:center;margin-top:10px;color:#9da5b0;";
+    const count = countOthello(boardData);
+    scoreDiv.textContent = "⚫ Black: " + count.black + "  ⚪ White: " + count.white;
+    area.appendChild(scoreDiv);
+
+    return area;
+}
+
+function getOthelloMoves(board, size, player){
+    const opponent = player === "black" ? "white" : "black";
+    const moves = [];
+    const dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+    
+    for (let i = 0; i < board.length; i++) {
+        if (board[i]) continue;
+        const row = Math.floor(i / size);
+        const col = i % size;
+        for (const [dr, dc] of dirs) {
+            let r = row + dr, c = col + dc;
+            let found = false;
+            while (r >= 0 && r < size && c >= 0 && c < size) {
+                const idx = r * size + c;
+                if (!board[idx]) break;
+                if (board[idx] === player) { found = true; break; }
+                r += dr; c += dc;
+            }
+            if (found) { moves.push(i); break; }
+        }
+    }
+    return moves;
+}
+
+function othelloFlip(board, size, pos, player){
+    const opponent = player === "black" ? "white" : "black";
+    const row = Math.floor(pos / size);
+    const col = pos % size;
+    const dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+    const flipped = [];
+    
+    for (const [dr, dc] of dirs) {
+        let r = row + dr, c = col + dc;
+        const toFlip = [];
+        while (r >= 0 && r < size && c >= 0 && c < size) {
+            const idx = r * size + c;
+            if (!board[idx]) break;
+            if (board[idx] === player) {
+                flipped.push(...toFlip);
+                break;
+            }
+            toFlip.push(idx);
+            r += dr; c += dc;
+        }
+    }
+    return flipped;
+}
+
+function countOthello(board){
+    let black = 0, white = 0;
+    for (const cell of board) {
+        if (cell === "black") black++;
+        else if (cell === "white") white++;
+    }
+    return { black, white };
+}
+
+
+/* =====================================================
+   CHECKERS
+===================================================== */
+
+function createCheckers(game){
+    const area = document.createElement("div");
+    const size = game.data.boardSize || 8;
+    const board = document.createElement("div");
+    board.className = "checkers-board";
+    board.style.gridTemplateColumns = `repeat(${size}, 60px)`;
+    board.style.gridTemplateRows = `repeat(${size}, 60px)`;
+
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
+
+    // Initialize board
+    if (!game.data.board) {
+        const b = Array(size * size).fill("");
+        for (let r = 0; r < size; r++) {
+            for (let c = 0; c < size; c++) {
+                if ((r + c) % 2 === 1) {
+                    if (r < size/2 - 1) b[r*size + c] = "black";
+                    else if (r > size/2) b[r*size + c] = "red";
+                }
+            }
+        }
+        game.data.board = b;
+        game.data.currentPlayer = "black";
+        game.data.selected = null;
+        game.data.validMoves = [];
+    }
+
+    const boardData = game.data.board;
+    const currentPlayer = game.data.currentPlayer || "black";
+    const selected = game.data.selected;
+    const validMoves = game.data.validMoves || [];
+
+    const playerColor = game.players.findIndex(p => p.deviceId === deviceId) % 2 === 0 ? "black" : "red";
+
+    for (let i = 0; i < boardData.length; i++) {
+        const row = Math.floor(i / size);
+        const col = i % size;
+        const cell = document.createElement("div");
+        cell.className = "checkers-cell " + ((row + col) % 2 === 0 ? "light" : "dark");
+        
+        const piece = boardData[i];
+        if (piece) {
+            const p = document.createElement("div");
+            p.className = "checkers-piece " + piece;
+            if (piece.includes("king")) p.classList.add("king");
+            if (selected === i) p.classList.add("selected");
+            
+            // Check if it's this player's piece and it's their turn
+            const isMyPiece = piece.includes(playerColor);
+            if (isMyPiece && myTurn && !game.winner) {
+                p.style.cursor = "pointer";
+                p.onclick = async () => {
+                    const copy = JSON.parse(JSON.stringify(game));
+                    // Clear previous selection
+                    const moves = getCheckersMoves(copy.data.board, size, i, currentPlayer);
+                    copy.data.selected = i;
+                    copy.data.validMoves = moves;
+                    await publishGameAndCleanup(game, copy);
+                };
+            }
+            cell.appendChild(p);
+        }
+        
+        // Valid move highlighting
+        if (validMoves.includes(i)) {
+            cell.classList.add("valid-move");
+            if (myTurn && !game.winner) {
+                cell.onclick = async () => {
+                    const copy = JSON.parse(JSON.stringify(game));
+                    const from = copy.data.selected;
+                    const to = i;
+                    const pieceType = copy.data.board[from];
+                    copy.data.board[to] = pieceType;
+                    copy.data.board[from] = "";
+                    
+                    // Check for jump
+                    const dr = Math.floor(to / size) - Math.floor(from / size);
+                    const dc = (to % size) - (from % size);
+                    if (Math.abs(dr) === 2) {
+                        const jumped = (from + to) / 2;
+                        copy.data.board[jumped] = "";
+                    }
+                    
+                    // King me
+                    const toRow = Math.floor(to / size);
+                    if ((pieceType === "black" && toRow === size - 1) || 
+                        (pieceType === "red" && toRow === 0)) {
+                        copy.data.board[to] = pieceType + "-king";
+                    }
+                    
+                    copy.data.selected = null;
+                    copy.data.validMoves = [];
+                    
+                    // Check win
+                    const pieces = { black: 0, red: 0 };
+                    for (const p of copy.data.board) {
+                        if (p.includes("black")) pieces.black++;
+                        else if (p.includes("red")) pieces.red++;
+                    }
+                    if (pieces.black === 0) {
+                        copy.winner = "Red wins!";
+                        copy.status = "finished";
+                    } else if (pieces.red === 0) {
+                        copy.winner = "Black wins!";
+                        copy.status = "finished";
+                    } else {
+                        copy.turnIndex++;
+                        copy.data.currentPlayer = currentPlayer === "black" ? "red" : "black";
+                    }
+                    await publishGameAndCleanup(game, copy);
+                };
+            }
+        }
+        
+        board.appendChild(cell);
+    }
+    area.appendChild(board);
+
+    // Turn indicator
+    const turn = document.createElement("div");
+    turn.className = "turn-banner";
+    turn.style.textAlign = "center";
+    turn.textContent = "⚫ " + (currentPlayer === "black" ? "Black" : "Red") + "'s turn";
+    area.appendChild(turn);
+
+    return area;
+}
+
+function getCheckersMoves(board, size, pos, player){
+    const row = Math.floor(pos / size);
+    const col = pos % size;
+    const piece = board[pos];
+    const moves = [];
+    const dirs = player === "black" ? [[1,-1],[1,1]] : [[-1,-1],[-1,1]];
+    const isKing = piece.includes("king");
+    if (isKing) dirs.push([-1,-1],[-1,1],[1,-1],[1,1]);
+    
+    for (const [dr, dc] of dirs) {
+        let r = row + dr, c = col + dc;
+        if (r < 0 || r >= size || c < 0 || c >= size) continue;
+        let idx = r * size + c;
+        if (!board[idx]) {
+            moves.push(idx);
+        } else if (!board[idx].includes(player)) {
+            // Jump
+            r += dr; c += dc;
+            if (r >= 0 && r < size && c >= 0 && c < size) {
+                idx = r * size + c;
+                if (!board[idx]) moves.push(idx);
+            }
+        }
+    }
+    return moves;
+}
+
+
+/* =====================================================
+   GOMOKU (Five in a Row)
+===================================================== */
+
+function createGomoku(game){
+    const area = document.createElement("div");
+    const size = game.data.boardSize || 15;
+    const board = document.createElement("div");
+    board.className = "othello-board";
+    board.style.gridTemplateColumns = `repeat(${size}, 36px)`;
+    board.style.gridTemplateRows = `repeat(${size}, 36px)`;
+    board.style.background = "#d4b896";
+    board.style.padding = "4px";
+
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
+
+    if (!game.data.board) {
+        game.data.board = Array(size * size).fill("");
+        game.data.currentPlayer = "black";
+    }
+
+    const boardData = game.data.board;
+
+    for (let i = 0; i < boardData.length; i++) {
+        const cell = document.createElement("div");
+        cell.className = "othello-cell";
+        cell.style.background = "#d4b896";
+        cell.style.width = "36px";
+        cell.style.height = "36px";
+        
+        const disc = boardData[i];
+        if (disc) {
+            const d = document.createElement("div");
+            d.className = "othello-cell disc " + disc;
+            d.style.width = "30px";
+            d.style.height = "30px";
+            cell.appendChild(d);
+        } else if (myTurn && !game.winner) {
+            cell.style.cursor = "pointer";
+            cell.onclick = async () => {
+                const copy = JSON.parse(JSON.stringify(game));
+                const playerColor = copy.turnIndex % 2 === 0 ? "black" : "white";
+                copy.data.board[i] = playerColor;
+                
+                if (checkGomokuWin(copy.data.board, size, i, playerColor)) {
+                    copy.winner = current.username;
+                    copy.status = "finished";
+                } else {
+                    copy.turnIndex++;
+                }
+                await publishGameAndCleanup(game, copy);
+            };
+        }
+        board.appendChild(cell);
+    }
+    area.appendChild(board);
+
+    // Turn indicator
+    const turn = document.createElement("div");
+    turn.className = "turn-banner";
+    turn.style.textAlign = "center";
+    turn.textContent = (game.turnIndex % 2 === 0 ? "⚫ Black" : "⚪ White") + "'s turn";
+    area.appendChild(turn);
+
+    return area;
+}
+
+function checkGomokuWin(board, size, pos, player){
+    const row = Math.floor(pos / size);
+    const col = pos % size;
+    const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+    for (const [dr, dc] of dirs) {
+        let count = 1;
+        for (const dir of [-1,1]) {
+            let r = row + dr * dir, c = col + dc * dir;
+            while (r >= 0 && r < size && c >= 0 && c < size && board[r * size + c] === player) {
+                count++;
+                r += dr * dir;
+                c += dc * dir;
+            }
+        }
+        if (count >= 5) return true;
+    }
+    return false;
+}
+
+
+/* =====================================================
+   SOS
+===================================================== */
+
+function createSOS(game){
+    const area = document.createElement("div");
+    const size = game.data.gridSize || 5;
+    const board = document.createElement("div");
+    board.className = "othello-board";
+    board.style.gridTemplateColumns = `repeat(${size}, 50px)`;
+    board.style.gridTemplateRows = `repeat(${size}, 50px)`;
+    board.style.background = "#1a2a3a";
+    board.style.padding = "4px";
+
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
+
+    if (!game.data.board) {
+        game.data.board = Array(size * size).fill("");
+        game.data.scores = {};
+        game.data.currentPlayer = 0;
+    }
+
+    const boardData = game.data.board;
+
+    for (let i = 0; i < boardData.length; i++) {
+        const cell = document.createElement("div");
+        cell.className = "othello-cell";
+        cell.style.background = "#1a2a3a";
+        cell.style.width = "50px";
+        cell.style.height = "50px";
+        cell.style.border = "1px solid #2a3a4a";
+        cell.style.borderRadius = "0";
+        cell.style.fontSize = "24px";
+        cell.style.fontWeight = "bold";
+        cell.style.color = "white";
+        
+        if (boardData[i]) {
+            cell.textContent = boardData[i];
+        } else if (myTurn && !game.winner) {
+            cell.style.cursor = "pointer";
+            cell.onclick = async () => {
+                const copy = JSON.parse(JSON.stringify(game));
+                // Let player choose S or O
+                const choice = confirm("Place S or O?") ? "S" : "O";
+                copy.data.board[i] = choice;
+                
+                // Check for SOS
+                const sosCount = countSOS(copy.data.board, size, i);
+                if (sosCount > 0) {
+                    copy.data.scores = copy.data.scores || {};
+                    copy.data.scores[current.deviceId] = (copy.data.scores[current.deviceId] || 0) + sosCount;
+                    // Player goes again
+                } else {
+                    copy.turnIndex++;
+                }
+                
+                // Check if board full
+                if (copy.data.board.every(c => c)) {
+                    let winner = null, max = -1;
+                    for (const [id, score] of Object.entries(copy.data.scores || {})) {
+                        if (score > max) { max = score; winner = copy.players.find(p => p.deviceId === id)?.username; }
+                    }
+                    copy.winner = winner || "draw";
+                    copy.status = "finished";
+                }
+                await publishGameAndCleanup(game, copy);
+            };
+        }
+        board.appendChild(cell);
+    }
+    area.appendChild(board);
+
+    // Scores
+    const scoreDiv = document.createElement("div");
+    scoreDiv.style.cssText = "text-align:center;margin-top:10px;color:#9da5b0;";
+    const scores = game.data.scores || {};
+    scoreDiv.textContent = game.players.map(p => 
+        escapeHtml(p.username) + ": " + (scores[p.deviceId] || 0)
+    ).join(" · ");
+    area.appendChild(scoreDiv);
+
+    return area;
+}
+
+function countSOS(board, size, pos){
+    const row = Math.floor(pos / size);
+    const col = pos % size;
+    const letter = board[pos];
+    let count = 0;
+    const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+    
+    for (const [dr, dc] of dirs) {
+        // Check S-O-S in both directions
+        for (const start of [-2, -1, 0, 1]) {
+            const r1 = row + dr * start;
+            const c1 = col + dc * start;
+            const r2 = row + dr * (start + 1);
+            const c2 = col + dc * (start + 1);
+            const r3 = row + dr * (start + 2);
+            const c3 = col + dc * (start + 2);
+            
+            if (r1 >= 0 && r1 < size && c1 >= 0 && c1 < size &&
+                r2 >= 0 && r2 < size && c2 >= 0 && c2 < size &&
+                r3 >= 0 && r3 < size && c3 >= 0 && c3 < size) {
+                const letters = [board[r1*size + c1], board[r2*size + c2], board[r3*size + c3]];
+                if (letters.every(l => l)) {
+                    if (letters[0] === "S" && letters[1] === "O" && letters[2] === "S") {
+                        count++;
+                    }
+                }
+            }
+        }
+    }
+    return count;
+}
+
+
+/* =====================================================
+   GAME HELPERS
 ===================================================== */
 
 async function joinGame(game){
-
-    if(
-        game.status!=="lobby"
-    ){
-        return;
-    }
-
-    if(
-        game.players.some(
-            p=>
-                p.deviceId===
-                deviceId
-        )
-    ){
-        return;
-    }
-
-    if(
-        game.players.length>=
-        game.maxPlayers
-    ){
-        return;
-    }
-
-    /*
-        The join is represented by
-        a temporary state message.
-    */
-
-    const copy=
-        JSON.parse(
-            JSON.stringify(game)
-        );
-
-    copy.players.push({
-
-        deviceId,
-
-        username:
-            settings.username
-    });
-
-    /*
-        Because the game state belongs
-        to the host, we publish the
-        updated state using the host ID.
-    */
-
+    if (game.status !== "lobby") return;
+    if (game.players.some(p => p.deviceId === deviceId)) return;
+    if (game.players.length >= game.maxPlayers) return;
+    
+    const copy = JSON.parse(JSON.stringify(game));
+    copy.players.push({ deviceId, username: settings.username });
     await writeGameState(copy);
-
     await loadMessages();
 }
-
-
-/* =====================================================
-   LEAVE
-===================================================== */
 
 async function leaveGame(game){
-
-    const copy=
-        JSON.parse(
-            JSON.stringify(game)
-        );
-
-    copy.players=
-        copy.players.filter(
-            player=>
-                player.deviceId!==deviceId
-        );
-
-    /*
-        If nobody is left, remove the game.
-    */
-
-    if(copy.players.length===0){
-
-        await removeGameMessages(
-            game
-        );
-
+    const copy = JSON.parse(JSON.stringify(game));
+    copy.players = copy.players.filter(p => p.deviceId !== deviceId);
+    
+    if (copy.players.length === 0) {
+        await removeGameMessages(game);
         await loadMessages();
-
         return;
     }
-
-    /*
-        If host leaves, the next player
-        becomes host.
-    */
-
-    if(
-        game.hostDeviceId===
-        deviceId
-    ){
-
-        const newHost=
-            copy.players[0];
-
-        copy.host=
-            newHost.username;
-
-        copy.hostDeviceId=
-            newHost.deviceId;
+    
+    if (game.hostDeviceId === deviceId) {
+        const newHost = copy.players[0];
+        copy.host = newHost.username;
+        copy.hostDeviceId = newHost.deviceId;
     }
-
-    if(
-        copy.status==="playing" &&
-        copy.turnIndex>=
-        copy.players.length
-    ){
-
-        copy.turnIndex=0;
+    
+    if (copy.status === "playing" && copy.turnIndex >= copy.players.length) {
+        copy.turnIndex = 0;
     }
-
-    await writeGameState(
-        copy
-    );
-
-    /*
-        Remove the old state.
-        This is requested using the
-        previous host ID.
-    */
-    await deleteStateMessage(
-        game
-    );
-
+    
+    await writeGameState(copy);
+    await deleteStateMessage(game);
     await loadMessages();
 }
-
-
-/* =====================================================
-   START GAME
-===================================================== */
 
 async function startGame(game){
-
-    if(
-        game.hostDeviceId!==deviceId
-    ){
-        return;
+    if (game.hostDeviceId !== deviceId) return;
+    if (game.players.length < GAME_TYPES[game.gameType].min) return;
+    
+    const copy = JSON.parse(JSON.stringify(game));
+    copy.status = "playing";
+    copy.turnIndex = 0;
+    
+    // Initialize game-specific data
+    if (copy.gameType === "mastermind") {
+        copy.data.codeSetter = copy.players[0].deviceId;
+        copy.data.code = null;
+        copy.data.guesses = [];
     }
-
-    if(
-        game.players.length<
-        GAME_TYPES[
-            game.gameType
-        ].min
-    ){
-        return;
+    if (copy.gameType === "hangman") {
+        copy.data.wordSetter = copy.players[0].deviceId;
+        copy.data.word = null;
+        copy.data.guessed = [];
+        copy.data.wrong = 0;
+        copy.data.maxWrong = 6;
     }
-
-    const copy=
-        JSON.parse(
-            JSON.stringify(game)
-        );
-
-    copy.status=
-        "playing";
-
-    copy.turnIndex=0;
-
-    if(
-        copy.gameType==="higher"
-    ){
-
-        copy.data.currentCard=
-            Math.floor(
-                Math.random()*13
-            )+1;
+    if (copy.gameType === "memory") {
+        const emojis = ["🍎","🍊","🍋","🍇","🍉","🍓","🍑","🍒","🥝","🍍","🥭","🍌","🍈","🫐","🍐","🥥"];
+        const gridSize = copy.data.gridSize || 4;
+        const pairs = (gridSize * gridSize) / 2;
+        let cards = [...emojis.slice(0, pairs), ...emojis.slice(0, pairs)];
+        for (let i = cards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [cards[i], cards[j]] = [cards[j], cards[i]];
+        }
+        copy.data.cards = cards;
+        copy.data.flipped = [];
+        copy.data.matched = [];
+        copy.data.scores = {};
     }
-
-    await publishGameAndCleanup(
-        game,
-        copy
-    );
+    if (copy.gameType === "dots") {
+        copy.data.lines = {};
+        copy.data.boxes = {};
+        copy.data.gridSize = copy.data.gridSize || 4;
+    }
+    if (copy.gameType === "othello") {
+        copy.data.board = null; // Will be initialized on render
+        copy.data.boardSize = copy.data.boardSize || 8;
+    }
+    if (copy.gameType === "checkers") {
+        copy.data.board = null;
+        copy.data.boardSize = copy.data.boardSize || 8;
+        copy.data.currentPlayer = "black";
+        copy.data.selected = null;
+        copy.data.validMoves = [];
+    }
+    if (copy.gameType === "gomoku") {
+        copy.data.board = null;
+        copy.data.boardSize = copy.data.boardSize || 15;
+    }
+    if (copy.gameType === "sos") {
+        copy.data.board = null;
+        copy.data.gridSize = copy.data.gridSize || 5;
+        copy.data.scores = {};
+    }
+    if (copy.gameType === "connect4") {
+        copy.data.playerColors = {};
+        copy.players.forEach((p, idx) => {
+            copy.data.playerColors[p.deviceId] = idx % 2 === 0 ? "R" : "Y";
+        });
+    }
+    
+    await publishGameAndCleanup(game, copy);
 }
-
-
-/* =====================================================
-   FORCE QUIT
-===================================================== */
 
 async function forceQuitGame(game){
-
-    if(
-        game.hostDeviceId!==deviceId
-    ){
-        return;
-    }
-
-    try{
-
-        await removeGameMessages(
-            game
-        );
-
+    if (game.hostDeviceId !== deviceId) return;
+    try {
+        await removeGameMessages(game);
         await loadMessages();
-
-    }catch(error){
-
-        alert(
-            "Could not remove game:\n\n"+
-            error.message
-        );
+    } catch(error) {
+        alert("Could not remove game:\n\n" + error.message);
     }
 }
 
-
-/* =====================================================
-   PUBLISH NEW STATE
-===================================================== */
-
-async function publishGameAndCleanup(
-    oldGame,
-    newGame
-){
-
-    if(
-        newGame.status==="finished"
-    ){
-
-        /*
-            The finished game is not rendered.
-            Remove temporary state.
-        */
-
-        await removeGameMessages(
-            oldGame
-        );
-
+async function publishGameAndCleanup(oldGame, newGame){
+    if (newGame.status === "finished") {
+        await removeGameMessages(oldGame);
         await loadMessages();
-
         return;
     }
-
-    await writeGameState(
-        newGame
-    );
-
-    /*
-        Remove previous state message.
-    */
-
-    if(
-        oldGame.messageId
-    ){
-
-        try{
-
-            await apiDelete({
-
-                id:
-                    oldGame.messageId,
-
-                device_id:
-                    oldGame.hostDeviceId
-            });
-
-        }catch{
-
-            /*
-                Do not break the game if
-                an old temporary message has
-                already disappeared.
-            */
-        }
+    
+    await writeGameState(newGame);
+    
+    if (oldGame.messageId) {
+        try {
+            await apiDelete({ id: oldGame.messageId, device_id: oldGame.hostDeviceId });
+        } catch {}
     }
-
+    
     await loadMessages();
 }
 
-
-/* =====================================================
-   REMOVE GAME MESSAGES
-===================================================== */
-
 async function removeGameMessages(game){
-
-    /*
-        Find ALL messages belonging to
-        this game and request deletion.
-
-        The game messages use the host
-        device ID, allowing the existing
-        DELETE endpoint to remove them.
-    */
-
-    const gameMessages=
-        currentMessages.filter(
-            message=>{
-
-                if(
-                    !isGameMessage(message)
-                ){
-                    return false;
-                }
-
-                const state=
-                    parseGameMessage(
-                        message
-                    );
-
-                return (
-                    state &&
-                    state.id===
-                    game.id
-                );
-            }
-        );
-
-    /*
-        Delete newest/known messages.
-    */
-
-    for(
-        const message
-        of gameMessages
-    ){
-
-        try{
-
-            await apiDelete({
-
-                id:
-                    message.id,
-
-                device_id:
-                    game.hostDeviceId
-            });
-
-        }catch{
-
-            /*
-                Ignore already deleted
-                messages.
-            */
-        }
+    const gameMessages = currentMessages.filter(message => {
+        if (!isGameMessage(message)) return false;
+        const state = parseGameMessage(message);
+        return state && state.id === game.id;
+    });
+    
+    for (const message of gameMessages) {
+        try {
+            await apiDelete({ id: message.id, device_id: game.hostDeviceId });
+        } catch {}
     }
 }
 
-
 async function deleteStateMessage(game){
-
-    if(!game.messageId){
-        return;
-    }
-
-    try{
-
-        await apiDelete({
-
-            id:
-                game.messageId,
-
-            device_id:
-                game.hostDeviceId
-        });
-
-    }catch{
-
-        /* Already removed. */
-    }
+    if (!game.messageId) return;
+    try {
+        await apiDelete({ id: game.messageId, device_id: game.hostDeviceId });
+    } catch {}
 }
 
 
@@ -4570,27 +4718,8 @@ async function deleteStateMessage(game){
 ===================================================== */
 
 function restartRefresh(){
-
-    if(refreshTimer){
-
-        clearInterval(
-            refreshTimer
-        );
-    }
-
-    /*
-        Games synchronize every 0.5 seconds
-        regardless of the normal chat refresh
-        setting.
-
-        This keeps game controls responsive.
-    */
-
-    refreshTimer=
-        setInterval(
-            loadMessages,
-            500
-        );
+    if (refreshTimer) clearInterval(refreshTimer);
+    refreshTimer = setInterval(loadMessages, 500);
 }
 
 
@@ -4598,60 +4727,25 @@ function restartRefresh(){
    CONFIRM
 ===================================================== */
 
-function openConfirm(
-    title,
-    text,
-    callback
-){
-
-    confirmTitle.textContent=
-        title;
-
-    confirmText.textContent=
-        text;
-
-    confirmCallback=
-        callback;
-
-    confirmOverlay.classList.add(
-        "show"
-    );
+function openConfirm(title, text, callback){
+    confirmTitle.textContent = title;
+    confirmText.textContent = text;
+    confirmCallback = callback;
+    confirmOverlay.classList.add("show");
 }
 
-
-confirmCancel.onclick=()=>{
-
-    confirmOverlay.classList.remove(
-        "show"
-    );
-
-    confirmCallback=null;
+confirmCancel.onclick = () => {
+    confirmOverlay.classList.remove("show");
+    confirmCallback = null;
 };
 
-
-confirmYes.onclick=async()=>{
-
-    const callback=
-        confirmCallback;
-
-    confirmOverlay.classList.remove(
-        "show"
-    );
-
-    confirmCallback=null;
-
-    if(callback){
-
-        try{
-
-            await callback();
-
-        }catch(error){
-
-            alert(
-                error.message
-            );
-        }
+confirmYes.onclick = async () => {
+    const callback = confirmCallback;
+    confirmOverlay.classList.remove("show");
+    confirmCallback = null;
+    if (callback) {
+        try { await callback(); } 
+        catch(error) { alert(error.message); }
     }
 };
 
@@ -4660,41 +4754,20 @@ confirmYes.onclick=async()=>{
    REMOVE EVERYTHING
 ===================================================== */
 
-removeEverything.onclick=()=>{
-
-    openConfirm(
-        "Remove everything?",
-        "This permanently removes every message from the chat.",
-        async()=>{
-
-            try{
-
-                /*
-                    Existing API supports delete_all.
-                */
-
-                await apiDelete({
-
-                    delete_all:true
-                });
-
-                currentMessages=[];
-                games=[];
-                renderedElements.clear();
-                seenMessageIds.clear();
-                seenGameIds.clear();
-
-                renderMessages();
-
-            }catch(error){
-
-                alert(
-                    "Failed to wipe chat:\n\n"+
-                    error.message
-                );
-            }
+removeEverything.onclick = () => {
+    openConfirm("Remove everything?", "This permanently removes every message from the chat.", async () => {
+        try {
+            await apiDelete({ delete_all: true });
+            currentMessages = [];
+            games = [];
+            renderedElements.clear();
+            seenMessageIds.clear();
+            seenGameIds.clear();
+            renderMessages();
+        } catch(error) {
+            alert("Failed to wipe chat:\n\n" + error.message);
         }
-    );
+    });
 };
 
 
@@ -4703,28 +4776,17 @@ removeEverything.onclick=()=>{
 ===================================================== */
 
 function formatTime(date){
-
-    if(!date)return "";
-
-    return new Date(date)
-        .toLocaleTimeString(
-            [],
-            {
-                hour:"2-digit",
-                minute:"2-digit"
-            }
-        );
+    if (!date) return "";
+    return new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-
 function escapeHtml(value){
-
     return String(value)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
 
@@ -4733,9 +4795,7 @@ function escapeHtml(value){
 ===================================================== */
 
 loadSettingsUI();
-
 applySettings();
-
 loadMessages();
 
 </script>
