@@ -2212,7 +2212,19 @@ function renderMessages(){
         return;
     }
 
-    // RENDER NORMAL MESSAGES FIRST (at the top)
+    for(const game of games){
+
+        if(
+            game.status!=="finished" &&
+            game.status!=="forcequit"
+        ){
+
+            fragment.appendChild(
+                createGameElement(game)
+            );
+        }
+    }
+
     for(const message of normal){
 
         const item=
@@ -2306,20 +2318,6 @@ function renderMessages(){
         item.appendChild(content);
 
         fragment.appendChild(item);
-    }
-
-    // RENDER GAME MESSAGES LAST (at the bottom)
-    for(const game of games){
-
-        if(
-            game.status!=="finished" &&
-            game.status!=="forcequit"
-        ){
-
-            fragment.appendChild(
-                createGameElement(game)
-            );
-        }
     }
 
     messagesEl.replaceChildren(
