@@ -161,6 +161,16 @@ button{
     line-height:var(--line-spacing);
 }
 
+.message-text a{
+    color:#7db7ff;
+    text-decoration:underline;
+    cursor:pointer;
+}
+
+.message-text a:hover{
+    filter:brightness(1.25);
+}
+
 .message-image{
     display:block;
     max-width:min(500px,80vw);
@@ -344,32 +354,29 @@ textarea{
     margin-top:5px;
 }
 
-.info{
-    margin-top:7px;
-    color:var(--muted);
-    font-size:12px;
-    line-height:1.45;
-}
-
-.save-btn{
+.save-btn,
+.test-btn{
     width:100%;
     margin-top:8px;
     padding:12px;
     border:0;
     border-radius:9px;
-    background:var(--accent);
-    color:#111;
     font-weight:700;
 }
 
-.permission-btn{
-    width:100%;
-    margin-top:10px;
-    padding:11px;
-    border:1px solid var(--border);
-    border-radius:9px;
-    background:#20252c;
+.save-btn{
+    background:var(--accent);
+    color:#111;
+}
+
+.test-btn{
+    background:#252c35;
     color:white;
+    border:1px solid var(--border);
+}
+
+.test-btn:hover{
+    background:#303844;
 }
 
 /* DANGER */
@@ -526,21 +533,21 @@ textarea{
 /* NOTIFICATION STATUS */
 
 .notification-status{
-    padding:9px 10px;
+    margin-top:8px;
+    padding:9px;
     border-radius:8px;
     background:#101419;
     border:1px solid var(--border);
     color:var(--muted);
     font-size:12px;
-    line-height:1.4;
 }
 
-.notification-status.ready{
-    color:#9be7ad;
+.notification-status.ok{
+    color:#9ee6a8;
 }
 
-.notification-status.denied{
-    color:#ff8585;
+.notification-status.warn{
+    color:#ffd27d;
 }
 
 @media(max-width:600px){
@@ -584,7 +591,10 @@ textarea{
 
 </header>
 
-<main class="messages" id="messages"></main>
+<main
+    class="messages"
+    id="messages"
+></main>
 
 <div class="composer">
 
@@ -623,7 +633,10 @@ textarea{
 
 <!-- SETTINGS -->
 
-<div class="overlay" id="settingsOverlay">
+<div
+    class="overlay"
+    id="settingsOverlay"
+>
 
 <div class="panel">
 
@@ -631,7 +644,10 @@ textarea{
 
     <h2>Settings</h2>
 
-    <button class="icon-btn" id="closeSettings">×</button>
+    <button
+        class="icon-btn"
+        id="closeSettings"
+    >×</button>
 
 </div>
 
@@ -665,7 +681,10 @@ textarea{
 
 <label>Device ID</label>
 
-<input id="deviceIdInput" readonly>
+<input
+    id="deviceIdInput"
+    readonly
+>
 
 </div>
 
@@ -685,51 +704,21 @@ textarea{
 <div class="category-body">
 
 <div class="setting">
-
 <label>Text size</label>
-
-<input
-    id="textSize"
-    type="range"
-    min="12"
-    max="24"
-    step="1"
->
-
+<input id="textSize" type="range" min="12" max="24" step="1">
 <div class="setting-value" id="textSizeValue"></div>
-
 </div>
 
 <div class="setting">
-
 <label>Word spacing</label>
-
-<input
-    id="wordSpacing"
-    type="range"
-    min="0"
-    max="12"
-    step="1"
->
-
+<input id="wordSpacing" type="range" min="0" max="12" step="1">
 <div class="setting-value" id="wordSpacingValue"></div>
-
 </div>
 
 <div class="setting">
-
 <label>Line spacing</label>
-
-<input
-    id="lineSpacing"
-    type="range"
-    min="1"
-    max="2"
-    step=".05"
->
-
+<input id="lineSpacing" type="range" min="1" max="2" step=".05">
 <div class="setting-value" id="lineSpacingValue"></div>
-
 </div>
 
 </div>
@@ -757,7 +746,7 @@ textarea{
 <option value="3000">3 seconds</option>
 <option value="2000">2 seconds</option>
 <option value="1000">1 second</option>
-<option value="500" selected>0.5 seconds</option>
+<option value="500">0.5 seconds</option>
 <option value="100">0.1 seconds</option>
 </select>
 
@@ -824,12 +813,7 @@ textarea{
 
 <label>Corner roundness</label>
 
-<input
-    id="cornerRadius"
-    type="range"
-    min="0"
-    max="25"
->
+<input id="cornerRadius" type="range" min="0" max="25">
 
 <div class="setting-value" id="cornerRadiusValue"></div>
 
@@ -839,13 +823,7 @@ textarea{
 
 <label>UI scale</label>
 
-<input
-    id="uiScale"
-    type="range"
-    min=".8"
-    max="1.2"
-    step=".05"
->
+<input id="uiScale" type="range" min=".8" max="1.2" step=".05">
 
 <div class="setting-value" id="uiScaleValue"></div>
 
@@ -871,41 +849,35 @@ textarea{
 <label>Notification sound</label>
 
 <select id="notificationSound">
-
 <option value="false">Off</option>
 <option value="true">On</option>
-
 </select>
 
 </div>
 
-
 <div class="setting">
 
-<label>Notification sound type</label>
+<label>Sound</label>
 
-<select id="notificationType">
-
-<option value="1">1 — Soft Click</option>
-<option value="2">2 — Pop</option>
-<option value="3">3 — Double Beep</option>
+<select id="soundType">
+<option value="1">1 — Soft Ping</option>
+<option value="2">2 — Double Ping</option>
+<option value="3">3 — Pop</option>
 <option value="4">4 — Digital</option>
 <option value="5">5 — Bell</option>
-<option value="6">6 — Chime</option>
-<option value="7">7 — Pulse</option>
-<option value="8">8 — Alert</option>
-<option value="9">9 — Retro</option>
-<option value="10">10 — Deep Ping</option>
-<option value="11">11 — Emergency Alarm</option>
-
+<option value="6">6 — Short Beep</option>
+<option value="7">7 — Triple Beep</option>
+<option value="8">8 — Deep Alert</option>
+<option value="9">9 — Rising Alert</option>
+<option value="10">10 — Classic Notification</option>
+<option value="11">🚨 Nuclear Alarm</option>
 </select>
 
 </div>
 
-
 <div class="setting">
 
-<label>Notification volume</label>
+<label>Volume</label>
 
 <input
     id="notificationVolume"
@@ -922,76 +894,59 @@ textarea{
 
 </div>
 
-
 <div class="setting">
 
-<label>Notification duration</label>
+<label>Sound duration</label>
 
-<select id="notificationDuration">
+<input
+    id="notificationDuration"
+    type="range"
+    min="50"
+    max="3000"
+    step="50"
+>
 
-<option value="250">0.25 second</option>
-<option value="500">0.5 second</option>
-<option value="1000">1 second</option>
-<option value="1500">1.5 seconds</option>
-<option value="2000">2 seconds</option>
-<option value="3000">3 seconds</option>
-<option value="5000">5 seconds</option>
-</select>
+<div
+    class="setting-value"
+    id="notificationDurationValue"
+></div>
 
 </div>
-
 
 <div class="setting">
 
 <label>Desktop notifications</label>
 
 <select id="desktopNotifications">
-
 <option value="false">Off</option>
 <option value="true">On</option>
-
 </select>
 
 </div>
-
 
 <div class="setting">
 
 <label>Mention notifications</label>
 
 <select id="mentionNotifications">
-
 <option value="false">Off</option>
 <option value="true">On</option>
-
 </select>
 
 </div>
 
-
-<div class="setting">
+<button
+    class="test-btn"
+    id="testNotification"
+>
+🪟 Test Windows Notification
+</button>
 
 <div
     class="notification-status"
     id="notificationStatus"
 >
-Checking notification permission...
-</div>
-
-<button
-    class="permission-btn"
-    id="enableNotifications"
->
-Enable Windows/Desktop Notifications
-</button>
-
-<button
-    class="permission-btn"
-    id="testNotification"
->
-Test Notification
-</button>
-
+Notification permission has not been requested.
 </div>
 
 </div>
@@ -1046,7 +1001,10 @@ Test Notification
 </div>
 
 
-<button class="save-btn" id="saveSettings">
+<button
+    class="save-btn"
+    id="saveSettings"
+>
 Save settings
 </button>
 
@@ -1064,7 +1022,10 @@ Remove every message from the chat permanently.
 This affects everyone using the chat.
 </p>
 
-<button class="danger-btn" id="removeEverything">
+<button
+    class="danger-btn"
+    id="removeEverything"
+>
 Remove everything
 </button>
 
@@ -1077,12 +1038,20 @@ Remove everything
 
 <!-- CONTEXT MENU -->
 
-<div class="context-menu" id="contextMenu">
+<div
+    class="context-menu"
+    id="contextMenu"
+>
 
-<button id="editMessage">Edit</button>
+<button id="editMessage">
+    Edit
+</button>
 
-<button class="delete-option" id="deleteMessage">
-Delete
+<button
+    class="delete-option"
+    id="deleteMessage"
+>
+    Delete
 </button>
 
 </div>
@@ -1090,9 +1059,15 @@ Delete
 
 <!-- IMAGE VIEWER -->
 
-<div class="image-viewer" id="imageViewer">
+<div
+    class="image-viewer"
+    id="imageViewer"
+>
 
-<button class="back-image" id="backImage">
+<button
+    class="back-image"
+    id="backImage"
+>
 ← Back
 </button>
 
@@ -1107,11 +1082,16 @@ Delete
 
 <!-- DIALOG -->
 
-<div class="overlay" id="dialogOverlay">
+<div
+    class="overlay"
+    id="dialogOverlay"
+>
 
 <div class="dialog">
 
-<h2 id="dialogTitle">Confirm</h2>
+<h2 id="dialogTitle">
+Confirm
+</h2>
 
 <p id="dialogText"></p>
 
@@ -1121,7 +1101,10 @@ Delete
 Cancel
 </button>
 
-<button class="danger" id="dialogConfirm">
+<button
+    class="danger"
+    id="dialogConfirm"
+>
 Yes
 </button>
 
@@ -1145,7 +1128,13 @@ let deviceId=localStorage.getItem("chat_device_id");
 
 if(!deviceId){
 
-    deviceId=crypto.randomUUID();
+    if(window.crypto && crypto.randomUUID){
+        deviceId=crypto.randomUUID();
+    }else{
+        deviceId=
+            Date.now().toString(36)+
+            Math.random().toString(36).substring(2);
+    }
 
     localStorage.setItem(
         "chat_device_id",
@@ -1161,41 +1150,30 @@ if(!deviceId){
 const defaults={
 
     username:"",
-
     theme:"dark",
 
     refreshRate:500,
 
     showTimestamps:true,
-
     compactMessages:false,
 
     textSize:16,
-
     wordSpacing:0,
-
     lineSpacing:1.45,
 
     cornerRadius:12,
-
     uiScale:1,
 
-    notificationSound:false,
-
-    notificationType:1,
-
+    notificationSound:true,
+    soundType:1,
     notificationVolume:70,
+    notificationDuration:500,
 
-    notificationDuration:1000,
-
-    desktopNotifications:false,
-
-    mentionNotifications:false,
+    desktopNotifications:true,
+    mentionNotifications:true,
 
     enterToSend:true,
-
     autoScroll:true,
-
     confirmDelete:true
 };
 
@@ -1203,21 +1181,19 @@ const defaults={
 function getSetting(key){
 
     const value=
-        localStorage.getItem("chat_"+key);
+        localStorage.getItem(
+            "chat_"+key
+        );
 
     if(value===null){
-
         return defaults[key];
-
     }
 
     if(
-        value==="true" ||
+        value==="true"||
         value==="false"
     ){
-
         return value==="true";
-
     }
 
     const number=Number(value);
@@ -1304,8 +1280,8 @@ const uiScale=
 const notificationSound=
     document.getElementById("notificationSound");
 
-const notificationType=
-    document.getElementById("notificationType");
+const soundType=
+    document.getElementById("soundType");
 
 const notificationVolume=
     document.getElementById("notificationVolume");
@@ -1319,6 +1295,12 @@ const desktopNotifications=
 const mentionNotifications=
     document.getElementById("mentionNotifications");
 
+const testNotification=
+    document.getElementById("testNotification");
+
+const notificationStatus=
+    document.getElementById("notificationStatus");
+
 const enterToSend=
     document.getElementById("enterToSend");
 
@@ -1327,15 +1309,6 @@ const autoScroll=
 
 const confirmDelete=
     document.getElementById("confirmDelete");
-
-const enableNotifications=
-    document.getElementById("enableNotifications");
-
-const testNotification=
-    document.getElementById("testNotification");
-
-const notificationStatus=
-    document.getElementById("notificationStatus");
 
 const contextMenu=
     document.getElementById("contextMenu");
@@ -1389,7 +1362,14 @@ const uiScaleValue=
     document.getElementById("uiScaleValue");
 
 const notificationVolumeValue=
-    document.getElementById("notificationVolumeValue");
+    document.getElementById(
+        "notificationVolumeValue"
+    );
+
+const notificationDurationValue=
+    document.getElementById(
+        "notificationDurationValue"
+    );
 
 
 let selectedFile=null;
@@ -1398,14 +1378,868 @@ let currentMessages=[];
 let confirmCallback=null;
 let refreshTimer=null;
 
-let hasLoadedMessages=false;
-let knownMessageIds=new Set();
+let lastMessageIds=new Set();
+let firstMessageLoad=true;
+
+
+/* =========================================================
+   AUDIO
+========================================================= */
 
 let audioContext=null;
 
 
+/*
+    Browsers block automatic audio until the user interacts
+    with the page.
+
+    This creates/unlocks the AudioContext on the first click,
+    key press or touch.
+*/
+
+function unlockAudio(){
+
+    try{
+
+        if(!audioContext){
+
+            const AudioCtx=
+                window.AudioContext||
+                window.webkitAudioContext;
+
+            if(!AudioCtx)return;
+
+            audioContext=
+                new AudioCtx();
+
+        }
+
+        if(
+            audioContext.state==="suspended"
+        ){
+
+            audioContext.resume();
+
+        }
+
+    }catch(error){
+
+        console.warn(
+            "Audio could not be unlocked.",
+            error
+        );
+
+    }
+
+}
+
+
+document.addEventListener(
+    "click",
+    unlockAudio,
+    {passive:true}
+);
+
+document.addEventListener(
+    "keydown",
+    unlockAudio,
+    {passive:true}
+);
+
+document.addEventListener(
+    "touchstart",
+    unlockAudio,
+    {passive:true}
+);
+
+
 /* =========================================================
-   SETTINGS
+   GENERATED NOTIFICATION SOUNDS
+========================================================= */
+
+function tone(
+    frequency,
+    duration,
+    volume,
+    type="sine",
+    startTime=0
+){
+
+    if(!audioContext)return;
+
+    const oscillator=
+        audioContext.createOscillator();
+
+    const gain=
+        audioContext.createGain();
+
+    oscillator.type=type;
+
+    oscillator.frequency.setValueAtTime(
+        frequency,
+        audioContext.currentTime+
+        startTime
+    );
+
+    gain.gain.setValueAtTime(
+        0.0001,
+        audioContext.currentTime+
+        startTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        Math.max(volume,0.0001),
+        audioContext.currentTime+
+        startTime+
+        0.01
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        audioContext.currentTime+
+        startTime+
+        duration
+    );
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start(
+        audioContext.currentTime+
+        startTime
+    );
+
+    oscillator.stop(
+        audioContext.currentTime+
+        startTime+
+        duration+
+        0.03
+    );
+}
+
+
+function playNotificationSound(){
+
+    if(!settings.notificationSound){
+        return;
+    }
+
+    unlockAudio();
+
+    if(!audioContext){
+        return;
+    }
+
+    const master=
+        Math.max(
+            0,
+            Math.min(
+                1,
+                Number(settings.notificationVolume)/100
+            )
+        );
+
+    const duration=
+        Math.max(
+            50,
+            Number(settings.notificationDuration)
+        )/1000;
+
+    const type=
+        Number(settings.soundType);
+
+
+    /* 1 — Soft Ping */
+
+    if(type===1){
+
+        tone(
+            880,
+            duration,
+            master*.18,
+            "sine"
+        );
+
+    }
+
+
+    /* 2 — Double Ping */
+
+    else if(type===2){
+
+        tone(
+            740,
+            duration*.45,
+            master*.18,
+            "sine",
+            0
+        );
+
+        tone(
+            1040,
+            duration*.55,
+            master*.18,
+            "sine",
+            duration*.42
+        );
+
+    }
+
+
+    /* 3 — Pop */
+
+    else if(type===3){
+
+        tone(
+            180,
+            duration*.22,
+            master*.25,
+            "triangle"
+        );
+
+        tone(
+            620,
+            duration*.55,
+            master*.13,
+            "sine",
+            .03
+        );
+
+    }
+
+
+    /* 4 — Digital */
+
+    else if(type===4){
+
+        tone(
+            1200,
+            duration*.25,
+            master*.15,
+            "square",
+            0
+        );
+
+        tone(
+            800,
+            duration*.25,
+            master*.15,
+            "square",
+            duration*.3
+        );
+
+        tone(
+            1400,
+            duration*.25,
+            master*.15,
+            "square",
+            duration*.6
+        );
+
+    }
+
+
+    /* 5 — Bell */
+
+    else if(type===5){
+
+        tone(
+            523,
+            duration,
+            master*.15,
+            "sine"
+        );
+
+        tone(
+            784,
+            duration*.8,
+            master*.09,
+            "sine",
+            .03
+        );
+
+    }
+
+
+    /* 6 — Short Beep */
+
+    else if(type===6){
+
+        tone(
+            1000,
+            Math.min(duration,.18),
+            master*.2,
+            "square"
+        );
+
+    }
+
+
+    /* 7 — Triple Beep */
+
+    else if(type===7){
+
+        const d=
+            Math.min(duration*.25,.25);
+
+        tone(700,d,master*.16,"square",0);
+        tone(900,d,master*.16,"square",d+.05);
+        tone(1100,d,master*.16,"square",(d+.05)*2);
+
+    }
+
+
+    /* 8 — Deep Alert */
+
+    else if(type===8){
+
+        tone(
+            220,
+            duration*.65,
+            master*.22,
+            "sawtooth"
+        );
+
+        tone(
+            330,
+            duration*.5,
+            master*.12,
+            "sine",
+            .05
+        );
+
+    }
+
+
+    /* 9 — Rising Alert */
+
+    else if(type===9){
+
+        if(!audioContext)return;
+
+        const oscillator=
+            audioContext.createOscillator();
+
+        const gain=
+            audioContext.createGain();
+
+        oscillator.type="sawtooth";
+
+        oscillator.frequency.setValueAtTime(
+            300,
+            audioContext.currentTime
+        );
+
+        oscillator.frequency.exponentialRampToValueAtTime(
+            1300,
+            audioContext.currentTime+
+            duration
+        );
+
+        gain.gain.setValueAtTime(
+            .0001,
+            audioContext.currentTime
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            Math.max(master*.12,.0001),
+            audioContext.currentTime+.02
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            .0001,
+            audioContext.currentTime+duration
+        );
+
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+
+        oscillator.start();
+        oscillator.stop(
+            audioContext.currentTime+
+            duration+
+            .03
+        );
+
+    }
+
+
+    /* 10 — Classic Notification */
+
+    else if(type===10){
+
+        tone(
+            660,
+            duration*.35,
+            master*.16,
+            "sine",
+            0
+        );
+
+        tone(
+            880,
+            duration*.5,
+            master*.16,
+            "sine",
+            duration*.4
+        );
+
+    }
+
+
+    /* 11 — NUCLEAR ALARM */
+
+    else if(type===11){
+
+        playNuclearAlarm(
+            duration,
+            master
+        );
+
+    }
+
+}
+
+
+/*
+    Synthetic warning siren.
+
+    No external audio file is required.
+*/
+
+function playNuclearAlarm(
+    duration,
+    master
+){
+
+    if(!audioContext)return;
+
+    const total=
+        Math.max(
+            duration,
+            1.5
+        );
+
+    const oscillator=
+        audioContext.createOscillator();
+
+    const gain=
+        audioContext.createGain();
+
+    oscillator.type="sawtooth";
+
+    const now=
+        audioContext.currentTime;
+
+    const startFrequency=420;
+    const endFrequency=820;
+
+    oscillator.frequency.setValueAtTime(
+        startFrequency,
+        now
+    );
+
+    oscillator.frequency.exponentialRampToValueAtTime(
+        endFrequency,
+        now+
+        total*.45
+    );
+
+    oscillator.frequency.exponentialRampToValueAtTime(
+        startFrequency,
+        now+
+        total*.9
+    );
+
+    gain.gain.setValueAtTime(
+        .0001,
+        now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        Math.max(master*.13,.0001),
+        now+.04
+    );
+
+    gain.gain.setValueAtTime(
+        Math.max(master*.13,.0001),
+        now+
+        total*.75
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .0001,
+        now+
+        total
+    );
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start(now);
+
+    oscillator.stop(
+        now+
+        total+
+        .05
+    );
+
+}
+
+
+/* =========================================================
+   NOTIFICATIONS
+========================================================= */
+
+function updateNotificationStatus(){
+
+    if(!("Notification" in window)){
+
+        notificationStatus.textContent=
+            "This browser does not support desktop notifications.";
+
+        notificationStatus.className=
+            "notification-status warn";
+
+        return;
+
+    }
+
+    if(Notification.permission==="granted"){
+
+        notificationStatus.textContent=
+            "Windows/browser notifications are enabled.";
+
+        notificationStatus.className=
+            "notification-status ok";
+
+    }
+
+    else if(Notification.permission==="denied"){
+
+        notificationStatus.textContent=
+            "Notifications are blocked. Allow them in your browser's site settings.";
+
+        notificationStatus.className=
+            "notification-status warn";
+
+    }
+
+    else{
+
+        notificationStatus.textContent=
+            "Click Test Windows Notification to request permission.";
+
+        notificationStatus.className=
+            "notification-status";
+
+    }
+
+}
+
+
+async function requestNotificationPermission(){
+
+    if(!("Notification" in window)){
+
+        alert(
+            "This browser does not support desktop notifications."
+        );
+
+        return false;
+    }
+
+    try{
+
+        const permission=
+            await Notification.requestPermission();
+
+        updateNotificationStatus();
+
+        return permission==="granted";
+
+    }catch(error){
+
+        console.error(error);
+
+        return false;
+
+    }
+
+}
+
+
+/*
+    This creates the Windows/browser notification.
+
+    The browser/OS controls the exact visual design.
+*/
+
+async function showDesktopNotification(
+    title,
+    body
+){
+
+    if(
+        !settings.desktopNotifications
+    ){
+        return;
+    }
+
+    if(!("Notification" in window)){
+        return;
+    }
+
+    if(
+        Notification.permission!=="granted"
+    ){
+
+        const allowed=
+            await requestNotificationPermission();
+
+        if(!allowed){
+            return;
+        }
+
+    }
+
+    try{
+
+        const notification=
+            new Notification(
+                title,
+                {
+                    body:body,
+                    tag:"chat-message",
+                    renotify:true,
+                    silent:true
+                }
+            );
+
+        notification.onclick=()=>{
+
+            window.focus();
+
+            notification.close();
+
+        };
+
+    }catch(error){
+
+        console.error(
+            "Notification failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   TEST NOTIFICATION
+========================================================= */
+
+testNotification.onclick=async()=>{
+
+    unlockAudio();
+
+    playNotificationSound();
+
+    if(
+        !settings.desktopNotifications
+    ){
+
+        const old=
+            desktopNotifications.value;
+
+        desktopNotifications.value="true";
+
+        await showDesktopNotification(
+            "Chat — Test Notification",
+            "This is a test Windows notification."
+        );
+
+        desktopNotifications.value=old;
+
+    }else{
+
+        await showDesktopNotification(
+            "Chat — Test Notification",
+            "This is a test Windows notification."
+        );
+
+    }
+
+    updateNotificationStatus();
+
+};
+
+
+/* =========================================================
+   NEW MESSAGE DETECTION
+========================================================= */
+
+function getMessageId(message){
+
+    return String(
+        message.id ??
+        (
+            String(message.created_at||"")+
+            "|" +
+            String(message.username||"")+
+            "|" +
+            String(message.message||"")
+        )
+    );
+
+}
+
+
+function isMention(message){
+
+    if(!settings.mentionNotifications){
+        return false;
+    }
+
+    if(!settings.username){
+        return false;
+    }
+
+    const text=
+        String(message.message||"")
+            .toLowerCase();
+
+    const name=
+        settings.username
+            .toLowerCase();
+
+    return (
+        text.includes("@"+name) ||
+        text.includes(name)
+    );
+
+}
+
+
+function processNotifications(messages){
+
+    if(!Array.isArray(messages)){
+        return;
+    }
+
+    const newMessages=[];
+
+    const newIds=
+        new Set(
+            messages.map(getMessageId)
+        );
+
+
+    /*
+        First load only establishes the known
+        message list. It does not spam notifications
+        for the entire existing chat.
+    */
+
+    if(firstMessageLoad){
+
+        lastMessageIds=newIds;
+
+        firstMessageLoad=false;
+
+        return;
+    }
+
+
+    for(const message of messages){
+
+        const id=
+            getMessageId(message);
+
+        if(
+            !lastMessageIds.has(id)
+        ){
+
+            newMessages.push(message);
+
+        }
+
+    }
+
+
+    lastMessageIds=newIds;
+
+
+    if(!newMessages.length){
+        return;
+    }
+
+
+    /*
+        Notify only for messages from other devices.
+    */
+
+    for(const message of newMessages){
+
+        if(
+            message.device_id &&
+            String(message.device_id)===String(deviceId)
+        ){
+            continue;
+        }
+
+
+        const mention=
+            isMention(message);
+
+        const shouldNotify=
+            settings.desktopNotifications ||
+            (
+                settings.mentionNotifications &&
+                mention
+            );
+
+        if(!shouldNotify){
+            continue;
+        }
+
+
+        playNotificationSound();
+
+
+        const username=
+            message.username||
+            "Someone";
+
+        const text=
+            String(message.message||"");
+
+        const body=
+            text||
+            (
+                message.image
+                ? "Sent an image."
+                : "New message."
+            );
+
+        showDesktopNotification(
+            username+
+            (
+                mention
+                ?" mentioned you"
+                :" sent a message"
+            ),
+            body.substring(0,250)
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   APPLY SETTINGS
 ========================================================= */
 
 function applySettings(){
@@ -1442,6 +2276,7 @@ function applySettings(){
     startRefreshTimer();
 
     updateNotificationStatus();
+
 }
 
 
@@ -1454,31 +2289,22 @@ function applyTheme(name){
     const themes={
 
         dark:["#0b0d10","#111419"],
-
         midnight:["#080b14","#101522"],
-
         slate:["#101418","#171d22"],
-
         black:["#000","#090909"],
-
         blue:["#091018","#101c29"],
-
         purple:["#100b17","#191021"],
-
         green:["#09120d","#101b15"],
-
         red:["#140b0b","#1e1111"],
-
         gray:["#151515","#202020"],
-
         light:["#eeeeee","#fff"],
-
         oled:["#000","#000"]
 
     };
 
     const t=
-        themes[name]||themes.dark;
+        themes[name]||
+        themes.dark;
 
     document.documentElement.style.setProperty(
         "--bg",
@@ -1490,7 +2316,9 @@ function applyTheme(name){
         t[1]
     );
 
-    document.body.style.background=t[0];
+    document.body.style.background=
+        t[0];
+
 }
 
 
@@ -1536,8 +2364,8 @@ function loadSettingsUI(){
     notificationSound.value=
         String(settings.notificationSound);
 
-    notificationType.value=
-        settings.notificationType;
+    soundType.value=
+        settings.soundType;
 
     notificationVolume.value=
         settings.notificationVolume;
@@ -1563,6 +2391,7 @@ function loadSettingsUI(){
     updateRangeLabels();
 
     updateNotificationStatus();
+
 }
 
 
@@ -1581,10 +2410,16 @@ function updateRangeLabels(){
         settings.cornerRadius+"px";
 
     uiScaleValue.textContent=
-        Math.round(settings.uiScale*100)+"%";
+        Math.round(
+            settings.uiScale*100
+        )+"%";
 
     notificationVolumeValue.textContent=
         settings.notificationVolume+"%";
+
+    notificationDurationValue.textContent=
+        settings.notificationDuration+" ms";
+
 }
 
 
@@ -1600,6 +2435,7 @@ settingsBtn.onclick=()=>{
 
 };
 
+
 closeSettings.onclick=()=>{
 
     settingsOverlay.classList.remove("show");
@@ -1611,8 +2447,8 @@ saveSettings.onclick=()=>{
 
     settings.username=
         usernameInput.value
-        .trim()
-        .substring(0,24);
+            .trim()
+            .substring(0,24);
 
     settings.theme=
         themeSelect.value;
@@ -1644,8 +2480,8 @@ saveSettings.onclick=()=>{
     settings.notificationSound=
         notificationSound.value==="true";
 
-    settings.notificationType=
-        Number(notificationType.value);
+    settings.soundType=
+        Number(soundType.value);
 
     settings.notificationVolume=
         Number(notificationVolume.value);
@@ -1683,6 +2519,19 @@ saveSettings.onclick=()=>{
 
     settingsOverlay.classList.remove("show");
 
+
+    /*
+        If notifications are enabled,
+        ask for permission after the user
+        explicitly saved the setting.
+    */
+
+    if(settings.desktopNotifications){
+
+        requestNotificationPermission();
+
+    }
+
 };
 
 
@@ -1697,8 +2546,8 @@ document
     btn.onclick=()=>{
 
         btn.parentElement
-        .classList
-        .toggle("open");
+            .classList
+            .toggle("open");
 
     };
 
@@ -1706,7 +2555,7 @@ document
 
 
 /* =========================================================
-   RANGE PREVIEWS
+   RANGE PREVIEW
 ========================================================= */
 
 textSize.oninput=()=>{
@@ -1753,772 +2602,32 @@ notificationVolume.oninput=()=>{
 
 };
 
+notificationDuration.oninput=()=>{
 
-/* =========================================================
-   AUDIO ENGINE
-========================================================= */
-
-function getAudioContext(){
-
-    if(!audioContext){
-
-        const AudioContextClass=
-            window.AudioContext ||
-            window.webkitAudioContext;
-
-        if(!AudioContextClass){
-            return null;
-        }
-
-        audioContext=
-            new AudioContextClass();
-
-    }
-
-    if(audioContext.state==="suspended"){
-
-        audioContext.resume().catch(()=>{});
-
-    }
-
-    return audioContext;
-}
-
-
-function tone(
-    ctx,
-    destination,
-    frequency,
-    start,
-    duration,
-    type="sine",
-    volume=0.15
-){
-
-    const oscillator=
-        ctx.createOscillator();
-
-    const gain=
-        ctx.createGain();
-
-    oscillator.type=type;
-
-    oscillator.frequency.setValueAtTime(
-        frequency,
-        start
-    );
-
-    gain.gain.setValueAtTime(
-        0,
-        start
-    );
-
-    gain.gain.linearRampToValueAtTime(
-        volume,
-        start+0.015
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        0.0001,
-        start+Math.max(duration,0.03)
-    );
-
-    oscillator.connect(gain);
-
-    gain.connect(destination);
-
-    oscillator.start(start);
-
-    oscillator.stop(
-        start+Math.max(duration,0.04)
-    );
-}
-
-
-/*
-    11 different notification sounds.
-
-    #11 is a fictional emergency alarm,
-    not a reproduction of a real-world warning signal.
-*/
-
-function playNotificationSound(){
-
-    if(!settings.notificationSound){
-        return;
-    }
-
-    const ctx=getAudioContext();
-
-    if(!ctx){
-        return;
-    }
-
-    const master=
-        ctx.createGain();
-
-    const volume=
-        Math.max(
-            0,
-            Math.min(
-                100,
-                settings.notificationVolume
-            )
-        )/100;
-
-    master.gain.value=
-        volume*0.22;
-
-    master.connect(
-        ctx.destination
-    );
-
-    const now=
-        ctx.currentTime+0.01;
-
-    const maxDuration=
-        Math.max(
-            0.1,
-            Number(settings.notificationDuration)/1000
-        );
-
-    const type=
-        Number(settings.notificationType);
-
-
-    if(type===1){
-
-        /* Soft click */
-
-        tone(
-            ctx,
-            master,
-            900,
-            now,
-            Math.min(.12,maxDuration),
-            "sine",
-            .7
-        );
-
-    }
-
-
-    else if(type===2){
-
-        /* Pop */
-
-        tone(
-            ctx,
-            master,
-            520,
-            now,
-            Math.min(.14,maxDuration),
-            "sine",
-            .8
-        );
-
-        tone(
-            ctx,
-            master,
-            760,
-            now+.04,
-            Math.min(.12,maxDuration-.04),
-            "sine",
-            .5
-        );
-
-    }
-
-
-    else if(type===3){
-
-        /* Double beep */
-
-        tone(
-            ctx,
-            master,
-            700,
-            now,
-            Math.min(.13,maxDuration),
-            "square",
-            .5
-        );
-
-        if(maxDuration>.18){
-
-            tone(
-                ctx,
-                master,
-                900,
-                now+.16,
-                Math.min(.13,maxDuration-.16),
-                "square",
-                .5
-            );
-
-        }
-
-    }
-
-
-    else if(type===4){
-
-        /* Digital */
-
-        tone(
-            ctx,
-            master,
-            1000,
-            now,
-            Math.min(.08,maxDuration),
-            "square",
-            .45
-        );
-
-        if(maxDuration>.12){
-
-            tone(
-                ctx,
-                master,
-                650,
-                now+.1,
-                Math.min(.08,maxDuration-.1),
-                "square",
-                .45
-            );
-
-        }
-
-        if(maxDuration>.24){
-
-            tone(
-                ctx,
-                master,
-                1200,
-                now+.2,
-                Math.min(.08,maxDuration-.2),
-                "square",
-                .45
-            );
-
-        }
-
-    }
-
-
-    else if(type===5){
-
-        /* Bell */
-
-        tone(
-            ctx,
-            master,
-            620,
-            now,
-            Math.min(.7,maxDuration),
-            "sine",
-            .75
-        );
-
-        tone(
-            ctx,
-            master,
-            930,
-            now+.015,
-            Math.min(.55,maxDuration),
-            "sine",
-            .4
-        );
-
-    }
-
-
-    else if(type===6){
-
-        /* Chime */
-
-        tone(
-            ctx,
-            master,
-            523.25,
-            now,
-            Math.min(.35,maxDuration),
-            "sine",
-            .55
-        );
-
-        if(maxDuration>.15){
-
-            tone(
-                ctx,
-                master,
-                659.25,
-                now+.13,
-                Math.min(.35,maxDuration-.13),
-                "sine",
-                .5
-            );
-
-        }
-
-        if(maxDuration>.3){
-
-            tone(
-                ctx,
-                master,
-                783.99,
-                now+.26,
-                Math.min(.4,maxDuration-.26),
-                "sine",
-                .45
-            );
-
-        }
-
-    }
-
-
-    else if(type===7){
-
-        /* Pulse */
-
-        tone(
-            ctx,
-            master,
-            400,
-            now,
-            Math.min(.12,maxDuration),
-            "triangle",
-            .8
-        );
-
-        if(maxDuration>.2){
-
-            tone(
-                ctx,
-                master,
-                400,
-                now+.2,
-                Math.min(.12,maxDuration-.2),
-                "triangle",
-                .8
-            );
-
-        }
-
-    }
-
-
-    else if(type===8){
-
-        /* Alert */
-
-        tone(
-            ctx,
-            master,
-            880,
-            now,
-            Math.min(.22,maxDuration),
-            "square",
-            .5
-        );
-
-        if(maxDuration>.27){
-
-            tone(
-                ctx,
-                master,
-                660,
-                now+.25,
-                Math.min(.22,maxDuration-.25),
-                "square",
-                .5
-            );
-
-        }
-
-    }
-
-
-    else if(type===9){
-
-        /* Retro */
-
-        tone(
-            ctx,
-            master,
-            440,
-            now,
-            Math.min(.1,maxDuration),
-            "square",
-            .45
-        );
-
-        if(maxDuration>.13){
-
-            tone(
-                ctx,
-                master,
-                660,
-                now+.12,
-                Math.min(.1,maxDuration-.12),
-                "square",
-                .45
-            );
-
-        }
-
-        if(maxDuration>.26){
-
-            tone(
-                ctx,
-                master,
-                880,
-                now+.25,
-                Math.min(.1,maxDuration-.25),
-                "square",
-                .45
-            );
-
-        }
-
-    }
-
-
-    else if(type===10){
-
-        /* Deep ping */
-
-        tone(
-            ctx,
-            master,
-            220,
-            now,
-            Math.min(.55,maxDuration),
-            "sine",
-            .8
-        );
-
-        tone(
-            ctx,
-            master,
-            440,
-            now+.04,
-            Math.min(.4,maxDuration-.04),
-            "sine",
-            .3
-        );
-
-    }
-
-
-    else if(type===11){
-
-        /*
-            Fictional emergency alarm.
-
-            Uses an escalating alternating warning
-            tone rather than reproducing an actual
-            nuclear/public-warning siren.
-        */
-
-        const step=
-            Math.min(
-                .7,
-                Math.max(
-                    .18,
-                    maxDuration/4
-                )
-            );
-
-        let position=0;
-
-        let high=true;
-
-        while(position<maxDuration){
-
-            const length=
-                Math.min(
-                    step,
-                    maxDuration-position
-                );
-
-            tone(
-                ctx,
-                master,
-                high ? 760 : 430,
-                now+position,
-                length,
-                "sawtooth",
-                .38
-            );
-
-            high=!high;
-
-            position+=length+.035;
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   ENABLE AUDIO ON USER INTERACTION
-========================================================= */
-
-document.addEventListener(
-    "click",
-    ()=>{
-        getAudioContext();
-    },
-    {once:true}
-);
-
-
-/* =========================================================
-   DESKTOP / WINDOWS NOTIFICATIONS
-========================================================= */
-
-function updateNotificationStatus(){
-
-    if(!("Notification" in window)){
-
-        notificationStatus.textContent=
-            "Desktop notifications are not supported by this browser.";
-
-        notificationStatus.className=
-            "notification-status denied";
-
-        return;
-    }
-
-
-    if(Notification.permission==="granted"){
-
-        notificationStatus.textContent=
-            "✓ Desktop notifications are enabled.";
-
-        notificationStatus.className=
-            "notification-status ready";
-
-    }
-
-    else if(Notification.permission==="denied"){
-
-        notificationStatus.textContent=
-            "Notifications are blocked. Allow them in your browser/site permissions.";
-
-        notificationStatus.className=
-            "notification-status denied";
-
-    }
-
-    else{
-
-        notificationStatus.textContent=
-            "Desktop notifications are not enabled yet.";
-
-        notificationStatus.className=
-            "notification-status";
-
-    }
-
-}
-
-
-async function requestNotificationPermission(){
-
-    if(!("Notification" in window)){
-
-        alert(
-            "Desktop notifications are not supported by this browser."
-        );
-
-        return false;
-    }
-
-
-    try{
-
-        const permission=
-            await Notification.requestPermission();
-
-        updateNotificationStatus();
-
-        return permission==="granted";
-
-    }catch(error){
-
-        console.error(
-            "Notification permission error:",
-            error
-        );
-
-        return false;
-
-    }
-
-}
-
-
-function showDesktopNotification(message){
-
-    if(
-        !settings.desktopNotifications
-    ){
-        return;
-    }
-
-
-    if(
-        !("Notification" in window)
-    ){
-        return;
-    }
-
-
-    if(
-        Notification.permission!=="granted"
-    ){
-        return;
-    }
-
-
-    /*
-        This uses the browser Notification API.
-        On Windows, supported browsers normally
-        display it through the Windows notification system.
-    */
-
-    try{
-
-        const title=
-            message.username||
-            "New message";
-
-        let body=
-            message.message||
-            "Sent an image";
-
-
-        if(body.length>180){
-
-            body=
-                body.substring(0,180)+"…";
-
-        }
-
-
-        const notification=
-            new Notification(
-                title,
-                {
-                    body:body,
-                    tag:"chat-"+message.id,
-                    renotify:true,
-                    silent:true
-                }
-            );
-
-
-        notification.onclick=()=>{
-
-            window.focus();
-
-            notification.close();
-
-        };
-
-    }catch(error){
-
-        console.error(
-            "Desktop notification error:",
-            error
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   TEST NOTIFICATION
-========================================================= */
-
-testNotification.onclick=async()=>{
-
-    /*
-        A user click unlocks browser audio.
-    */
-
-    getAudioContext();
-
-    playNotificationSound();
-
-
-    if(
-        desktopNotifications.value==="true"
-    ){
-
-        settings.desktopNotifications=true;
-
-        if(
-            Notification.permission!=="granted"
-        ){
-
-            const allowed=
-                await requestNotificationPermission();
-
-            if(!allowed){
-                return;
-            }
-
-        }
-
-
-        showDesktopNotification({
-
-            id:"test-"+Date.now(),
-
-            username:"Chat",
-
-            message:
-                "This is a test notification."
-
-        });
-
-    }
+    notificationDurationValue.textContent=
+        notificationDuration.value+" ms";
 
 };
 
 
-/* =========================================================
-   ENABLE NOTIFICATIONS BUTTON
-========================================================= */
+/*
+    Preview sound when changing the sound type.
+*/
 
-enableNotifications.onclick=async()=>{
+soundType.onchange=()=>{
 
-    getAudioContext();
+    unlockAudio();
 
-    const allowed=
-        await requestNotificationPermission();
+    const old=
+        settings.soundType;
 
-    if(allowed){
+    settings.soundType=
+        Number(soundType.value);
 
-        settings.desktopNotifications=true;
+    playNotificationSound();
 
-        desktopNotifications.value="true";
-
-        localStorage.setItem(
-            "chat_desktopNotifications",
-            "true"
-        );
-
-        updateNotificationStatus();
-
-    }
+    settings.soundType=
+        old;
 
 };
 
@@ -2531,7 +2640,8 @@ messageInput.addEventListener(
     "input",
     ()=>{
 
-        messageInput.style.height="auto";
+        messageInput.style.height=
+            "auto";
 
         messageInput.style.height=
             Math.min(
@@ -2557,7 +2667,8 @@ attachBtn.onclick=()=>{
 imageInput.onchange=()=>{
 
     selectedFile=
-        imageInput.files[0]||null;
+        imageInput.files[0]||
+        null;
 
     attachBtn.textContent=
         selectedFile
@@ -2594,9 +2705,8 @@ function resizeImage(file){
 
                     const max=1500;
 
-
                     if(
-                        width>max ||
+                        width>max||
                         height>max
                     ){
 
@@ -2618,7 +2728,6 @@ function resizeImage(file){
 
                     }
 
-
                     const canvas=
                         document.createElement(
                             "canvas"
@@ -2630,12 +2739,10 @@ function resizeImage(file){
                     canvas.height=
                         height;
 
-
                     const ctx=
                         canvas.getContext(
                             "2d"
                         );
-
 
                     ctx.drawImage(
                         img,
@@ -2644,7 +2751,6 @@ function resizeImage(file){
                         width,
                         height
                     );
-
 
                     resolve(
                         canvas.toDataURL(
@@ -2655,18 +2761,20 @@ function resizeImage(file){
 
                 };
 
-
-                img.onerror=reject;
+                img.onerror=
+                    reject;
 
                 img.src=
                     reader.result;
 
             };
 
+            reader.onerror=
+                reject;
 
-            reader.onerror=reject;
-
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(
+                file
+            );
 
         }
     );
@@ -2719,16 +2827,12 @@ async function sendMessage(){
         );
 
         return;
+
     }
 
 
-    if(
-        !text &&
-        !selectedFile
-    ){
-
+    if(!text&&!selectedFile){
         return;
-
     }
 
 
@@ -2738,7 +2842,6 @@ async function sendMessage(){
     try{
 
         let image=null;
-
 
         if(selectedFile){
 
@@ -2755,32 +2858,28 @@ async function sendMessage(){
                 API_URL,
                 {
                     method:"POST",
-
                     headers:{
                         "Content-Type":
                             "application/json"
                     },
+                    body:JSON.stringify({
 
-                    body:
-                        JSON.stringify({
+                        username:
+                            settings.username,
 
-                            username:
-                                settings.username,
+                        channel:
+                            CHANNEL,
 
-                            channel:
-                                CHANNEL,
+                        message:
+                            text,
 
-                            message:
-                                text,
+                        image:
+                            image,
 
-                            image:
-                                image,
+                        device_id:
+                            deviceId
 
-                            device_id:
-                                deviceId
-
-                        })
-
+                    })
                 }
             );
 
@@ -2804,12 +2903,12 @@ async function sendMessage(){
         messageInput.style.height=
             "auto";
 
-
         selectedFile=null;
 
         imageInput.value="";
 
-        attachBtn.textContent="＋";
+        attachBtn.textContent=
+            "＋";
 
 
         await loadMessages();
@@ -2832,7 +2931,127 @@ async function sendMessage(){
 
 
 /* =========================================================
-   LOAD MESSAGES
+   LINK PARSER
+========================================================= */
+
+function appendTextWithLinks(
+    container,
+    text
+){
+
+    /*
+        Detects:
+        https://example.com
+        http://example.com
+        www.example.com
+
+        The message itself is never inserted
+        as HTML.
+    */
+
+    const urlRegex=
+        /((?:https?:\/\/|www\.)[^\s<]+)/gi;
+
+    let lastIndex=0;
+
+    let match;
+
+
+    while(
+        (match=urlRegex.exec(text))!==null
+    ){
+
+        const before=
+            text.slice(
+                lastIndex,
+                match.index
+            );
+
+        if(before){
+            container.appendChild(
+                document.createTextNode(
+                    before
+                )
+            );
+        }
+
+
+        let rawUrl=
+            match[0];
+
+        /*
+            Remove common punctuation from
+            the end of a URL.
+        */
+
+        let trailing="";
+
+        while(
+            /[.,!?;:)\]}]$/.test(rawUrl)
+        ){
+
+            trailing=
+                rawUrl.slice(-1)+
+                trailing;
+
+            rawUrl=
+                rawUrl.slice(0,-1);
+
+        }
+
+
+        const link=
+            document.createElement("a");
+
+        link.href=
+            rawUrl.startsWith("www.")
+            ?"https://"+rawUrl
+            :rawUrl;
+
+        link.target="_blank";
+
+        link.rel=
+            "noopener noreferrer";
+
+        link.textContent=
+            rawUrl;
+
+        container.appendChild(link);
+
+
+        if(trailing){
+
+            container.appendChild(
+                document.createTextNode(
+                    trailing
+                )
+            );
+
+        }
+
+
+        lastIndex=
+            match.index+
+            match[0].length;
+
+    }
+
+
+    if(lastIndex<text.length){
+
+        container.appendChild(
+            document.createTextNode(
+                text.slice(lastIndex)
+            )
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   LOAD
 ========================================================= */
 
 async function loadMessages(){
@@ -2845,7 +3064,10 @@ async function loadMessages(){
                 "?channel="+
                 encodeURIComponent(
                     CHANNEL
-                )
+                ),
+                {
+                    cache:"no-store"
+                }
             );
 
 
@@ -2863,111 +3085,15 @@ async function loadMessages(){
         }
 
 
-        const incoming=
+        currentMessages=
             Array.isArray(data.messages)
             ?data.messages
             :[];
 
 
-        /*
-            First load establishes the known messages.
-            This prevents every old message from producing
-            a notification when the page starts.
-        */
-
-        if(!hasLoadedMessages){
-
-            incoming.forEach(message=>{
-
-                knownMessageIds.add(
-                    String(message.id)
-                );
-
-            });
-
-            hasLoadedMessages=true;
-
-        }
-
-        else{
-
-            incoming.forEach(message=>{
-
-                const id=
-                    String(message.id);
-
-
-                if(
-                    !knownMessageIds.has(id)
-                ){
-
-                    knownMessageIds.add(id);
-
-
-                    const fromMe=
-                        message.device_id &&
-                        message.device_id===deviceId;
-
-
-                    const mentionsMe=
-                        message.message &&
-                        settings.username &&
-                        message.message
-                        .toLowerCase()
-                        .includes(
-                            "@"+
-                            settings.username
-                            .toLowerCase()
-                        );
-
-
-                    if(!fromMe){
-
-                        const shouldNotify=
-                            settings.mentionNotifications
-                            ?mentionsMe
-                            :true;
-
-
-                        if(shouldNotify){
-
-                            playNotificationSound();
-
-                            showDesktopNotification(
-                                message
-                            );
-
-                        }
-
-                    }
-
-                }
-
-            });
-
-
-            /*
-                Prevent the set from growing forever.
-            */
-
-            if(
-                knownMessageIds.size>1000
-            ){
-
-                knownMessageIds=
-                    new Set(
-                        incoming.map(
-                            m=>String(m.id)
-                        )
-                    );
-
-            }
-
-        }
-
-
-        currentMessages=
-            incoming;
+        processNotifications(
+            currentMessages
+        );
 
 
         renderMessages();
@@ -3042,237 +3168,192 @@ function renderMessages(){
         document.createDocumentFragment();
 
 
-    currentMessages.forEach(
-        message=>{
+    currentMessages.forEach(message=>{
 
-            const item=
-                document.createElement(
-                    "div"
-                );
+        const item=
+            document.createElement("div");
 
+        item.className=
+            "message"+
+            (
+                settings.compactMessages
+                ?" compact"
+                :""
+            );
 
-            item.className=
-                "message";
-
-
-            if(settings.compactMessages){
-
-                item.classList.add(
-                    "compact"
-                );
-
-            }
+        item.dataset.id=
+            message.id;
 
 
-            item.dataset.id=
-                message.id;
+        const avatar=
+            document.createElement("div");
+
+        avatar.className=
+            "avatar";
+
+        avatar.textContent=
+            (
+                message.username||
+                "?"
+            )
+            .charAt(0)
+            .toUpperCase();
 
 
-            const avatar=
-                document.createElement(
-                    "div"
-                );
+        const content=
+            document.createElement("div");
+
+        content.className=
+            "message-content";
 
 
-            avatar.className=
-                "avatar";
+        const top=
+            document.createElement("div");
+
+        top.className=
+            "message-top";
 
 
-            avatar.textContent=
-                (message.username||"?")
-                .charAt(0)
-                .toUpperCase();
+        const name=
+            document.createElement("span");
+
+        name.className=
+            "username";
+
+        name.textContent=
+            message.username||
+            "User";
+
+        top.appendChild(name);
 
 
-            const content=
-                document.createElement(
-                    "div"
-                );
+        if(settings.showTimestamps){
 
-
-            content.className=
-                "message-content";
-
-
-            const top=
-                document.createElement(
-                    "div"
-                );
-
-
-            top.className=
-                "message-top";
-
-
-            const name=
+            const time=
                 document.createElement(
                     "span"
                 );
 
+            time.className=
+                "time";
 
-            name.className=
-                "username";
-
-
-            name.textContent=
-                message.username||
-                "User";
-
-
-            top.appendChild(name);
-
-
-            if(settings.showTimestamps){
-
-                const time=
-                    document.createElement(
-                        "span"
-                    );
-
-
-                time.className=
-                    "time";
-
-
-                time.textContent=
-                    formatTime(
-                        message.created_at
-                    );
-
-
-                top.appendChild(time);
-
-            }
-
-
-            if(message.edited){
-
-                const edited=
-                    document.createElement(
-                        "span"
-                    );
-
-
-                edited.className=
-                    "edited";
-
-
-                edited.textContent=
-                    "(edited)";
-
-
-                top.appendChild(
-                    edited
+            time.textContent=
+                formatTime(
+                    message.created_at
                 );
 
-            }
+            top.appendChild(time);
+
+        }
 
 
-            content.appendChild(top);
+        if(message.edited){
 
-
-            if(message.message){
-
-                const text=
-                    document.createElement(
-                        "div"
-                    );
-
-
-                text.className=
-                    "message-text";
-
-
-                text.textContent=
-                    message.message;
-
-
-                content.appendChild(
-                    text
+            const edited=
+                document.createElement(
+                    "span"
                 );
 
-            }
+            edited.className=
+                "edited";
+
+            edited.textContent=
+                "(edited)";
+
+            top.appendChild(edited);
+
+        }
 
 
-            if(message.image){
-
-                const img=
-                    document.createElement(
-                        "img"
-                    );
+        content.appendChild(top);
 
 
-                img.className=
-                    "message-image";
+        if(message.message){
 
-
-                img.src=
-                    message.image;
-
-
-                img.alt=
-                    "Image";
-
-
-                img.onclick=()=>{
-
-                    openImage(
-                        message.image
-                    );
-
-                };
-
-
-                content.appendChild(
-                    img
+            const text=
+                document.createElement(
+                    "div"
                 );
 
-            }
+            text.className=
+                "message-text";
 
-
-            item.appendChild(
-                avatar
+            appendTextWithLinks(
+                text,
+                String(message.message)
             );
 
-            item.appendChild(
-                content
-            );
+            content.appendChild(text);
+
+        }
 
 
-            /*
-                Only allow the normal context menu
-                for your own messages.
-            */
+        if(message.image){
 
-            if(
-                message.device_id &&
-                message.device_id===deviceId
-            ){
-
-                item.addEventListener(
-                    "contextmenu",
-                    event=>{
-
-                        event.preventDefault();
-
-                        showContextMenu(
-                            event.clientX,
-                            event.clientY,
-                            message
-                        );
-
-                    }
+            const img=
+                document.createElement(
+                    "img"
                 );
 
-            }
+            img.className=
+                "message-image";
+
+            img.src=
+                message.image;
+
+            img.alt=
+                "Image";
+
+            img.onclick=()=>{
+
+                openImage(
+                    message.image
+                );
+
+            };
+
+            content.appendChild(img);
+
+        }
 
 
-            fragment.appendChild(
-                item
+        item.appendChild(avatar);
+
+        item.appendChild(content);
+
+
+        /*
+            Only show the normal Edit/Delete menu
+            for the user's own messages.
+        */
+
+        if(
+            message.device_id &&
+            String(message.device_id)===
+            String(deviceId)
+        ){
+
+            item.addEventListener(
+                "contextmenu",
+                event=>{
+
+                    event.preventDefault();
+
+                    showContextMenu(
+                        event.clientX,
+                        event.clientY,
+                        message
+                    );
+
+                }
             );
 
         }
-    );
+
+
+        fragment.appendChild(item);
+
+    });
 
 
     messagesEl.replaceChildren(
@@ -3331,11 +3412,9 @@ function showContextMenu(
 document.addEventListener(
     "click",
     ()=>{
-
         contextMenu.classList.remove(
             "show"
         );
-
     }
 );
 
@@ -3354,21 +3433,18 @@ editMessageBtn.onclick=
         );
 
 
-        if(!selectedMessage){
-            return;
-        }
+        if(!selectedMessage)return;
 
 
         const newText=
             prompt(
                 "Edit message:",
-                selectedMessage.message||""
+                selectedMessage.message||
+                ""
             );
 
 
-        if(newText===null){
-            return;
-        }
+        if(newText===null)return;
 
 
         try{
@@ -3378,26 +3454,22 @@ editMessageBtn.onclick=
                     API_URL,
                     {
                         method:"PATCH",
-
                         headers:{
                             "Content-Type":
                                 "application/json"
                         },
+                        body:JSON.stringify({
 
-                        body:
-                            JSON.stringify({
+                            id:
+                                selectedMessage.id,
 
-                                id:
-                                    selectedMessage.id,
+                            device_id:
+                                deviceId,
 
-                                device_id:
-                                    deviceId,
+                            message:
+                                newText.trim()
 
-                                message:
-                                    newText.trim()
-
-                            })
-
+                        })
                     }
                 );
 
@@ -3445,9 +3517,7 @@ deleteMessageBtn.onclick=
         );
 
 
-        if(!selectedMessage){
-            return;
-        }
+        if(!selectedMessage)return;
 
 
         if(settings.confirmDelete){
@@ -3469,9 +3539,7 @@ deleteMessageBtn.onclick=
 
 async function deleteSelectedMessage(){
 
-    if(!selectedMessage){
-        return;
-    }
+    if(!selectedMessage)return;
 
 
     try{
@@ -3481,23 +3549,19 @@ async function deleteSelectedMessage(){
                 API_URL,
                 {
                     method:"DELETE",
-
                     headers:{
                         "Content-Type":
                             "application/json"
                     },
+                    body:JSON.stringify({
 
-                    body:
-                        JSON.stringify({
+                        id:
+                            selectedMessage.id,
 
-                            id:
-                                selectedMessage.id,
+                        device_id:
+                            deviceId
 
-                            device_id:
-                                deviceId
-
-                        })
-
+                    })
                 }
             );
 
@@ -3641,14 +3705,11 @@ dialogConfirm.onclick=
         const callback=
             confirmCallback;
 
-
         dialogOverlay.classList.remove(
             "show"
         );
 
-
         confirmCallback=null;
-
 
         if(callback){
 
@@ -3666,37 +3727,21 @@ dialogConfirm.onclick=
 removeEverything.onclick=()=>{
 
     openConfirm(
-
         "Remove everything?",
-
         "This will permanently remove every message and image from the chat for EVERYONE.",
-
         ()=>{
-
             openConfirm(
-
                 "I know",
-
                 "You understand that the entire chat history will be deleted.",
-
                 ()=>{
-
                     openConfirm(
-
                         "Are you ultra sure?",
-
                         "Last time: every stored message and image will be permanently removed and there will be no chat history left.",
-
                         permanentlyDeleteEverything
-
                     );
-
                 }
-
             );
-
         }
-
     );
 
 };
@@ -3711,17 +3756,13 @@ async function permanentlyDeleteEverything(){
                 API_URL,
                 {
                     method:"DELETE",
-
                     headers:{
                         "Content-Type":
                             "application/json"
                     },
-
-                    body:
-                        JSON.stringify({
-                            delete_all:true
-                        })
-
+                    body:JSON.stringify({
+                        delete_all:true
+                    })
                 }
             );
 
@@ -3742,10 +3783,9 @@ async function permanentlyDeleteEverything(){
 
         currentMessages=[];
 
-        knownMessageIds.clear();
+        lastMessageIds.clear();
 
         renderMessages();
-
 
         alert(
             "The entire chat has been wiped."
@@ -3779,12 +3819,17 @@ function startRefreshTimer(){
     }
 
 
+    const interval=
+        Math.max(
+            100,
+            Number(settings.refreshRate)
+        );
+
+
     refreshTimer=
         setInterval(
             loadMessages,
-            Number(
-                settings.refreshRate
-            )
+            interval
         );
 
 }
@@ -3796,14 +3841,23 @@ function startRefreshTimer(){
 
 function formatTime(date){
 
-    if(!date){
+    if(!date)return "";
+
+    const parsed=
+        new Date(date);
+
+    if(
+        Number.isNaN(
+            parsed.getTime()
+        )
+    ){
+
         return "";
+
     }
 
 
-    return new Date(
-        date
-    ).toLocaleTimeString(
+    return parsed.toLocaleTimeString(
         [],
         {
             hour:"2-digit",
@@ -3817,27 +3871,22 @@ function formatTime(date){
 function escapeHtml(value){
 
     return String(value)
-
         .replaceAll(
             "&",
             "&amp;"
         )
-
         .replaceAll(
             "<",
             "&lt;"
         )
-
         .replaceAll(
             ">",
             "&gt;"
         )
-
         .replaceAll(
             '"',
             "&quot;"
         )
-
         .replaceAll(
             "'",
             "&#039;"
@@ -3847,7 +3896,7 @@ function escapeHtml(value){
 
 
 /* =========================================================
-   START
+   INITIALIZATION
 ========================================================= */
 
 loadSettingsUI();
@@ -3855,6 +3904,27 @@ loadSettingsUI();
 applySettings();
 
 loadMessages();
+
+
+/*
+    Re-request notification status when
+    the page becomes visible again.
+*/
+
+document.addEventListener(
+    "visibilitychange",
+    ()=>{
+
+        if(
+            !document.hidden
+        ){
+
+            updateNotificationStatus();
+
+        }
+
+    }
+);
 
 </script>
 
