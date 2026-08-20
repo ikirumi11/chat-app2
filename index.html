@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,9 +7,7 @@
 <title>Chat</title>
 
 <style>
-*{
-    box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 :root{
     --bg:#0b0d10;
@@ -20,18 +19,18 @@
     --muted:#7e8793;
     --accent:#e8eaed;
     --danger:#ff7070;
-    --success:#70d99a;
-    --warning:#e5c76b;
-
+    --green:#65d68b;
+    --blue:#6ea8ff;
+    --yellow:#ffd166;
     --radius:12px;
+
     --ui-scale:1;
     --text-size:16px;
     --word-spacing:0px;
     --line-spacing:1.45;
 }
 
-html,
-body{
+html,body{
     margin:0;
     width:100%;
     height:100%;
@@ -45,20 +44,13 @@ body{
     font-size:calc(16px * var(--ui-scale));
 }
 
-button,
-input,
-textarea,
-select{
+button,input,textarea,select{
     font:inherit;
 }
 
 button{
     cursor:pointer;
 }
-
-/* =========================================================
-   APP
-========================================================= */
 
 .app{
     width:100%;
@@ -67,15 +59,15 @@ button{
     flex-direction:column;
 }
 
+/* HEADER */
+
 .header{
     height:64px;
     min-height:64px;
     padding:0 18px;
-
     display:flex;
     align-items:center;
     justify-content:space-between;
-
     background:var(--panel);
     border-bottom:1px solid var(--border);
 }
@@ -90,10 +82,8 @@ button{
 .logo-icon{
     width:35px;
     height:35px;
-
     display:grid;
     place-items:center;
-
     border-radius:10px;
     background:var(--panel2);
     border:1px solid var(--border);
@@ -104,18 +94,11 @@ button{
     font-weight:400;
 }
 
-.header-buttons{
-    display:flex;
-    gap:7px;
-}
-
 .icon-btn{
     width:39px;
     height:39px;
-
     border-radius:10px;
     border:1px solid var(--border);
-
     background:var(--panel2);
     color:var(--text);
 }
@@ -124,9 +107,7 @@ button{
     filter:brightness(1.15);
 }
 
-/* =========================================================
-   MESSAGES
-========================================================= */
+/* MESSAGES */
 
 .messages{
     flex:1;
@@ -142,17 +123,13 @@ button{
 
 .avatar{
     flex:0 0 40px;
-
     width:40px;
     height:40px;
-
     display:grid;
     place-items:center;
-
     border-radius:var(--radius);
     background:var(--panel2);
     border:1px solid var(--border);
-
     font-weight:700;
 }
 
@@ -172,8 +149,7 @@ button{
     font-weight:700;
 }
 
-.time,
-.edited{
+.time,.edited{
     color:var(--muted);
     font-size:11px;
 }
@@ -182,7 +158,6 @@ button{
     color:#d8dde4;
     white-space:pre-wrap;
     overflow-wrap:anywhere;
-
     font-size:var(--text-size);
     word-spacing:var(--word-spacing);
     line-height:var(--line-spacing);
@@ -190,28 +165,377 @@ button{
 
 .message-image{
     display:block;
-
     max-width:min(500px,80vw);
     max-height:500px;
-
     margin-top:8px;
-
     border:1px solid var(--border);
     border-radius:var(--radius);
-
     background:#000;
     object-fit:contain;
-
     cursor:pointer;
 }
 
-/* =========================================================
-   COMPOSER
-========================================================= */
+/* GAME INVITES */
+
+.game-message{
+    width:min(760px,100%);
+    margin-top:8px;
+}
+
+.game-card{
+    position:relative;
+    overflow:hidden;
+    border:1px solid #303742;
+    border-radius:16px;
+    background:
+        linear-gradient(
+            145deg,
+            #171b22,
+            #101318
+        );
+    box-shadow:
+        0 12px 40px rgba(0,0,0,.22);
+}
+
+.game-card-header{
+    padding:18px 18px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    border-bottom:1px solid var(--border);
+}
+
+.game-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.game-icon{
+    width:46px;
+    height:46px;
+    display:grid;
+    place-items:center;
+    border-radius:13px;
+    background:#222832;
+    border:1px solid #353c47;
+    font-size:23px;
+}
+
+.game-name{
+    font-size:17px;
+    font-weight:800;
+}
+
+.game-host{
+    margin-top:3px;
+    color:var(--muted);
+    font-size:12px;
+}
+
+.game-status{
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:800;
+    background:#20262e;
+    color:#aeb7c4;
+}
+
+.game-status.waiting{
+    color:var(--yellow);
+}
+
+.game-status.running{
+    color:var(--green);
+}
+
+.game-status.finished{
+    color:#aaa;
+}
+
+.game-info{
+    padding:14px 18px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.game-pill{
+    padding:7px 10px;
+    border-radius:8px;
+    background:#1c2129;
+    border:1px solid #2c333d;
+    color:#adb6c2;
+    font-size:12px;
+}
+
+.game-pill strong{
+    color:white;
+}
+
+.game-body{
+    padding:0 18px 18px;
+}
+
+.game-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.game-btn{
+    border:1px solid #353c47;
+    background:#222832;
+    color:white;
+    padding:10px 14px;
+    border-radius:9px;
+    font-weight:700;
+}
+
+.game-btn:hover{
+    background:#2b323d;
+}
+
+.game-btn.primary{
+    background:#e8eaed;
+    color:#111;
+    border-color:#e8eaed;
+}
+
+.game-btn.danger{
+    color:#ff8c8c;
+    border-color:#633232;
+    background:#261719;
+}
+
+.game-btn.green{
+    color:#82e6a0;
+    border-color:#31583e;
+    background:#17241b;
+}
+
+.game-players{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-bottom:12px;
+}
+
+.player-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 10px;
+    border-radius:8px;
+    background:#171b21;
+    border:1px solid #252b34;
+    font-size:13px;
+}
+
+.player-name{
+    display:flex;
+    align-items:center;
+    gap:7px;
+}
+
+.player-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#687280;
+}
+
+.player-dot.host{
+    background:#ffd166;
+}
+
+.player-dot.turn{
+    background:#65d68b;
+    box-shadow:0 0 8px #65d68b;
+}
+
+/* GAME BOARD */
+
+.game-board-wrap{
+    margin-top:14px;
+    padding:14px;
+    border-radius:13px;
+    background:#0d1014;
+    border:1px solid #252b33;
+}
+
+.turn-banner{
+    text-align:center;
+    margin-bottom:12px;
+    padding:9px;
+    border-radius:9px;
+    background:#171c23;
+    color:#b9c2ce;
+    font-size:13px;
+    font-weight:700;
+}
+
+.turn-banner.my-turn{
+    color:#7de89a;
+    background:#132219;
+    border:1px solid #274833;
+}
+
+/* TIC TAC TOE */
+
+.ttt-board{
+    width:min(330px,100%);
+    margin:auto;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:7px;
+}
+
+.ttt-cell{
+    aspect-ratio:1;
+    border:1px solid #343b46;
+    border-radius:11px;
+    background:#171c23;
+    color:white;
+    font-size:40px;
+    font-weight:900;
+}
+
+.ttt-cell:hover{
+    background:#202630;
+}
+
+/* CONNECT FOUR */
+
+.connect-board{
+    width:min(430px,100%);
+    margin:auto;
+    padding:9px;
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:6px;
+    background:#151a21;
+    border-radius:12px;
+}
+
+.connect-cell{
+    aspect-ratio:1;
+    border-radius:50%;
+    background:#090b0e;
+    border:2px solid #292f38;
+}
+
+.connect-cell.red{
+    background:#ef6262;
+    border-color:#ff8585;
+}
+
+.connect-cell.yellow{
+    background:#ffd166;
+    border-color:#ffe19a;
+}
+
+/* REVERSI */
+
+.reversi-board{
+    width:min(430px,100%);
+    margin:auto;
+    padding:7px;
+    display:grid;
+    grid-template-columns:repeat(8,1fr);
+    gap:3px;
+    background:#142619;
+    border-radius:10px;
+}
+
+.reversi-cell{
+    aspect-ratio:1;
+    display:grid;
+    place-items:center;
+    background:#1d6332;
+    border:1px solid #287540;
+    border-radius:4px;
+}
+
+.reversi-piece{
+    width:78%;
+    height:78%;
+    border-radius:50%;
+    background:#111;
+    box-shadow:inset 0 2px 4px #ffffff20;
+}
+
+.reversi-piece.white{
+    background:#eee;
+}
+
+/* DICE */
+
+.dice-area{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+    padding:15px;
+}
+
+.dice{
+    width:100px;
+    height:100px;
+    display:grid;
+    place-items:center;
+    border-radius:18px;
+    background:#ececec;
+    color:#111;
+    font-size:48px;
+    font-weight:900;
+    box-shadow:0 12px 30px #0006;
+}
+
+.dice-result{
+    color:#aab3bf;
+    text-align:center;
+}
+
+/* GRID RACE */
+
+.race-board{
+    width:min(500px,100%);
+    margin:auto;
+    display:grid;
+    grid-template-columns:repeat(10,1fr);
+    gap:3px;
+}
+
+.race-cell{
+    aspect-ratio:1;
+    display:grid;
+    place-items:center;
+    border-radius:4px;
+    background:#171c23;
+    border:1px solid #242a33;
+    font-size:11px;
+    font-weight:800;
+}
+
+.race-cell.finish{
+    background:#28231a;
+}
+
+.race-piece{
+    width:65%;
+    height:65%;
+    border-radius:50%;
+    background:#65d68b;
+    box-shadow:0 0 8px #65d68b77;
+}
+
+/* COMPOSER */
 
 .composer{
     padding:12px 16px 16px;
-
     background:var(--panel);
     border-top:1px solid var(--border);
 }
@@ -219,13 +543,10 @@ button{
 .composer-box{
     max-width:1100px;
     margin:auto;
-
     display:flex;
     align-items:flex-end;
     gap:7px;
-
     padding:8px;
-
     background:var(--panel2);
     border:1px solid var(--border);
     border-radius:14px;
@@ -233,70 +554,46 @@ button{
 
 textarea{
     flex:1;
-
     min-height:42px;
     max-height:150px;
-
     resize:none;
-
     border:0;
     outline:none;
-
     background:transparent;
     color:white;
-
     padding:10px;
 }
 
 .attach-btn,
 .send-btn{
     height:42px;
-
     border:0;
     border-radius:9px;
 }
 
 .attach-btn{
     width:42px;
-
     background:transparent;
     color:#adb5c0;
-
     font-size:20px;
-}
-
-.attach-btn:hover{
-    background:#242932;
 }
 
 .send-btn{
     padding:0 18px;
-
     background:var(--accent);
     color:#111;
-
     font-weight:700;
 }
 
-.send-btn:disabled{
-    opacity:.5;
-    cursor:not-allowed;
-}
-
-/* =========================================================
-   OVERLAY
-========================================================= */
+/* OVERLAYS */
 
 .overlay{
     position:fixed;
     inset:0;
-
     display:none;
     align-items:center;
     justify-content:center;
-
     background:rgba(0,0,0,.72);
-
     z-index:100;
 }
 
@@ -305,16 +602,12 @@ textarea{
 }
 
 .panel{
-    width:min(620px,calc(100vw - 25px));
+    width:min(560px,calc(100vw - 25px));
     max-height:calc(100vh - 25px);
-
     overflow-y:auto;
-
     background:var(--panel);
-
     border:1px solid var(--border);
     border-radius:15px;
-
     box-shadow:0 25px 80px #000b;
 }
 
@@ -322,9 +615,7 @@ textarea{
     display:flex;
     justify-content:space-between;
     align-items:center;
-
     padding:18px;
-
     border-bottom:1px solid var(--border);
 }
 
@@ -336,468 +627,28 @@ textarea{
     padding:18px;
 }
 
-/* =========================================================
-   GAMES
-========================================================= */
-
-.games-panel{
-    width:min(900px,calc(100vw - 25px));
-}
-
-.games-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-
-    margin-bottom:15px;
-}
-
-.games-top h2{
-    margin:0;
-}
-
-.primary-btn{
-    border:0;
-    border-radius:9px;
-
-    padding:10px 15px;
-
-    background:var(--accent);
-    color:#111;
-
-    font-weight:700;
-}
-
-.secondary-btn{
-    border:1px solid var(--border);
-    border-radius:9px;
-
-    padding:9px 14px;
-
-    background:var(--panel3);
-    color:var(--text);
-}
-
-.danger-btn{
-    border:1px solid #743333;
-    border-radius:9px;
-
-    padding:9px 14px;
-
-    background:#241719;
-    color:#ff8585;
-}
-
-.games-list{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-    gap:12px;
-}
-
-.game-card{
-    background:var(--panel2);
-
-    border:1px solid var(--border);
-    border-radius:13px;
-
-    padding:15px;
-}
-
-.game-card h3{
-    margin:0 0 6px;
-}
-
-.game-description{
-    color:var(--muted);
-    font-size:13px;
-    min-height:38px;
-}
-
-.game-status{
-    display:flex;
-    align-items:center;
-    gap:6px;
-
-    margin:10px 0;
-
-    font-size:12px;
-}
-
-.status-dot{
-    width:8px;
-    height:8px;
-
-    border-radius:50%;
-
-    background:var(--success);
-}
-
-.status-dot.waiting{
-    background:var(--warning);
-}
-
-.game-card-footer{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:8px;
-}
-
-.players-small{
-    color:var(--muted);
-    font-size:12px;
-}
-
-.no-games{
-    padding:40px 15px;
-
-    text-align:center;
-
-    color:var(--muted);
-}
-
-/* =========================================================
-   GAME CREATE
-========================================================= */
-
-.game-select{
-    width:100%;
-
-    margin-bottom:12px;
-
-    padding:11px;
-
-    background:#101419;
-    color:white;
-
-    border:1px solid var(--border);
-    border-radius:9px;
-}
-
-/* =========================================================
-   GAME ROOM
-========================================================= */
-
-.game-room{
-    width:min(800px,calc(100vw - 20px));
-}
-
-.game-room-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:12px;
-
-    padding:18px;
-
-    border-bottom:1px solid var(--border);
-}
-
-.game-room-title h2{
-    margin:0 0 5px;
-}
-
-.game-room-title small{
-    color:var(--muted);
-}
-
-.game-room-body{
-    padding:18px;
-}
-
-.game-info{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:8px;
-
-    margin-bottom:15px;
-}
-
-.info-box{
-    padding:11px;
-
-    background:var(--panel2);
-    border:1px solid var(--border);
-    border-radius:10px;
-}
-
-.info-label{
-    color:var(--muted);
-    font-size:11px;
-}
-
-.info-value{
-    margin-top:3px;
-    font-weight:700;
-}
-
-.turn-banner{
-    padding:12px;
-
-    margin-bottom:15px;
-
-    text-align:center;
-
-    background:var(--panel2);
-    border:1px solid var(--border);
-    border-radius:10px;
-
-    font-weight:700;
-}
-
-.turn-banner.my-turn{
-    border-color:#667078;
-}
-
-/* =========================================================
-   PLAYER LIST
-========================================================= */
-
-.player-list{
-    display:flex;
-    flex-wrap:wrap;
-    gap:7px;
-
-    margin-bottom:15px;
-}
-
-.player-chip{
-    padding:6px 9px;
-
-    background:var(--panel2);
-
-    border:1px solid var(--border);
-    border-radius:8px;
-
-    font-size:12px;
-}
-
-.player-chip.host{
-    border-color:#80734b;
-}
-
-.player-chip.me{
-    border-color:#657b8b;
-}
-
-/* =========================================================
-   GAME BOARD
-========================================================= */
-
-.board{
-    display:grid;
-
-    margin:15px auto;
-
-    width:min(420px,90vw);
-}
-
-.tictactoe-board{
-    grid-template-columns:repeat(3,1fr);
-}
-
-.ttt-cell{
-    aspect-ratio:1;
-
-    display:grid;
-    place-items:center;
-
-    font-size:clamp(35px,9vw,65px);
-    font-weight:800;
-
-    background:var(--panel2);
-
-    border:1px solid var(--border);
-
-    color:var(--text);
-}
-
-.ttt-cell:hover{
-    background:var(--panel3);
-}
-
-.connect-board{
-    grid-template-columns:repeat(7,1fr);
-
-    gap:4px;
-
-    padding:8px;
-
-    background:#101419;
-
-    border:1px solid var(--border);
-    border-radius:12px;
-}
-
-.connect-cell{
-    aspect-ratio:1;
-
-    display:grid;
-    place-items:center;
-
-    border-radius:50%;
-
-    background:#080a0d;
-
-    border:1px solid var(--border);
-
-    cursor:pointer;
-}
-
-.connect-piece{
-    width:78%;
-    height:78%;
-
-    border-radius:50%;
-
-    background:#777;
-}
-
-.connect-piece.red{
-    background:#d85c5c;
-}
-
-.connect-piece.yellow{
-    background:#d9c55b;
-}
-
-.dice-area{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:15px;
-
-    padding:30px 10px;
-}
-
-.dice{
-    width:100px;
-    height:100px;
-
-    display:grid;
-    place-items:center;
-
-    background:var(--panel2);
-
-    border:1px solid var(--border);
-    border-radius:18px;
-
-    font-size:50px;
-}
-
-.rps-area{
-    display:flex;
-    justify-content:center;
-    flex-wrap:wrap;
-    gap:10px;
-
-    padding:25px 0;
-}
-
-.rps-choice{
-    min-width:110px;
-
-    padding:18px 15px;
-
-    background:var(--panel2);
-
-    border:1px solid var(--border);
-    border-radius:12px;
-
-    color:var(--text);
-
-    font-weight:700;
-}
-
-.rps-choice:hover{
-    background:var(--panel3);
-}
-
-.highlow-area{
-    text-align:center;
-
-    padding:25px 10px;
-}
-
-.card-display{
-    width:120px;
-    height:165px;
-
-    margin:15px auto;
-
-    display:grid;
-    place-items:center;
-
-    background:#f0f0f0;
-    color:#111;
-
-    border-radius:12px;
-
-    font-size:42px;
-    font-weight:800;
-}
-
-.highlow-buttons{
-    display:flex;
-    justify-content:center;
-    gap:10px;
-}
-
-.game-message{
-    margin-top:12px;
-
-    padding:10px;
-
-    text-align:center;
-
-    color:var(--muted);
-
-    background:var(--panel2);
-
-    border-radius:9px;
-}
-
-/* =========================================================
-   SETTINGS
-========================================================= */
-
 .category{
     margin-bottom:12px;
-
     border:1px solid var(--border);
     border-radius:12px;
-
     overflow:hidden;
-
     background:var(--panel2);
 }
 
 .category-title{
     width:100%;
-
     padding:14px;
-
     border:0;
-
     background:transparent;
     color:var(--text);
-
     display:flex;
     justify-content:space-between;
-
     font-weight:700;
-
     text-align:left;
-}
-
-.category-title span:last-child{
-    color:var(--muted);
 }
 
 .category-body{
     display:none;
-
     padding:0 14px 14px;
 }
 
@@ -811,76 +662,67 @@ textarea{
 
 .setting label{
     display:block;
-
     margin-bottom:7px;
-
     color:#aab2bd;
-
     font-size:13px;
 }
 
 .setting input,
 .setting select{
     width:100%;
-
     padding:10px;
-
     border:1px solid var(--border);
     border-radius:9px;
-
     outline:none;
-
     background:#101419;
     color:white;
 }
 
-.setting input[type="range"]{
+.setting input[type=range]{
     padding:0;
-}
-
-.setting-value{
-    color:var(--muted);
-    font-size:12px;
-    margin-top:5px;
 }
 
 .save-btn{
     width:100%;
-
     margin-top:8px;
-
     padding:12px;
-
     border:0;
     border-radius:9px;
-
     background:var(--accent);
     color:#111;
-
     font-weight:700;
 }
 
-/* =========================================================
-   CONTEXT MENU
-========================================================= */
+.danger-zone{
+    margin-top:20px;
+    padding-top:20px;
+    border-top:1px solid #402529;
+}
+
+.danger-title{
+    color:var(--danger);
+    font-weight:700;
+    margin-bottom:7px;
+}
+
+.danger-btn{
+    width:100%;
+    padding:12px;
+    border-radius:9px;
+    border:1px solid #743333;
+    background:#241719;
+    color:#ff8585;
+}
 
 .context-menu{
     position:fixed;
-
     display:none;
-
     width:160px;
-
     padding:5px;
-
     z-index:200;
-
     background:var(--panel2);
-
     border:1px solid var(--border);
     border-radius:9px;
-
-    box-shadow:0 15px 40px #0009;
 }
 
 .context-menu.show{
@@ -889,172 +731,66 @@ textarea{
 
 .context-menu button{
     width:100%;
-
     padding:9px 10px;
-
     text-align:left;
-
     border:0;
     border-radius:6px;
-
     background:transparent;
     color:var(--text);
-}
-
-.context-menu button:hover{
-    background:#252b33;
 }
 
 .delete-option{
     color:#ff7777!important;
 }
 
-/* =========================================================
-   IMAGE
-========================================================= */
-
-.image-viewer{
-    position:fixed;
-    inset:0;
-
-    display:none;
-
-    align-items:center;
-    justify-content:center;
-
-    background:#000f;
-
-    z-index:300;
-}
-
-.image-viewer.show{
-    display:flex;
-}
-
-.full-image{
-    max-width:95vw;
-    max-height:90vh;
-
-    object-fit:contain;
-}
-
-.back-image{
-    position:absolute;
-
-    top:18px;
-    left:18px;
-
-    padding:10px 16px;
-
-    border-radius:9px;
-    border:1px solid #3a4049;
-
-    background:#171b21;
-    color:white;
-}
-
-/* =========================================================
-   DIALOG
-========================================================= */
-
-.dialog{
-    width:min(450px,calc(100vw - 30px));
-
-    background:var(--panel);
-
-    border:1px solid var(--border);
-    border-radius:14px;
-
-    padding:20px;
-}
-
-.dialog h2{
-    margin-top:0;
-}
-
-.dialog p{
-    color:#aab2bd;
-    line-height:1.5;
-}
-
-.dialog-buttons{
-    display:flex;
-    gap:8px;
-    justify-content:flex-end;
-}
-
-.dialog-buttons button{
-    padding:10px 16px;
-
-    border-radius:8px;
-    border:1px solid var(--border);
-
-    background:#20252c;
-    color:white;
-}
-
-.dialog-buttons .danger{
-    background:#6b2929;
-    border-color:#813434;
-}
-
-/* =========================================================
-   DANGER
-========================================================= */
-
-.danger-zone{
-    margin-top:20px;
-    padding-top:20px;
-
-    border-top:1px solid #402529;
-}
-
-.danger-title{
-    color:var(--danger);
-    font-weight:700;
-
-    margin-bottom:7px;
-}
-
-.danger-zone p{
-    color:var(--muted);
-    line-height:1.45;
-}
-
-.danger-btn-wide{
-    width:100%;
-
-    padding:12px;
-
-    border-radius:9px;
-
-    border:1px solid #743333;
-
-    background:#241719;
-    color:#ff8585;
-}
-
-/* =========================================================
-   EMPTY
-========================================================= */
-
 .empty{
     height:100%;
-
     display:grid;
     place-items:center;
-
     color:#656d78;
-
     text-align:center;
 }
 
 .empty strong{
     display:block;
-
     color:#aab2bd;
-
     margin-bottom:5px;
+}
+
+/* GAME CREATOR */
+
+.game-picker{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:9px;
+}
+
+.game-option{
+    padding:14px;
+    border:1px solid var(--border);
+    border-radius:11px;
+    background:#171b21;
+    color:white;
+    text-align:left;
+}
+
+.game-option:hover{
+    background:#20252d;
+}
+
+.game-option-icon{
+    font-size:25px;
+    margin-bottom:6px;
+}
+
+.game-option-name{
+    font-weight:800;
+}
+
+.game-option-desc{
+    color:var(--muted);
+    font-size:11px;
+    margin-top:4px;
 }
 
 @media(max-width:600px){
@@ -1075,12 +811,12 @@ textarea{
         max-width:calc(100vw - 70px);
     }
 
-    .game-info{
+    .game-picker{
         grid-template-columns:1fr;
     }
 
-    .game-room-header{
-        flex-direction:column;
+    .game-card-header{
+        align-items:flex-start;
     }
 }
 </style>
@@ -1098,7 +834,7 @@ textarea{
         <span class="channel"># general</span>
     </div>
 
-    <div class="header-buttons">
+    <div style="display:flex;gap:7px">
 
         <button
             class="icon-btn"
@@ -1116,12 +852,7 @@ textarea{
 
 </header>
 
-
-<main
-    class="messages"
-    id="messages"
-></main>
-
+<main class="messages" id="messages"></main>
 
 <div class="composer">
 
@@ -1137,7 +868,6 @@ textarea{
         <button
             class="attach-btn"
             id="attachBtn"
-            title="Choose image"
         >＋</button>
 
         <textarea
@@ -1158,20 +888,15 @@ textarea{
 </div>
 
 
-<!-- ======================================================
-     GAMES LIST
-====================================================== -->
+<!-- GAME CREATOR -->
 
-<div
-    class="overlay"
-    id="gamesOverlay"
->
+<div class="overlay" id="gamesOverlay">
 
-<div class="panel games-panel">
+<div class="panel">
 
 <div class="panel-header">
 
-    <h2>🎮 Games & Activities</h2>
+    <h2>🎮 Games</h2>
 
     <button
         class="icon-btn"
@@ -1182,233 +907,33 @@ textarea{
 
 <div class="panel-body">
 
-<div class="games-top">
+<p style="color:var(--muted);margin-top:0">
+Choose a game to host. You can only host one game at a time.
+</p>
 
-    <div>
-        <strong>Play together</strong>
-        <div style="color:var(--muted);font-size:12px">
-            Join before the host starts the game.
-        </div>
-    </div>
-
-    <button
-        class="primary-btn"
-        id="createGameBtn"
-    >
-        + Host Game
-    </button>
+<div class="game-picker" id="gamePicker"></div>
 
 </div>
 
-<div
-    class="games-list"
-    id="gamesList"
-></div>
+</div>
 
-</div>
-</div>
 </div>
 
 
-<!-- ======================================================
-     CREATE GAME
-====================================================== -->
+<!-- SETTINGS -->
 
-<div
-    class="overlay"
-    id="createGameOverlay"
->
+<div class="overlay" id="settingsOverlay">
 
 <div class="panel">
 
 <div class="panel-header">
 
-    <h2>Host a Game</h2>
-
-    <button
-        class="icon-btn"
-        id="closeCreateGame"
-    >×</button>
-
-</div>
-
-<div class="panel-body">
-
-<label
-    style="display:block;margin-bottom:7px;color:var(--muted)"
->
-Choose a game
-</label>
-
-<select
-    id="gameTypeSelect"
-    class="game-select"
->
-
-<option value="tictactoe">
-    Tic Tac Toe
-</option>
-
-<option value="connect4">
-    Connect Four
-</option>
-
-<option value="dice">
-    Dice Duel
-</option>
-
-<option value="rps">
-    Rock Paper Scissors
-</option>
-
-<option value="highlow">
-    High Card
-</option>
-
-</select>
+<h2>Settings</h2>
 
 <button
-    class="primary-btn"
-    id="confirmCreateGame"
-    style="width:100%"
->
-Create Lobby
-</button>
-
-</div>
-</div>
-</div>
-
-
-<!-- ======================================================
-     GAME ROOM
-====================================================== -->
-
-<div
-    class="overlay"
-    id="gameRoomOverlay"
->
-
-<div class="panel game-room">
-
-<div class="game-room-header">
-
-<div class="game-room-title">
-
-<h2 id="gameRoomTitle">
-Game
-</h2>
-
-<small id="gameRoomStatus">
-Waiting for players
-</small>
-
-</div>
-
-<div id="gameRoomActions"></div>
-
-</div>
-
-<div class="game-room-body">
-
-<div class="game-info">
-
-<div class="info-box">
-
-<div class="info-label">
-HOST
-</div>
-
-<div
-    class="info-value"
-    id="gameHostName"
->
--
-</div>
-
-</div>
-
-<div class="info-box">
-
-<div class="info-label">
-PLAYERS
-</div>
-
-<div
-    class="info-value"
-    id="gamePlayersCount"
->
-0
-</div>
-
-</div>
-
-<div class="info-box">
-
-<div class="info-label">
-TURN
-</div>
-
-<div
-    class="info-value"
-    id="gameTurnName"
->
--
-</div>
-
-</div>
-
-</div>
-
-
-<div
-    class="player-list"
-    id="gamePlayerList"
-></div>
-
-
-<div
-    class="turn-banner"
-    id="turnBanner"
->
-Waiting...
-</div>
-
-
-<div id="gameContent"></div>
-
-
-<div
-    class="game-message"
-    id="gameMessage"
->
-Waiting...
-</div>
-
-</div>
-</div>
-</div>
-
-
-<!-- ======================================================
-     SETTINGS
-====================================================== -->
-
-<div
-    class="overlay"
-    id="settingsOverlay"
->
-
-<div class="panel">
-
-<div class="panel-header">
-
-    <h2>Settings</h2>
-
-    <button
-        class="icon-btn"
-        id="closeSettings"
-    >×</button>
+    class="icon-btn"
+    id="closeSettings"
+>×</button>
 
 </div>
 
@@ -1417,8 +942,8 @@ Waiting...
 <div class="category open">
 
 <button class="category-title">
-    <span>👤 Profile</span>
-    <span>⌄</span>
+<span>👤 Profile</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
@@ -1453,67 +978,25 @@ Waiting...
 <div class="category">
 
 <button class="category-title">
-    <span>📝 Text</span>
-    <span>⌄</span>
+<span>📝 Text</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
 
 <div class="setting">
-
 <label>Text size</label>
-
-<input
-    id="textSize"
-    type="range"
-    min="12"
-    max="24"
-    step="1"
->
-
-<div
-    class="setting-value"
-    id="textSizeValue"
-></div>
-
+<input id="textSize" type="range" min="12" max="24">
 </div>
 
 <div class="setting">
-
 <label>Word spacing</label>
-
-<input
-    id="wordSpacing"
-    type="range"
-    min="0"
-    max="12"
-    step="1"
->
-
-<div
-    class="setting-value"
-    id="wordSpacingValue"
-></div>
-
+<input id="wordSpacing" type="range" min="0" max="12">
 </div>
 
 <div class="setting">
-
 <label>Line spacing</label>
-
-<input
-    id="lineSpacing"
-    type="range"
-    min="1"
-    max="2"
-    step=".05"
->
-
-<div
-    class="setting-value"
-    id="lineSpacingValue"
-></div>
-
+<input id="lineSpacing" type="range" min="1" max="2" step=".05">
 </div>
 
 </div>
@@ -1523,8 +1006,8 @@ Waiting...
 <div class="category">
 
 <button class="category-title">
-    <span>💬 Chat</span>
-    <span>⌄</span>
+<span>💬 Chat</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
@@ -1534,7 +1017,6 @@ Waiting...
 <label>Refresh rate</label>
 
 <select id="refreshRate">
-
 <option value="10000">10 seconds</option>
 <option value="5000">5 seconds</option>
 <option value="3000">3 seconds</option>
@@ -1542,7 +1024,6 @@ Waiting...
 <option value="1000">1 second</option>
 <option value="500">0.5 seconds</option>
 <option value="100">0.1 seconds</option>
-
 </select>
 
 </div>
@@ -1552,10 +1033,8 @@ Waiting...
 <label>Show timestamps</label>
 
 <select id="showTimestamps">
-
 <option value="true">On</option>
 <option value="false">Off</option>
-
 </select>
 
 </div>
@@ -1565,10 +1044,8 @@ Waiting...
 <label>Compact messages</label>
 
 <select id="compactMessages">
-
 <option value="false">Off</option>
 <option value="true">On</option>
-
 </select>
 
 </div>
@@ -1580,8 +1057,8 @@ Waiting...
 <div class="category">
 
 <button class="category-title">
-    <span>🎨 Appearance</span>
-    <span>⌄</span>
+<span>🎨 Appearance</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
@@ -1619,11 +1096,6 @@ Waiting...
     max="25"
 >
 
-<div
-    class="setting-value"
-    id="cornerRadiusValue"
-></div>
-
 </div>
 
 <div class="setting">
@@ -1638,11 +1110,6 @@ Waiting...
     step=".05"
 >
 
-<div
-    class="setting-value"
-    id="uiScaleValue"
-></div>
-
 </div>
 
 </div>
@@ -1652,63 +1119,8 @@ Waiting...
 <div class="category">
 
 <button class="category-title">
-    <span>🎮 Games</span>
-    <span>⌄</span>
-</button>
-
-<div class="category-body">
-
-<div class="setting">
-
-<label>Show games button</label>
-
-<select id="showGamesButton">
-
-<option value="true">On</option>
-<option value="false">Off</option>
-
-</select>
-
-</div>
-
-<div class="setting">
-
-<label>Game refresh speed</label>
-
-<select id="gameRefresh">
-
-<option value="100">0.1 seconds</option>
-<option value="250">0.25 seconds</option>
-<option value="500">0.5 seconds</option>
-<option value="1000">1 second</option>
-<option value="2000">2 seconds</option>
-
-</select>
-
-</div>
-
-<div class="setting">
-
-<label>Game sounds</label>
-
-<select id="gameSounds">
-
-<option value="true">On</option>
-<option value="false">Off</option>
-
-</select>
-
-</div>
-
-</div>
-</div>
-
-
-<div class="category">
-
-<button class="category-title">
-    <span>⚙️ Behavior</span>
-    <span>⌄</span>
+<span>⚙️ Behavior</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
@@ -1718,10 +1130,8 @@ Waiting...
 <label>Enter to send</label>
 
 <select id="enterToSend">
-
 <option value="true">On</option>
 <option value="false">Off</option>
-
 </select>
 
 </div>
@@ -1731,10 +1141,8 @@ Waiting...
 <label>Auto-scroll</label>
 
 <select id="autoScroll">
-
 <option value="true">On</option>
 <option value="false">Off</option>
-
 </select>
 
 </div>
@@ -1744,10 +1152,8 @@ Waiting...
 <label>Confirm before deleting</label>
 
 <select id="confirmDelete">
-
 <option value="true">On</option>
 <option value="false">Off</option>
-
 </select>
 
 </div>
@@ -1763,27 +1169,6 @@ Waiting...
 Save settings
 </button>
 
-
-<div class="danger-zone">
-
-<div class="danger-title">
-⚠ Danger Zone
-</div>
-
-<p>
-Remove every normal chat message permanently.
-This affects everyone.
-</p>
-
-<button
-    class="danger-btn-wide"
-    id="removeEverything"
->
-Remove everything
-</button>
-
-</div>
-
 </div>
 </div>
 </div>
@@ -1791,79 +1176,19 @@ Remove everything
 
 <!-- CONTEXT MENU -->
 
-<div
-    class="context-menu"
-    id="contextMenu"
->
+<div class="context-menu" id="contextMenu">
 
 <button id="editMessage">
 Edit
 </button>
 
 <button
-    class="delete-option"
     id="deleteMessage"
+    class="delete-option"
 >
 Delete
 </button>
 
-</div>
-
-
-<!-- IMAGE VIEWER -->
-
-<div
-    class="image-viewer"
-    id="imageViewer"
->
-
-<button
-    class="back-image"
-    id="backImage"
->
-← Back
-</button>
-
-<img
-    class="full-image"
-    id="fullImage"
-    alt="Full image"
->
-
-</div>
-
-
-<!-- DIALOG -->
-
-<div
-    class="overlay"
-    id="dialogOverlay"
->
-
-<div class="dialog">
-
-<h2 id="dialogTitle">
-Confirm
-</h2>
-
-<p id="dialogText"></p>
-
-<div class="dialog-buttons">
-
-<button id="dialogCancel">
-Cancel
-</button>
-
-<button
-    class="danger"
-    id="dialogConfirm"
->
-Yes
-</button>
-
-</div>
-
-</div>
 </div>
 
 
@@ -1877,12 +1202,13 @@ const API_URL="/api/messages";
 const CHANNEL="general";
 
 /*
-   Special marker.
+    Normal chat uses the user's chosen refresh rate.
 
-   These are stored in the SAME messages table,
-   but the normal chat renderer ignores them.
+    Games deliberately use 10ms polling while an active game
+    exists so game actions feel much faster.
 */
-const GAME_MARKER="__HIDDEN_GAME_STATE__";
+
+const GAME_REFRESH_MS=10;
 
 
 /* =========================================================
@@ -1893,7 +1219,8 @@ let deviceId=localStorage.getItem("chat_device_id");
 
 if(!deviceId){
 
-    deviceId=crypto.randomUUID();
+    deviceId=
+        crypto.randomUUID();
 
     localStorage.setItem(
         "chat_device_id",
@@ -1925,40 +1252,40 @@ const defaults={
 
     enterToSend:true,
     autoScroll:true,
-    confirmDelete:true,
-
-    showGamesButton:true,
-    gameRefresh:500,
-    gameSounds:true
+    confirmDelete:true
 };
 
-function getSetting(key){
-
-    const value=
-        localStorage.getItem("chat_"+key);
-
-    if(value===null){
-        return defaults[key];
-    }
-
-    if(
-        value==="true" ||
-        value==="false"
-    ){
-        return value==="true";
-    }
-
-    const number=Number(value);
-
-    return Number.isNaN(number)
-        ?value
-        :number;
-}
-
-let settings={};
+const settings={};
 
 Object.keys(defaults).forEach(key=>{
-    settings[key]=getSetting(key);
+
+    const saved=
+        localStorage.getItem(
+            "chat_"+key
+        );
+
+    if(saved===null){
+
+        settings[key]=
+            defaults[key];
+
+    }else if(
+        saved==="true"||
+        saved==="false"
+    ){
+
+        settings[key]=
+            saved==="true";
+
+    }else{
+
+        const n=Number(saved);
+
+        settings[key]=
+            Number.isNaN(n)
+            ?saved
+            :n;
+    }
 });
 
 
@@ -1981,6 +1308,17 @@ const imageInput=
 const attachBtn=
     document.getElementById("attachBtn");
 
+const gamesBtn=
+    document.getElementById("gamesBtn");
+
+const gamesOverlay=
+    document.getElementById("gamesOverlay");
+
+const closeGames=
+    document.getElementById("closeGames");
+
+const gamePicker=
+    document.getElementById("gamePicker");
 
 const settingsBtn=
     document.getElementById("settingsBtn");
@@ -1993,71 +1331,6 @@ const closeSettings=
 
 const saveSettings=
     document.getElementById("saveSettings");
-
-
-const gamesBtn=
-    document.getElementById("gamesBtn");
-
-const gamesOverlay=
-    document.getElementById("gamesOverlay");
-
-const closeGames=
-    document.getElementById("closeGames");
-
-const gamesList=
-    document.getElementById("gamesList");
-
-const createGameBtn=
-    document.getElementById("createGameBtn");
-
-const createGameOverlay=
-    document.getElementById("createGameOverlay");
-
-const closeCreateGame=
-    document.getElementById("closeCreateGame");
-
-const gameTypeSelect=
-    document.getElementById("gameTypeSelect");
-
-const confirmCreateGame=
-    document.getElementById("confirmCreateGame");
-
-
-const gameRoomOverlay=
-    document.getElementById("gameRoomOverlay");
-
-const gameRoomTitle=
-    document.getElementById("gameRoomTitle");
-
-const gameRoomStatus=
-    document.getElementById("gameRoomStatus");
-
-const gameRoomActions=
-    document.getElementById("gameRoomActions");
-
-const gameHostName=
-    document.getElementById("gameHostName");
-
-const gamePlayersCount=
-    document.getElementById("gamePlayersCount");
-
-const gameTurnName=
-    document.getElementById("gameTurnName");
-
-const gamePlayerList=
-    document.getElementById("gamePlayerList");
-
-const turnBanner=
-    document.getElementById("turnBanner");
-
-const gameContent=
-    document.getElementById("gameContent");
-
-const gameMessage=
-    document.getElementById("gameMessage");
-
-
-/* SETTINGS ELEMENTS */
 
 const usernameInput=
     document.getElementById("usernameInput");
@@ -2101,34 +1374,6 @@ const autoScroll=
 const confirmDelete=
     document.getElementById("confirmDelete");
 
-const showGamesButton=
-    document.getElementById("showGamesButton");
-
-const gameRefresh=
-    document.getElementById("gameRefresh");
-
-const gameSounds=
-    document.getElementById("gameSounds");
-
-
-const textSizeValue=
-    document.getElementById("textSizeValue");
-
-const wordSpacingValue=
-    document.getElementById("wordSpacingValue");
-
-const lineSpacingValue=
-    document.getElementById("lineSpacingValue");
-
-const cornerRadiusValue=
-    document.getElementById("cornerRadiusValue");
-
-const uiScaleValue=
-    document.getElementById("uiScaleValue");
-
-
-/* NORMAL CHAT */
-
 const contextMenu=
     document.getElementById("contextMenu");
 
@@ -2137,35 +1382,6 @@ const editMessageBtn=
 
 const deleteMessageBtn=
     document.getElementById("deleteMessage");
-
-
-const imageViewer=
-    document.getElementById("imageViewer");
-
-const fullImage=
-    document.getElementById("fullImage");
-
-const backImage=
-    document.getElementById("backImage");
-
-
-const dialogOverlay=
-    document.getElementById("dialogOverlay");
-
-const dialogTitle=
-    document.getElementById("dialogTitle");
-
-const dialogText=
-    document.getElementById("dialogText");
-
-const dialogCancel=
-    document.getElementById("dialogCancel");
-
-const dialogConfirm=
-    document.getElementById("dialogConfirm");
-
-const removeEverything=
-    document.getElementById("removeEverything");
 
 
 /* =========================================================
@@ -2180,129 +1396,325 @@ let currentMessages=[];
 let refreshTimer=null;
 let gameTimer=null;
 
-let gameStates=new Map();
+let games={};
 
-let currentGameId=null;
-
-let confirmCallback=null;
+let activeGameIds=new Set();
 
 
 /* =========================================================
    GAME DEFINITIONS
 ========================================================= */
 
-const GAME_DEFINITIONS={
+const GAME_TYPES={
 
-    tictactoe:{
-        name:"Tic Tac Toe",
+    ttt:{
+        name:"Tic-Tac-Toe",
         icon:"❌",
-        description:"Classic 3×3 game for two players.",
-        maxPlayers:2
+        max:2,
+        description:"Classic 3 × 3 turn-based game."
     },
 
     connect4:{
         name:"Connect Four",
         icon:"🔴",
-        description:"Connect four pieces in a row.",
-        maxPlayers:2
+        max:2,
+        description:"Drop pieces and connect four."
+    },
+
+    reversi:{
+        name:"Reversi",
+        icon:"⚫",
+        max:2,
+        description:"Surround and capture your opponent."
     },
 
     dice:{
         name:"Dice Duel",
         icon:"🎲",
-        description:"Roll against another player.",
-        maxPlayers:2
+        max:4,
+        description:"Roll against everyone on your turn."
     },
 
-    rps:{
-        name:"Rock Paper Scissors",
-        icon:"✊",
-        description:"Choose your move and beat your opponent.",
-        maxPlayers:2
-    },
-
-    highlow:{
-        name:"High Card",
-        icon:"🃏",
-        description:"Guess whether the next card is higher or lower.",
-        maxPlayers:2
+    race:{
+        name:"Grid Race",
+        icon:"🏁",
+        max:4,
+        description:"Roll and race to the finish."
     }
-
 };
 
 
 /* =========================================================
-   ID
+   GAME CREATOR
 ========================================================= */
 
-function makeId(){
+function renderGamePicker(){
 
-    if(
-        typeof crypto!=="undefined" &&
-        crypto.randomUUID
-    ){
+    gamePicker.innerHTML="";
 
-        return crypto.randomUUID();
+    Object.entries(GAME_TYPES)
+    .forEach(([type,info])=>{
 
-    }
+        const button=
+            document.createElement("button");
 
-    return Date.now()+"_"+Math.random()
-        .toString(36)
-        .substring(2);
+        button.className="game-option";
+
+        button.innerHTML=`
+            <div class="game-option-icon">
+                ${info.icon}
+            </div>
+
+            <div class="game-option-name">
+                ${escapeHtml(info.name)}
+            </div>
+
+            <div class="game-option-desc">
+                ${escapeHtml(info.description)}
+                · ${info.max} max
+            </div>
+        `;
+
+        button.onclick=()=>{
+            createGame(type);
+        };
+
+        gamePicker.appendChild(button);
+    });
+}
+
+
+gamesBtn.onclick=()=>{
+
+    renderGamePicker();
+
+    gamesOverlay.classList.add("show");
+};
+
+closeGames.onclick=()=>{
+
+    gamesOverlay.classList.remove("show");
+};
+
+
+/* =========================================================
+   UNIQUE GAME ID
+========================================================= */
+
+function newGameId(){
+
+    return (
+        "game_"+
+
+        Date.now().toString(36)+
+
+        "_"+
+
+        crypto.randomUUID()
+        .replaceAll("-","")
+        .slice(0,8)
+    );
 }
 
 
 /* =========================================================
-   GAME STATE MESSAGE
+   HIDDEN GAME MESSAGE FORMAT
 ========================================================= */
 
-function encodeGameState(state){
+const GAME_PREFIX="__CHAT_GAME_STATE_v4__";
 
-    return GAME_MARKER+
-        JSON.stringify(state);
+
+function encodeGame(game){
+
+    return GAME_PREFIX+
+        JSON.stringify(game);
 }
 
-function decodeGameState(message){
+
+function decodeGame(message){
 
     if(
-        !message ||
-        typeof message.message!=="string"
+        typeof message!=="string"||
+        !message.startsWith(GAME_PREFIX)
     ){
-        return null;
-    }
 
-    if(
-        !message.message.startsWith(
-            GAME_MARKER
-        )
-    ){
         return null;
     }
 
     try{
 
         return JSON.parse(
-            message.message.substring(
-                GAME_MARKER.length
+            message.slice(
+                GAME_PREFIX.length
             )
         );
 
     }catch{
 
         return null;
-
     }
 }
 
 
 /* =========================================================
-   POST HIDDEN GAME STATE
+   CREATE GAME
 ========================================================= */
 
-async function saveGameState(state){
+async function createGame(type){
 
-    const response=
+    if(!settings.username){
+
+        settingsOverlay.classList.add("show");
+
+        usernameInput.focus();
+
+        alert(
+            "Set your name in Settings first."
+        );
+
+        return;
+    }
+
+    /*
+       One host can only host one game.
+    */
+
+    const alreadyHosting=
+        Object.values(games).some(game=>
+            game.hostDeviceId===deviceId &&
+            game.status!=="finished"
+        );
+
+    if(alreadyHosting){
+
+        alert(
+            "You are already hosting a game."
+        );
+
+        return;
+    }
+
+    const info=GAME_TYPES[type];
+
+    const game={
+
+        kind:"game",
+
+        gameId:newGameId(),
+
+        type,
+
+        name:info.name,
+
+        icon:info.icon,
+
+        maxPlayers:info.max,
+
+        hostDeviceId:deviceId,
+
+        hostName:settings.username,
+
+        status:"waiting",
+
+        turnIndex:0,
+
+        winner:null,
+
+        createdAt:Date.now(),
+
+        players:[{
+
+            deviceId,
+
+            username:settings.username,
+
+            index:0
+
+        }],
+
+        state:createInitialState(type)
+
+    };
+
+    games[game.gameId]=game;
+
+    activeGameIds.add(game.gameId);
+
+    gamesOverlay.classList.remove("show");
+
+    await saveGame(game);
+
+    await loadMessages();
+}
+
+
+/* =========================================================
+   INITIAL GAME STATES
+========================================================= */
+
+function createInitialState(type){
+
+    if(type==="ttt"){
+
+        return {
+            board:Array(9).fill(null)
+        };
+    }
+
+    if(type==="connect4"){
+
+        return {
+            board:Array(42).fill(null),
+            columns:7,
+            rows:6
+        };
+    }
+
+    if(type==="reversi"){
+
+        const board=
+            Array(64).fill(null);
+
+        board[27]="white";
+        board[28]="black";
+        board[35]="black";
+        board[36]="white";
+
+        return {
+            board
+        };
+    }
+
+    if(type==="dice"){
+
+        return {
+            scores:{},
+            lastRoll:null,
+            lastRoller:null
+        };
+    }
+
+    if(type==="race"){
+
+        return {
+            positions:{}
+        };
+    }
+
+    return {};
+}
+
+
+/* =========================================================
+   SAVE GAME
+========================================================= */
+
+async function saveGame(game){
+
+    try{
+
         await fetch(API_URL,{
+
             method:"POST",
 
             headers:{
@@ -2312,268 +1724,88 @@ async function saveGameState(state){
 
             body:JSON.stringify({
 
-                username:"SYSTEM",
+                username:
+                    game.hostName,
 
                 channel:CHANNEL,
 
                 message:
-                    encodeGameState(state),
+                    encodeGame(game),
 
                 image:null,
 
                 device_id:
-                    "GAME_"+state.id
+                    game.hostDeviceId
 
             })
-
         });
-
-    const data=
-        await response.json();
-
-    if(!response.ok){
-
-        throw new Error(
-            data.error||
-            "Could not save game."
-        );
-
-    }
-
-    return data;
-}
-
-
-/* =========================================================
-   CREATE BASE GAME
-========================================================= */
-
-function createBaseGame(type){
-
-    const definition=
-        GAME_DEFINITIONS[type];
-
-    return {
-
-        id:makeId(),
-
-        type:type,
-
-        name:definition.name,
-
-        icon:definition.icon,
-
-        hostId:deviceId,
-
-        hostName:
-            settings.username,
-
-        status:"lobby",
-
-        createdAt:
-            Date.now(),
-
-        startedAt:null,
-
-        players:[],
-
-        turnIndex:0,
-
-        winner:null,
-
-        message:"Waiting for players.",
-
-        data:createGameData(type)
-
-    };
-}
-
-
-function createGameData(type){
-
-    if(type==="tictactoe"){
-
-        return {
-            board:Array(9).fill(""),
-            symbols:{}
-        };
-
-    }
-
-    if(type==="connect4"){
-
-        return {
-            board:
-                Array(42).fill(""),
-            symbols:{}
-        };
-
-    }
-
-    if(type==="dice"){
-
-        return {
-            rolls:{},
-            result:null
-        };
-
-    }
-
-    if(type==="rps"){
-
-        return {
-            choices:{},
-            result:null
-        };
-
-    }
-
-    if(type==="highlow"){
-
-        return {
-            deck:[],
-            currentCard:null,
-            nextCard:null,
-            guess:null,
-            score:{}
-        };
-
-    }
-
-    return {};
-
-}
-
-
-/* =========================================================
-   HOST LIMIT
-========================================================= */
-
-function userIsHostingGame(){
-
-    for(const state of gameStates.values()){
-
-        if(
-            state.status!=="finished" &&
-            state.status!=="stopped" &&
-            state.hostId===deviceId
-        ){
-
-            return state;
-
-        }
-
-    }
-
-    return null;
-}
-
-
-/* =========================================================
-   CREATE GAME
-========================================================= */
-
-confirmCreateGame.onclick=async()=>{
-
-    if(!settings.username){
-
-        alert(
-            "Set your name in Settings first."
-        );
-
-        settingsBtn.click();
-
-        return;
-    }
-
-
-    const existing=
-        userIsHostingGame();
-
-    if(existing){
-
-        alert(
-            "You are already hosting a game.\n\n"+
-            "You can only host one game at a time."
-        );
-
-        return;
-    }
-
-
-    const type=
-        gameTypeSelect.value;
-
-    const state=
-        createBaseGame(type);
-
-
-    /*
-       Host automatically joins before starting.
-    */
-
-    state.players.push({
-
-        id:deviceId,
-
-        name:settings.username,
-
-        joinedAt:Date.now(),
-
-        symbol:null
-
-    });
-
-
-    assignSymbols(state);
-
-
-    try{
-
-        await saveGameState(state);
-
-        createGameOverlay
-            .classList.remove("show");
-
-        gamesOverlay
-            .classList.remove("show");
-
-        currentGameId=state.id;
-
-        gameRoomOverlay
-            .classList.add("show");
-
-        await loadMessages();
-
-        openGame(state.id);
 
     }catch(error){
 
-        alert(
-            "Could not create game:\n\n"+
-            error.message
+        console.error(
+            "Game save failed:",
+            error
         );
-
     }
-
-};
+}
 
 
 /* =========================================================
-   JOIN
+   LOAD GAME STATES
+========================================================= */
+
+function processGameMessages(){
+
+    const latest={};
+
+    currentMessages.forEach(message=>{
+
+        const game=
+            decodeGame(message.message);
+
+        if(!game)return;
+
+        if(
+            !game.gameId||
+            !game.createdAt
+        )return;
+
+        const old=
+            latest[game.gameId];
+
+        if(
+            !old||
+            game.updatedAt>=
+            old.updatedAt
+        ){
+
+            latest[game.gameId]=game;
+        }
+    });
+
+    games=latest;
+
+    activeGameIds=
+        new Set(
+            Object.keys(games)
+            .filter(id=>
+                games[id].status!=="finished"
+            )
+        );
+}
+
+
+/* =========================================================
+   JOIN GAME
 ========================================================= */
 
 async function joinGame(gameId){
 
-    const state=
-        gameStates.get(gameId);
+    const game=games[gameId];
 
-    if(!state)return;
+    if(!game)return;
 
-
-    if(
-        state.status!=="lobby"
-    ){
+    if(game.status!=="waiting"){
 
         alert(
             "This game has already started."
@@ -2582,121 +1814,42 @@ async function joinGame(gameId){
         return;
     }
 
-
     if(
-        state.players.some(
-            p=>p.id===deviceId
+        game.players.some(
+            p=>p.deviceId===deviceId
         )
     ){
 
-        currentGameId=gameId;
-
-        gamesOverlay
-            .classList.remove("show");
-
-        gameRoomOverlay
-            .classList.add("show");
-
-        openGame(gameId);
-
         return;
     }
-
-
-    const definition=
-        GAME_DEFINITIONS[state.type];
-
 
     if(
-        state.players.length>=
-        definition.maxPlayers
+        game.players.length>=
+        game.maxPlayers
     ){
 
-        alert(
-            "This game is full."
-        );
+        alert("This game is full.");
 
         return;
     }
 
+    game.players.push({
 
-    if(!settings.username){
+        deviceId,
 
-        alert(
-            "Set your name in Settings first."
-        );
+        username:
+            settings.username,
 
-        settingsBtn.click();
-
-        return;
-    }
-
-
-    state.players.push({
-
-        id:deviceId,
-
-        name:settings.username,
-
-        joinedAt:Date.now(),
-
-        symbol:null
+        index:
+            game.players.length
 
     });
 
+    game.updatedAt=Date.now();
 
-    assignSymbols(state);
-
-
-    await saveGameState(state);
-
-    currentGameId=gameId;
-
-    gamesOverlay
-        .classList.remove("show");
-
-    gameRoomOverlay
-        .classList.add("show");
+    await saveGame(game);
 
     await loadMessages();
-
-    openGame(gameId);
-}
-
-
-/* =========================================================
-   ASSIGN SYMBOLS
-========================================================= */
-
-function assignSymbols(state){
-
-    if(state.type==="tictactoe"){
-
-        state.players.forEach(
-            (player,index)=>{
-                player.symbol=
-                    index===0
-                    ?"X"
-                    :"O";
-            }
-        );
-
-    }
-
-
-    if(state.type==="connect4"){
-
-        state.players.forEach(
-            (player,index)=>{
-                player.symbol=
-                    index===0
-                    ?"R"
-                    :"Y";
-            }
-        );
-
-    }
-
 }
 
 
@@ -2704,552 +1857,174 @@ function assignSymbols(state){
    START GAME
 ========================================================= */
 
-async function startGame(){
+async function startGame(gameId){
 
-    const state=
-        gameStates.get(currentGameId);
+    const game=games[gameId];
 
-    if(!state)return;
-
-    if(state.hostId!==deviceId){
-
-        return;
-    }
-
+    if(!game)return;
 
     if(
-        state.players.length<2
+        game.hostDeviceId!==deviceId
     ){
 
-        alert(
-            "You need at least 2 players."
-        );
-
         return;
     }
 
-
-    if(state.status!=="lobby"){
+    if(game.status!=="waiting"){
 
         return;
     }
-
-
-    state.status="running";
-
-    state.startedAt=Date.now();
-
-    state.turnIndex=0;
-
-    state.message=
-        "Game started!";
-
 
     /*
-       IMPORTANT:
-
-       players are NOT allowed to join
-       after this point.
+       The player list becomes locked here.
     */
 
+    game.status="running";
 
-    await saveGameState(state);
+    game.turnIndex=0;
 
-    await loadMessages();
+    game.updatedAt=Date.now();
 
-    openGame(state.id);
-}
-
-
-/* =========================================================
-   FORCE STOP
-========================================================= */
-
-async function forceStopGame(){
-
-    const state=
-        gameStates.get(currentGameId);
-
-    if(!state)return;
-
-    if(state.hostId!==deviceId){
-
-        return;
-    }
-
-
-    if(
-        !confirm(
-            "Force stop this game?\n\n"+
-            "Everyone will be removed from the game."
-        )
-    ){
-
-        return;
-    }
-
-
-    state.status="stopped";
-
-    state.message=
-        "The host stopped the game.";
-
-    state.players=[];
-
-    state.winner=null;
-
-
-    await saveGameState(state);
-
-    currentGameId=null;
-
-    gameRoomOverlay
-        .classList.remove("show");
+    await saveGame(game);
 
     await loadMessages();
 }
 
 
 /* =========================================================
-   LEAVE
+   LEAVE GAME
 ========================================================= */
 
-async function leaveGame(){
+async function leaveGame(gameId){
 
-    const state=
-        gameStates.get(currentGameId);
+    const game=games[gameId];
 
-    if(!state)return;
+    if(!game)return;
 
+    if(game.status==="finished"){
+
+        return;
+    }
+
+    const me=
+        game.players.findIndex(
+            p=>p.deviceId===deviceId
+        );
+
+    if(me===-1)return;
 
     /*
        Host cannot simply leave.
 
-       They must force stop.
+       Host must force quit the game.
     */
 
-    if(state.hostId===deviceId){
+    if(
+        game.hostDeviceId===deviceId
+    ){
 
         alert(
-            "You are the host.\n\n"+
-            "Use Force Stop to close the game."
+            "The host must use Force Quit."
         );
 
         return;
     }
 
+    game.players.splice(me,1);
 
-    state.players=
-        state.players.filter(
-            p=>p.id!==deviceId
-        );
-
-
-    /*
-       If a player leaves during a running
-       game, the remaining player wins.
-    */
+    game.players.forEach(
+        (p,index)=>{
+            p.index=index;
+        }
+    );
 
     if(
-        state.status==="running" &&
-        state.players.length===1
+        game.turnIndex>=
+        game.players.length
     ){
 
-        state.status="finished";
-
-        state.winner=
-            state.players[0].id;
-
-        state.message=
-            state.players[0].name+
-            " wins because the other player left.";
-
+        game.turnIndex=0;
     }
 
+    game.updatedAt=Date.now();
 
-    await saveGameState(state);
-
-    currentGameId=null;
-
-    gameRoomOverlay
-        .classList.remove("show");
+    await saveGame(game);
 
     await loadMessages();
 }
 
 
 /* =========================================================
-   OPEN GAME
+   FORCE QUIT
 ========================================================= */
 
-function openGame(gameId){
+async function forceQuitGame(gameId){
 
-    const state=
-        gameStates.get(gameId);
+    const game=games[gameId];
 
-    if(!state)return;
-
-    currentGameId=gameId;
-
-    gameRoomOverlay
-        .classList.add("show");
-
-    renderGameRoom(state);
-}
-
-
-/* =========================================================
-   GAME ROOM RENDER
-========================================================= */
-
-function renderGameRoom(state){
-
-    const definition=
-        GAME_DEFINITIONS[state.type];
-
-
-    gameRoomTitle.textContent=
-        definition.icon+
-        " "+
-        definition.name;
-
-
-    gameRoomStatus.textContent=
-        state.status==="lobby"
-        ?"Waiting for players"
-        :
-        state.status==="running"
-        ?"Game in progress"
-        :
-        state.status==="stopped"
-        ?"Game stopped"
-        :
-        "Game finished";
-
-
-    gameHostName.textContent=
-        state.hostName;
-
-
-    gamePlayersCount.textContent=
-        state.players.length+
-        "/"+
-        definition.maxPlayers;
-
-
-    const turnPlayer=
-        state.players[
-            state.turnIndex
-        ];
-
-
-    gameTurnName.textContent=
-        turnPlayer
-        ?turnPlayer.name
-        :"";
-
-
-    renderPlayers(state);
-
-
-    const myPlayer=
-        state.players.find(
-            p=>p.id===deviceId
-        );
-
-
-    const isMyTurn=
-        state.status==="running" &&
-        turnPlayer &&
-        turnPlayer.id===deviceId;
-
-
-    turnBanner.classList.toggle(
-        "my-turn",
-        isMyTurn
-    );
-
-
-    if(state.status==="lobby"){
-
-        turnBanner.textContent=
-            state.players.length+
-            " player"+
-            (
-                state.players.length===1
-                ?""
-                :"s"
-            )+
-            " joined. Waiting for host.";
-
-    }else if(state.status==="running"){
-
-        turnBanner.textContent=
-            isMyTurn
-            ?"🎯 Your turn!"
-            :"⏳ "+turnPlayer.name+"'s turn";
-
-    }else if(state.status==="finished"){
-
-        const winner=
-            state.players.find(
-                p=>p.id===state.winner
-            );
-
-        turnBanner.textContent=
-            winner
-            ?"🏆 "+winner.name+" wins!"
-            :"Game finished.";
-
-    }else{
-
-        turnBanner.textContent=
-            "🛑 "+state.message;
-
-    }
-
-
-    renderGameActions(state,myPlayer);
-
-    renderGameContent(state,isMyTurn);
-
-    gameMessage.textContent=
-        state.message||"";
-}
-
-
-/* =========================================================
-   PLAYERS
-========================================================= */
-
-function renderPlayers(state){
-
-    gamePlayerList.innerHTML="";
-
-    state.players.forEach(player=>{
-
-        const chip=
-            document.createElement("div");
-
-        chip.className="player-chip";
-
-        if(
-            player.id===state.hostId
-        ){
-
-            chip.classList.add("host");
-
-        }
-
-        if(
-            player.id===deviceId
-        ){
-
-            chip.classList.add("me");
-
-        }
-
-
-        let text=
-            player.name;
-
-
-        if(
-            player.id===state.hostId
-        ){
-
-            text+=" 👑";
-
-        }
-
-
-        if(player.symbol){
-
-            text+=" ["+
-                player.symbol+
-                "]";
-
-        }
-
-
-        if(
-            state.status==="running" &&
-            state.players[
-                state.turnIndex
-            ]?.id===player.id
-        ){
-
-            text+=" 🎯";
-
-        }
-
-
-        chip.textContent=text;
-
-        gamePlayerList.appendChild(chip);
-
-    });
-
-}
-
-
-/* =========================================================
-   GAME ACTION BUTTONS
-========================================================= */
-
-function renderGameActions(
-    state,
-    myPlayer
-){
-
-    gameRoomActions.innerHTML="";
-
+    if(!game)return;
 
     if(
-        state.hostId===deviceId
+        game.hostDeviceId!==deviceId
     ){
 
-        if(
-            state.status==="lobby"
-        ){
-
-            const start=
-                document.createElement("button");
-
-            start.className=
-                "primary-btn";
-
-            start.textContent=
-                "Start Game";
-
-            start.onclick=
-                startGame;
-
-            gameRoomActions
-                .appendChild(start);
-
-        }
-
-
-        if(
-            state.status==="lobby" ||
-            state.status==="running"
-        ){
-
-            const stop=
-                document.createElement("button");
-
-            stop.className=
-                "danger-btn";
-
-            stop.style.marginLeft="6px";
-
-            stop.textContent=
-                "Force Stop";
-
-            stop.onclick=
-                forceStopGame;
-
-            gameRoomActions
-                .appendChild(stop);
-
-        }
-
-    }else{
-
-        if(
-            state.status==="lobby" ||
-            state.status==="running"
-        ){
-
-            const leave=
-                document.createElement("button");
-
-            leave.className=
-                "secondary-btn";
-
-            leave.textContent=
-                "Leave";
-
-            leave.onclick=
-                leaveGame;
-
-            gameRoomActions
-                .appendChild(leave);
-
-        }
-
+        return;
     }
 
+    game.status="finished";
+
+    game.winner=null;
+
+    game.forceStopped=true;
+
+    game.updatedAt=Date.now();
+
+    await saveGame(game);
+
+    await loadMessages();
 }
 
 
 /* =========================================================
-   RENDER GAME
+   GET MY PLAYER
 ========================================================= */
 
-function renderGameContent(
-    state,
-    isMyTurn
-){
+function getMyPlayer(game){
 
-    gameContent.innerHTML="";
-
-
-    if(state.type==="tictactoe"){
-
-        renderTicTacToe(
-            state,
-            isMyTurn
-        );
-
-        return;
-    }
+    return game.players.find(
+        p=>p.deviceId===deviceId
+    );
+}
 
 
-    if(state.type==="connect4"){
+function isMyTurn(game){
 
-        renderConnect4(
-            state,
-            isMyTurn
-        );
+    const me=getMyPlayer(game);
 
-        return;
-    }
+    if(!me)return false;
+
+    return me.index===game.turnIndex;
+}
 
 
-    if(state.type==="dice"){
+/* =========================================================
+   NEXT TURN
+========================================================= */
 
-        renderDice(
-            state,
-            isMyTurn
-        );
+function nextTurn(game){
+
+    if(!game.players.length){
+
+        game.status="finished";
 
         return;
     }
 
-
-    if(state.type==="rps"){
-
-        renderRPS(
-            state,
-            isMyTurn
-        );
-
-        return;
-    }
-
-
-    if(state.type==="highlow"){
-
-        renderHighLow(
-            state,
-            isMyTurn
-        );
-
-        return;
-    }
-
+    game.turnIndex=
+        (
+            game.turnIndex+1
+        )%
+        game.players.length;
 }
 
 
@@ -3257,150 +2032,49 @@ function renderGameContent(
    TIC TAC TOE
 ========================================================= */
 
-function renderTicTacToe(
-    state,
-    isMyTurn
-){
-
-    const board=
-        document.createElement("div");
-
-    board.className=
-        "board tictactoe-board";
-
-
-    state.data.board.forEach(
-        (value,index)=>{
-
-            const cell=
-                document.createElement("button");
-
-            cell.className=
-                "ttt-cell";
-
-            cell.textContent=value;
-
-
-            cell.disabled=
-                !isMyTurn ||
-                value!=="" ||
-                state.status!=="running";
-
-
-            cell.onclick=()=>{
-
-                playTicTacToe(
-                    state,
-                    index
-                );
-
-            };
-
-
-            board.appendChild(cell);
-
-        }
-    );
-
-
-    gameContent.appendChild(board);
-
-}
-
-
-/* =========================================================
-   TIC TAC TOE MOVE
-========================================================= */
-
-async function playTicTacToe(
-    state,
-    index
-){
-
-    if(state.status!=="running")return;
-
-
-    const player=
-        state.players[
-            state.turnIndex
-        ];
-
+async function tttMove(game,index){
 
     if(
-        !player ||
-        player.id!==deviceId
-    ){
+        game.status!=="running"||
+        !isMyTurn(game)
+    )return;
 
-        return;
-    }
+    if(game.state.board[index])return;
 
+    const me=getMyPlayer(game);
 
-    if(
-        state.data.board[index]!==""
-    ){
+    game.state.board[index]=
+        me.index===0
+        ?"X"
+        :"O";
 
-        return;
-    }
+    const result=
+        checkTTT(game.state.board);
 
+    if(result){
 
-    state.data.board[index]=
-        player.symbol;
+        game.status="finished";
 
-
-    const winner=
-        checkTicTacToeWinner(
-            state.data.board
-        );
-
-
-    if(winner){
-
-        state.status="finished";
-
-        state.winner=deviceId;
-
-        state.message=
-            settings.username+
-            " wins!";
-
-    }else if(
-        state.data.board.every(
-            cell=>cell!==""
-        )
-    ){
-
-        state.status="finished";
-
-        state.winner=null;
-
-        state.message=
-            "Draw!";
+        game.winner=
+            result==="draw"
+            ?"draw"
+            :me.username;
 
     }else{
 
-        state.turnIndex=
-            (state.turnIndex+1)%
-            state.players.length;
-
-        state.message=
-            state.players[
-                state.turnIndex
-            ].name+
-            "'s turn.";
-
+        nextTurn(game);
     }
 
+    game.updatedAt=Date.now();
 
-    await saveGameState(state);
-
+    await saveGame(game);
     await loadMessages();
-
 }
 
 
-function checkTicTacToeWinner(board){
+function checkTTT(board){
 
-    const lines=[
+    const wins=[
 
         [0,1,2],
         [3,4,5],
@@ -3412,24 +2086,25 @@ function checkTicTacToeWinner(board){
 
         [0,4,8],
         [2,4,6]
-
     ];
 
-
-    for(const line of lines){
-
-        const[a,b,c]=line;
+    for(const w of wins){
 
         if(
-            board[a] &&
-            board[a]===board[b] &&
-            board[a]===board[c]
+            board[w[0]] &&
+            board[w[0]]===
+            board[w[1]] &&
+            board[w[1]]===
+            board[w[2]]
         ){
 
-            return board[a];
-
+            return board[w[0]];
         }
+    }
 
+    if(board.every(Boolean)){
+
+        return "draw";
     }
 
     return null;
@@ -3440,283 +2115,254 @@ function checkTicTacToeWinner(board){
    CONNECT FOUR
 ========================================================= */
 
-function renderConnect4(
-    state,
-    isMyTurn
-){
-
-    const board=
-        document.createElement("div");
-
-    board.className=
-        "board connect-board";
-
-
-    for(
-        let row=0;
-        row<6;
-        row++
-    ){
-
-        for(
-            let col=0;
-            col<7;
-            col++
-        ){
-
-            const index=
-                row*7+col;
-
-            const cell=
-                document.createElement("button");
-
-            cell.className=
-                "connect-cell";
-
-            cell.disabled=
-                !isMyTurn ||
-                state.status!=="running";
-
-
-            const piece=
-                document.createElement("div");
-
-            piece.className=
-                "connect-piece";
-
-
-            if(
-                state.data.board[index]==="R"
-            ){
-
-                piece.classList.add("red");
-
-            }
-
-            if(
-                state.data.board[index]==="Y"
-            ){
-
-                piece.classList.add("yellow");
-
-            }
-
-
-            cell.appendChild(piece);
-
-
-            cell.onclick=()=>{
-
-                playConnect4(
-                    state,
-                    col
-                );
-
-            };
-
-
-            board.appendChild(cell);
-
-        }
-
-    }
-
-
-    gameContent.appendChild(board);
-
-}
-
-
-async function playConnect4(
-    state,
-    col
-){
-
-    if(state.status!=="running")return;
-
-
-    const player=
-        state.players[
-            state.turnIndex
-        ];
-
+async function connectMove(game,column){
 
     if(
-        !player ||
-        player.id!==deviceId
-    ){
+        game.status!=="running"||
+        !isMyTurn(game)
+    )return;
 
-        return;
-    }
+    const rows=6;
 
+    const me=getMyPlayer(game);
 
-    let target=-1;
+    const piece=
+        me.index===0
+        ?"red"
+        :"yellow";
 
+    let placed=-1;
 
     for(
-        let row=5;
+        let row=rows-1;
         row>=0;
         row--
     ){
 
         const index=
-            row*7+col;
+            row*7+column;
 
         if(
-            state.data.board[index]===""
+            !game.state.board[index]
         ){
 
-            target=index;
+            game.state.board[index]=
+                piece;
+
+            placed=index;
 
             break;
-
         }
-
     }
 
+    if(placed===-1)return;
 
-    if(target===-1)return;
-
-
-    state.data.board[target]=
-        player.symbol;
-
-
-    const winner=
-        checkConnectWinner(
-            state.data.board,
-            target
-        );
-
-
-    if(winner){
-
-        state.status="finished";
-
-        state.winner=deviceId;
-
-        state.message=
-            settings.username+
-            " wins!";
-
-    }else if(
-        state.data.board.every(
-            cell=>cell!==""
+    if(
+        checkConnectFour(
+            game.state.board,
+            placed
         )
     ){
 
-        state.status="finished";
+        game.status="finished";
 
-        state.message="Draw!";
+        game.winner=
+            me.username;
+
+    }else if(
+        game.state.board.every(Boolean)
+    ){
+
+        game.status="finished";
+
+        game.winner="draw";
 
     }else{
 
-        state.turnIndex=
-            (state.turnIndex+1)%
-            state.players.length;
-
-        state.message=
-            state.players[
-                state.turnIndex
-            ].name+
-            "'s turn.";
-
+        nextTurn(game);
     }
 
+    game.updatedAt=Date.now();
 
-    await saveGameState(state);
-
+    await saveGame(game);
     await loadMessages();
-
 }
 
 
-function checkConnectWinner(
-    board,
-    position
-){
+function checkConnectFour(board,index){
 
-    const row=
-        Math.floor(position/7);
+    const r=Math.floor(index/7);
+    const c=index%7;
+    const value=board[index];
 
-    const col=
-        position%7;
-
-    const player=
-        board[position];
-
-
-    const directions=[
-
+    const dirs=[
         [1,0],
         [0,1],
         [1,1],
         [1,-1]
-
     ];
 
-
-    for(
-        const [dr,dc]
-        of directions
-    ){
+    for(const [dr,dc] of dirs){
 
         let count=1;
 
-
         for(
-            const direction
-            of [-1,1]
+            let sign of [-1,1]
         ){
 
-            let r=row;
-            let c=col;
+            let rr=r+dr*sign;
+            let cc=c+dc*sign;
 
-
-            while(true){
-
-                r+=dr*direction;
-                c+=dc*direction;
-
-
-                if(
-                    r<0 ||
-                    r>=6 ||
-                    c<0 ||
-                    c>=7
-                ){
-
-                    break;
-
-                }
-
-
-                if(
-                    board[r*7+c]!==player
-                ){
-
-                    break;
-
-                }
-
+            while(
+                rr>=0&&
+                rr<6&&
+                cc>=0&&
+                cc<7&&
+                board[rr*7+cc]===value
+            ){
 
                 count++;
 
+                rr+=dr*sign;
+                cc+=dc*sign;
             }
-
         }
 
-
-        if(count>=4){
-
-            return true;
-
-        }
-
+        if(count>=4)return true;
     }
 
-
     return false;
+}
+
+
+/* =========================================================
+   REVERSI
+========================================================= */
+
+async function reversiMove(game,index){
+
+    if(
+        game.status!=="running"||
+        !isMyTurn(game)
+    )return;
+
+    if(
+        game.state.board[index]
+    )return;
+
+    const me=getMyPlayer(game);
+
+    const color=
+        me.index===0
+        ?"black"
+        :"white";
+
+    const opponent=
+        color==="black"
+        ?"white"
+        :"black";
+
+    const flips=
+        getReversiFlips(
+            game.state.board,
+            index,
+            color,
+            opponent
+        );
+
+    if(!flips.length)return;
+
+    game.state.board[index]=color;
+
+    flips.forEach(
+        i=>{
+            game.state.board[i]=color;
+        }
+    );
+
+    nextTurn(game);
+
+    game.updatedAt=Date.now();
+
+    await saveGame(game);
+    await loadMessages();
+}
+
+
+function getReversiFlips(
+    board,
+    index,
+    color,
+    opponent
+){
+
+    const r=
+        Math.floor(index/8);
+
+    const c=
+        index%8;
+
+    const dirs=[
+
+        [-1,-1],
+        [-1,0],
+        [-1,1],
+
+        [0,-1],
+        [0,1],
+
+        [1,-1],
+        [1,0],
+        [1,1]
+    ];
+
+    const result=[];
+
+    for(const [dr,dc] of dirs){
+
+        const line=[];
+
+        let rr=r+dr;
+        let cc=c+dc;
+
+        while(
+            rr>=0&&
+            rr<8&&
+            cc>=0&&
+            cc<8
+        ){
+
+            const value=
+                board[rr*8+cc];
+
+            if(value===opponent){
+
+                line.push(
+                    rr*8+cc
+                );
+
+            }else if(
+                value===color
+            ){
+
+                if(line.length){
+
+                    result.push(...line);
+                }
+
+                break;
+
+            }else{
+
+                break;
+            }
+
+            rr+=dr;
+            cc+=dc;
+        }
+    }
+
+    return result;
 }
 
 
@@ -3724,9 +2370,773 @@ function checkConnectWinner(
    DICE DUEL
 ========================================================= */
 
+async function diceMove(game){
+
+    if(
+        game.status!=="running"||
+        !isMyTurn(game)
+    )return;
+
+    const me=getMyPlayer(game);
+
+    const roll=
+        Math.floor(
+            Math.random()*6
+        )+1;
+
+    game.state.lastRoll=roll;
+
+    game.state.lastRoller=
+        me.username;
+
+    if(
+        !game.state.scores[
+            me.deviceId
+        ]
+    ){
+
+        game.state.scores[
+            me.deviceId
+        ]=0;
+    }
+
+    game.state.scores[
+        me.deviceId
+    ]+=roll;
+
+    nextTurn(game);
+
+    game.updatedAt=Date.now();
+
+    await saveGame(game);
+    await loadMessages();
+}
+
+
+/* =========================================================
+   GRID RACE
+========================================================= */
+
+async function raceMove(game){
+
+    if(
+        game.status!=="running"||
+        !isMyTurn(game)
+    )return;
+
+    const me=getMyPlayer(game);
+
+    if(
+        game.state.positions[
+            me.deviceId
+        ]===undefined
+    ){
+
+        game.state.positions[
+            me.deviceId
+        ]=0;
+    }
+
+    const roll=
+        Math.floor(
+            Math.random()*6
+        )+1;
+
+    game.state.positions[
+        me.deviceId
+    ]+=roll;
+
+    if(
+        game.state.positions[
+            me.deviceId
+        ]>=99
+    ){
+
+        game.state.positions[
+            me.deviceId
+        ]=99;
+
+        game.status="finished";
+
+        game.winner=
+            me.username;
+
+    }else{
+
+        nextTurn(game);
+    }
+
+    game.updatedAt=Date.now();
+
+    await saveGame(game);
+    await loadMessages();
+}
+
+
+/* =========================================================
+   GAME BUTTON HANDLER
+========================================================= */
+
+function handleGameAction(
+    game,
+    action,
+    value
+){
+
+    if(action==="join"){
+
+        joinGame(game.gameId);
+
+        return;
+    }
+
+    if(action==="start"){
+
+        startGame(game.gameId);
+
+        return;
+    }
+
+    if(action==="leave"){
+
+        leaveGame(game.gameId);
+
+        return;
+    }
+
+    if(action==="force"){
+
+        forceQuitGame(game.gameId);
+
+        return;
+    }
+
+    if(action==="ttt"){
+
+        tttMove(
+            game,
+            Number(value)
+        );
+
+        return;
+    }
+
+    if(action==="connect"){
+
+        connectMove(
+            game,
+            Number(value)
+        );
+
+        return;
+    }
+
+    if(action==="reversi"){
+
+        reversiMove(
+            game,
+            Number(value)
+        );
+
+        return;
+    }
+
+    if(action==="dice"){
+
+        diceMove(game);
+
+        return;
+    }
+
+    if(action==="race"){
+
+        raceMove(game);
+
+        return;
+    }
+}
+
+
+/* =========================================================
+   GAME CARD
+========================================================= */
+
+function createGameCard(game){
+
+    const wrapper=
+        document.createElement("div");
+
+    wrapper.className=
+        "game-message";
+
+    const card=
+        document.createElement("div");
+
+    card.className=
+        "game-card";
+
+    let statusClass="waiting";
+
+    if(game.status==="running"){
+        statusClass="running";
+    }
+
+    if(game.status==="finished"){
+        statusClass="finished";
+    }
+
+    const statusText=
+        game.status==="waiting"
+        ?"WAITING"
+        :game.status==="running"
+        ?"LIVE"
+        :"ENDED";
+
+    card.innerHTML=`
+
+        <div class="game-card-header">
+
+            <div class="game-title">
+
+                <div class="game-icon">
+                    ${game.icon}
+                </div>
+
+                <div>
+
+                    <div class="game-name">
+                        ${escapeHtml(game.name)}
+                    </div>
+
+                    <div class="game-host">
+                        Hosted by
+                        <strong>
+                            ${escapeHtml(game.hostName)}
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="game-status ${statusClass}">
+                ${statusText}
+            </div>
+
+        </div>
+
+        <div class="game-info">
+
+            <div class="game-pill">
+                Players:
+                <strong>
+                    ${game.players.length}/${game.maxPlayers}
+                </strong>
+            </div>
+
+            ${
+                game.status==="running"
+                ?
+                `
+                <div class="game-pill">
+                    Turn:
+                    <strong>
+                        ${escapeHtml(
+                            game.players[
+                                game.turnIndex
+                            ]?.username||"?"
+                        )}
+                    </strong>
+                </div>
+                `
+                :
+                ""
+            }
+
+            ${
+                game.status==="finished"
+                ?
+                `
+                <div class="game-pill">
+                    ${
+                        game.forceStopped
+                        ?"Game force stopped"
+                        :
+                        game.winner==="draw"
+                        ?"Draw"
+                        :
+                        game.winner
+                        ?"Winner: "+escapeHtml(game.winner)
+                        :"Game ended"
+                    }
+                </div>
+                `
+                :
+                ""
+            }
+
+        </div>
+
+        <div class="game-body">
+
+            <div class="game-players"></div>
+
+            <div class="game-actions"></div>
+
+            <div class="game-board-wrap"></div>
+
+        </div>
+    `;
+
+    const playersEl=
+        card.querySelector(
+            ".game-players"
+        );
+
+    game.players.forEach(player=>{
+
+        const row=
+            document.createElement("div");
+
+        row.className="player-row";
+
+        const turn=
+            game.status==="running"&&
+            game.players[
+                game.turnIndex
+            ]?.deviceId===
+            player.deviceId;
+
+        row.innerHTML=`
+
+            <div class="player-name">
+
+                <span class="
+                    player-dot
+                    ${player.index===0?"host":""}
+                    ${turn?"turn":""}
+                "></span>
+
+                <span>
+                    ${escapeHtml(
+                        player.username
+                    )}
+                </span>
+
+                ${
+                    player.deviceId===
+                    game.hostDeviceId
+                    ?
+                    `<small style="color:#ffd166">
+                        HOST
+                    </small>`
+                    :
+                    ""
+                }
+
+            </div>
+
+            ${
+                turn
+                ?
+                `<span style="color:#65d68b">
+                    TURN
+                </span>`
+                :
+                ""
+            }
+
+        `;
+
+        playersEl.appendChild(row);
+    });
+
+
+    const actions=
+        card.querySelector(
+            ".game-actions"
+        );
+
+    const board=
+        card.querySelector(
+            ".game-board-wrap"
+        );
+
+
+    const me=
+        getMyPlayer(game);
+
+    const isHost=
+        game.hostDeviceId===
+        deviceId;
+
+    const playing=
+        !!me;
+
+    if(game.status==="waiting"){
+
+        if(!playing){
+
+            addGameButton(
+                actions,
+                "Join",
+                "primary",
+                "join",
+                game.gameId
+            );
+
+        }else{
+
+            addGameButton(
+                actions,
+                "Joined",
+                "green",
+                null,
+                null
+            );
+
+        }
+
+        if(isHost){
+
+            addGameButton(
+                actions,
+                "Start Game",
+                "primary",
+                "start",
+                game.gameId
+            );
+
+            addGameButton(
+                actions,
+                "Force Quit",
+                "danger",
+                "force",
+                game.gameId
+            );
+
+        }else if(playing){
+
+            addGameButton(
+                actions,
+                "Leave",
+                "",
+                "leave",
+                game.gameId
+            );
+        }
+
+    }else if(game.status==="running"){
+
+        if(playing){
+
+            addGameButton(
+                actions,
+                "Leave",
+                "",
+                "leave",
+                game.gameId
+            );
+        }
+
+        if(isHost){
+
+            addGameButton(
+                actions,
+                "Force Quit",
+                "danger",
+                "force",
+                game.gameId
+            );
+        }
+
+    }
+
+
+    if(game.status==="running"){
+
+        const turnPlayer=
+            game.players[
+                game.turnIndex
+            ];
+
+        const banner=
+            document.createElement("div");
+
+        banner.className=
+            "turn-banner";
+
+        const myTurn=
+            turnPlayer?.deviceId===
+            deviceId;
+
+        if(myTurn){
+
+            banner.classList.add(
+                "my-turn"
+            );
+
+            banner.textContent=
+                "🟢 Your turn";
+
+        }else{
+
+            banner.textContent=
+                "⏳ "+(
+                    turnPlayer?.username||
+                    "Unknown"
+                )+
+                "'s turn";
+        }
+
+        board.appendChild(banner);
+    }
+
+
+    renderGameBoard(
+        game,
+        board
+    );
+
+
+    wrapper.appendChild(card);
+
+    return wrapper;
+}
+
+
+/* =========================================================
+   GAME BUTTON
+========================================================= */
+
+function addGameButton(
+    parent,
+    text,
+    className,
+    action,
+    value
+){
+
+    const button=
+        document.createElement("button");
+
+    button.className=
+        "game-btn "+className;
+
+    button.textContent=text;
+
+    if(action){
+
+        button.onclick=event=>{
+
+            event.stopPropagation();
+
+            handleGameAction(
+                games[value],
+                action,
+                null
+            );
+        };
+    }
+
+    parent.appendChild(button);
+}
+
+
+/* =========================================================
+   RENDER GAME BOARD
+========================================================= */
+
+function renderGameBoard(
+    game,
+    container
+){
+
+    if(game.status!=="running"){
+
+        return;
+    }
+
+    if(game.type==="ttt"){
+
+        renderTTT(
+            game,
+            container
+        );
+
+    }else if(game.type==="connect4"){
+
+        renderConnect4(
+            game,
+            container
+        );
+
+    }else if(game.type==="reversi"){
+
+        renderReversi(
+            game,
+            container
+        );
+
+    }else if(game.type==="dice"){
+
+        renderDice(
+            game,
+            container
+        );
+
+    }else if(game.type==="race"){
+
+        renderRace(
+            game,
+            container
+        );
+    }
+}
+
+
+/* =========================================================
+   TTT UI
+========================================================= */
+
+function renderTTT(game,container){
+
+    const board=
+        document.createElement("div");
+
+    board.className="ttt-board";
+
+    game.state.board.forEach(
+        (value,index)=>{
+
+            const button=
+                document.createElement("button");
+
+            button.className=
+                "ttt-cell";
+
+            button.textContent=
+                value||"";
+
+            button.onclick=()=>{
+
+                handleGameAction(
+                    game,
+                    "ttt",
+                    index
+                );
+            };
+
+            board.appendChild(button);
+        }
+    );
+
+    container.appendChild(board);
+}
+
+
+/* =========================================================
+   CONNECT UI
+========================================================= */
+
+function renderConnect4(
+    game,
+    container
+){
+
+    const board=
+        document.createElement("div");
+
+    board.className=
+        "connect-board";
+
+    game.state.board.forEach(
+        (value,index)=>{
+
+            const button=
+                document.createElement("button");
+
+            button.className=
+                "connect-cell "+
+                (value||"");
+
+            button.onclick=()=>{
+
+                handleGameAction(
+                    game,
+                    "connect",
+                    index%7
+                );
+            };
+
+            board.appendChild(button);
+        }
+    );
+
+    container.appendChild(board);
+}
+
+
+/* =========================================================
+   REVERSI UI
+========================================================= */
+
+function renderReversi(
+    game,
+    container
+){
+
+    const board=
+        document.createElement("div");
+
+    board.className=
+        "reversi-board";
+
+    game.state.board.forEach(
+        (value,index)=>{
+
+            const cell=
+                document.createElement("button");
+
+            cell.className=
+                "reversi-cell";
+
+            cell.onclick=()=>{
+
+                handleGameAction(
+                    game,
+                    "reversi",
+                    index
+                );
+            };
+
+            if(value){
+
+                const piece=
+                    document.createElement("div");
+
+                piece.className=
+                    "reversi-piece "+
+                    value;
+
+                cell.appendChild(piece);
+            }
+
+            board.appendChild(cell);
+        }
+    );
+
+    container.appendChild(board);
+}
+
+
+/* =========================================================
+   DICE UI
+========================================================= */
+
 function renderDice(
-    state,
-    isMyTurn
+    game,
+    container
 ){
 
     const area=
@@ -3735,654 +3145,429 @@ function renderDice(
     area.className=
         "dice-area";
 
-
     const dice=
         document.createElement("div");
 
     dice.className="dice";
 
-
-    const myRoll=
-        state.data.rolls[deviceId];
-
-
     dice.textContent=
-        myRoll
-        ?"🎲 "+myRoll
-        :"🎲";
-
+        game.state.lastRoll||
+        "🎲";
 
     area.appendChild(dice);
 
+    if(game.state.lastRoll){
 
-    const button=
-        document.createElement("button");
-
-    button.className=
-        "primary-btn";
-
-    button.textContent=
-        "Roll Dice";
-
-
-    button.disabled=
-        !isMyTurn ||
-        state.status!=="running" ||
-        myRoll;
-
-
-    button.onclick=()=>{
-
-        playDice(state);
-
-    };
-
-
-    area.appendChild(button);
-
-
-    const result=
-        document.createElement("div");
-
-    result.style.color=
-        "var(--muted)";
-
-    result.textContent=
-        Object.entries(
-            state.data.rolls
-        )
-        .map(
-            ([id,roll])=>{
-                const p=
-                    state.players.find(
-                        x=>x.id===id
-                    );
-
-                return (
-                    p?.name||
-                    "Player"
-                )+
-                ": "+
-                roll;
-            }
-        )
-        .join(" • ");
-
-
-    area.appendChild(result);
-
-
-    gameContent.appendChild(area);
-
-}
-
-
-async function playDice(state){
-
-    if(state.status!=="running")return;
-
-
-    const player=
-        state.players[
-            state.turnIndex
-        ];
-
-
-    if(
-        !player ||
-        player.id!==deviceId
-    ){
-
-        return;
-    }
-
-
-    const roll=
-        Math.floor(
-            Math.random()*6
-        )+1;
-
-
-    state.data.rolls[deviceId]=
-        roll;
-
-
-    if(
-        Object.keys(
-            state.data.rolls
-        ).length>=
-        state.players.length
-    ){
-
-        const entries=
-            state.players.map(
-                p=>({
-                    player:p,
-                    roll:
-                        state.data.rolls[p.id]
-                })
-            );
-
-
-        entries.sort(
-            (a,b)=>b.roll-a.roll
-        );
-
-
-        if(
-            entries[0].roll===
-            entries[1].roll
-        ){
-
-            state.message=
-                "Draw! Both rolled "+
-                entries[0].roll+".";
-
-        }else{
-
-            state.status="finished";
-
-            state.winner=
-                entries[0].player.id;
-
-            state.message=
-                entries[0].player.name+
-                " wins with "+
-                entries[0].roll+"!";
-
-        }
-
-    }else{
-
-        state.turnIndex=
-            (state.turnIndex+1)%
-            state.players.length;
-
-        state.message=
-            state.players[
-                state.turnIndex
-            ].name+
-            "'s turn.";
-
-    }
-
-
-    await saveGameState(state);
-
-    await loadMessages();
-
-}
-
-
-/* =========================================================
-   ROCK PAPER SCISSORS
-========================================================= */
-
-function renderRPS(
-    state,
-    isMyTurn
-){
-
-    const area=
-        document.createElement("div");
-
-    area.className=
-        "rps-area";
-
-
-    const choices=[
-
-        ["rock","✊ Rock"],
-        ["paper","✋ Paper"],
-        ["scissors","✌️ Scissors"]
-
-    ];
-
-
-    choices.forEach(
-        ([value,label])=>{
-
-            const button=
-                document.createElement("button");
-
-            button.className=
-                "rps-choice";
-
-            button.textContent=label;
-
-            button.disabled=
-                !isMyTurn ||
-                state.status!=="running" ||
-                state.data.choices[
-                    deviceId
-                ];
-
-
-            button.onclick=()=>{
-
-                playRPS(
-                    state,
-                    value
-                );
-
-            };
-
-
-            area.appendChild(button);
-
-        }
-    );
-
-
-    gameContent.appendChild(area);
-
-
-    const choicesText=
-        document.createElement("div");
-
-    choicesText.className=
-        "game-message";
-
-
-    choicesText.textContent=
-        state.players
-        .map(
-            p=>{
-                const choice=
-                    state.data.choices[p.id];
-
-                return p.name+
-                    ": "+
-                    (
-                        choice
-                        ?"✓ chosen"
-                        :"waiting"
-                    );
-            }
-        )
-        .join(" • ");
-
-
-    gameContent.appendChild(
-        choicesText
-    );
-
-}
-
-
-async function playRPS(
-    state,
-    choice
-){
-
-    if(state.status!=="running")return;
-
-
-    const player=
-        state.players[
-            state.turnIndex
-        ];
-
-
-    if(
-        !player ||
-        player.id!==deviceId
-    ){
-
-        return;
-    }
-
-
-    state.data.choices[deviceId]=
-        choice;
-
-
-    if(
-        Object.keys(
-            state.data.choices
-        ).length>=
-        state.players.length
-    ){
-
-        const a=
-            state.players[0];
-
-        const b=
-            state.players[1];
-
-        const ca=
-            state.data.choices[a.id];
-
-        const cb=
-            state.data.choices[b.id];
-
-
-        if(ca===cb){
-
-            state.status="finished";
-
-            state.message=
-                "Draw!";
-
-        }else{
-
-            const wins={
-
-                rock:"scissors",
-
-                paper:"rock",
-
-                scissors:"paper"
-
-            };
-
-
-            const winner=
-                wins[ca]===cb
-                ?a
-                :b;
-
-
-            state.status="finished";
-
-            state.winner=
-                winner.id;
-
-            state.message=
-                winner.name+
-                " wins!";
-
-        }
-
-    }else{
-
-        state.turnIndex=
-            (state.turnIndex+1)%
-            state.players.length;
-
-        state.message=
-            state.players[
-                state.turnIndex
-            ].name+
-            "'s turn.";
-
-    }
-
-
-    await saveGameState(state);
-
-    await loadMessages();
-
-}
-
-
-/* =========================================================
-   HIGH CARD
-========================================================= */
-
-function makeDeck(){
-
-    const suits=[
-        "♠",
-        "♥",
-        "♦",
-        "♣"
-    ];
-
-    const deck=[];
-
-    for(
-        let value=2;
-        value<=14;
-        value++
-    ){
-
-        for(
-            const suit
-            of suits
-        ){
-
-            deck.push({
-                value,
-                suit
-            });
-
-        }
-
-    }
-
-    return deck;
-}
-
-
-function renderHighLow(
-    state,
-    isMyTurn
-){
-
-    const area=
-        document.createElement("div");
-
-    area.className=
-        "highlow-area";
-
-
-    const card=
-        document.createElement("div");
-
-    card.className=
-        "card-display";
-
-
-    if(state.data.currentCard){
-
-        card.textContent=
-            cardName(
-                state.data.currentCard
-            );
-
-    }else{
-
-        card.textContent="?";
-
-    }
-
-
-    area.appendChild(card);
-
-
-    if(
-        state.status==="running" &&
-        isMyTurn
-    ){
-
-        const buttons=
+        const result=
             document.createElement("div");
 
-        buttons.className=
-            "highlow-buttons";
+        result.className=
+            "dice-result";
 
+        result.textContent=
+            game.state.lastRoller+
+            " rolled "+
+            game.state.lastRoll;
 
-        const high=
+        area.appendChild(result);
+    }
+
+    if(isMyTurn(game)){
+
+        const button=
             document.createElement("button");
 
-        high.className=
-            "primary-btn";
+        button.className=
+            "game-btn primary";
 
-        high.textContent=
-            "Higher";
+        button.textContent=
+            "Roll Dice";
 
+        button.onclick=()=>{
 
-        const low=
-            document.createElement("button");
-
-        low.className=
-            "secondary-btn";
-
-        low.textContent=
-            "Lower";
-
-
-        high.onclick=()=>{
-
-            playHighLow(
-                state,
-                "higher"
+            handleGameAction(
+                game,
+                "dice"
             );
-
         };
 
+        area.appendChild(button);
+    }
 
-        low.onclick=()=>{
+    const scores=
+        document.createElement("div");
 
-            playHighLow(
-                state,
-                "lower"
+    scores.style.width="100%";
+
+    Object.entries(
+        game.state.scores
+    ).forEach(([id,score])=>{
+
+        const player=
+            game.players.find(
+                p=>p.deviceId===id
             );
 
-        };
+        if(!player)return;
 
+        const row=
+            document.createElement("div");
 
-        buttons.appendChild(high);
+        row.className="player-row";
 
-        buttons.appendChild(low);
+        row.innerHTML=`
+            <span>
+                ${escapeHtml(
+                    player.username
+                )}
+            </span>
+            <strong>
+                ${score}
+            </strong>
+        `;
 
-        area.appendChild(buttons);
+        scores.appendChild(row);
+    });
 
-    }
+    area.appendChild(scores);
 
-
-    gameContent.appendChild(area);
-
-}
-
-
-function cardName(card){
-
-    if(!card)return "?";
-
-    const values={
-
-        11:"J",
-        12:"Q",
-        13:"K",
-        14:"A"
-
-    };
-
-
-    return (
-        values[card.value]||
-        card.value
-    )+
-    card.suit;
-
-}
-
-
-async function playHighLow(
-    state,
-    guess
-){
-
-    if(state.status!=="running")return;
-
-
-    const player=
-        state.players[
-            state.turnIndex
-        ];
-
-
-    if(
-        !player ||
-        player.id!==deviceId
-    ){
-
-        return;
-    }
-
-
-    if(
-        !state.data.deck.length
-    ){
-
-        state.data.deck=
-            makeDeck()
-            .sort(
-                ()=>Math.random()-.5
-            );
-
-    }
-
-
-    const current=
-        state.data.currentCard||
-        state.data.deck.pop();
-
-
-    const next=
-        state.data.deck.pop();
-
-
-    state.data.currentCard=
-        next;
-
-
-    const correct=
-        guess==="higher"
-        ?next.value>=current.value
-        :next.value<=current.value;
-
-
-    if(!correct){
-
-        state.status="finished";
-
-        const winner=
-            state.players.find(
-                p=>p.id!==deviceId
-            );
-
-
-        state.winner=
-            winner?.id||null;
-
-
-        state.message=
-            winner
-            ?winner.name+
-              " wins!"
-            :"Game over.";
-
-    }else{
-
-        state.turnIndex=
-            (state.turnIndex+1)%
-            state.players.length;
-
-        state.message=
-            "Correct! "+
-            state.players[
-                state.turnIndex
-            ].name+
-            "'s turn.";
-
-    }
-
-
-    await saveGameState(state);
-
-    await loadMessages();
-
+    container.appendChild(area);
 }
 
 
 /* =========================================================
-   LOAD ALL DATA
+   RACE UI
 ========================================================= */
 
+function renderRace(
+    game,
+    container
+){
+
+    const board=
+        document.createElement("div");
+
+    board.className=
+        "race-board";
+
+    for(let i=0;i<100;i++){
+
+        const cell=
+            document.createElement("div");
+
+        cell.className=
+            "race-cell";
+
+        if(i===99){
+
+            cell.classList.add(
+                "finish"
+            );
+
+            cell.textContent="🏁";
+        }
+
+        game.players.forEach(
+            player=>{
+
+                const position=
+                    game.state.positions[
+                        player.deviceId
+                    ]??0;
+
+                if(position===i){
+
+                    const piece=
+                        document.createElement(
+                            "div"
+                        );
+
+                    piece.className=
+                        "race-piece";
+
+                    piece.title=
+                        player.username;
+
+                    cell.appendChild(piece);
+                }
+            }
+        );
+
+        board.appendChild(cell);
+    }
+
+    container.appendChild(board);
+
+    if(isMyTurn(game)){
+
+        const button=
+            document.createElement("button");
+
+        button.className=
+            "game-btn primary";
+
+        button.style.display="block";
+        button.style.margin="12px auto 0";
+
+        button.textContent=
+            "🎲 Roll & Move";
+
+        button.onclick=()=>{
+
+            handleGameAction(
+                game,
+                "race"
+            );
+        };
+
+        container.appendChild(button);
+    }
+}
+
+
+/* =========================================================
+   RENDER CHAT
+========================================================= */
+
+function renderMessages(){
+
+    const wasBottom=
+        messagesEl.scrollHeight-
+        messagesEl.scrollTop-
+        messagesEl.clientHeight<100;
+
+    processGameMessages();
+
+    const normalMessages=
+        currentMessages.filter(
+            message=>
+                !decodeGame(
+                    message.message
+                )
+        );
+
+    const fragment=
+        document.createDocumentFragment();
+
+
+    /*
+       Normal messages.
+    */
+
+    normalMessages.forEach(message=>{
+
+        const item=
+            document.createElement("div");
+
+        item.className="message";
+
+        item.dataset.id=
+            message.id;
+
+        const avatar=
+            document.createElement("div");
+
+        avatar.className="avatar";
+
+        avatar.textContent=
+            (
+                message.username||
+                "?"
+            )
+            .charAt(0)
+            .toUpperCase();
+
+        const content=
+            document.createElement(
+                "div"
+            );
+
+        content.className=
+            "message-content";
+
+        const top=
+            document.createElement("div");
+
+        top.className=
+            "message-top";
+
+        const name=
+            document.createElement("span");
+
+        name.className="username";
+
+        name.textContent=
+            message.username||
+            "User";
+
+        top.appendChild(name);
+
+        if(settings.showTimestamps){
+
+            const time=
+                document.createElement("span");
+
+            time.className="time";
+
+            time.textContent=
+                formatTime(
+                    message.created_at
+                );
+
+            top.appendChild(time);
+        }
+
+        if(message.edited){
+
+            const edited=
+                document.createElement(
+                    "span"
+                );
+
+            edited.className="edited";
+
+            edited.textContent=
+                "(edited)";
+
+            top.appendChild(edited);
+        }
+
+        content.appendChild(top);
+
+        if(message.message){
+
+            const text=
+                document.createElement(
+                    "div"
+                );
+
+            text.className=
+                "message-text";
+
+            text.textContent=
+                message.message;
+
+            content.appendChild(text);
+        }
+
+        if(message.image){
+
+            const img=
+                document.createElement("img");
+
+            img.className=
+                "message-image";
+
+            img.src=
+                message.image;
+
+            content.appendChild(img);
+        }
+
+        item.appendChild(avatar);
+        item.appendChild(content);
+
+        if(
+            message.device_id===
+            deviceId
+        ){
+
+            item.addEventListener(
+                "contextmenu",
+                event=>{
+
+                    event.preventDefault();
+
+                    selectedMessage=
+                        message;
+
+                    contextMenu.style.left=
+                        event.clientX+
+                        "px";
+
+                    contextMenu.style.top=
+                        event.clientY+
+                        "px";
+
+                    contextMenu.classList.add(
+                        "show"
+                    );
+                }
+            );
+        }
+
+        fragment.appendChild(item);
+    });
+
+
+    /*
+       Game messages.
+
+       They are still stored in messages,
+       but are rendered as interactive game
+       cards instead of visible raw JSON.
+    */
+
+    Object.values(games)
+    .sort(
+        (a,b)=>
+            a.createdAt-b.createdAt
+    )
+    .forEach(game=>{
+
+        fragment.appendChild(
+            createGameCard(game)
+        );
+    });
+
+
+    if(
+        !fragment.childNodes.length
+    ){
+
+        const empty=
+            document.createElement("div");
+
+        empty.className="empty";
+
+        empty.innerHTML=`
+            <div>
+                <strong>
+                    No messages yet
+                </strong>
+                Be the first to send something.
+            </div>
+        `;
+
+        fragment.appendChild(empty);
+    }
+
+    messagesEl.replaceChildren(
+        fragment
+    );
+
+    if(
+        wasBottom&&
+        settings.autoScroll
+    ){
+
+        messagesEl.scrollTop=
+            messagesEl.scrollHeight;
+    }
+}
+
+
+/* =========================================================
+   LOAD MESSAGES
+========================================================= */
+
+let loadingMessages=false;
+
 async function loadMessages(){
+
+    if(loadingMessages)return;
+
+    loadingMessages=true;
 
     try{
 
@@ -4390,13 +3575,16 @@ async function loadMessages(){
             await fetch(
                 API_URL+
                 "?channel="+
-                encodeURIComponent(CHANNEL)
+                encodeURIComponent(
+                    CHANNEL
+                ),
+                {
+                    cache:"no-store"
+                }
             );
-
 
         const data=
             await response.json();
-
 
         if(!response.ok){
 
@@ -4404,619 +3592,81 @@ async function loadMessages(){
                 data.error||
                 "Failed to load messages."
             );
-
         }
-
 
         currentMessages=
             Array.isArray(data.messages)
             ?data.messages
             :[];
 
-
-        processGameMessages();
-
         renderMessages();
-
-        renderGamesList();
-
-
-        if(currentGameId){
-
-            const current=
-                gameStates.get(
-                    currentGameId
-                );
-
-
-            if(current){
-
-                renderGameRoom(current);
-
-            }else{
-
-                gameRoomOverlay
-                    .classList.remove(
-                        "show"
-                    );
-
-                currentGameId=null;
-
-            }
-
-        }
-
 
     }catch(error){
 
-        messagesEl.innerHTML=`
+        console.error(error);
 
-            <div class="empty">
+    }finally{
 
-                <div>
-
-                    <strong>
-                        Unable to load messages
-                    </strong>
-
-                    ${escapeHtml(
-                        error.message
-                    )}
-
-                </div>
-
-            </div>
-
-        `;
-
+        loadingMessages=false;
     }
-
 }
 
 
 /* =========================================================
-   PROCESS HIDDEN GAME MESSAGES
+   FAST GAME REFRESH
 ========================================================= */
 
-function processGameMessages(){
+function startGameRefresh(){
 
-    const map=
-        new Map();
+    if(gameTimer){
 
+        clearInterval(
+            gameTimer
+        );
+    }
 
     /*
-       Every game state is a new message.
-
-       The newest message for each game ID
-       becomes the current state.
+       Only poll this fast while at least
+       one game is active.
     */
 
-    for(
-        const message
-        of currentMessages
-    ){
+    gameTimer=
+        setInterval(
+            async()=>{
 
-        const state=
-            decodeGameState(message);
+                if(
+                    activeGameIds.size
+                ){
 
+                    await loadMessages();
+                }
 
-        if(!state)continue;
-
-
-        const existing=
-            map.get(state.id);
-
-
-        if(
-            !existing ||
-            state.updatedAt>=
-            (existing.updatedAt||0)
-        ){
-
-            state.updatedAt=
-                state.updatedAt||
-                new Date(
-                    message.created_at
-                ).getTime()||
-                Date.now();
-
-
-            map.set(
-                state.id,
-                state
-            );
-
-        }
-
-    }
-
-
-    gameStates=map;
-
-
-    /*
-       If someone else force-stopped a game
-       while we were inside it, close it.
-    */
-
-    if(currentGameId){
-
-        const state=
-            gameStates.get(
-                currentGameId
-            );
-
-
-        if(
-            !state ||
-            state.status==="stopped"
-        ){
-
-            gameRoomOverlay
-                .classList.remove(
-                    "show"
-                );
-
-            currentGameId=null;
-
-        }
-
-    }
-
+            },
+            GAME_REFRESH_MS
+        );
 }
 
 
 /* =========================================================
-   GAMES LIST
+   NORMAL REFRESH
 ========================================================= */
 
-function renderGamesList(){
+function startNormalRefresh(){
 
-    gamesList.innerHTML="";
+    if(refreshTimer){
 
-
-    const active=
-        [...gameStates.values()]
-        .filter(
-            state=>
-                state.status==="lobby" ||
-                state.status==="running"
-        )
-        .sort(
-            (a,b)=>
-                b.createdAt-a.createdAt
+        clearInterval(
+            refreshTimer
         );
-
-
-    if(!active.length){
-
-        gamesList.innerHTML=`
-
-            <div class="no-games">
-
-                <strong>
-                    No active games
-                </strong>
-
-                <br>
-
-                Host a game to get started.
-
-            </div>
-
-        `;
-
-        return;
     }
 
-
-    active.forEach(state=>{
-
-        const definition=
-            GAME_DEFINITIONS[
-                state.type
-            ];
-
-
-        const card=
-            document.createElement("div");
-
-        card.className=
-            "game-card";
-
-
-        const title=
-            document.createElement("h3");
-
-        title.textContent=
-            definition.icon+
-            " "+
-            definition.name;
-
-
-        const description=
-            document.createElement("div");
-
-        description.className=
-            "game-description";
-
-        description.textContent=
-            definition.description;
-
-
-        const status=
-            document.createElement("div");
-
-        status.className=
-            "game-status";
-
-
-        const dot=
-            document.createElement("span");
-
-        dot.className=
-            "status-dot";
-
-
-        if(
-            state.status==="lobby"
-        ){
-
-            dot.classList.add(
-                "waiting"
-            );
-
-        }
-
-
-        status.appendChild(dot);
-
-
-        status.appendChild(
-            document.createTextNode(
-                state.status==="lobby"
-                ?" Waiting for players"
-                :" In progress"
+    refreshTimer=
+        setInterval(
+            loadMessages,
+            Number(
+                settings.refreshRate
             )
         );
-
-
-        const footer=
-            document.createElement(
-                "div"
-            );
-
-        footer.className=
-            "game-card-footer";
-
-
-        const players=
-            document.createElement(
-                "span"
-            );
-
-        players.className=
-            "players-small";
-
-        players.textContent=
-            state.players.length+
-            "/"+
-            definition.maxPlayers+
-            " players";
-
-
-        const button=
-            document.createElement(
-                "button"
-            );
-
-        button.className=
-            state.players.some(
-                p=>p.id===deviceId
-            )
-            ?"secondary-btn"
-            :"primary-btn";
-
-
-        button.textContent=
-            state.players.some(
-                p=>p.id===deviceId
-            )
-            ?"Open"
-            :"Join";
-
-
-        button.onclick=()=>{
-
-            joinGame(state.id);
-
-        };
-
-
-        footer.appendChild(players);
-
-        footer.appendChild(button);
-
-
-        card.appendChild(title);
-
-        card.appendChild(description);
-
-        card.appendChild(status);
-
-        card.appendChild(footer);
-
-
-        gamesList.appendChild(card);
-
-    });
-
-}
-
-
-/* =========================================================
-   NORMAL CHAT RENDER
-========================================================= */
-
-function isGameMessage(message){
-
-    return (
-        typeof message?.message==="string" &&
-        message.message.startsWith(
-            GAME_MARKER
-        )
-    );
-
-}
-
-
-function renderMessages(){
-
-    const normalMessages=
-        currentMessages.filter(
-            message=>
-                !isGameMessage(message)
-        );
-
-
-    const wasBottom=
-        messagesEl.scrollHeight-
-        messagesEl.scrollTop-
-        messagesEl.clientHeight<
-        100;
-
-
-    if(!normalMessages.length){
-
-        messagesEl.innerHTML=`
-
-            <div class="empty">
-
-                <div>
-
-                    <strong>
-                        No messages yet
-                    </strong>
-
-                    Be the first to send something.
-
-                </div>
-
-            </div>
-
-        `;
-
-        return;
-    }
-
-
-    const fragment=
-        document.createDocumentFragment();
-
-
-    normalMessages.forEach(
-        message=>{
-
-            const item=
-                document.createElement(
-                    "div"
-                );
-
-            item.className="message";
-
-            item.dataset.id=
-                message.id;
-
-
-            const avatar=
-                document.createElement(
-                    "div"
-                );
-
-            avatar.className="avatar";
-
-            avatar.textContent=
-                (
-                    message.username||
-                    "?"
-                )
-                .charAt(0)
-                .toUpperCase();
-
-
-            const content=
-                document.createElement(
-                    "div"
-                );
-
-            content.className=
-                "message-content";
-
-
-            const top=
-                document.createElement(
-                    "div"
-                );
-
-            top.className=
-                "message-top";
-
-
-            const name=
-                document.createElement(
-                    "span"
-                );
-
-            name.className=
-                "username";
-
-            name.textContent=
-                message.username||
-                "User";
-
-
-            top.appendChild(name);
-
-
-            if(
-                settings.showTimestamps
-            ){
-
-                const time=
-                    document.createElement(
-                        "span"
-                    );
-
-                time.className="time";
-
-                time.textContent=
-                    formatTime(
-                        message.created_at
-                    );
-
-                top.appendChild(time);
-
-            }
-
-
-            if(message.edited){
-
-                const edited=
-                    document.createElement(
-                        "span"
-                    );
-
-                edited.className=
-                    "edited";
-
-                edited.textContent=
-                    "(edited)";
-
-                top.appendChild(edited);
-
-            }
-
-
-            content.appendChild(top);
-
-
-            if(message.message){
-
-                const text=
-                    document.createElement(
-                        "div"
-                    );
-
-                text.className=
-                    "message-text";
-
-                text.textContent=
-                    message.message;
-
-                content.appendChild(text);
-
-            }
-
-
-            if(message.image){
-
-                const img=
-                    document.createElement(
-                        "img"
-                    );
-
-                img.className=
-                    "message-image";
-
-                img.src=
-                    message.image;
-
-                img.alt="Image";
-
-
-                img.onclick=()=>{
-
-                    openImage(
-                        message.image
-                    );
-
-                };
-
-
-                content.appendChild(img);
-
-            }
-
-
-            item.appendChild(avatar);
-
-            item.appendChild(content);
-
-
-            if(
-                message.device_id &&
-                message.device_id===deviceId
-            ){
-
-                item.addEventListener(
-                    "contextmenu",
-                    event=>{
-
-                        event.preventDefault();
-
-                        showContextMenu(
-                            event.clientX,
-                            event.clientY,
-                            message
-                        );
-
-                    }
-                );
-
-            }
-
-
-            fragment.appendChild(item);
-
-        }
-    );
-
-
-    messagesEl.replaceChildren(
-        fragment
-    );
-
-
-    if(
-        wasBottom &&
-        settings.autoScroll
-    ){
-
-        messagesEl.scrollTop=
-            messagesEl.scrollHeight;
-
-    }
-
 }
 
 
@@ -5024,91 +3674,69 @@ function renderMessages(){
    SETTINGS
 ========================================================= */
 
-function applySettings(){
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--text-size",
-            settings.textSize+"px"
-        );
-
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--word-spacing",
-            settings.wordSpacing+"px"
-        );
-
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--line-spacing",
-            settings.lineSpacing
-        );
-
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--radius",
-            settings.cornerRadius+"px"
-        );
-
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--ui-scale",
-            settings.uiScale
-        );
-
-
-    applyTheme(
-        settings.theme
-    );
-
-
-    gamesBtn.style.display=
-        settings.showGamesButton
-        ?"block"
-        :"none";
-
-
-    renderMessages();
-
-    startRefreshTimer();
-
-    startGameTimer();
-
-}
-
-
 function applyTheme(name){
 
     const themes={
 
-        dark:["#0b0d10","#111419"],
-        midnight:["#080b14","#101522"],
-        slate:["#101418","#171d22"],
-        black:["#000","#090909"],
-        blue:["#091018","#101c29"],
-        purple:["#100b17","#191021"],
-        green:["#09120d","#101b15"],
-        red:["#140b0b","#1e1111"],
-        gray:["#151515","#202020"],
-        light:["#eeeeee","#fff"],
-        oled:["#000","#000"]
+        dark:[
+            "#0b0d10",
+            "#111419"
+        ],
 
+        midnight:[
+            "#080b14",
+            "#101522"
+        ],
+
+        slate:[
+            "#101418",
+            "#171d22"
+        ],
+
+        black:[
+            "#000",
+            "#090909"
+        ],
+
+        blue:[
+            "#091018",
+            "#101c29"
+        ],
+
+        purple:[
+            "#100b17",
+            "#191021"
+        ],
+
+        green:[
+            "#09120d",
+            "#101b15"
+        ],
+
+        red:[
+            "#140b0b",
+            "#1e1111"
+        ],
+
+        gray:[
+            "#151515",
+            "#202020"
+        ],
+
+        light:[
+            "#eeeeee",
+            "#fff"
+        ],
+
+        oled:[
+            "#000",
+            "#000"
+        ]
     };
-
 
     const t=
         themes[name]||
         themes.dark;
-
 
     document.documentElement
         .style
@@ -5117,18 +3745,60 @@ function applyTheme(name){
             t[0]
         );
 
-
     document.documentElement
         .style
         .setProperty(
             "--panel",
             t[1]
         );
+}
 
 
-    document.body.style.background=
-        t[0];
+function applySettings(){
 
+    document.documentElement
+        .style
+        .setProperty(
+            "--text-size",
+            settings.textSize+
+            "px"
+        );
+
+    document.documentElement
+        .style
+        .setProperty(
+            "--word-spacing",
+            settings.wordSpacing+
+            "px"
+        );
+
+    document.documentElement
+        .style
+        .setProperty(
+            "--line-spacing",
+            settings.lineSpacing
+        );
+
+    document.documentElement
+        .style
+        .setProperty(
+            "--radius",
+            settings.cornerRadius+
+            "px"
+        );
+
+    document.documentElement
+        .style
+        .setProperty(
+            "--ui-scale",
+            settings.uiScale
+        );
+
+    applyTheme(
+        settings.theme
+    );
+
+    startNormalRefresh();
 }
 
 
@@ -5139,7 +3809,6 @@ function loadSettingsUI(){
 
     deviceIdInput.value=
         deviceId;
-
 
     themeSelect.value=
         settings.theme;
@@ -5157,7 +3826,6 @@ function loadSettingsUI(){
             settings.compactMessages
         );
 
-
     textSize.value=
         settings.textSize;
 
@@ -5167,13 +3835,11 @@ function loadSettingsUI(){
     lineSpacing.value=
         settings.lineSpacing;
 
-
     cornerRadius.value=
         settings.cornerRadius;
 
     uiScale.value=
         settings.uiScale;
-
 
     enterToSend.value=
         String(
@@ -5189,46 +3855,6 @@ function loadSettingsUI(){
         String(
             settings.confirmDelete
         );
-
-
-    showGamesButton.value=
-        String(
-            settings.showGamesButton
-        );
-
-    gameRefresh.value=
-        settings.gameRefresh;
-
-    gameSounds.value=
-        String(
-            settings.gameSounds
-        );
-
-
-    updateRangeLabels();
-
-}
-
-
-function updateRangeLabels(){
-
-    textSizeValue.textContent=
-        textSize.value+"px";
-
-    wordSpacingValue.textContent=
-        wordSpacing.value+"px";
-
-    lineSpacingValue.textContent=
-        lineSpacing.value;
-
-    cornerRadiusValue.textContent=
-        cornerRadius.value+"px";
-
-    uiScaleValue.textContent=
-        Math.round(
-            Number(uiScale.value)*100
-        )+"%";
-
 }
 
 
@@ -5236,17 +3862,17 @@ settingsBtn.onclick=()=>{
 
     loadSettingsUI();
 
-    settingsOverlay
-        .classList.add("show");
-
+    settingsOverlay.classList.add(
+        "show"
+    );
 };
 
 
 closeSettings.onclick=()=>{
 
-    settingsOverlay
-        .classList.remove("show");
-
+    settingsOverlay.classList.remove(
+        "show"
+    );
 };
 
 
@@ -5266,77 +3892,56 @@ saveSettings.onclick=()=>{
         );
 
     settings.showTimestamps=
-        showTimestamps.value==="true";
+        showTimestamps.value===
+        "true";
 
     settings.compactMessages=
-        compactMessages.value==="true";
-
+        compactMessages.value===
+        "true";
 
     settings.textSize=
-        Number(
-            textSize.value
-        );
+        Number(textSize.value);
 
     settings.wordSpacing=
-        Number(
-            wordSpacing.value
-        );
+        Number(wordSpacing.value);
 
     settings.lineSpacing=
-        Number(
-            lineSpacing.value
-        );
-
+        Number(lineSpacing.value);
 
     settings.cornerRadius=
-        Number(
-            cornerRadius.value
-        );
+        Number(cornerRadius.value);
 
     settings.uiScale=
-        Number(
-            uiScale.value
-        );
-
+        Number(uiScale.value);
 
     settings.enterToSend=
-        enterToSend.value==="true";
+        enterToSend.value===
+        "true";
 
     settings.autoScroll=
-        autoScroll.value==="true";
+        autoScroll.value===
+        "true";
 
     settings.confirmDelete=
-        confirmDelete.value==="true";
-
-
-    settings.showGamesButton=
-        showGamesButton.value==="true";
-
-    settings.gameRefresh=
-        Number(
-            gameRefresh.value
-        );
-
-    settings.gameSounds=
-        gameSounds.value==="true";
-
+        confirmDelete.value===
+        "true";
 
     Object.keys(settings)
-        .forEach(key=>{
+    .forEach(key=>{
 
-            localStorage.setItem(
-                "chat_"+key,
-                settings[key]
-            );
-
-        });
-
+        localStorage.setItem(
+            "chat_"+key,
+            settings[key]
+        );
+    });
 
     applySettings();
 
-    settingsOverlay
-        .classList.remove("show");
+    settingsOverlay.classList.remove(
+        "show"
+    );
 
+    renderMessages();
 };
 
 
@@ -5345,81 +3950,22 @@ saveSettings.onclick=()=>{
 ========================================================= */
 
 document
-.querySelectorAll(".category-title")
-.forEach(btn=>{
+.querySelectorAll(
+    ".category-title"
+)
+.forEach(button=>{
 
-    btn.onclick=()=>{
+    button.onclick=()=>{
 
-        btn.parentElement
-            .classList.toggle(
-                "open"
-            );
-
+        button.parentElement
+            .classList
+            .toggle("open");
     };
-
 });
 
 
 /* =========================================================
-   RANGE
-========================================================= */
-
-textSize.oninput=
-    updateRangeLabels;
-
-wordSpacing.oninput=
-    updateRangeLabels;
-
-lineSpacing.oninput=
-    updateRangeLabels;
-
-cornerRadius.oninput=
-    updateRangeLabels;
-
-uiScale.oninput=
-    updateRangeLabels;
-
-
-/* =========================================================
-   GAME WINDOWS
-========================================================= */
-
-gamesBtn.onclick=async()=>{
-
-    await loadMessages();
-
-    gamesOverlay
-        .classList.add("show");
-
-};
-
-
-closeGames.onclick=()=>{
-
-    gamesOverlay
-        .classList.remove("show");
-
-};
-
-
-createGameBtn.onclick=()=>{
-
-    createGameOverlay
-        .classList.add("show");
-
-};
-
-
-closeCreateGame.onclick=()=>{
-
-    createGameOverlay
-        .classList.remove("show");
-
-};
-
-
-/* =========================================================
-   TEXT AREA
+   TEXTAREA
 ========================================================= */
 
 messageInput.addEventListener(
@@ -5433,152 +3979,13 @@ messageInput.addEventListener(
             Math.min(
                 messageInput.scrollHeight,
                 150
-            )+
-            "px";
-
+            )+"px";
     }
 );
 
 
 /* =========================================================
-   IMAGE
-========================================================= */
-
-attachBtn.onclick=()=>{
-
-    imageInput.click();
-
-};
-
-
-imageInput.onchange=()=>{
-
-    selectedFile=
-        imageInput.files[0]||
-        null;
-
-    attachBtn.textContent=
-        selectedFile
-        ?"✓"
-        :"＋";
-
-};
-
-
-/* =========================================================
-   IMAGE RESIZE
-========================================================= */
-
-function resizeImage(file){
-
-    return new Promise(
-        (resolve,reject)=>{
-
-            const reader=
-                new FileReader();
-
-
-            reader.onload=()=>{
-
-                const img=
-                    new Image();
-
-
-                img.onload=()=>{
-
-                    let width=
-                        img.width;
-
-                    let height=
-                        img.height;
-
-
-                    const max=1500;
-
-
-                    if(
-                        width>max ||
-                        height>max
-                    ){
-
-                        const scale=
-                            Math.min(
-                                max/width,
-                                max/height
-                            );
-
-
-                        width=
-                            Math.round(
-                                width*scale
-                            );
-
-                        height=
-                            Math.round(
-                                height*scale
-                            );
-
-                    }
-
-
-                    const canvas=
-                        document.createElement(
-                            "canvas"
-                        );
-
-
-                    canvas.width=
-                        width;
-
-                    canvas.height=
-                        height;
-
-
-                    const ctx=
-                        canvas.getContext(
-                            "2d"
-                        );
-
-
-                    ctx.drawImage(
-                        img,
-                        0,
-                        0,
-                        width,
-                        height
-                    );
-
-
-                    resolve(
-                        canvas.toDataURL(
-                            "image/jpeg",
-                            .78
-                        )
-                    );
-
-                };
-
-
-                img.onerror=reject;
-
-                img.src=
-                    reader.result;
-
-            };
-
-
-            reader.onerror=reject;
-
-            reader.readAsDataURL(file);
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   SEND CHAT
+   SEND MESSAGE
 ========================================================= */
 
 sendBtn.onclick=
@@ -5590,17 +3997,15 @@ messageInput.addEventListener(
     event=>{
 
         if(
-            event.key==="Enter" &&
-            !event.shiftKey &&
+            event.key==="Enter"&&
+            !event.shiftKey&&
             settings.enterToSend
         ){
 
             event.preventDefault();
 
             sendMessage();
-
         }
-
     }
 );
 
@@ -5610,10 +4015,11 @@ async function sendMessage(){
     const text=
         messageInput.value.trim();
 
-
     if(!settings.username){
 
-        settingsBtn.click();
+        settingsOverlay.classList.add(
+            "show"
+        );
 
         usernameInput.focus();
 
@@ -5624,24 +4030,13 @@ async function sendMessage(){
         return;
     }
 
-
-    if(
-        !text &&
-        !selectedFile
-    ){
-
-        return;
-
-    }
-
+    if(!text&&!selectedFile)return;
 
     sendBtn.disabled=true;
-
 
     try{
 
         let image=null;
-
 
         if(selectedFile){
 
@@ -5649,15 +4044,12 @@ async function sendMessage(){
                 await resizeImage(
                     selectedFile
                 );
-
         }
-
 
         const response=
             await fetch(
                 API_URL,
                 {
-
                     method:"POST",
 
                     headers:{
@@ -5674,49 +4066,39 @@ async function sendMessage(){
                             channel:
                                 CHANNEL,
 
-                            message:text,
+                            message:
+                                text,
 
-                            image:image,
+                            image,
 
                             device_id:
                                 deviceId
-
                         })
-
                 }
             );
 
-
         const data=
             await response.json();
-
 
         if(!response.ok){
 
             throw new Error(
                 data.error||
-                "Failed to send message."
+                "Failed to send."
             );
-
         }
 
-
         messageInput.value="";
-
         messageInput.style.height=
             "auto";
-
 
         selectedFile=null;
 
         imageInput.value="";
 
-        attachBtn.textContent=
-            "＋";
-
+        attachBtn.textContent="＋";
 
         await loadMessages();
-
 
     }catch(error){
 
@@ -5728,64 +4110,134 @@ async function sendMessage(){
     }finally{
 
         sendBtn.disabled=false;
-
     }
-
 }
 
 
 /* =========================================================
-   CONTEXT MENU
+   IMAGE
 ========================================================= */
 
-function showContextMenu(
-    x,
-    y,
-    message
-){
+attachBtn.onclick=()=>{
+    imageInput.click();
+};
 
-    selectedMessage=
-        message;
+imageInput.onchange=()=>{
 
+    selectedFile=
+        imageInput.files[0]||
+        null;
 
-    contextMenu.style.left=
-        Math.min(
-            x,
-            window.innerWidth-170
-        )+
-        "px";
-
-
-    contextMenu.style.top=
-        Math.min(
-            y,
-            window.innerHeight-100
-        )+
-        "px";
+    attachBtn.textContent=
+        selectedFile
+        ?"✓"
+        :"＋";
+};
 
 
-    contextMenu.classList.add(
-        "show"
+function resizeImage(file){
+
+    return new Promise(
+        (resolve,reject)=>{
+
+            const reader=
+                new FileReader();
+
+            reader.onload=()=>{
+
+                const img=
+                    new Image();
+
+                img.onload=()=>{
+
+                    let width=
+                        img.width;
+
+                    let height=
+                        img.height;
+
+                    const max=1500;
+
+                    if(
+                        width>max||
+                        height>max
+                    ){
+
+                        const scale=
+                            Math.min(
+                                max/width,
+                                max/height
+                            );
+
+                        width=
+                            Math.round(
+                                width*scale
+                            );
+
+                        height=
+                            Math.round(
+                                height*scale
+                            );
+                    }
+
+                    const canvas=
+                        document.createElement(
+                            "canvas"
+                        );
+
+                    canvas.width=width;
+                    canvas.height=height;
+
+                    const ctx=
+                        canvas.getContext(
+                            "2d"
+                        );
+
+                    ctx.drawImage(
+                        img,
+                        0,
+                        0,
+                        width,
+                        height
+                    );
+
+                    resolve(
+                        canvas.toDataURL(
+                            "image/jpeg",
+                            .78
+                        )
+                    );
+                };
+
+                img.onerror=reject;
+
+                img.src=
+                    reader.result;
+            };
+
+            reader.onerror=reject;
+
+            reader.readAsDataURL(
+                file
+            );
+        }
     );
-
 }
 
+
+/* =========================================================
+   EDIT / DELETE
+========================================================= */
 
 document.addEventListener(
     "click",
     ()=>{
-
         contextMenu.classList.remove(
             "show"
         );
-
     }
 );
 
-
-/* =========================================================
-   EDIT
-========================================================= */
 
 editMessageBtn.onclick=
 async event=>{
@@ -5796,20 +4248,16 @@ async event=>{
         "show"
     );
 
-
     if(!selectedMessage)return;
 
-
-    const newText=
+    const text=
         prompt(
             "Edit message:",
             selectedMessage.message||
             ""
         );
 
-
-    if(newText===null)return;
-
+    if(text===null)return;
 
     try{
 
@@ -5817,7 +4265,6 @@ async event=>{
             await fetch(
                 API_URL,
                 {
-
                     method:"PATCH",
 
                     headers:{
@@ -5835,30 +4282,23 @@ async event=>{
                                 deviceId,
 
                             message:
-                                newText.trim()
-
+                                text.trim()
                         })
-
                 }
             );
 
-
-        const data=
-            await response.json();
-
-
         if(!response.ok){
+
+            const data=
+                await response.json();
 
             throw new Error(
                 data.error||
-                "Failed to edit message."
+                "Failed to edit."
             );
-
         }
 
-
         await loadMessages();
-
 
     }catch(error){
 
@@ -5866,18 +4306,12 @@ async event=>{
             "Failed to edit:\n\n"+
             error.message
         );
-
     }
-
 };
 
 
-/* =========================================================
-   DELETE
-========================================================= */
-
 deleteMessageBtn.onclick=
-event=>{
+async event=>{
 
     event.stopPropagation();
 
@@ -5885,31 +4319,17 @@ event=>{
         "show"
     );
 
-
     if(!selectedMessage)return;
 
+    if(
+        settings.confirmDelete&&
+        !confirm(
+            "Delete this message?"
+        )
+    ){
 
-    if(settings.confirmDelete){
-
-        openConfirm(
-            "Delete message?",
-            "This message will be permanently removed.",
-            deleteSelectedMessage
-        );
-
-    }else{
-
-        deleteSelectedMessage();
-
+        return;
     }
-
-};
-
-
-async function deleteSelectedMessage(){
-
-    if(!selectedMessage)return;
-
 
     try{
 
@@ -5917,7 +4337,6 @@ async function deleteSelectedMessage(){
             await fetch(
                 API_URL,
                 {
-
                     method:"DELETE",
 
                     headers:{
@@ -5933,31 +4352,24 @@ async function deleteSelectedMessage(){
 
                             device_id:
                                 deviceId
-
                         })
-
                 }
             );
 
-
-        const data=
-            await response.json();
-
-
         if(!response.ok){
+
+            const data=
+                await response.json();
 
             throw new Error(
                 data.error||
-                "Failed to delete message."
+                "Failed to delete."
             );
-
         }
-
 
         selectedMessage=null;
 
         await loadMessages();
-
 
     }catch(error){
 
@@ -5965,261 +4377,8 @@ async function deleteSelectedMessage(){
             "Failed to delete:\n\n"+
             error.message
         );
-
     }
-
-}
-
-
-/* =========================================================
-   IMAGE VIEWER
-========================================================= */
-
-function openImage(src){
-
-    fullImage.src=src;
-
-    imageViewer
-        .classList.add("show");
-
-}
-
-
-function closeImage(){
-
-    imageViewer
-        .classList.remove("show");
-
-    fullImage.src="";
-
-}
-
-
-backImage.onclick=
-    closeImage;
-
-
-imageViewer.onclick=
-event=>{
-
-    if(
-        event.target===
-        imageViewer
-    ){
-
-        closeImage();
-
-    }
-
 };
-
-
-/* =========================================================
-   CONFIRM
-========================================================= */
-
-function openConfirm(
-    title,
-    text,
-    callback
-){
-
-    dialogTitle.textContent=
-        title;
-
-    dialogText.textContent=
-        text;
-
-    confirmCallback=
-        callback;
-
-    dialogOverlay
-        .classList.add("show");
-
-}
-
-
-dialogCancel.onclick=()=>{
-
-    dialogOverlay
-        .classList.remove(
-            "show"
-        );
-
-    confirmCallback=null;
-
-};
-
-
-dialogConfirm.onclick=
-async()=>{
-
-    const callback=
-        confirmCallback;
-
-
-    dialogOverlay
-        .classList.remove(
-            "show"
-        );
-
-
-    confirmCallback=null;
-
-
-    if(callback){
-
-        await callback();
-
-    }
-
-};
-
-
-/* =========================================================
-   WIPE CHAT
-========================================================= */
-
-removeEverything.onclick=()=>{
-
-    openConfirm(
-        "Remove everything?",
-        "This removes the entire chat for everyone.",
-        permanentlyDeleteEverything
-    );
-
-};
-
-
-async function permanentlyDeleteEverything(){
-
-    try{
-
-        const response=
-            await fetch(
-                API_URL,
-                {
-
-                    method:"DELETE",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify({
-                            delete_all:true
-                        })
-
-                }
-            );
-
-
-        const data=
-            await response.json();
-
-
-        if(!response.ok){
-
-            throw new Error(
-                data.error||
-                "Failed to wipe chat."
-            );
-
-        }
-
-
-        currentMessages=[];
-
-        gameStates.clear();
-
-        currentGameId=null;
-
-
-        gameRoomOverlay
-            .classList.remove(
-                "show"
-            );
-
-
-        renderMessages();
-
-        renderGamesList();
-
-
-        alert(
-            "The entire chat has been wiped."
-        );
-
-
-    }catch(error){
-
-        alert(
-            "Failed to wipe chat:\n\n"+
-            error.message
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   REFRESH
-========================================================= */
-
-function startRefreshTimer(){
-
-    if(refreshTimer){
-
-        clearInterval(
-            refreshTimer
-        );
-
-    }
-
-
-    refreshTimer=
-        setInterval(
-            loadMessages,
-            Number(
-                settings.refreshRate
-            )
-        );
-
-}
-
-
-function startGameTimer(){
-
-    if(gameTimer){
-
-        clearInterval(
-            gameTimer
-        );
-
-    }
-
-
-    gameTimer=
-        setInterval(
-            async()=>{
-
-                /*
-                   Games need to refresh independently
-                   from normal chat if desired.
-                */
-
-                await loadMessages();
-
-            },
-            Number(
-                settings.gameRefresh
-            )
-        );
-
-}
 
 
 /* =========================================================
@@ -6230,58 +4389,55 @@ function formatTime(date){
 
     if(!date)return "";
 
-
-    return new Date(date)
-        .toLocaleTimeString(
-            [],
-            {
-                hour:"2-digit",
-                minute:"2-digit"
-            }
-        );
-
+    return new Date(
+        date
+    ).toLocaleTimeString(
+        [],
+        {
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
 }
 
 
 function escapeHtml(value){
 
     return String(value)
-
         .replaceAll(
             "&",
             "&amp;"
         )
-
         .replaceAll(
             "<",
             "&lt;"
         )
-
         .replaceAll(
             ">",
             "&gt;"
         )
-
         .replaceAll(
             '"',
             "&quot;"
         )
-
         .replaceAll(
             "'",
             "&#039;"
         );
-
 }
 
 
 /* =========================================================
-   INITIAL START
+   START
 ========================================================= */
 
 loadSettingsUI();
 
 applySettings();
+
+renderGamePicker();
+
+startGameRefresh();
 
 loadMessages();
 
@@ -6289,3 +4445,4 @@ loadMessages();
 
 </body>
 </html>
+```
