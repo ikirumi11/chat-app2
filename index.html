@@ -1,9 +1,11 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="theme-color" content="#0b0d11">
+<meta name="theme-color" content="#0b0d10">
+
 <title>Game Chat</title>
 
 <style>
@@ -12,29 +14,24 @@
 }
 
 :root{
-    --bg:#080a0e;
-    --sidebar:#0d1015;
-    --panel:#11151b;
-    --panel2:#171c23;
-    --panel3:#1d232c;
-    --hover:#202731;
-    --border:#282f39;
-
+    --bg:#080a0d;
+    --sidebar:#0d1014;
+    --panel:#11151a;
+    --panel2:#171c22;
+    --panel3:#1d232b;
+    --border:#282f38;
     --text:#f2f4f7;
-    --text2:#c5cbd3;
-    --muted:#7f8996;
-
+    --muted:#8a94a1;
+    --muted2:#66707c;
     --accent:#e9edf2;
-    --accentText:#111318;
-
-    --success:#67d99a;
-    --danger:#ff7373;
-    --warning:#e8c86d;
+    --accentText:#111317;
+    --success:#63d391;
+    --danger:#ff7272;
+    --warning:#e7c866;
 
     --radius:12px;
     --ui-scale:1;
-
-    --text-size:15px;
+    --text-size:16px;
     --word-spacing:0px;
     --line-spacing:1.45;
 }
@@ -47,6 +44,7 @@ body{
 }
 
 body{
+    overflow:hidden;
     background:var(--bg);
     color:var(--text);
     font-family:
@@ -59,8 +57,7 @@ body{
         Arial,
         sans-serif;
 
-    font-size:calc(15px * var(--ui-scale));
-    overflow:hidden;
+    font-size:calc(16px * var(--ui-scale));
 }
 
 button,
@@ -74,12 +71,8 @@ button{
     cursor:pointer;
 }
 
-button:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible{
-    outline:2px solid #ffffff55;
-    outline-offset:2px;
+button:disabled{
+    cursor:not-allowed;
 }
 
 
@@ -89,10 +82,9 @@ select:focus-visible{
 
 .app{
     width:100%;
-    height:100vh;
-    display:grid;
-    grid-template-columns:250px minmax(0,1fr);
-    grid-template-rows:1fr;
+    height:100dvh;
+    display:flex;
+    overflow:hidden;
 }
 
 
@@ -101,77 +93,84 @@ select:focus-visible{
 ========================================================= */
 
 .sidebar{
-    background:var(--sidebar);
-    border-right:1px solid var(--border);
+    width:250px;
+    min-width:250px;
+    height:100%;
     display:flex;
     flex-direction:column;
-    min-width:0;
+
+    background:var(--sidebar);
+    border-right:1px solid var(--border);
 }
 
-.server-head{
-    height:64px;
-    padding:0 16px;
+.brand{
+    height:68px;
+    min-height:68px;
+
     display:flex;
     align-items:center;
     gap:11px;
+
+    padding:0 17px;
+
     border-bottom:1px solid var(--border);
 }
 
-.server-icon{
-    width:36px;
-    height:36px;
-    flex:0 0 36px;
+.brand-icon{
+    width:37px;
+    height:37px;
 
     display:grid;
     place-items:center;
 
-    border-radius:10px;
+    border-radius:11px;
+
     background:var(--panel2);
     border:1px solid var(--border);
 
     font-size:18px;
 }
 
-.server-name{
+.brand-text{
     min-width:0;
 }
 
-.server-name strong{
-    display:block;
-    font-size:14px;
+.brand-title{
+    font-size:15px;
+    font-weight:800;
 }
 
-.server-name span{
-    color:var(--muted);
+.brand-subtitle{
+    color:var(--muted2);
     font-size:11px;
+    margin-top:2px;
 }
 
-.sidebar-content{
-    flex:1;
-    overflow-y:auto;
-    padding:14px 10px;
+.sidebar-section{
+    padding:17px 11px 0;
 }
 
-.side-label{
-    padding:7px 9px;
-    color:#697380;
+.sidebar-label{
+    padding:0 8px 8px;
+
+    color:var(--muted2);
     font-size:10px;
     font-weight:800;
-    letter-spacing:.08em;
+    letter-spacing:.09em;
     text-transform:uppercase;
 }
 
-.channel{
+.channel-btn{
     width:100%;
+
     display:flex;
     align-items:center;
     gap:9px;
 
-    padding:9px 10px;
-    margin-bottom:3px;
+    padding:10px 10px;
 
-    border:0;
-    border-radius:8px;
+    border:1px solid transparent;
+    border-radius:9px;
 
     background:transparent;
     color:var(--muted);
@@ -179,103 +178,77 @@ select:focus-visible{
     text-align:left;
 }
 
-.channel:hover{
-    background:var(--hover);
-    color:var(--text2);
-}
-
-.channel.active{
-    background:var(--panel3);
+.channel-btn:hover{
+    background:var(--panel2);
     color:var(--text);
 }
 
-.channel-icon{
-    color:#707a87;
-}
-
-.channel.active .channel-icon{
+.channel-btn.active{
+    background:var(--panel2);
+    border-color:var(--border);
     color:var(--text);
 }
 
-.side-game{
-    width:100%;
-    padding:9px 10px;
-    border:0;
-    background:transparent;
-    color:var(--muted);
-    border-radius:8px;
-    display:flex;
-    align-items:center;
-    gap:9px;
-    text-align:left;
-}
-
-.side-game:hover{
-    background:var(--hover);
-    color:var(--text);
-}
-
-.sidebar-user{
-    padding:10px;
-    border-top:1px solid var(--border);
-}
-
-.user-card{
-    display:flex;
-    align-items:center;
-    gap:9px;
-    padding:8px;
-    border-radius:9px;
-}
-
-.user-card:hover{
-    background:var(--hover);
-}
-
-.user-avatar{
-    width:34px;
-    height:34px;
-    border-radius:9px;
-
-    display:grid;
-    place-items:center;
-
-    background:var(--panel3);
-    border:1px solid var(--border);
-
-    font-size:12px;
+.channel-hash{
+    color:var(--muted2);
     font-weight:800;
 }
 
-.user-info{
-    min-width:0;
-    flex:1;
+.sidebar-bottom{
+    margin-top:auto;
+    padding:11px;
 }
 
-.user-info strong{
-    display:block;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-}
-
-.user-info span{
+.connection{
     display:flex;
     align-items:center;
-    gap:5px;
-    color:var(--muted);
-    font-size:10px;
+    gap:8px;
+
+    padding:10px;
+
+    border:1px solid var(--border);
+    border-radius:10px;
+
+    background:var(--panel);
 }
 
-.status-dot{
-    width:6px;
-    height:6px;
+.connection-dot{
+    width:8px;
+    height:8px;
+    flex:0 0 8px;
+
     border-radius:50%;
-    background:var(--success);
+
+    background:var(--muted2);
 }
 
-.status-dot.offline{
+.connection.online .connection-dot{
+    background:var(--success);
+    box-shadow:0 0 9px #63d39166;
+}
+
+.connection.error .connection-dot{
     background:var(--danger);
+}
+
+.connection-text{
+    min-width:0;
+}
+
+.connection-title{
+    font-size:11px;
+    font-weight:700;
+}
+
+.connection-detail{
+    margin-top:2px;
+
+    color:var(--muted2);
+    font-size:9px;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 
@@ -284,109 +257,100 @@ select:focus-visible{
 ========================================================= */
 
 .main{
+    flex:1;
     min-width:0;
-    min-height:0;
+    height:100%;
+
     display:flex;
     flex-direction:column;
+
     background:var(--bg);
 }
 
 
 /* =========================================================
-   TOPBAR
+   HEADER
 ========================================================= */
 
-.topbar{
-    height:64px;
-    min-height:64px;
+.header{
+    height:68px;
+    min-height:68px;
 
     display:flex;
     align-items:center;
     justify-content:space-between;
 
-    padding:0 18px;
+    padding:0 17px;
 
     background:var(--panel);
     border-bottom:1px solid var(--border);
 }
 
-.topbar-left{
-    min-width:0;
+.header-left{
     display:flex;
     align-items:center;
     gap:10px;
+    min-width:0;
 }
 
 .mobile-menu{
     display:none;
 }
 
-.hash{
-    color:#717b87;
-    font-size:22px;
-    font-weight:500;
-}
-
 .channel-title{
-    min-width:0;
-}
-
-.channel-title strong{
-    display:block;
-    font-size:14px;
-}
-
-.channel-topic{
-    color:var(--muted);
-    font-size:10px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-}
-
-.topbar-actions{
-    display:flex;
-    gap:6px;
-}
-
-.icon-button{
-    width:36px;
-    height:36px;
-
-    display:grid;
-    place-items:center;
-
-    border-radius:9px;
-    border:1px solid transparent;
-
-    background:transparent;
-    color:var(--muted);
-
-    transition:
-        background .15s,
-        color .15s,
-        border .15s;
-}
-
-.icon-button:hover{
-    background:var(--panel3);
-    border-color:var(--border);
-    color:var(--text);
-}
-
-.connection{
     display:flex;
     align-items:center;
     gap:7px;
 
-    padding:6px 9px;
-    margin-right:3px;
+    font-size:15px;
+    font-weight:800;
+}
+
+.channel-title .hash{
+    color:var(--muted2);
+}
+
+.channel-description{
+    margin-left:8px;
+
+    color:var(--muted2);
+    font-size:11px;
+
+    white-space:nowrap;
+}
+
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:7px;
+}
+
+.icon-btn{
+    width:38px;
+    height:38px;
+
+    display:grid;
+    place-items:center;
 
     border:1px solid var(--border);
-    border-radius:8px;
+    border-radius:9px;
 
-    color:var(--muted);
-    font-size:10px;
+    background:var(--panel2);
+    color:var(--text);
+
+    transition:
+        background .15s,
+        border-color .15s,
+        transform .15s;
+}
+
+.icon-btn:hover{
+    background:var(--panel3);
+    border-color:#39414d;
+}
+
+.icon-btn:active{
+    transform:scale(.96);
 }
 
 
@@ -399,106 +363,63 @@ select:focus-visible{
     min-height:0;
 
     overflow-y:auto;
-    overflow-x:hidden;
 
-    padding:20px max(18px,calc((100% - 1000px) / 2));
+    padding:24px clamp(15px,4vw,55px);
+
     scroll-behavior:smooth;
 }
 
-.messages::-webkit-scrollbar,
-.sidebar-content::-webkit-scrollbar,
-.modal::-webkit-scrollbar{
-    width:8px;
+.messages-inner{
+    width:100%;
+    max-width:1050px;
+    margin:0 auto;
 }
-
-.messages::-webkit-scrollbar-thumb,
-.sidebar-content::-webkit-scrollbar-thumb,
-.modal::-webkit-scrollbar-thumb{
-    background:#ffffff12;
-    border-radius:20px;
-}
-
-.empty{
-    min-height:100%;
-    display:grid;
-    place-items:center;
-    text-align:center;
-}
-
-.empty-box{
-    max-width:430px;
-}
-
-.empty-icon{
-    width:60px;
-    height:60px;
-
-    display:grid;
-    place-items:center;
-
-    margin:0 auto 13px;
-
-    border-radius:16px;
-    background:var(--panel);
-    border:1px solid var(--border);
-
-    font-size:25px;
-}
-
-.empty strong{
-    display:block;
-    margin-bottom:5px;
-    font-size:17px;
-}
-
-.empty p{
-    margin:0;
-    color:var(--muted);
-    line-height:1.5;
-    font-size:13px;
-}
-
-
-/* MESSAGE */
 
 .message{
     display:flex;
     gap:11px;
 
-    padding:8px 10px;
-    margin:0 -10px 2px;
+    padding:7px 9px;
+    margin:0 -9px;
 
-    border-radius:9px;
+    border-radius:10px;
 
     transition:background .12s;
 }
 
 .message:hover{
-    background:#ffffff04;
+    background:#ffffff03;
 }
 
-.message-avatar{
-    width:38px;
-    height:38px;
-    flex:0 0 38px;
+.message + .message{
+    margin-top:4px;
+}
+
+.avatar{
+    width:39px;
+    height:39px;
+    min-width:39px;
 
     display:grid;
     place-items:center;
 
-    border-radius:10px;
+    border-radius:11px;
+
     background:var(--panel2);
     border:1px solid var(--border);
 
-    font-size:12px;
+    color:#dfe4ea;
+
+    font-size:13px;
     font-weight:800;
 }
 
-.message-content{
+.message-body{
     min-width:0;
-    max-width:850px;
+    flex:1;
 }
 
-.message-header{
+.message-top{
     display:flex;
     align-items:baseline;
     gap:8px;
@@ -511,13 +432,20 @@ select:focus-visible{
     font-weight:800;
 }
 
-.timestamp{
-    color:#69727e;
+.time{
+    color:var(--muted2);
+    font-size:10px;
+}
+
+.edited{
+    color:var(--muted2);
     font-size:9px;
 }
 
 .message-text{
-    color:var(--text2);
+    margin-top:2px;
+
+    color:#d7dce3;
 
     font-size:var(--text-size);
     line-height:var(--line-spacing);
@@ -527,254 +455,91 @@ select:focus-visible{
     overflow-wrap:anywhere;
 }
 
-.edited{
-    color:#69727e;
-    font-size:9px;
-    margin-left:5px;
-}
+.message-image{
+    display:block;
 
+    max-width:min(520px,100%);
+    max-height:400px;
 
-/* =========================================================
-   GAME CARDS
-========================================================= */
+    margin-top:8px;
 
-.game-message{
-    margin:12px auto 18px;
-    max-width:900px;
-}
-
-.game-card{
-    overflow:hidden;
-
+    border-radius:10px;
     border:1px solid var(--border);
-    border-radius:15px;
 
-    background:
-        linear-gradient(
-            145deg,
-            var(--panel2),
-            var(--panel)
-        );
-
-    box-shadow:0 18px 55px #0007;
+    object-fit:contain;
 }
 
-.game-head{
-    padding:15px 17px;
-
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-
-    border-bottom:1px solid var(--border);
-}
-
-.game-title{
-    display:flex;
-    align-items:center;
-    gap:9px;
-}
-
-.game-title-icon{
-    width:35px;
-    height:35px;
+.empty{
+    min-height:100%;
 
     display:grid;
     place-items:center;
 
-    border-radius:9px;
-    background:var(--panel3);
+    text-align:center;
+}
+
+.empty-card{
+    padding:30px;
+}
+
+.empty-icon{
+    width:55px;
+    height:55px;
+
+    display:grid;
+    place-items:center;
+
+    margin:0 auto 12px;
+
+    border-radius:15px;
+
+    background:var(--panel2);
     border:1px solid var(--border);
+
+    font-size:23px;
 }
 
-.game-title strong{
-    display:block;
-    font-size:14px;
+.empty-title{
+    font-size:16px;
+    font-weight:800;
 }
 
-.game-title span{
-    color:var(--muted);
-    font-size:10px;
-}
-
-.game-status{
-    padding:5px 8px;
-    border-radius:999px;
-
-    background:var(--panel3);
-    border:1px solid var(--border);
+.empty-text{
+    margin-top:5px;
 
     color:var(--muted);
-    font-size:9px;
-}
-
-.game-body{
-    padding:17px;
-}
-
-.game-description{
-    margin:0 0 14px;
-    color:var(--muted);
-    line-height:1.5;
     font-size:12px;
-}
-
-.game-info{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    margin-bottom:13px;
-}
-
-.game-pill{
-    padding:6px 8px;
-
-    border:1px solid var(--border);
-    border-radius:7px;
-
-    background:var(--panel);
-    color:var(--muted);
-
-    font-size:9px;
-}
-
-.game-pill strong{
-    color:var(--text);
-}
-
-.players{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    margin:12px 0;
-}
-
-.player{
-    padding:6px 8px;
-
-    border:1px solid var(--border);
-    border-radius:7px;
-
-    background:var(--panel);
-    color:var(--text2);
-
-    font-size:10px;
-}
-
-.player.host{
-    border-color:#66562a;
-    color:var(--warning);
-}
-
-.game-actions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:7px;
-}
-
-.btn{
-    min-height:36px;
-
-    padding:0 13px;
-
-    border:1px solid var(--border);
-    border-radius:8px;
-
-    background:var(--panel3);
-    color:var(--text);
-
-    font-weight:700;
-    font-size:11px;
-
-    transition:
-        transform .12s,
-        filter .12s,
-        background .12s;
-}
-
-.btn:hover:not(:disabled){
-    filter:brightness(1.15);
-    transform:translateY(-1px);
-}
-
-.btn.primary{
-    background:var(--accent);
-    color:var(--accentText);
-}
-
-.btn.green{
-    background:#163326;
-    border-color:#29583f;
-    color:#8be5af;
-}
-
-.btn.danger{
-    background:#351a1d;
-    border-color:#673036;
-    color:#ff8d8d;
-}
-
-.btn:disabled{
-    opacity:.4;
-    cursor:not-allowed;
 }
 
 
 /* =========================================================
-   GAME CREATOR
+   NEW MESSAGE BUTTON
 ========================================================= */
 
-.game-grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:8px;
-}
+.scroll-bottom{
+    position:absolute;
 
-.game-choice{
-    min-height:84px;
+    right:22px;
+    bottom:94px;
 
-    padding:13px;
+    display:none;
 
-    text-align:left;
+    padding:8px 12px;
 
     border:1px solid var(--border);
-    border-radius:11px;
+    border-radius:999px;
 
     background:var(--panel2);
     color:var(--text);
 
-    transition:
-        background .12s,
-        border .12s,
-        transform .12s;
+    box-shadow:0 8px 30px #0008;
+
+    font-size:11px;
+    font-weight:700;
 }
 
-.game-choice:hover{
-    background:var(--panel3);
-    transform:translateY(-1px);
-}
-
-.game-choice strong{
+.scroll-bottom.show{
     display:block;
-    margin-bottom:5px;
-    font-size:13px;
-}
-
-.game-choice span{
-    display:block;
-    color:var(--muted);
-    font-size:10px;
-    line-height:1.4;
-}
-
-.players-count{
-    display:inline-block;
-    margin-top:7px;
-    padding:3px 6px;
-    border-radius:6px;
-    background:var(--panel3);
-    color:#9da6b1;
-    font-size:8px;
 }
 
 
@@ -783,39 +548,49 @@ select:focus-visible{
 ========================================================= */
 
 .composer{
-    padding:10px max(18px,calc((100% - 1000px) / 2)) 14px;
+    padding:10px 17px 16px;
+
     background:var(--panel);
     border-top:1px solid var(--border);
 }
 
 .composer-inner{
+    width:100%;
+    max-width:1050px;
+    margin:0 auto;
+}
+
+.composer-box{
     display:flex;
     align-items:flex-end;
-    gap:7px;
+    gap:8px;
 
     padding:7px;
 
     background:var(--panel2);
     border:1px solid var(--border);
-    border-radius:12px;
+    border-radius:13px;
 
-    transition:border .15s;
+    transition:
+        border-color .15s,
+        box-shadow .15s;
 }
 
-.composer-inner:focus-within{
-    border-color:#ffffff22;
+.composer-box:focus-within{
+    border-color:#3a424e;
+    box-shadow:0 0 0 2px #ffffff05;
 }
 
-.message-input{
+textarea{
     flex:1;
-
     min-width:0;
-    min-height:40px;
+
+    min-height:42px;
     max-height:150px;
 
-    padding:10px;
-
     resize:none;
+
+    padding:10px 11px;
 
     border:0;
     outline:0;
@@ -823,35 +598,54 @@ select:focus-visible{
     background:transparent;
     color:var(--text);
 
-    font-size:13px;
-    line-height:1.45;
+    line-height:1.4;
 }
 
-.message-input::placeholder{
-    color:#68727e;
+textarea::placeholder{
+    color:var(--muted2);
 }
 
-.send{
-    height:40px;
-    padding:0 15px;
+.send-btn{
+    height:42px;
+
+    padding:0 17px;
 
     border:0;
-    border-radius:8px;
+    border-radius:9px;
 
     background:var(--accent);
     color:var(--accentText);
 
     font-weight:800;
-    font-size:11px;
+
+    transition:
+        opacity .15s,
+        transform .15s;
 }
 
-.send:disabled{
+.send-btn:hover{
+    filter:brightness(1.08);
+}
+
+.send-btn:active{
+    transform:scale(.97);
+}
+
+.send-btn:disabled{
     opacity:.4;
+}
+
+.composer-hint{
+    margin-top:6px;
+    padding:0 4px;
+
+    color:var(--muted2);
+    font-size:9px;
 }
 
 
 /* =========================================================
-   OVERLAY / MODAL
+   OVERLAY
 ========================================================= */
 
 .overlay{
@@ -866,7 +660,7 @@ select:focus-visible{
 
     background:#000b;
 
-    z-index:1000;
+    z-index:100;
 }
 
 .overlay.show{
@@ -875,48 +669,39 @@ select:focus-visible{
 
 .modal{
     width:min(650px,100%);
-    max-height:calc(100vh - 30px);
+    max-height:calc(100dvh - 30px);
 
-    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
 
     background:var(--panel);
+
     border:1px solid var(--border);
     border-radius:15px;
 
-    box-shadow:0 30px 100px #000c;
-
-    animation:modalIn .16s ease-out;
+    box-shadow:
+        0 30px 100px #000c;
 }
 
-@keyframes modalIn{
-    from{
-        opacity:0;
-        transform:translateY(8px) scale(.985);
-    }
-    to{
-        opacity:1;
-        transform:none;
-    }
-}
-
-.modal-head{
-    height:59px;
-
-    padding:0 16px;
+.modal-header{
+    min-height:61px;
 
     display:flex;
     align-items:center;
     justify-content:space-between;
 
+    padding:0 16px;
+
     border-bottom:1px solid var(--border);
 }
 
-.modal-head h2{
-    margin:0;
-    font-size:15px;
+.modal-title{
+    font-size:16px;
+    font-weight:800;
 }
 
 .modal-body{
+    overflow-y:auto;
     padding:16px;
 }
 
@@ -925,47 +710,59 @@ select:focus-visible{
    SETTINGS
 ========================================================= */
 
-.setting-group{
-    overflow:hidden;
-
+.category{
     margin-bottom:8px;
 
+    overflow:hidden;
+
     border:1px solid var(--border);
-    border-radius:10px;
+    border-radius:11px;
 
     background:var(--panel2);
 }
 
-.setting-title{
+.category-title{
     width:100%;
 
     display:flex;
-    justify-content:space-between;
     align-items:center;
+    justify-content:space-between;
 
     padding:13px;
 
     border:0;
-    background:transparent;
 
+    background:transparent;
     color:var(--text);
 
-    text-align:left;
-    font-weight:700;
     font-size:12px;
+    font-weight:800;
+
+    text-align:left;
 }
 
-.setting-body{
+.category-arrow{
+    color:var(--muted2);
+
+    transition:transform .15s;
+}
+
+.category.open .category-arrow{
+    transform:rotate(180deg);
+}
+
+.category-body{
     display:none;
+
     padding:0 13px 13px;
 }
 
-.setting-group.open .setting-body{
+.category.open .category-body{
     display:block;
 }
 
 .setting{
-    margin-top:12px;
+    margin-top:13px;
 }
 
 .setting:first-child{
@@ -974,131 +771,298 @@ select:focus-visible{
 
 .setting label{
     display:block;
+
     margin-bottom:6px;
 
-    color:#aab2bd;
+    color:#adb5c0;
+
     font-size:10px;
+    font-weight:700;
 }
 
 .setting input,
 .setting select{
     width:100%;
 
-    padding:9px;
+    padding:9px 10px;
 
     border:1px solid var(--border);
     border-radius:8px;
 
     outline:0;
 
-    background:#0d1116;
+    background:#0e1216;
     color:var(--text);
+}
 
-    font-size:11px;
+.setting input:focus,
+.setting select:focus{
+    border-color:#46505d;
 }
 
 .setting input[type="range"]{
     padding:0;
 }
 
-.value{
-    margin-top:4px;
-    color:var(--muted);
-    font-size:9px;
+.setting-value{
+    margin-top:5px;
+
+    color:var(--muted2);
+    font-size:10px;
 }
 
-.save{
+.save-btn{
     width:100%;
-    height:39px;
 
-    margin-top:7px;
+    margin-top:8px;
+    padding:11px;
 
     border:0;
-    border-radius:8px;
+    border-radius:9px;
 
     background:var(--accent);
     color:var(--accentText);
 
     font-weight:800;
-    font-size:11px;
 }
 
 .danger-zone{
-    margin-top:17px;
-    padding-top:16px;
+    margin-top:18px;
+    padding-top:17px;
 
-    border-top:1px solid #47272b;
+    border-top:1px solid #3d2428;
 }
 
 .danger-title{
     color:var(--danger);
+    font-size:12px;
     font-weight:800;
-    font-size:11px;
 }
 
-.danger-zone p{
+.danger-text{
+    margin:6px 0 10px;
+
     color:var(--muted);
-    font-size:10px;
+    font-size:11px;
     line-height:1.5;
 }
 
-.danger{
+.danger-btn{
     width:100%;
-    height:38px;
 
-    border:1px solid #693137;
-    border-radius:8px;
+    padding:10px;
 
-    background:#271517;
-    color:#ff8b8b;
+    border:1px solid #663238;
+    border-radius:9px;
+
+    background:#241619;
+    color:#ff8585;
 
     font-weight:700;
-    font-size:11px;
 }
 
 
 /* =========================================================
-   TOAST
+   GAMES
 ========================================================= */
 
-.toast-container{
-    position:fixed;
-    right:18px;
-    bottom:80px;
-
-    display:flex;
-    flex-direction:column;
-    gap:7px;
-
-    z-index:3000;
+.game-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:9px;
 }
 
-.toast{
-    max-width:330px;
+.game-choice{
+    min-height:100px;
 
-    padding:10px 13px;
+    padding:13px;
+
+    border:1px solid var(--border);
+    border-radius:11px;
 
     background:var(--panel2);
+    color:var(--text);
+
+    text-align:left;
+
+    transition:
+        background .15s,
+        border-color .15s,
+        transform .15s;
+}
+
+.game-choice:hover{
+    background:var(--panel3);
+    border-color:#3b444f;
+    transform:translateY(-1px);
+}
+
+.game-icon{
+    font-size:19px;
+    margin-bottom:7px;
+}
+
+.game-choice strong{
+    display:block;
+
+    font-size:13px;
+}
+
+.game-choice span{
+    display:block;
+
+    margin-top:4px;
+
+    color:var(--muted);
+    font-size:10px;
+    line-height:1.4;
+}
+
+.game-players{
+    display:inline-block;
+
+    margin-top:8px;
+    padding:4px 7px;
+
+    border-radius:6px;
+
+    background:#0e1216;
+
+    color:var(--muted);
+
+    font-size:9px;
+}
+
+
+/* =========================================================
+   CONFIRM
+========================================================= */
+
+.confirm-actions{
+    display:flex;
+    gap:8px;
+    margin-top:15px;
+}
+
+.action-btn{
+    flex:1;
+
+    padding:10px;
+
     border:1px solid var(--border);
     border-radius:9px;
 
+    background:var(--panel2);
     color:var(--text);
-    font-size:11px;
 
-    box-shadow:0 15px 40px #0008;
-
-    animation:toastIn .18s ease-out;
+    font-weight:700;
 }
 
-@keyframes toastIn{
-    from{
-        opacity:0;
-        transform:translateY(6px);
-    }
-    to{
-        opacity:1;
-        transform:none;
-    }
+.action-btn.primary{
+    background:var(--accent);
+    color:var(--accentText);
+}
+
+.action-btn.danger{
+    background:#3a1b20;
+    border-color:#6d3038;
+    color:#ff9090;
+}
+
+
+/* =========================================================
+   GAME MESSAGE
+========================================================= */
+
+.game-message{
+    margin:8px 0 16px;
+}
+
+.game-card{
+    overflow:hidden;
+
+    border:1px solid var(--border);
+    border-radius:13px;
+
+    background:linear-gradient(
+        145deg,
+        var(--panel2),
+        var(--panel)
+    );
+
+    box-shadow:0 10px 35px #0005;
+}
+
+.game-card-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:14px 15px;
+
+    border-bottom:1px solid var(--border);
+}
+
+.game-card-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    font-size:14px;
+    font-weight:800;
+}
+
+.game-status{
+    padding:4px 7px;
+
+    border-radius:999px;
+
+    background:#252b32;
+
+    color:#aeb6c0;
+
+    font-size:9px;
+}
+
+.game-card-body{
+    padding:15px;
+}
+
+.game-card-description{
+    color:var(--muted);
+
+    font-size:11px;
+    line-height:1.5;
+}
+
+.game-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+
+    margin-top:13px;
+}
+
+.game-btn{
+    padding:8px 12px;
+
+    border:1px solid var(--border);
+    border-radius:8px;
+
+    background:var(--panel3);
+    color:var(--text);
+
+    font-size:11px;
+    font-weight:700;
+}
+
+.game-btn.primary{
+    background:var(--accent);
+    color:var(--accentText);
+}
+
+.game-btn:hover{
+    filter:brightness(1.1);
 }
 
 
@@ -1106,29 +1070,22 @@ select:focus-visible{
    MOBILE
 ========================================================= */
 
-@media(max-width:800px){
-
-    .app{
-        grid-template-columns:1fr;
-    }
+@media(max-width:760px){
 
     .sidebar{
         position:fixed;
-        z-index:900;
-
+        left:0;
         top:0;
         bottom:0;
-        left:0;
 
-        width:260px;
+        z-index:200;
 
-        transform:translateX(-105%);
+        transform:translateX(-100%);
+
         transition:transform .2s;
-
-        box-shadow:20px 0 60px #0009;
     }
 
-    .sidebar.open{
+    .sidebar.mobile-open{
         transform:translateX(0);
     }
 
@@ -1136,15 +1093,19 @@ select:focus-visible{
         display:grid;
     }
 
+    .channel-description{
+        display:none;
+    }
+
     .messages{
-        padding:15px 11px;
+        padding:17px 10px;
     }
 
     .composer{
-        padding:8px 9px 10px;
+        padding:8px 9px 11px;
     }
 
-    .connection{
+    .composer-hint{
         display:none;
     }
 
@@ -1152,70 +1113,79 @@ select:focus-visible{
         grid-template-columns:1fr;
     }
 
-    .message{
-        padding:7px 5px;
-        margin-left:-5px;
-        margin-right:-5px;
-    }
-
-    .message-avatar{
-        width:34px;
-        height:34px;
-        flex-basis:34px;
-    }
-
-    .game-message{
-        margin-left:0;
-        margin-right:0;
-    }
-
-    .topbar{
+    .header{
         padding:0 10px;
     }
 
-    .channel-topic{
-        display:none;
+    .header-right{
+        gap:4px;
     }
 
-    .toast-container{
-        left:10px;
-        right:10px;
-        bottom:70px;
+    .avatar{
+        width:35px;
+        min-width:35px;
+        height:35px;
     }
 
-    .toast{
-        max-width:none;
+    .message{
+        gap:8px;
+    }
+
+    .send-btn{
+        padding:0 13px;
     }
 }
 
-@media(max-width:420px){
 
-    .topbar-actions .optional{
-        display:none;
-    }
+/* =========================================================
+   LIGHT THEME OVERRIDES
+========================================================= */
 
-    .modal{
-        border-radius:12px;
-    }
+body.light-theme{
+    --text:#171a1f;
+    --muted:#68717d;
+    --muted2:#89919b;
 
-    .modal-body{
-        padding:12px;
-    }
+    --border:#d8dce1;
+    --accent:#171a1f;
+    --accentText:#fff;
+}
 
-    .game-head{
-        padding:13px;
-    }
+body.light-theme .message-text{
+    color:#30353b;
+}
 
-    .game-body{
-        padding:13px;
-    }
+body.light-theme .setting input,
+body.light-theme .setting select{
+    background:#f6f7f8;
+    color:#171a1f;
+}
 
-    .send{
-        padding:0 11px;
+body.light-theme textarea{
+    color:#171a1f;
+}
+
+body.light-theme textarea::placeholder{
+    color:#8b929a;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+    *,
+    *::before,
+    *::after{
+        scroll-behavior:auto !important;
+        transition:none !important;
     }
 }
 </style>
 </head>
+
 
 <body>
 
@@ -1225,89 +1195,87 @@ select:focus-visible{
 
     <aside class="sidebar" id="sidebar">
 
-        <div class="server-head">
+        <div class="brand">
 
-            <div class="server-icon">🎮</div>
+            <div class="brand-icon">
+                🎮
+            </div>
 
-            <div class="server-name">
-                <strong>Game Chat</strong>
-                <span>Multiplayer community</span>
+            <div class="brand-text">
+
+                <div class="brand-title">
+                    Game Chat
+                </div>
+
+                <div class="brand-subtitle">
+                    Multiplayer chat
+                </div>
+
             </div>
 
         </div>
 
-        <div class="sidebar-content">
 
-            <div class="side-label">
+        <div class="sidebar-section">
+
+            <div class="sidebar-label">
                 Channels
             </div>
 
-            <button class="channel active">
-                <span class="channel-icon">#</span>
+            <button
+                class="channel-btn active"
+                id="generalChannel"
+            >
+                <span class="channel-hash">#</span>
                 <span>general</span>
-            </button>
-
-            <button class="channel" id="gamesChannel">
-                <span class="channel-icon">♟</span>
-                <span>games</span>
-            </button>
-
-            <div class="side-label" style="margin-top:15px">
-                Games
-            </div>
-
-            <button class="side-game" data-create-game="ttt3">
-                <span>⭕</span>
-                <span>Tic-Tac-Toe</span>
-            </button>
-
-            <button class="side-game" data-create-game="reaction">
-                <span>⚡</span>
-                <span>Reaction</span>
-            </button>
-
-            <button class="side-game" data-create-game="type">
-                <span>⌨</span>
-                <span>Type Race</span>
-            </button>
-
-            <button class="side-game" data-create-game="boss">
-                <span>👹</span>
-                <span>Boss Battle</span>
             </button>
 
         </div>
 
-        <div class="sidebar-user">
 
-            <div class="user-card">
+        <div class="sidebar-section">
 
-                <div class="user-avatar" id="sideAvatar">
-                    ?
+            <div class="sidebar-label">
+                Games
+            </div>
+
+            <button
+                class="channel-btn"
+                id="openGamesSide"
+            >
+                <span>🎮</span>
+                <span>Create game</span>
+            </button>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <div
+                class="connection"
+                id="connection"
+            >
+
+                <div class="connection-dot"></div>
+
+                <div class="connection-text">
+
+                    <div
+                        class="connection-title"
+                        id="connectionTitle"
+                    >
+                        Connecting...
+                    </div>
+
+                    <div
+                        class="connection-detail"
+                        id="connectionDetail"
+                    >
+                        Checking server
+                    </div>
+
                 </div>
-
-                <div class="user-info">
-
-                    <strong id="sideUsername">
-                        Guest
-                    </strong>
-
-                    <span>
-                        <i class="status-dot" id="sideStatus"></i>
-                        <span id="sideStatusText">
-                            Connecting
-                        </span>
-                    </span>
-
-                </div>
-
-                <button
-                    class="icon-button"
-                    id="sideSettings"
-                    title="Settings"
-                >
-                    ⚙
-                </button>
 
             </div>
 
@@ -1318,57 +1286,52 @@ select:focus-visible{
 
     <!-- MAIN -->
 
-    <section class="main">
+    <main class="main">
 
-        <header class="topbar">
+        <header class="header">
 
-            <div class="topbar-left">
+            <div class="header-left">
 
                 <button
-                    class="icon-button mobile-menu"
+                    class="icon-btn mobile-menu"
                     id="mobileMenu"
+                    title="Menu"
                 >
                     ☰
                 </button>
 
-                <span class="hash">#</span>
-
                 <div class="channel-title">
-                    <strong>general</strong>
-                    <div class="channel-topic">
-                        Talk, play games and hang out
-                    </div>
+
+                    <span class="hash">
+                        #
+                    </span>
+
+                    <span>
+                        general
+                    </span>
+
+                </div>
+
+                <div class="channel-description">
+                    Multiplayer chat
                 </div>
 
             </div>
 
 
-            <div class="topbar-actions">
-
-                <div class="connection">
-
-                    <span
-                        class="status-dot"
-                        id="connectionDot"
-                    ></span>
-
-                    <span id="connectionText">
-                        Connecting
-                    </span>
-
-                </div>
+            <div class="header-right">
 
                 <button
-                    class="icon-button optional"
-                    id="gamesButton"
+                    class="icon-btn"
+                    id="gamesBtn"
                     title="Games"
                 >
-                    ♟
+                    🎮
                 </button>
 
                 <button
-                    class="icon-button"
-                    id="settingsButton"
+                    class="icon-btn"
+                    id="settingsBtn"
                     title="Settings"
                 >
                     ⚙
@@ -1379,69 +1342,65 @@ select:focus-visible{
         </header>
 
 
-        <!-- MESSAGES -->
-
-        <main
+        <section
             class="messages"
             id="messages"
         >
 
-            <div class="empty">
-                <div class="empty-box">
+            <div
+                class="messages-inner"
+                id="messagesInner"
+            ></div>
 
-                    <div class="empty-icon">
-                        #
-                    </div>
-
-                    <strong>
-                        Welcome to #general
-                    </strong>
-
-                    <p>
-                        This is the beginning of the channel.
-                        Send a message to start chatting.
-                    </p>
-
-                </div>
-            </div>
-
-        </main>
+        </section>
 
 
-        <!-- COMPOSER -->
+        <button
+            class="scroll-bottom"
+            id="scrollBottom"
+        >
+            ↓ New messages
+        </button>
 
-        <div class="composer">
+
+        <footer class="composer">
 
             <div class="composer-inner">
 
-                <textarea
-                    class="message-input"
-                    id="messageInput"
-                    rows="1"
-                    maxlength="2000"
-                    placeholder="Message #general"
-                ></textarea>
+                <div class="composer-box">
 
-                <button
-                    class="send"
-                    id="sendButton"
-                    disabled
-                >
-                    Send
-                </button>
+                    <textarea
+                        id="messageInput"
+                        rows="1"
+                        maxlength="20000"
+                        placeholder="Message #general"
+                    ></textarea>
+
+                    <button
+                        class="send-btn"
+                        id="sendBtn"
+                    >
+                        Send
+                    </button>
+
+                </div>
+
+                <div class="composer-hint">
+                    Enter to send · Shift + Enter for a new line
+                </div>
 
             </div>
 
-        </div>
+        </footer>
 
-    </section>
+    </main>
 
 </div>
 
 
-<!-- =====================================================
-     GAME MODAL
-===================================================== -->
+<!-- =======================================================
+     GAMES MODAL
+======================================================= -->
 
 <div
     class="overlay"
@@ -1450,14 +1409,14 @@ select:focus-visible{
 
     <div class="modal">
 
-        <div class="modal-head">
+        <div class="modal-header">
 
-            <h2>
-                Create a game
-            </h2>
+            <div class="modal-title">
+                🎮 Create a game
+            </div>
 
             <button
-                class="icon-button"
+                class="icon-btn"
                 id="closeGames"
             >
                 ×
@@ -1467,14 +1426,18 @@ select:focus-visible{
 
         <div class="modal-body">
 
-            <p style="
-                margin:0 0 13px;
-                color:var(--muted);
-                font-size:11px;
-                line-height:1.5;
-            ">
-                Choose a game to create a multiplayer lobby.
+            <p
+                style="
+                    color:var(--muted);
+                    font-size:12px;
+                    line-height:1.5;
+                    margin-top:0;
+                "
+            >
+                Create a multiplayer game that can be
+                shared with people connected to this chat.
             </p>
+
 
             <div class="game-grid">
 
@@ -1482,89 +1445,137 @@ select:focus-visible{
                     class="game-choice"
                     data-game="ttt3"
                 >
-                    <strong>⭕ Tic-Tac-Toe 3×3</strong>
+                    <div class="game-icon">⭕</div>
+
+                    <strong>
+                        Tic-Tac-Toe 3×3
+                    </strong>
+
                     <span>
-                        Classic game. Get three in a row.
+                        Classic three in a row.
                     </span>
-                    <div class="players-count">
+
+                    <div class="game-players">
                         2 players
                     </div>
                 </button>
+
 
                 <button
                     class="game-choice"
                     data-game="ttt4"
                 >
-                    <strong>⭕ Tic-Tac-Toe 4×4</strong>
+                    <div class="game-icon">⭕</div>
+
+                    <strong>
+                        Tic-Tac-Toe 4×4
+                    </strong>
+
                     <span>
-                        Larger board. Get four in a row.
+                        Four in a row on a larger board.
                     </span>
-                    <div class="players-count">
+
+                    <div class="game-players">
                         2 players
                     </div>
                 </button>
+
 
                 <button
                     class="game-choice"
                     data-game="ttt5"
                 >
-                    <strong>⭕ Tic-Tac-Toe 5×5</strong>
+                    <div class="game-icon">⭕</div>
+
+                    <strong>
+                        Tic-Tac-Toe 5×5
+                    </strong>
+
                     <span>
-                        Bigger board with five in a row.
+                        Five in a row.
                     </span>
-                    <div class="players-count">
+
+                    <div class="game-players">
                         2 players
                     </div>
                 </button>
+
 
                 <button
                     class="game-choice"
                     data-game="ttt6"
                 >
-                    <strong>⭕ Tic-Tac-Toe 6×6</strong>
+                    <div class="game-icon">⭕</div>
+
+                    <strong>
+                        Tic-Tac-Toe 6×6
+                    </strong>
+
                     <span>
-                        Huge board. Get six in a row.
+                        Six in a row.
                     </span>
-                    <div class="players-count">
+
+                    <div class="game-players">
                         2 players
                     </div>
                 </button>
+
 
                 <button
                     class="game-choice"
                     data-game="reaction"
                 >
-                    <strong>⚡ Reaction Time</strong>
+                    <div class="game-icon">⚡</div>
+
+                    <strong>
+                        Reaction Time
+                    </strong>
+
                     <span>
                         React as quickly as possible.
                     </span>
-                    <div class="players-count">
+
+                    <div class="game-players">
                         2–6 players
                     </div>
                 </button>
+
 
                 <button
                     class="game-choice"
                     data-game="type"
                 >
-                    <strong>⌨ Type Race</strong>
+                    <div class="game-icon">⌨️</div>
+
+                    <strong>
+                        Type Sentence
+                    </strong>
+
                     <span>
-                        Type the sentence faster than everyone.
+                        Type the sentence faster than everyone else.
                     </span>
-                    <div class="players-count">
+
+                    <div class="game-players">
                         2–6 players
                     </div>
                 </button>
+
 
                 <button
                     class="game-choice"
                     data-game="boss"
                 >
-                    <strong>👹 Boss Battle</strong>
+                    <div class="game-icon">👹</div>
+
+                    <strong>
+                        Boss Battle
+                    </strong>
+
                     <span>
-                        Work together against a massive boss.
+                        Work together to defeat the boss.
                     </span>
-                    <div class="players-count">
+
+                    <div class="game-players">
                         2–6 players
                     </div>
                 </button>
@@ -1578,9 +1589,9 @@ select:focus-visible{
 </div>
 
 
-<!-- =====================================================
+<!-- =======================================================
      SETTINGS
-===================================================== -->
+======================================================= -->
 
 <div
     class="overlay"
@@ -1589,14 +1600,14 @@ select:focus-visible{
 
     <div class="modal">
 
-        <div class="modal-head">
+        <div class="modal-header">
 
-            <h2>
+            <div class="modal-title">
                 Settings
-            </h2>
+            </div>
 
             <button
-                class="icon-button"
+                class="icon-btn"
                 id="closeSettings"
             >
                 ×
@@ -1604,24 +1615,32 @@ select:focus-visible{
 
         </div>
 
+
         <div class="modal-body">
 
 
             <!-- PROFILE -->
 
-            <div class="setting-group open">
+            <div class="category open">
 
-                <button class="setting-title">
-                    <span>👤 Profile</span>
-                    <span>⌄</span>
+                <button class="category-title">
+
+                    <span>
+                        👤 Profile
+                    </span>
+
+                    <span class="category-arrow">
+                        ⌄
+                    </span>
+
                 </button>
 
-                <div class="setting-body">
+                <div class="category-body">
 
                     <div class="setting">
 
                         <label>
-                            Display name
+                            Your name
                         </label>
 
                         <input
@@ -1631,6 +1650,7 @@ select:focus-visible{
                         >
 
                     </div>
+
 
                     <div class="setting">
 
@@ -1652,14 +1672,21 @@ select:focus-visible{
 
             <!-- TEXT -->
 
-            <div class="setting-group">
+            <div class="category">
 
-                <button class="setting-title">
-                    <span>📝 Text</span>
-                    <span>⌄</span>
+                <button class="category-title">
+
+                    <span>
+                        📝 Text
+                    </span>
+
+                    <span class="category-arrow">
+                        ⌄
+                    </span>
+
                 </button>
 
-                <div class="setting-body">
+                <div class="category-body">
 
                     <div class="setting">
 
@@ -1672,15 +1699,16 @@ select:focus-visible{
                             type="range"
                             min="12"
                             max="24"
-                            value="15"
+                            value="16"
                         >
 
                         <div
-                            class="value"
+                            class="setting-value"
                             id="textSizeValue"
                         ></div>
 
                     </div>
+
 
                     <div class="setting">
 
@@ -1697,11 +1725,12 @@ select:focus-visible{
                         >
 
                         <div
-                            class="value"
+                            class="setting-value"
                             id="wordSpacingValue"
                         ></div>
 
                     </div>
+
 
                     <div class="setting">
 
@@ -1719,7 +1748,7 @@ select:focus-visible{
                         >
 
                         <div
-                            class="value"
+                            class="setting-value"
                             id="lineSpacingValue"
                         ></div>
 
@@ -1732,14 +1761,21 @@ select:focus-visible{
 
             <!-- CHAT -->
 
-            <div class="setting-group">
+            <div class="category">
 
-                <button class="setting-title">
-                    <span>💬 Chat</span>
-                    <span>⌄</span>
+                <button class="category-title">
+
+                    <span>
+                        💬 Chat
+                    </span>
+
+                    <span class="category-arrow">
+                        ⌄
+                    </span>
+
                 </button>
 
-                <div class="setting-body">
+                <div class="category-body">
 
                     <div class="setting">
 
@@ -1777,13 +1813,10 @@ select:focus-visible{
                                 0.25 seconds
                             </option>
 
-                            <option value="100">
-                                0.1 seconds
-                            </option>
-
                         </select>
 
                     </div>
+
 
                     <div class="setting">
 
@@ -1812,14 +1845,21 @@ select:focus-visible{
 
             <!-- APPEARANCE -->
 
-            <div class="setting-group">
+            <div class="category">
 
-                <button class="setting-title">
-                    <span>🎨 Appearance</span>
-                    <span>⌄</span>
+                <button class="category-title">
+
+                    <span>
+                        🎨 Appearance
+                    </span>
+
+                    <span class="category-arrow">
+                        ⌄
+                    </span>
+
                 </button>
 
-                <div class="setting-body">
+                <div class="category-body">
 
                     <div class="setting">
 
@@ -1873,6 +1913,7 @@ select:focus-visible{
 
                     </div>
 
+
                     <div class="setting">
 
                         <label>
@@ -1888,11 +1929,12 @@ select:focus-visible{
                         >
 
                         <div
-                            class="value"
+                            class="setting-value"
                             id="cornerRadiusValue"
                         ></div>
 
                     </div>
+
 
                     <div class="setting">
 
@@ -1910,7 +1952,7 @@ select:focus-visible{
                         >
 
                         <div
-                            class="value"
+                            class="setting-value"
                             id="uiScaleValue"
                         ></div>
 
@@ -1923,14 +1965,21 @@ select:focus-visible{
 
             <!-- BEHAVIOR -->
 
-            <div class="setting-group">
+            <div class="category">
 
-                <button class="setting-title">
-                    <span>⚙ Behavior</span>
-                    <span>⌄</span>
+                <button class="category-title">
+
+                    <span>
+                        ⚙️ Behavior
+                    </span>
+
+                    <span class="category-arrow">
+                        ⌄
+                    </span>
+
                 </button>
 
-                <div class="setting-body">
+                <div class="category-body">
 
                     <div class="setting">
 
@@ -1951,6 +2000,7 @@ select:focus-visible{
                         </select>
 
                     </div>
+
 
                     <div class="setting">
 
@@ -1978,7 +2028,7 @@ select:focus-visible{
 
 
             <button
-                class="save"
+                class="save-btn"
                 id="saveSettings"
             >
                 Save settings
@@ -1991,16 +2041,16 @@ select:focus-visible{
                     ⚠ Danger Zone
                 </div>
 
-                <p>
-                    Remove all chat messages from the server.
-                    This requires your server to allow DELETE requests.
-                </p>
+                <div class="danger-text">
+                    Delete all chat messages from the server.
+                    This affects every connected device.
+                </div>
 
                 <button
-                    class="danger"
+                    class="danger-btn"
                     id="removeEverything"
                 >
-                    Remove everything
+                    Delete everything
                 </button>
 
             </div>
@@ -2012,12 +2062,62 @@ select:focus-visible{
 </div>
 
 
-<!-- TOASTS -->
+<!-- =======================================================
+     CONFIRM
+======================================================= -->
 
 <div
-    class="toast-container"
-    id="toastContainer"
-></div>
+    class="overlay"
+    id="confirmOverlay"
+>
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div
+                class="modal-title"
+                id="confirmTitle"
+            >
+                Confirm
+            </div>
+
+        </div>
+
+        <div class="modal-body">
+
+            <div
+                id="confirmText"
+                style="
+                    color:var(--muted);
+                    font-size:12px;
+                    line-height:1.5;
+                "
+            ></div>
+
+            <div class="confirm-actions">
+
+                <button
+                    class="action-btn"
+                    id="confirmCancel"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    class="action-btn danger"
+                    id="confirmYes"
+                >
+                    Confirm
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 
 <script>
@@ -2028,14 +2128,11 @@ select:focus-visible{
    CONFIG
 ========================================================= */
 
-const API_URL = "/api/messages";
-const CHANNEL = "general";
+const API_URL =
+    "/api/messages";
 
-const GAME_PREFIX = "__CHAT_GAME_STATE__:";
-
-const MAX_MESSAGE_LENGTH = 2000;
-
-const REQUEST_TIMEOUT = 7000;
+const CHANNEL =
+    "general";
 
 
 /* =========================================================
@@ -2043,16 +2140,20 @@ const REQUEST_TIMEOUT = 7000;
 ========================================================= */
 
 let deviceId =
-    localStorage.getItem("chat_device_id");
+    localStorage.getItem(
+        "chat_device_id"
+    );
+
 
 if(!deviceId){
 
     if(
         window.crypto &&
-        typeof crypto.randomUUID === "function"
+        crypto.randomUUID
     ){
 
-        deviceId = crypto.randomUUID();
+        deviceId =
+            crypto.randomUUID();
 
     }else{
 
@@ -2065,35 +2166,43 @@ if(!deviceId){
 
     }
 
+
     localStorage.setItem(
         "chat_device_id",
         deviceId
     );
+
 }
 
 
 /* =========================================================
-   SETTINGS
+   DEFAULT SETTINGS
 ========================================================= */
 
 const defaults = {
 
     username:"",
+
     refreshRate:500,
 
     showTimestamps:true,
 
-    textSize:15,
+    textSize:16,
+
     wordSpacing:0,
+
     lineSpacing:1.45,
 
     cornerRadius:12,
+
     uiScale:1,
 
     theme:"dark",
 
     enterToSend:true,
+
     autoScroll:true
+
 };
 
 
@@ -2104,11 +2213,13 @@ function getSetting(key){
             "chat_" + key
         );
 
+
     if(value === null){
 
         return defaults[key];
 
     }
+
 
     if(value === "true"){
         return true;
@@ -2118,352 +2229,448 @@ function getSetting(key){
         return false;
     }
 
-    const number = Number(value);
+
+    const number =
+        Number(value);
+
 
     if(!Number.isNaN(number)){
         return number;
     }
 
+
     return value;
+
 }
 
 
-let settings = {};
+const settings = {};
 
-Object.keys(defaults).forEach(key => {
 
-    settings[key] = getSetting(key);
+Object.keys(defaults).forEach(
+    key => {
 
-});
+        settings[key] =
+            getSetting(key);
+
+    }
+);
 
 
 /* =========================================================
    ELEMENTS
 ========================================================= */
 
-const messagesEl =
-    document.getElementById("messages");
+const sidebar =
+    document.getElementById(
+        "sidebar"
+    );
+
+const messages =
+    document.getElementById(
+        "messages"
+    );
+
+const messagesInner =
+    document.getElementById(
+        "messagesInner"
+    );
 
 const messageInput =
-    document.getElementById("messageInput");
+    document.getElementById(
+        "messageInput"
+    );
 
-const sendButton =
-    document.getElementById("sendButton");
+const sendBtn =
+    document.getElementById(
+        "sendBtn"
+    );
 
-const sidebar =
-    document.getElementById("sidebar");
-
-const mobileMenu =
-    document.getElementById("mobileMenu");
-
-const gamesButton =
-    document.getElementById("gamesButton");
-
-const gamesChannel =
-    document.getElementById("gamesChannel");
-
-const settingsButton =
-    document.getElementById("settingsButton");
-
-const sideSettings =
-    document.getElementById("sideSettings");
-
-const gamesOverlay =
-    document.getElementById("gamesOverlay");
-
-const closeGames =
-    document.getElementById("closeGames");
+const settingsBtn =
+    document.getElementById(
+        "settingsBtn"
+    );
 
 const settingsOverlay =
-    document.getElementById("settingsOverlay");
+    document.getElementById(
+        "settingsOverlay"
+    );
 
 const closeSettings =
-    document.getElementById("closeSettings");
+    document.getElementById(
+        "closeSettings"
+    );
 
-const saveSettings =
-    document.getElementById("saveSettings");
+const gamesBtn =
+    document.getElementById(
+        "gamesBtn"
+    );
+
+const gamesOverlay =
+    document.getElementById(
+        "gamesOverlay"
+    );
+
+const closeGames =
+    document.getElementById(
+        "closeGames"
+    );
+
+const openGamesSide =
+    document.getElementById(
+        "openGamesSide"
+    );
+
+const mobileMenu =
+    document.getElementById(
+        "mobileMenu"
+    );
+
+const connection =
+    document.getElementById(
+        "connection"
+    );
+
+const connectionTitle =
+    document.getElementById(
+        "connectionTitle"
+    );
+
+const connectionDetail =
+    document.getElementById(
+        "connectionDetail"
+    );
+
+const scrollBottom =
+    document.getElementById(
+        "scrollBottom"
+    );
+
 
 const usernameInput =
-    document.getElementById("usernameInput");
+    document.getElementById(
+        "usernameInput"
+    );
 
 const deviceIdInput =
-    document.getElementById("deviceIdInput");
+    document.getElementById(
+        "deviceIdInput"
+    );
 
 const refreshRate =
-    document.getElementById("refreshRate");
+    document.getElementById(
+        "refreshRate"
+    );
 
 const showTimestamps =
-    document.getElementById("showTimestamps");
+    document.getElementById(
+        "showTimestamps"
+    );
 
 const themeSelect =
-    document.getElementById("themeSelect");
+    document.getElementById(
+        "themeSelect"
+    );
 
 const textSize =
-    document.getElementById("textSize");
+    document.getElementById(
+        "textSize"
+    );
 
 const wordSpacing =
-    document.getElementById("wordSpacing");
+    document.getElementById(
+        "wordSpacing"
+    );
 
 const lineSpacing =
-    document.getElementById("lineSpacing");
+    document.getElementById(
+        "lineSpacing"
+    );
 
 const cornerRadius =
-    document.getElementById("cornerRadius");
+    document.getElementById(
+        "cornerRadius"
+    );
 
 const uiScale =
-    document.getElementById("uiScale");
+    document.getElementById(
+        "uiScale"
+    );
 
 const enterToSend =
-    document.getElementById("enterToSend");
+    document.getElementById(
+        "enterToSend"
+    );
 
 const autoScroll =
-    document.getElementById("autoScroll");
+    document.getElementById(
+        "autoScroll"
+    );
 
 const textSizeValue =
-    document.getElementById("textSizeValue");
+    document.getElementById(
+        "textSizeValue"
+    );
 
 const wordSpacingValue =
-    document.getElementById("wordSpacingValue");
+    document.getElementById(
+        "wordSpacingValue"
+    );
 
 const lineSpacingValue =
-    document.getElementById("lineSpacingValue");
+    document.getElementById(
+        "lineSpacingValue"
+    );
 
 const cornerRadiusValue =
-    document.getElementById("cornerRadiusValue");
+    document.getElementById(
+        "cornerRadiusValue"
+    );
 
 const uiScaleValue =
-    document.getElementById("uiScaleValue");
+    document.getElementById(
+        "uiScaleValue"
+    );
+
+const saveSettings =
+    document.getElementById(
+        "saveSettings"
+    );
 
 const removeEverything =
-    document.getElementById("removeEverything");
+    document.getElementById(
+        "removeEverything"
+    );
 
-const toastContainer =
-    document.getElementById("toastContainer");
+const confirmOverlay =
+    document.getElementById(
+        "confirmOverlay"
+    );
 
-const connectionDot =
-    document.getElementById("connectionDot");
+const confirmTitle =
+    document.getElementById(
+        "confirmTitle"
+    );
 
-const connectionText =
-    document.getElementById("connectionText");
+const confirmText =
+    document.getElementById(
+        "confirmText"
+    );
 
-const sideStatus =
-    document.getElementById("sideStatus");
+const confirmCancel =
+    document.getElementById(
+        "confirmCancel"
+    );
 
-const sideStatusText =
-    document.getElementById("sideStatusText");
-
-const sideUsername =
-    document.getElementById("sideUsername");
-
-const sideAvatar =
-    document.getElementById("sideAvatar");
+const confirmYes =
+    document.getElementById(
+        "confirmYes"
+    );
 
 
 /* =========================================================
-   LOCAL STATE
+   STATE
 ========================================================= */
 
 let currentMessages = [];
-
-let games = [];
 
 let refreshTimer = null;
 
 let syncing = false;
 
-let firstLoad = true;
+let confirmCallback = null;
 
-let lastSuccessfulSync = 0;
+let lastMessageSignature = "";
+
+let firstLoad = true;
 
 
 /* =========================================================
-   GAME TYPES
+   THEMES
 ========================================================= */
 
-const GAME_TYPES = {
+const themes = {
 
-    ttt3:{
-        name:"Tic-Tac-Toe 3×3",
-        icon:"⭕",
-        min:2,
-        max:2,
-        desc:"Classic 3×3 board. Get three in a row.",
-        size:3
+    dark:{
+        bg:"#080a0d",
+        sidebar:"#0d1014",
+        panel:"#11151a",
+        panel2:"#171c22",
+        panel3:"#1d232b",
+        border:"#282f38"
     },
 
-    ttt4:{
-        name:"Tic-Tac-Toe 4×4",
-        icon:"⭕",
-        min:2,
-        max:2,
-        desc:"4×4 board. Get four in a row.",
-        size:4
+    midnight:{
+        bg:"#070a12",
+        sidebar:"#0b0f19",
+        panel:"#101622",
+        panel2:"#151d2b",
+        panel3:"#1b2433",
+        border:"#283244"
     },
 
-    ttt5:{
-        name:"Tic-Tac-Toe 5×5",
-        icon:"⭕",
-        min:2,
-        max:2,
-        desc:"5×5 board. Get five in a row.",
-        size:5
+    slate:{
+        bg:"#0d1115",
+        sidebar:"#12171c",
+        panel:"#171d23",
+        panel2:"#1c232a",
+        panel3:"#242c35",
+        border:"#303943"
     },
 
-    ttt6:{
-        name:"Tic-Tac-Toe 6×6",
-        icon:"⭕",
-        min:2,
-        max:2,
-        desc:"6×6 board. Get six in a row.",
-        size:6
+    black:{
+        bg:"#000000",
+        sidebar:"#050505",
+        panel:"#090909",
+        panel2:"#111111",
+        panel3:"#171717",
+        border:"#252525"
     },
 
-    reaction:{
-        name:"Reaction Time",
-        icon:"⚡",
-        min:2,
-        max:6,
-        desc:"React faster than everyone else."
+    blue:{
+        bg:"#071018",
+        sidebar:"#0a151f",
+        panel:"#0f1b27",
+        panel2:"#152330",
+        panel3:"#1c2d3d",
+        border:"#293d50"
     },
 
-    type:{
-        name:"Type Race",
-        icon:"⌨",
-        min:2,
-        max:6,
-        desc:"Type the sentence as quickly as possible."
+    purple:{
+        bg:"#0d0913",
+        sidebar:"#130d1b",
+        panel:"#191120",
+        panel2:"#21172a",
+        panel3:"#2a1d35",
+        border:"#3b2a49"
     },
 
-    boss:{
-        name:"Boss Battle",
-        icon:"👹",
-        min:2,
-        max:6,
-        desc:"Work together to defeat the boss."
+    green:{
+        bg:"#07100b",
+        sidebar:"#0b150f",
+        panel:"#101b15",
+        panel2:"#16231b",
+        panel3:"#1d2d23",
+        border:"#2a4031"
+    },
+
+    red:{
+        bg:"#110808",
+        sidebar:"#170b0b",
+        panel:"#201111",
+        panel2:"#291717",
+        panel3:"#341d1d",
+        border:"#4a2929"
+    },
+
+    gray:{
+        bg:"#151515",
+        sidebar:"#1b1b1b",
+        panel:"#222222",
+        panel2:"#292929",
+        panel3:"#303030",
+        border:"#3b3b3b"
+    },
+
+    light:{
+        bg:"#eeeeee",
+        sidebar:"#f5f5f5",
+        panel:"#ffffff",
+        panel2:"#f3f4f5",
+        panel3:"#e9ebed",
+        border:"#d8dce1"
     }
 
 };
 
 
 /* =========================================================
-   HELPERS
+   APPLY THEME
 ========================================================= */
 
-function escapeHTML(value){
+function applyTheme(name){
 
-    const div =
-        document.createElement("div");
-
-    div.textContent =
-        String(value ?? "");
-
-    return div.innerHTML;
-}
+    const theme =
+        themes[name] ||
+        themes.dark;
 
 
-function getUsername(){
+    Object.entries(theme).forEach(
+        ([key,value]) => {
 
-    const name =
-        String(settings.username || "")
-            .trim()
-            .slice(0,24);
+            document.documentElement
+                .style
+                .setProperty(
+                    "--" + key,
+                    value
+                );
 
-    return name || "Guest";
-
-}
-
-
-function getInitials(name){
-
-    const clean =
-        String(name || "Guest")
-            .trim();
-
-    if(!clean){
-        return "?";
-    }
-
-    const parts =
-        clean.split(/\s+/);
-
-    if(parts.length >= 2){
-
-        return (
-            parts[0][0] +
-            parts[1][0]
-        ).toUpperCase();
-
-    }
-
-    return clean
-        .slice(0,2)
-        .toUpperCase();
-}
-
-
-function formatTime(value){
-
-    const date =
-        new Date(value);
-
-    if(Number.isNaN(date.getTime())){
-        return "";
-    }
-
-    return date.toLocaleTimeString(
-        [],
-        {
-            hour:"2-digit",
-            minute:"2-digit"
         }
     );
 
-}
 
-
-function toast(message){
-
-    const item =
-        document.createElement("div");
-
-    item.className = "toast";
-
-    item.textContent = message;
-
-    toastContainer.appendChild(item);
-
-    setTimeout(() => {
-
-        item.remove();
-
-    },3000);
-
-}
-
-
-function setConnection(online){
-
-    connectionDot.classList.toggle(
-        "offline",
-        !online
+    document.body.classList.toggle(
+        "light-theme",
+        name === "light"
     );
 
-    sideStatus.classList.toggle(
-        "offline",
-        !online
+}
+
+
+applyTheme(
+    settings.theme
+);
+
+
+/* =========================================================
+   APPLY SETTINGS
+========================================================= */
+
+function applySettings(){
+
+    document.documentElement.style
+        .setProperty(
+            "--text-size",
+            settings.textSize + "px"
+        );
+
+
+    document.documentElement.style
+        .setProperty(
+            "--word-spacing",
+            settings.wordSpacing + "px"
+        );
+
+
+    document.documentElement.style
+        .setProperty(
+            "--line-spacing",
+            settings.lineSpacing
+        );
+
+
+    document.documentElement.style
+        .setProperty(
+            "--radius",
+            settings.cornerRadius + "px"
+        );
+
+
+    document.documentElement.style
+        .setProperty(
+            "--ui-scale",
+            settings.uiScale
+        );
+
+
+    applyTheme(
+        settings.theme
     );
 
-    connectionText.textContent =
-        online
-            ? "Connected"
-            : "Offline";
-
-    sideStatusText.textContent =
-        online
-            ? "Online"
-            : "Offline";
-
 }
+
+
+applySettings();
 
 
 /* =========================================================
@@ -2522,8 +2729,9 @@ function updateRangeLabels(){
         wordSpacing.value + "px";
 
     lineSpacingValue.textContent =
-        Number(lineSpacing.value)
-            .toFixed(2);
+        Number(
+            lineSpacing.value
+        ).toFixed(2);
 
     cornerRadiusValue.textContent =
         cornerRadius.value + "px";
@@ -2536,392 +2744,237 @@ function updateRangeLabels(){
 }
 
 
-[
-    textSize,
-    wordSpacing,
-    lineSpacing,
-    cornerRadius,
-    uiScale
-].forEach(input => {
+/* Live appearance preview */
 
-    input.addEventListener(
-        "input",
-        updateRangeLabels
-    );
+textSize.addEventListener(
+    "input",
+    updateRangeLabels
+);
 
-});
+wordSpacing.addEventListener(
+    "input",
+    updateRangeLabels
+);
 
+lineSpacing.addEventListener(
+    "input",
+    updateRangeLabels
+);
 
-function saveAllSettings(){
+cornerRadius.addEventListener(
+    "input",
+    updateRangeLabels
+);
 
-    settings.username =
-        usernameInput.value
-            .trim()
-            .slice(0,24);
+uiScale.addEventListener(
+    "input",
+    updateRangeLabels
+);
 
-    settings.refreshRate =
-        Number(refreshRate.value);
+themeSelect.addEventListener(
+    "change",
+    () => {
 
-    settings.showTimestamps =
-        showTimestamps.value === "true";
+        applyTheme(
+            themeSelect.value
+        );
 
-    settings.theme =
-        themeSelect.value;
-
-    settings.textSize =
-        Number(textSize.value);
-
-    settings.wordSpacing =
-        Number(wordSpacing.value);
-
-    settings.lineSpacing =
-        Number(lineSpacing.value);
-
-    settings.cornerRadius =
-        Number(cornerRadius.value);
-
-    settings.uiScale =
-        Number(uiScale.value);
-
-    settings.enterToSend =
-        enterToSend.value === "true";
-
-    settings.autoScroll =
-        autoScroll.value === "true";
+    }
+);
 
 
-    Object.entries(settings).forEach(
-        ([key,value]) => {
+/* =========================================================
+   SAVE SETTINGS
+========================================================= */
 
-            localStorage.setItem(
-                "chat_" + key,
-                String(value)
+saveSettings.addEventListener(
+    "click",
+    () => {
+
+        settings.username =
+            usernameInput.value
+                .trim()
+                .substring(0,24);
+
+        settings.refreshRate =
+            Number(
+                refreshRate.value
             );
 
-        }
-    );
+        settings.showTimestamps =
+            showTimestamps.value ===
+            "true";
+
+        settings.textSize =
+            Number(
+                textSize.value
+            );
+
+        settings.wordSpacing =
+            Number(
+                wordSpacing.value
+            );
+
+        settings.lineSpacing =
+            Number(
+                lineSpacing.value
+            );
+
+        settings.cornerRadius =
+            Number(
+                cornerRadius.value
+            );
+
+        settings.uiScale =
+            Number(
+                uiScale.value
+            );
+
+        settings.theme =
+            themeSelect.value;
+
+        settings.enterToSend =
+            enterToSend.value ===
+            "true";
+
+        settings.autoScroll =
+            autoScroll.value ===
+            "true";
 
 
-    applySettings();
+        Object.entries(settings)
+            .forEach(
+                ([key,value]) => {
 
-    settingsOverlay.classList.remove(
-        "show"
-    );
+                    localStorage.setItem(
+                        "chat_" + key,
+                        String(value)
+                    );
 
-    toast("Settings saved");
+                }
+            );
 
-}
 
+        applySettings();
 
-function applySettings(){
+        renderMessages();
 
-    document.documentElement
-        .style
-        .setProperty(
-            "--text-size",
-            settings.textSize + "px"
+        restartRefresh();
+
+        closeOverlay(
+            settingsOverlay
         );
 
-    document.documentElement
-        .style
-        .setProperty(
-            "--word-spacing",
-            settings.wordSpacing + "px"
-        );
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--line-spacing",
-            settings.lineSpacing
-        );
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--radius",
-            settings.cornerRadius + "px"
-        );
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--ui-scale",
-            settings.uiScale
-        );
-
-    applyTheme(settings.theme);
-
-    sideUsername.textContent =
-        getUsername();
-
-    sideAvatar.textContent =
-        getInitials(
-            getUsername()
-        );
-
-    messageInput.placeholder =
-        "Message #general";
-
-    restartRefresh();
-
-    renderMessages();
-
-}
-
-
-function applyTheme(name){
-
-    const themes = {
-
-        dark:{
-            bg:"#080a0e",
-            sidebar:"#0d1015",
-            panel:"#11151b",
-            panel2:"#171c23",
-            panel3:"#1d232c",
-            hover:"#202731",
-            border:"#282f39",
-            text:"#f2f4f7",
-            text2:"#c5cbd3",
-            muted:"#7f8996",
-            accent:"#e9edf2",
-            accentText:"#111318"
-        },
-
-        midnight:{
-            bg:"#070912",
-            sidebar:"#0b0e19",
-            panel:"#0f1420",
-            panel2:"#151b29",
-            panel3:"#1c2434",
-            hover:"#222b3d",
-            border:"#293346",
-            text:"#edf1ff",
-            text2:"#c5cce0",
-            muted:"#7e879d",
-            accent:"#dfe7ff",
-            accentText:"#101522"
-        },
-
-        slate:{
-            bg:"#0d1115",
-            sidebar:"#12171c",
-            panel:"#181e24",
-            panel2:"#20272e",
-            panel3:"#293139",
-            hover:"#303941",
-            border:"#37414b",
-            text:"#eef1f3",
-            text2:"#c5cbd0",
-            muted:"#87919b",
-            accent:"#e6e9eb",
-            accentText:"#15181b"
-        },
-
-        black:{
-            bg:"#000000",
-            sidebar:"#050505",
-            panel:"#090909",
-            panel2:"#101010",
-            panel3:"#181818",
-            hover:"#202020",
-            border:"#252525",
-            text:"#ffffff",
-            text2:"#d1d1d1",
-            muted:"#777777",
-            accent:"#eeeeee",
-            accentText:"#080808"
-        },
-
-        blue:{
-            bg:"#071019",
-            sidebar:"#0a141f",
-            panel:"#0e1a26",
-            panel2:"#142433",
-            panel3:"#1b3042",
-            hover:"#21394d",
-            border:"#294456",
-            text:"#eef7ff",
-            text2:"#c5d5e1",
-            muted:"#7f94a5",
-            accent:"#dceeff",
-            accentText:"#0a131b"
-        },
-
-        purple:{
-            bg:"#0d0914",
-            sidebar:"#130d1b",
-            panel:"#191120",
-            panel2:"#21162a",
-            panel3:"#2c1e38",
-            hover:"#382549",
-            border:"#473052",
-            text:"#faf2ff",
-            text2:"#d5c8dd",
-            muted:"#93819e",
-            accent:"#f1e3ff",
-            accentText:"#130c19"
-        },
-
-        green:{
-            bg:"#07100b",
-            sidebar:"#0b1510",
-            panel:"#101b15",
-            panel2:"#16251c",
-            panel3:"#1e3025",
-            hover:"#263d2f",
-            border:"#2c4736",
-            text:"#eefaf2",
-            text2:"#c5d7cb",
-            muted:"#7f9888",
-            accent:"#dff8e8",
-            accentText:"#0a140e"
-        },
-
-        red:{
-            bg:"#100808",
-            sidebar:"#160b0b",
-            panel:"#1d1010",
-            panel2:"#291616",
-            panel3:"#351c1d",
-            hover:"#432223",
-            border:"#51292a",
-            text:"#fff2f2",
-            text2:"#dccaca",
-            muted:"#9a7f7f",
-            accent:"#ffe1e1",
-            accentText:"#160b0b"
-        },
-
-        gray:{
-            bg:"#151515",
-            sidebar:"#1b1b1b",
-            panel:"#222222",
-            panel2:"#292929",
-            panel3:"#333333",
-            hover:"#3a3a3a",
-            border:"#404040",
-            text:"#f1f1f1",
-            text2:"#cecece",
-            muted:"#919191",
-            accent:"#eeeeee",
-            accentText:"#181818"
-        },
-
-        light:{
-            bg:"#e9eaec",
-            sidebar:"#f0f1f3",
-            panel:"#ffffff",
-            panel2:"#f5f6f7",
-            panel3:"#e7e9ec",
-            hover:"#dfe2e6",
-            border:"#d4d8dd",
-            text:"#16191d",
-            text2:"#41464d",
-            muted:"#707780",
-            accent:"#15181c",
-            accentText:"#ffffff"
-        }
-
-    };
-
-
-    const theme =
-        themes[name] ||
-        themes.dark;
-
-
-    Object.entries(theme).forEach(
-        ([key,value]) => {
-
-            document.documentElement
-                .style
-                .setProperty(
-                    "--" + key,
-                    value
-                );
-
-        }
-    );
-
-}
+    }
+);
 
 
 /* =========================================================
    MODALS
 ========================================================= */
 
-function openGames(){
+function openOverlay(overlay){
 
-    gamesOverlay.classList.add("show");
-
-    sidebar.classList.remove("open");
-
-}
-
-
-function closeGamesModal(){
-
-    gamesOverlay.classList.remove("show");
+    overlay.classList.add(
+        "show"
+    );
 
 }
 
 
-function openSettings(){
+function closeOverlay(overlay){
 
-    loadSettingsUI();
-
-    settingsOverlay.classList.add("show");
-
-    sidebar.classList.remove("open");
+    overlay.classList.remove(
+        "show"
+    );
 
 }
 
 
-function closeSettingsModal(){
+settingsBtn.addEventListener(
+    "click",
+    () => {
 
-    settingsOverlay.classList.remove("show");
+        loadSettingsUI();
 
-}
+        openOverlay(
+            settingsOverlay
+        );
 
-
-gamesButton.onclick =
-    openGames;
-
-gamesChannel.onclick =
-    openGames;
-
-closeGames.onclick =
-    closeGamesModal;
-
-settingsButton.onclick =
-    openSettings;
-
-sideSettings.onclick =
-    openSettings;
-
-closeSettings.onclick =
-    closeSettingsModal;
-
-mobileMenu.onclick = () => {
-
-    sidebar.classList.toggle("open");
-
-};
+    }
+);
 
 
-[gamesOverlay,settingsOverlay]
-    .forEach(overlay => {
+closeSettings.addEventListener(
+    "click",
+    () => {
+
+        closeOverlay(
+            settingsOverlay
+        );
+
+    }
+);
+
+
+gamesBtn.addEventListener(
+    "click",
+    () => {
+
+        openOverlay(
+            gamesOverlay
+        );
+
+    }
+);
+
+
+openGamesSide.addEventListener(
+    "click",
+    () => {
+
+        sidebar.classList.remove(
+            "mobile-open"
+        );
+
+        openOverlay(
+            gamesOverlay
+        );
+
+    }
+);
+
+
+closeGames.addEventListener(
+    "click",
+    () => {
+
+        closeOverlay(
+            gamesOverlay
+        );
+
+    }
+);
+
+
+/* Click outside modal */
+
+[
+    settingsOverlay,
+    gamesOverlay
+].forEach(
+    overlay => {
 
         overlay.addEventListener(
             "click",
             event => {
 
-                if(event.target === overlay){
+                if(
+                    event.target === overlay
+                ){
 
-                    overlay.classList.remove(
-                        "show"
+                    closeOverlay(
+                        overlay
                     );
 
                 }
@@ -2929,40 +2982,18 @@ mobileMenu.onclick = () => {
             }
         );
 
-    });
-
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if(event.key === "Escape"){
-
-            gamesOverlay.classList.remove(
-                "show"
-            );
-
-            settingsOverlay.classList.remove(
-                "show"
-            );
-
-            sidebar.classList.remove(
-                "open"
-            );
-
-        }
-
     }
 );
 
 
 /* =========================================================
-   SETTING ACCORDIONS
+   CATEGORIES
 ========================================================= */
 
-document
-    .querySelectorAll(".setting-title")
-    .forEach(button => {
+document.querySelectorAll(
+    ".category-title"
+).forEach(
+    button => {
 
         button.addEventListener(
             "click",
@@ -2976,240 +3007,79 @@ document
             }
         );
 
-    });
+    }
+);
 
 
 /* =========================================================
-   SEND BUTTON
+   MOBILE SIDEBAR
 ========================================================= */
 
-function updateSendButton(){
-
-    sendButton.disabled =
-        !messageInput.value.trim();
-
-}
-
-
-messageInput.addEventListener(
-    "input",
+mobileMenu.addEventListener(
+    "click",
     () => {
 
-        updateSendButton();
-
-        messageInput.style.height =
-            "auto";
-
-        messageInput.style.height =
-            Math.min(
-                messageInput.scrollHeight,
-                150
-            ) + "px";
+        sidebar.classList.toggle(
+            "mobile-open"
+        );
 
     }
 );
-
-
-messageInput.addEventListener(
-    "keydown",
-    event => {
-
-        if(
-            event.key === "Enter" &&
-            !event.shiftKey &&
-            settings.enterToSend
-        ){
-
-            event.preventDefault();
-
-            sendMessage();
-
-        }
-
-    }
-);
-
-
-sendButton.onclick =
-    sendMessage;
 
 
 /* =========================================================
-   API
+   CONNECTION STATUS
 ========================================================= */
 
-async function fetchWithTimeout(
-    url,
-    options = {}
+function setConnection(
+    state,
+    title,
+    detail
 ){
 
-    const controller =
-        new AbortController();
+    connection.classList.remove(
+        "online",
+        "error"
+    );
 
-    const timer =
-        setTimeout(
-            () => controller.abort(),
-            REQUEST_TIMEOUT
+
+    if(state === "online"){
+
+        connection.classList.add(
+            "online"
         );
-
-    try{
-
-        return await fetch(
-            url,
-            {
-                ...options,
-                signal:controller.signal,
-                cache:"no-store"
-            }
-        );
-
-    }finally{
-
-        clearTimeout(timer);
 
     }
+
+
+    if(state === "error"){
+
+        connection.classList.add(
+            "error"
+        );
+
+    }
+
+
+    connectionTitle.textContent =
+        title;
+
+    connectionDetail.textContent =
+        detail;
 
 }
 
 
 /* =========================================================
-   SEND MESSAGE
+   LOAD MESSAGES
 ========================================================= */
 
-async function sendMessage(){
-
-    const text =
-        messageInput.value
-            .trim();
-
-    if(!text){
-        return;
-    }
-
-    if(text.length > MAX_MESSAGE_LENGTH){
-
-        toast(
-            "Message is too long."
-        );
-
-        return;
-
-    }
-
-
-    const username =
-        getUsername();
-
-
-    sendButton.disabled = true;
-
-
-    try{
-
-        const response =
-            await fetchWithTimeout(
-                API_URL,
-                {
-                    method:"POST",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:JSON.stringify({
-
-                        channel:CHANNEL,
-
-                        username:username,
-
-                        deviceId:deviceId,
-
-                        content:text,
-
-                        type:"message",
-
-                        timestamp:
-                            new Date()
-                                .toISOString()
-
-                    })
-
-                }
-            );
-
-
-        if(!response.ok){
-
-            throw new Error(
-                "Server returned " +
-                response.status
-            );
-
-        }
-
-
-        messageInput.value = "";
-
-        messageInput.style.height =
-            "auto";
-
-        updateSendButton();
-
-        await syncMessages(true);
-
-
-    }catch(error){
-
-        console.error(error);
-
-        setConnection(false);
-
-        toast(
-            "Could not send message."
-        );
-
-    }finally{
-
-        updateSendButton();
-
-    }
-
-}
-
-
-/* =========================================================
-   NORMALIZE API DATA
-========================================================= */
-
-function normalizeMessages(data){
-
-    if(Array.isArray(data)){
-        return data;
-    }
-
-    if(data && Array.isArray(data.messages)){
-        return data.messages;
-    }
-
-    if(data && Array.isArray(data.data)){
-        return data.data;
-    }
-
-    return [];
-
-}
-
-
-/* =========================================================
-   SYNC
-========================================================= */
-
-async function syncMessages(forceScroll = false){
+async function loadMessages(){
 
     if(syncing){
         return;
     }
+
 
     syncing = true;
 
@@ -3217,13 +3087,17 @@ async function syncMessages(forceScroll = false){
     try{
 
         const response =
-            await fetchWithTimeout(
+            await fetch(
                 API_URL +
                 "?channel=" +
-                encodeURIComponent(CHANNEL),
-
+                encodeURIComponent(
+                    CHANNEL
+                ) +
+                "&_=" +
+                Date.now(),
                 {
                     method:"GET",
+                    cache:"no-store",
                     headers:{
                         "Accept":
                             "application/json"
@@ -3246,38 +3120,75 @@ async function syncMessages(forceScroll = false){
             await response.json();
 
 
-        const incoming =
-            normalizeMessages(data);
+        if(
+            !data ||
+            !Array.isArray(
+                data.messages
+            )
+        ){
+
+            throw new Error(
+                "Invalid server response"
+            );
+
+        }
 
 
-        currentMessages =
-            incoming
-                .filter(item => item)
-                .sort(
-                    (a,b) =>
-                        new Date(
-                            a.timestamp ||
-                            a.createdAt ||
-                            0
-                        ) -
-                        new Date(
-                            b.timestamp ||
-                            b.createdAt ||
-                            0
-                        )
-                );
+        const newMessages =
+            data.messages;
 
 
-        setConnection(true);
-
-        lastSuccessfulSync =
-            Date.now();
-
-
-        renderMessages(
-            forceScroll ||
-            firstLoad
+        setConnection(
+            "online",
+            "Connected",
+            newMessages.length +
+            " messages loaded"
         );
+
+
+        const signature =
+            newMessages
+                .map(
+                    message =>
+                        String(
+                            message.id
+                        ) +
+                        ":" +
+                        String(
+                            message.edited
+                        )
+                )
+                .join("|");
+
+
+        /*
+         * Don't redraw the entire chat if nothing
+         * changed. This makes the UI much smoother.
+         */
+
+        if(
+            signature !==
+            lastMessageSignature
+        ){
+
+            const nearBottom =
+                isNearBottom();
+
+
+            currentMessages =
+                newMessages;
+
+
+            lastMessageSignature =
+                signature;
+
+
+            renderMessages(
+                nearBottom ||
+                firstLoad
+            );
+
+        }
 
 
         firstLoad = false;
@@ -3286,11 +3197,17 @@ async function syncMessages(forceScroll = false){
     }catch(error){
 
         console.error(
-            "Sync failed:",
+            "CHAT SYNC ERROR:",
             error
         );
 
-        setConnection(false);
+
+        setConnection(
+            "error",
+            "Connection error",
+            error.message
+        );
+
 
     }finally{
 
@@ -3305,181 +3222,204 @@ async function syncMessages(forceScroll = false){
    RENDER
 ========================================================= */
 
-function renderMessages(forceScroll = false){
+function renderMessages(
+    shouldScroll = false
+){
 
-    const oldScrollHeight =
-        messagesEl.scrollHeight;
-
-    const oldScrollTop =
-        messagesEl.scrollTop;
-
-    const nearBottom =
-        messagesEl.scrollHeight -
-        messagesEl.scrollTop -
-        messagesEl.clientHeight <
-        100;
+    messagesInner.replaceChildren();
 
 
-    messagesEl.innerHTML = "";
-
-
-    if(!currentMessages.length){
+    if(
+        currentMessages.length === 0
+    ){
 
         const empty =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
-        empty.className = "empty";
+        empty.className =
+            "empty";
 
-        empty.innerHTML = `
-            <div class="empty-box">
-                <div class="empty-icon">#</div>
-                <strong>Welcome to #general</strong>
-                <p>
-                    This is the beginning of the channel.
-                    Send a message to start chatting.
-                </p>
-            </div>
-        `;
 
-        messagesEl.appendChild(empty);
+        const card =
+            document.createElement(
+                "div"
+            );
+
+        card.className =
+            "empty-card";
+
+
+        const icon =
+            document.createElement(
+                "div"
+            );
+
+        icon.className =
+            "empty-icon";
+
+        icon.textContent =
+            "💬";
+
+
+        const title =
+            document.createElement(
+                "div"
+            );
+
+        title.className =
+            "empty-title";
+
+        title.textContent =
+            "No messages yet";
+
+
+        const text =
+            document.createElement(
+                "div"
+            );
+
+        text.className =
+            "empty-text";
+
+        text.textContent =
+            "Be the first person to say something.";
+
+
+        card.appendChild(
+            icon
+        );
+
+        card.appendChild(
+            title
+        );
+
+        card.appendChild(
+            text
+        );
+
+        empty.appendChild(
+            card
+        );
+
+        messagesInner.appendChild(
+            empty
+        );
+
 
         return;
 
     }
 
 
-    const fragment =
-        document.createDocumentFragment();
+    let previousUser =
+        null;
 
 
     currentMessages.forEach(
         message => {
 
-            const content =
-                String(
-                    message.content ??
-                    message.text ??
-                    ""
-                );
+            const compact =
+                previousUser ===
+                message.username;
 
 
-            if(
-                content.startsWith(
-                    GAME_PREFIX
-                )
-            ){
-
-                const game =
-                    parseGameMessage(
-                        message
-                    );
-
-                if(game){
-
-                    fragment.appendChild(
-                        createGameCard(
-                            game
-                        )
-                    );
-
-                }
-
-                return;
-
-            }
-
-
-            fragment.appendChild(
-                createMessageElement(
-                    message
-                )
+            renderMessage(
+                message,
+                compact
             );
+
+
+            previousUser =
+                message.username;
 
         }
     );
 
 
-    messagesEl.appendChild(
-        fragment
-    );
+    if(shouldScroll){
 
+        requestAnimationFrame(
+            () => {
 
-    if(
-        settings.autoScroll &&
-        (nearBottom || forceScroll)
-    ){
+                messages.scrollTop =
+                    messages.scrollHeight;
 
-        messagesEl.scrollTop =
-            messagesEl.scrollHeight;
-
-    }else{
-
-        messagesEl.scrollTop =
-            oldScrollTop +
-            (
-                messagesEl.scrollHeight -
-                oldScrollHeight
-            );
+            }
+        );
 
     }
 
 }
 
 
-/* =========================================================
-   MESSAGE ELEMENT
-========================================================= */
-
-function createMessageElement(message){
-
-    const username =
-        String(
-            message.username ||
-            "Guest"
-        ).slice(0,24);
-
-
-    const content =
-        String(
-            message.content ??
-            message.text ??
-            ""
-        );
-
+function renderMessage(
+    msg,
+    compact
+){
 
     const article =
-        document.createElement("article");
+        document.createElement(
+            "article"
+        );
 
     article.className =
         "message";
 
 
+    if(compact){
+
+        article.style.marginTop =
+            "-1px";
+
+    }
+
+
     const avatar =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     avatar.className =
-        "message-avatar";
+        "avatar";
+
+
+    const username =
+        String(
+            msg.username ||
+            "User"
+        );
+
 
     avatar.textContent =
-        getInitials(username);
+        username
+            .charAt(0)
+            .toUpperCase();
 
 
     const body =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     body.className =
-        "message-content";
+        "message-body";
 
 
-    const header =
-        document.createElement("div");
+    const top =
+        document.createElement(
+            "div"
+        );
 
-    header.className =
-        "message-header";
+    top.className =
+        "message-top";
 
 
     const name =
-        document.createElement("span");
+        document.createElement(
+            "span"
+        );
 
     name.className =
         "username";
@@ -3488,489 +3428,301 @@ function createMessageElement(message){
         username;
 
 
-    header.appendChild(name);
+    top.appendChild(
+        name
+    );
 
 
     if(settings.showTimestamps){
 
         const time =
-            document.createElement("span");
-
-        time.className =
-            "timestamp";
-
-        time.textContent =
-            formatTime(
-                message.timestamp ||
-                message.createdAt
+            document.createElement(
+                "span"
             );
 
-        header.appendChild(time);
+        time.className =
+            "time";
+
+
+        const date =
+            new Date(
+                msg.created_at
+            );
+
+
+        if(!Number.isNaN(
+            date.getTime()
+        )){
+
+            time.textContent =
+                date.toLocaleTimeString(
+                    [],
+                    {
+                        hour:"2-digit",
+                        minute:"2-digit"
+                    }
+                );
+
+        }
+
+
+        top.appendChild(
+            time
+        );
+
+    }
+
+
+    if(msg.edited){
+
+        const edited =
+            document.createElement(
+                "span"
+            );
+
+        edited.className =
+            "edited";
+
+        edited.textContent =
+            "edited";
+
+
+        top.appendChild(
+            edited
+        );
 
     }
 
 
     const text =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     text.className =
         "message-text";
 
+
+    /*
+     * NEVER use innerHTML for user messages.
+     *
+     * textContent prevents someone from sending HTML
+     * that executes on another user's PC.
+     */
+
     text.textContent =
-        content;
+        msg.message || "";
 
 
-    body.appendChild(header);
+    body.appendChild(
+        top
+    );
 
-    body.appendChild(text);
-
-
-    article.appendChild(avatar);
-
-    article.appendChild(body);
-
-
-    return article;
-
-}
-
-
-/* =========================================================
-   GAME PARSER
-========================================================= */
-
-function parseGameMessage(message){
-
-    const raw =
-        String(
-            message.content ??
-            message.text ??
-            ""
-        );
+    body.appendChild(
+        text
+    );
 
 
     if(
-        !raw.startsWith(
-            GAME_PREFIX
-        )
+        msg.image &&
+        typeof msg.image ===
+            "string"
     ){
 
-        return null;
+        const image =
+            document.createElement(
+                "img"
+            );
 
-    }
+        image.className =
+            "message-image";
+
+        image.src =
+            msg.image;
+
+        image.alt =
+            "Attached image";
+
+        image.loading =
+            "lazy";
 
 
-    try{
-
-        return JSON.parse(
-            raw.slice(
-                GAME_PREFIX.length
-            )
+        body.appendChild(
+            image
         );
 
-    }catch{
-
-        return null;
-
     }
 
-}
+
+    article.appendChild(
+        avatar
+    );
+
+    article.appendChild(
+        body
+    );
 
 
-/* =========================================================
-   GAME CARD
-========================================================= */
-
-function createGameCard(game){
-
-    const type =
-        GAME_TYPES[
-            game.type
-        ] ||
-        GAME_TYPES.ttt3;
-
-
-    const card =
-        document.createElement("article");
-
-    card.className =
-        "game-message";
-
-
-    const players =
-        Array.isArray(
-            game.players
-        )
-            ? game.players
-            : [];
-
-
-    const status =
-        game.status ||
-        "Waiting";
-
-
-    card.innerHTML = `
-
-        <div class="game-card">
-
-            <div class="game-head">
-
-                <div class="game-title">
-
-                    <div class="game-title-icon">
-                        ${escapeHTML(type.icon)}
-                    </div>
-
-                    <div>
-                        <strong>
-                            ${escapeHTML(type.name)}
-                        </strong>
-
-                        <span>
-                            Created by
-                            ${escapeHTML(
-                                game.hostName ||
-                                game.host ||
-                                "Guest"
-                            )}
-                        </span>
-                    </div>
-
-                </div>
-
-                <div class="game-status">
-                    ${escapeHTML(status)}
-                </div>
-
-            </div>
-
-
-            <div class="game-body">
-
-                <p class="game-description">
-                    ${escapeHTML(type.desc)}
-                </p>
-
-                <div class="game-info">
-
-                    <div class="game-pill">
-                        Players:
-                        <strong>
-                            ${players.length}/${type.max}
-                        </strong>
-                    </div>
-
-                    <div class="game-pill">
-                        Game ID:
-                        <strong>
-                            ${escapeHTML(
-                                String(
-                                    game.id ||
-                                    "unknown"
-                                ).slice(0,10)
-                            )}
-                        </strong>
-                    </div>
-
-                </div>
-
-
-                <div class="players">
-
-                    ${players.map(
-                        player => `
-
-                        <div class="player ${
-                            player.isHost
-                                ? "host"
-                                : ""
-                        }">
-
-                            ${
-                                player.isHost
-                                    ? "★ "
-                                    : ""
-                            }
-
-                            ${escapeHTML(
-                                player.name ||
-                                player.username ||
-                                "Guest"
-                            )}
-
-                        </div>
-
-                    `
-                    ).join("")}
-
-                </div>
-
-
-                <div class="game-actions">
-
-                    <button
-                        class="btn primary"
-                        data-join-game="${
-                            escapeHTML(
-                                game.id || ""
-                            )
-                        }"
-                    >
-                        Join game
-                    </button>
-
-                    <button
-                        class="btn"
-                        data-copy-game="${
-                            escapeHTML(
-                                game.id || ""
-                            )
-                        }"
-                    >
-                        Copy ID
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-    `;
-
-
-    return card;
+    messagesInner.appendChild(
+        article
+    );
 
 }
 
 
 /* =========================================================
-   GAME CREATION
+   SEND
 ========================================================= */
 
-async function createGame(typeId){
+async function sendMessage(){
 
-    const type =
-        GAME_TYPES[typeId];
+    const message =
+        messageInput.value
+            .trim();
 
-    if(!type){
+
+    if(!message){
+        return;
+    }
+
+
+    if(
+        !settings.username.trim()
+    ){
+
+        openOverlay(
+            settingsOverlay
+        );
+
+        loadSettingsUI();
+
+        usernameInput.focus();
 
         return;
 
     }
 
 
-    const id =
-        cryptoRandomId();
-
-
-    const game = {
-
-        id:id,
-
-        type:typeId,
-
-        host:deviceId,
-
-        hostName:getUsername(),
-
-        status:"Waiting",
-
-        players:[
-
-            {
-                id:deviceId,
-                name:getUsername(),
-                isHost:true
-            }
-
-        ],
-
-        createdAt:
-            new Date()
-                .toISOString()
-
-    };
-
-
-    const message = {
-
-        channel:CHANNEL,
-
-        username:getUsername(),
-
-        deviceId:deviceId,
-
-        content:
-            GAME_PREFIX +
-            JSON.stringify(game),
-
-        type:"game",
-
-        timestamp:
-            new Date()
-                .toISOString()
-
-    };
+    sendBtn.disabled =
+        true;
 
 
     try{
 
         const response =
-            await fetchWithTimeout(
+            await fetch(
                 API_URL,
                 {
+
                     method:"POST",
 
                     headers:{
                         "Content-Type":
+                            "application/json",
+
+                        "Accept":
                             "application/json"
                     },
 
                     body:
-                        JSON.stringify(
-                            message
-                        )
+                        JSON.stringify({
+
+                            username:
+                                settings.username,
+
+                            channel:
+                                CHANNEL,
+
+                            message,
+
+                            device_id:
+                                deviceId
+
+                        })
+
                 }
             );
+
+
+        const data =
+            await response.json();
 
 
         if(!response.ok){
 
             throw new Error(
-                "Could not create game"
+                data.error ||
+                "Could not send message."
             );
 
         }
 
 
-        closeGamesModal();
-
-        toast(
-            type.name +
-            " lobby created"
-        );
+        messageInput.value =
+            "";
 
 
-        await syncMessages(true);
+        resizeTextarea();
+
+
+        /*
+         * Immediately fetch the message from the
+         * server so every device uses the same data.
+         */
+
+        await loadMessages();
 
 
     }catch(error){
 
-        console.error(error);
-
-        toast(
-            "Could not create game."
+        console.error(
+            "SEND ERROR:",
+            error
         );
+
+
+        setConnection(
+            "error",
+            "Send failed",
+            error.message
+        );
+
+
+    }finally{
+
+        sendBtn.disabled =
+            false;
+
+        messageInput.focus();
 
     }
 
 }
 
 
-/* =========================================================
-   GAME BUTTONS
-========================================================= */
-
-document
-    .querySelectorAll(
-        "[data-game]"
-    )
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                createGame(
-                    button.dataset.game
-                );
-
-            }
-        );
-
-    });
-
-
-document
-    .querySelectorAll(
-        "[data-create-game]"
-    )
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                createGame(
-                    button.dataset.createGame
-                );
-
-            }
-        );
-
-    });
-
-
-/* =========================================================
-   GAME CARD EVENTS
-========================================================= */
-
-messagesEl.addEventListener(
+sendBtn.addEventListener(
     "click",
-    async event => {
-
-        const join =
-            event.target.closest(
-                "[data-join-game]"
-            );
-
-        const copy =
-            event.target.closest(
-                "[data-copy-game]"
-            );
+    sendMessage
+);
 
 
-        if(join){
+/* =========================================================
+   ENTER TO SEND
+========================================================= */
 
-            const id =
-                join.dataset.joinGame;
+messageInput.addEventListener(
+    "keydown",
+    event => {
 
-            toast(
-                "Game lobby: " + id
-            );
+        if(
+            event.key === "Enter" &&
+            !event.shiftKey &&
+            settings.enterToSend
+        ){
 
-            /*
-                The actual multiplayer join logic
-                should update the game state on
-                your server.
-            */
+            event.preventDefault();
 
-        }
-
-
-        if(copy){
-
-            const id =
-                copy.dataset.copyGame;
-
-            try{
-
-                await navigator.clipboard.writeText(
-                    id
-                );
-
-                toast(
-                    "Game ID copied"
-                );
-
-            }catch{
-
-                toast(
-                    "Could not copy ID"
-                );
-
-            }
+            sendMessage();
 
         }
 
@@ -3979,134 +3731,76 @@ messagesEl.addEventListener(
 
 
 /* =========================================================
-   RANDOM ID
+   TEXTAREA AUTO SIZE
 ========================================================= */
 
-function cryptoRandomId(){
+function resizeTextarea(){
 
-    if(
-        window.crypto &&
-        typeof crypto.randomUUID ===
-            "function"
-    ){
+    messageInput.style.height =
+        "auto";
 
-        return crypto.randomUUID();
-
-    }
-
-
-    return (
-        Date.now().toString(36) +
-        "-" +
-        Math.random()
-            .toString(36)
-            .slice(2)
-    );
+    messageInput.style.height =
+        Math.min(
+            messageInput.scrollHeight,
+            150
+        ) + "px";
 
 }
 
 
+messageInput.addEventListener(
+    "input",
+    resizeTextarea
+);
+
+
 /* =========================================================
-   DELETE EVERYTHING
+   SCROLL
 ========================================================= */
 
-removeEverything.onclick =
-    async () => {
+function isNearBottom(){
 
-        const confirmed =
-            confirm(
-                "Delete all chat messages?"
-            );
+    return (
+        messages.scrollHeight -
+        messages.scrollTop -
+        messages.clientHeight
+    ) < 140;
 
-        if(!confirmed){
-            return;
-        }
+}
 
 
-        try{
+messages.addEventListener(
+    "scroll",
+    () => {
 
-            const response =
-                await fetchWithTimeout(
-                    API_URL +
-                    "?channel=" +
-                    encodeURIComponent(
-                        CHANNEL
-                    ),
+        scrollBottom.classList.toggle(
+            "show",
+            !isNearBottom()
+        );
 
-                    {
-                        method:"DELETE",
-
-                        headers:{
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body:JSON.stringify({
-
-                            channel:CHANNEL,
-
-                            deviceId:deviceId
-
-                        })
-
-                    }
-                );
+    }
+);
 
 
-            if(!response.ok){
+scrollBottom.addEventListener(
+    "click",
+    () => {
 
-                throw new Error(
-                    "Delete failed"
-                );
+        messages.scrollTo({
 
-            }
+            top:
+                messages.scrollHeight,
 
+            behavior:"smooth"
 
-            currentMessages = [];
+        });
 
-            renderMessages(true);
-
-            toast(
-                "Messages removed"
-            );
-
-
-        }catch(error){
-
-            console.error(error);
-
-            toast(
-                "The server refused the delete request."
-            );
-
-        }
-
-    };
+    }
+);
 
 
 /* =========================================================
-   SETTINGS
-========================================================= */
-
-saveSettings.onclick =
-    saveAllSettings;
-
-
-/* =========================================================
-   INITIALIZATION
-========================================================= */
-
-applySettings();
-
-loadSettingsUI();
-
-updateSendButton();
-
-setConnection(false);
-
-
-/* =========================================================
-   REFRESH LOOP
+   REFRESH TIMER
 ========================================================= */
 
 function restartRefresh(){
@@ -4122,13 +3816,9 @@ function restartRefresh(){
 
     refreshTimer =
         setInterval(
-            () => {
-
-                syncMessages(false);
-
-            },
+            loadMessages,
             Math.max(
-                100,
+                250,
                 Number(
                     settings.refreshRate
                 )
@@ -4142,85 +3832,299 @@ restartRefresh();
 
 
 /* =========================================================
-   INITIAL SYNC
+   DELETE EVERYTHING
 ========================================================= */
 
-syncMessages(true);
-
-
-/* =========================================================
-   VISIBILITY
-========================================================= */
-
-document.addEventListener(
-    "visibilitychange",
+removeEverything.addEventListener(
+    "click",
     () => {
 
-        if(
-            document.visibilityState ===
-            "visible"
-        ){
+        confirmTitle.textContent =
+            "Delete everything?";
 
-            syncMessages(false);
+        confirmText.textContent =
+            "This will delete every message from the server for every connected device. This cannot be undone.";
 
-        }
-
-    }
-);
+        confirmCallback =
+            deleteEverything;
 
 
-/* =========================================================
-   ONLINE / OFFLINE
-========================================================= */
-
-window.addEventListener(
-    "online",
-    () => {
-
-        toast(
-            "Internet connection restored"
-        );
-
-        syncMessages(true);
-
-    }
-);
-
-
-window.addEventListener(
-    "offline",
-    () => {
-
-        setConnection(false);
-
-        toast(
-            "You are offline"
+        openOverlay(
+            confirmOverlay
         );
 
     }
 );
 
 
-/* =========================================================
-   BEFORE UNLOAD
-========================================================= */
+async function deleteEverything(){
 
-window.addEventListener(
-    "beforeunload",
-    () => {
+    try{
 
-        if(refreshTimer){
+        const response =
+            await fetch(
+                API_URL,
+                {
 
-            clearInterval(
-                refreshTimer
+                    method:"DELETE",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json",
+
+                        "Accept":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            delete_all:true
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error ||
+                "Delete failed."
             );
 
         }
 
+
+        currentMessages =
+            [];
+
+        lastMessageSignature =
+            "";
+
+        renderMessages(
+            true
+        );
+
+
+        closeOverlay(
+            confirmOverlay
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "DELETE ERROR:",
+            error
+        );
+
+        alert(
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CONFIRM BUTTONS
+========================================================= */
+
+confirmCancel.addEventListener(
+    "click",
+    () => {
+
+        confirmCallback =
+            null;
+
+        closeOverlay(
+            confirmOverlay
+        );
+
     }
 );
+
+
+confirmYes.addEventListener(
+    "click",
+    async () => {
+
+        if(
+            typeof confirmCallback ===
+            "function"
+        ){
+
+            await confirmCallback();
+
+        }
+
+        confirmCallback =
+            null;
+
+    }
+);
+
+
+/* =========================================================
+   GAME CREATOR
+========================================================= */
+
+const GAME_TYPES = {
+
+    ttt3:{
+        name:"Tic-Tac-Toe 3×3",
+        icon:"⭕",
+        players:"2 players"
+    },
+
+    ttt4:{
+        name:"Tic-Tac-Toe 4×4",
+        icon:"⭕",
+        players:"2 players"
+    },
+
+    ttt5:{
+        name:"Tic-Tac-Toe 5×5",
+        icon:"⭕",
+        players:"2 players"
+    },
+
+    ttt6:{
+        name:"Tic-Tac-Toe 6×6",
+        icon:"⭕",
+        players:"2 players"
+    },
+
+    reaction:{
+        name:"Reaction Time",
+        icon:"⚡",
+        players:"2–6 players"
+    },
+
+    type:{
+        name:"Type Sentence",
+        icon:"⌨️",
+        players:"2–6 players"
+    },
+
+    boss:{
+        name:"Boss Battle",
+        icon:"👹",
+        players:"2–6 players"
+    }
+
+};
+
+
+document.querySelectorAll(
+    ".game-choice"
+).forEach(
+    button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                const type =
+                    button.dataset.game;
+
+                createGameMessage(
+                    type
+                );
+
+            }
+        );
+
+    }
+);
+
+
+function createGameMessage(
+    type
+){
+
+    const game =
+        GAME_TYPES[type];
+
+
+    if(!game){
+        return;
+    }
+
+
+    /*
+     * This creates a normal chat message announcing
+     * the game. It doesn't pretend to be a synchronized
+     * game server.
+     */
+
+    messageInput.value =
+        `${game.icon} ${game.name} created — ${game.players}`;
+
+    closeOverlay(
+        gamesOverlay
+    );
+
+    messageInput.focus();
+
+    resizeTextarea();
+
+}
+
+
+/* =========================================================
+   KEYBOARD SHORTCUT
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if(
+            event.key === "Escape"
+        ){
+
+            settingsOverlay
+                .classList
+                .remove("show");
+
+            gamesOverlay
+                .classList
+                .remove("show");
+
+            confirmOverlay
+                .classList
+                .remove("show");
+
+            sidebar
+                .classList
+                .remove("mobile-open");
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+loadSettingsUI();
+
+updateRangeLabels();
+
+loadMessages();
+
+resizeTextarea();
 
 </script>
 
 </body>
 </html>
+```
