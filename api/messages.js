@@ -1,50 +1,83 @@
 export default async function handler(req, res) {
 
+    // ==============================
+    // CORS / RESPONSE SETTINGS
+    // ==============================
+
     res.setHeader("Content-Type", "application/json");
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+    res.setHeader(
+        "Access-Control-Allow-Origin",
+        "*"
+    );
+
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET,POST,OPTIONS"
+    );
+
+    res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Content-Type"
+    );
+
+
+    // ==============================
+    // OPTIONS
+    // ==============================
 
     if (req.method === "OPTIONS") {
         return res.status(200).end();
     }
 
+
     try {
 
-        // ==========================================
-        // VERCEL ENVIRONMENT VARIABLES
-        // ==========================================
+        // ==============================
+        // SUPABASE SETTINGS
+        // ==============================
 
         const supabaseUrl =
-            process.env.https://wlvbkdzcueqkknysisfw.supabase.co;
+            "https://wlvbkdzcueqkknysisfw.supabase.co";
+
+        /*
+         * IMPORTANT:
+         *
+         * Put your PRIVATE Supabase secret key
+         * into Vercel Environment Variables as:
+         *
+         * SUPABASE_SECRET_KEY
+         *
+         * DO NOT put the secret key into this file.
+         */
 
         const supabaseKey =
             process.env.sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL;
 
 
-        // ==========================================
-        // CHECK URL
-        // ==========================================
+        // ==============================
+        // CHECK CONFIGURATION
+        // ==============================
 
         if (!supabaseUrl) {
 
             return res.status(500).json({
-                error: "SUPABASE_URL is missing.",
-                fix: "Go to Vercel → Project → Settings → Environment Variables and add SUPABASE_URL."
+                error: "Supabase URL is missing.",
+                fix: "Check api/messages.js."
             });
 
         }
 
 
-        // ==========================================
-        // CHECK SECRET KEY
-        // ==========================================
-
         if (!supabaseKey) {
 
             return res.status(500).json({
-                error: "SUPABASE_SECRET_KEY is missing.",
-                fix: "Go to Vercel → Project → Settings → Environment Variables and add SUPABASE_SECRET_KEY."
+
+                error:
+                    "SUPABASE_SECRET_KEY is not configured.",
+
+                fix:
+                    "Go to Vercel → Project → Settings → Environment Variables and add SUPABASE_SECRET_KEY."
             });
 
         }
@@ -54,15 +87,16 @@ export default async function handler(req, res) {
             supabaseUrl.replace(/\/+$/, "");
 
 
-        // ==========================================
-        // GET
-        // ==========================================
+        // ==============================
+        // GET MESSAGES
+        // ==============================
 
         if (req.method === "GET") {
 
             const channel =
                 String(
-                    req.query.channel || "general"
+                    req.query?.channel ||
+                    "general"
                 )
                 .trim()
                 .substring(0, 32);
@@ -71,24 +105,33 @@ export default async function handler(req, res) {
             const url =
                 cleanUrl +
                 "/rest/v1/messages" +
-                "?select=id,username,channel,message,image_data,created_at" +
+                "?select=id,username,channel,message,created_at" +
                 "&channel=eq." +
                 encodeURIComponent(channel) +
                 "&order=created_at.asc";
 
 
             const response =
-                await fetch(url, {
-                    method: "GET",
+                await fetch(
+                    url,
+                    {
+                        method: "GET",
 
-                    headers: {
-                        "apikey": supabaseKey,
-                        "Authorization":
-                            "Bearer " + supabaseKey,
-                        "Accept":
-                            "application/json"
+                        headers: {
+
+                            "apikey":
+                                supabaseKey,
+
+                            "Authorization":
+                                "Bearer " +
+                                supabaseKey,
+
+                            "Accept":
+                                "application/json"
+
+                        }
                     }
-                });
+                );
 
 
             const text =
@@ -97,22 +140,27 @@ export default async function handler(req, res) {
 
             let data;
 
+
             try {
 
-                data = JSON.parse(text);
+                data =
+                    JSON.parse(text);
 
             } catch {
 
                 return res.status(500).json({
 
                     error:
-                        "Supabase did not return JSON.",
+                        "Supabase returned invalid JSON.",
 
                     httpStatus:
                         response.status,
 
-                    rawResponse:
-                        text.substring(0, 2000)
+                    response:
+                        text.substring(0, 1500),
+
+                    fix:
+                        "Check your Supabase URL and server key."
 
                 });
 
@@ -129,10 +177,13 @@ export default async function handler(req, res) {
                         data.message ||
                         data.error ||
                         data.hint ||
-                        "Supabase GET request failed.",
+                        "Supabase request failed.",
 
-                    supabase:
-                        data
+                    details:
+                        data,
+
+                    fix:
+                        "Check your Supabase server key and messages table."
 
                 });
 
@@ -153,9 +204,9 @@ export default async function handler(req, res) {
         }
 
 
-        // ==========================================
-        // POST
-        // ==========================================
+        // ==============================
+        // POST MESSAGE
+        // ==============================
 
         if (req.method === "POST") {
 
@@ -171,6 +222,15 @@ export default async function handler(req, res) {
                 .substring(0, 24);
 
 
+            const channel =
+                String(
+                    body.channel ||
+                    "general"
+                )
+                .trim()
+                .substring(0, 32);
+
+
             const message =
                 String(
                     body.message || ""
@@ -179,96 +239,43 @@ export default async function handler(req, res) {
                 .substring(0, 2000);
 
 
-            const imageData =
-                typeof body.image_data === "string"
-                    ? body.image_data
-                    : null;
-
+            // ==============================
+            // VALIDATION
+            // ==============================
 
             if (!username) {
 
                 return res.status(400).json({
 
                     error:
-                        "Username is required."
+                        "Username is required.",
+
+                    fix:
+                        "Enter a username."
 
                 });
 
             }
 
 
-            if (!message && !imageData) {
+            if (!message) {
 
                 return res.status(400).json({
 
                     error:
-                        "Message or image is required."
+                        "Message is required.",
+
+                    fix:
+                        "Enter a message."
 
                 });
 
             }
 
 
-            // ==========================================
-            // IMAGE CHECK
-            // ==========================================
-
-            if (imageData) {
-
-                if (
-                    !imageData.startsWith("data:image/")
-                ) {
-
-                    return res.status(400).json({
-
-                        error:
-                            "Invalid image data."
-
-                    });
-
-                }
-
-
-                if (
-                    imageData.length >
-                    3 * 1024 * 1024
-                ) {
-
-                    return res.status(413).json({
-
-                        error:
-                            "Image is too large.",
-
-                        fix:
-                            "Maximum image size is approximately 2 MB."
-
-                    });
-
-                }
-
-            }
-
-
-            // ==========================================
-            // DATA
-            // ==========================================
-
-            const messageData = {
-
-                username: username,
-
-                channel: "general",
-
-                message: message,
-
-                image_data: imageData
-
-            };
-
-
-            // ==========================================
+            // ==============================
             // SEND TO SUPABASE
-            // ==========================================
+            // ==============================
 
             const response =
                 await fetch(
@@ -299,9 +306,18 @@ export default async function handler(req, res) {
                         },
 
                         body:
-                            JSON.stringify(
-                                messageData
-                            )
+                            JSON.stringify({
+
+                                username:
+                                    username,
+
+                                channel:
+                                    channel,
+
+                                message:
+                                    message
+
+                            })
 
                     }
                 );
@@ -313,6 +329,7 @@ export default async function handler(req, res) {
 
             let data;
 
+
             try {
 
                 data =
@@ -323,18 +340,25 @@ export default async function handler(req, res) {
                 return res.status(500).json({
 
                     error:
-                        "Supabase did not return JSON.",
+                        "Supabase returned invalid JSON.",
 
                     httpStatus:
                         response.status,
 
-                    rawResponse:
-                        text.substring(0, 2000)
+                    response:
+                        text.substring(0, 1500),
+
+                    fix:
+                        "Check your Supabase URL and server key."
 
                 });
 
             }
 
+
+            // ==============================
+            // SUPABASE ERROR
+            // ==============================
 
             if (!response.ok) {
 
@@ -348,16 +372,20 @@ export default async function handler(req, res) {
                         data.hint ||
                         "Supabase rejected the message.",
 
-                    supabase:
+                    details:
                         data,
 
                     fix:
-                        "Check the messages table, image_data column, and INSERT policy."
+                        "Check your Supabase server key, messages table and RLS policies."
 
                 });
 
             }
 
+
+            // ==============================
+            // SUCCESS
+            // ==============================
 
             return res.status(200).json({
 
@@ -373,9 +401,9 @@ export default async function handler(req, res) {
         }
 
 
-        // ==========================================
-        // UNKNOWN METHOD
-        // ==========================================
+        // ==============================
+        // METHOD NOT ALLOWED
+        // ==============================
 
         return res.status(405).json({
 
@@ -399,18 +427,15 @@ export default async function handler(req, res) {
         return res.status(500).json({
 
             error:
-                error?.message ||
-                String(error) ||
+                error.message ||
                 "Unknown server error.",
 
             type:
-                error?.name ||
+                error.name ||
                 "Error",
 
-            stack:
-                error?.stack
-                    ? error.stack.substring(0, 2000)
-                    : null
+            fix:
+                "Check the Vercel function logs. Never send your private Supabase key."
 
         });
 

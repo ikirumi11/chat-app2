@@ -3,736 +3,1179 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>General Chat</title>
+<meta name="theme-color" content="#0b0d12">
+
+<title>MyChat</title>
 
 <style>
-* {
-    box-sizing: border-box;
+
+*{
+    box-sizing:border-box;
 }
 
-:root {
-    --bg: #0b0d10;
-    --panel: #111419;
-    --panel2: #171a20;
-    --panel3: #1d2129;
-    --border: rgba(255,255,255,.07);
-    --text: #f2f4f7;
-    --muted: #8b929d;
-    --accent: #5865f2;
-    --accent2: #7280ff;
-    --danger: #ed4245;
-    --success: #3ddc84;
+:root{
+    --bg:#080a0f;
+    --panel:#0d1017;
+    --panel2:#11151d;
+    --panel3:#171b24;
+    --border:rgba(255,255,255,.07);
+    --text:#f5f7fb;
+    --muted:#858c9a;
+    --accent:#6d7cff;
+    --accent2:#8b5cf6;
+    --green:#43e08b;
+    --danger:#ff5d6c;
 }
 
 html,
-body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
+body{
+    width:100%;
+    height:100%;
+    margin:0;
 }
 
-body {
+body{
     background:
-        radial-gradient(circle at 20% 0%, rgba(88,101,242,.12), transparent 30%),
-        radial-gradient(circle at 90% 100%, rgba(114,128,255,.08), transparent 30%),
+        radial-gradient(
+            circle at 20% 0%,
+            rgba(109,124,255,.09),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 100% 100%,
+            rgba(139,92,246,.07),
+            transparent 35%
+        ),
         var(--bg);
-    color: var(--text);
-    font-family: Inter, Arial, sans-serif;
-    overflow: hidden;
+
+    color:var(--text);
+
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    overflow:hidden;
 }
 
-button,
-input,
-textarea {
-    font: inherit;
-}
 
-
-/* ==============================
+/* ========================================
    APP
-============================== */
+======================================== */
 
-.app {
-    width: 100%;
-    height: 100vh;
-    display: flex;
+.app{
+    width:100%;
+    height:100%;
+    display:flex;
 }
 
 
-/* ==============================
+/* ========================================
    SIDEBAR
-============================== */
+======================================== */
 
-.sidebar {
-    width: 250px;
-    background: rgba(15,17,21,.94);
-    border-right: 1px solid var(--border);
-    padding: 18px;
-    flex-shrink: 0;
-}
+.sidebar{
+    width:270px;
+    height:100%;
 
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 30px;
-}
-
-.brand-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    display: grid;
-    place-items: center;
-    background: linear-gradient(135deg,#5865f2,#7280ff);
-    box-shadow: 0 8px 30px rgba(88,101,242,.3);
-    font-size: 20px;
-    font-weight: 900;
-}
-
-.brand-title {
-    font-weight: 800;
-    font-size: 17px;
-}
-
-.brand-sub {
-    color: var(--muted);
-    font-size: 11px;
-    margin-top: 2px;
-}
-
-.section-title {
-    color: #6e7580;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1.2px;
-    margin: 10px 8px;
-}
-
-.channel {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 11px 12px;
-    border-radius: 9px;
-    color: #9da3ad;
-    cursor: pointer;
-}
-
-.channel:hover {
-    background: rgba(255,255,255,.05);
-    color: white;
-}
-
-.channel.active {
-    background: rgba(88,101,242,.16);
-    color: white;
-}
-
-.channel-icon {
-    color: #727985;
-    font-size: 19px;
-}
-
-.channel.active .channel-icon {
-    color: #8791ff;
-}
-
-.user-card {
-    position: absolute;
-    left: 18px;
-    bottom: 18px;
-    width: 214px;
-    background: var(--panel2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    background: linear-gradient(135deg,#5865f2,#8d98ff);
-    color: white;
-    font-weight: 800;
-    flex-shrink: 0;
-}
-
-.user-name {
-    font-size: 13px;
-    font-weight: 700;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.user-status {
-    color: var(--success);
-    font-size: 11px;
-    margin-top: 2px;
-}
-
-
-/* ==============================
-   MAIN
-============================== */
-
-.main {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-}
-
-
-/* ==============================
-   HEADER
-============================== */
-
-.header {
-    height: 68px;
-    flex-shrink: 0;
-    border-bottom: 1px solid var(--border);
-    background: rgba(17,20,25,.8);
-    backdrop-filter: blur(15px);
-    display: flex;
-    align-items: center;
-    padding: 0 24px;
-}
-
-.header-channel {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.header-hash {
-    font-size: 25px;
-    color: #858c97;
-}
-
-.header-name {
-    font-weight: 800;
-    font-size: 16px;
-}
-
-.header-description {
-    margin-left: 18px;
-    padding-left: 18px;
-    border-left: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 12px;
-}
-
-
-/* ==============================
-   STATUS
-============================== */
-
-.connection {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    color: var(--muted);
-    font-size: 11px;
-}
-
-.connection-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--success);
-    box-shadow: 0 0 10px var(--success);
-}
-
-.connection.loading .connection-dot {
-    background: #f0b232;
-    box-shadow: 0 0 10px #f0b232;
-}
-
-.connection.error .connection-dot {
-    background: var(--danger);
-    box-shadow: 0 0 10px var(--danger);
-}
-
-
-/* ==============================
-   MESSAGES
-============================== */
-
-.messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 28px max(20px, calc((100vw - 1000px)/2));
-    scroll-behavior: smooth;
-}
-
-.messages::-webkit-scrollbar {
-    width: 8px;
-}
-
-.messages::-webkit-scrollbar-thumb {
-    background: #2a2f38;
-    border-radius: 10px;
-}
-
-.welcome {
-    padding: 20px 0 30px;
-}
-
-.welcome-icon {
-    width: 58px;
-    height: 58px;
-    border-radius: 18px;
-    background: rgba(88,101,242,.15);
-    color: #8791ff;
-    display: grid;
-    place-items: center;
-    font-size: 28px;
-    margin-bottom: 15px;
-}
-
-.welcome h1 {
-    margin: 0 0 8px;
-    font-size: 26px;
-}
-
-.welcome p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 13px;
-}
-
-.message {
-    display: flex;
-    gap: 12px;
-    margin: 5px 0;
-    padding: 8px;
-    border-radius: 10px;
-}
-
-.message:hover {
-    background: rgba(255,255,255,.025);
-}
-
-.message-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    display: grid;
-    place-items: center;
-    font-weight: 800;
-    background: linear-gradient(135deg,#5865f2,#7b86ff);
-}
-
-.message-content {
-    min-width: 0;
-    flex: 1;
-}
-
-.message-top {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-}
-
-.message-user {
-    font-size: 14px;
-    font-weight: 800;
-}
-
-.message-time {
-    color: #646b75;
-    font-size: 10px;
-}
-
-.message-text {
-    color: #d9dde4;
-    font-size: 14px;
-    line-height: 1.55;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-    margin-top: 3px;
-}
-
-.message-image {
-    display: block;
-    max-width: min(500px,100%);
-    max-height: 420px;
-    margin-top: 9px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    cursor: pointer;
-    object-fit: contain;
-    background: #0b0d10;
-}
-
-.empty {
-    color: var(--muted);
-    text-align: center;
-    padding: 50px 10px;
-}
-
-
-/* ==============================
-   COMPOSER
-============================== */
-
-.composer-wrap {
-    padding: 10px max(20px, calc((100vw - 1000px)/2)) 18px;
-}
-
-.composer {
-    background: var(--panel2);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    box-shadow: 0 15px 40px rgba(0,0,0,.2);
-    overflow: hidden;
-}
-
-.preview {
-    display: none;
-    padding: 10px;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-}
-
-.preview img {
-    width: 90px;
-    height: 90px;
-    object-fit: cover;
-    border-radius: 9px;
-}
-
-.remove-image {
-    position: absolute;
-    left: 88px;
-    top: 3px;
-    width: 22px;
-    height: 22px;
-    border: 0;
-    border-radius: 50%;
-    background: #111;
-    color: white;
-    cursor: pointer;
-}
-
-.composer-row {
-    display: flex;
-    align-items: flex-end;
-    padding: 7px;
-    gap: 5px;
-}
-
-.attach {
-    width: 42px;
-    height: 42px;
-    flex-shrink: 0;
-    border: 0;
-    border-radius: 10px;
-    background: transparent;
-    color: #969da7;
-    cursor: pointer;
-    font-size: 22px;
-}
-
-.attach:hover {
-    background: rgba(255,255,255,.06);
-    color: white;
-}
-
-textarea {
-    flex: 1;
-    min-height: 42px;
-    max-height: 150px;
-    resize: none;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    color: white;
-    padding: 11px;
-    line-height: 20px;
-}
-
-textarea::placeholder {
-    color: #6f7680;
-}
-
-.send {
-    height: 42px;
-    padding: 0 17px;
-    border: 0;
-    border-radius: 10px;
-    background: var(--accent);
-    color: white;
-    cursor: pointer;
-    font-weight: 800;
-}
-
-.send:hover {
-    background: var(--accent2);
-}
-
-.send:disabled {
-    opacity: .5;
-    cursor: not-allowed;
-}
-
-.composer-help {
-    color: #626975;
-    font-size: 10px;
-    padding: 0 14px 9px;
-}
-
-
-/* ==============================
-   LOGIN
-============================== */
-
-.login-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
     background:
-        radial-gradient(circle at 50% 0%, rgba(88,101,242,.2), transparent 35%),
-        #080a0d;
-    display: grid;
-    place-items: center;
-    padding: 20px;
-}
+        linear-gradient(
+            180deg,
+            rgba(18,21,29,.98),
+            rgba(9,11,16,.98)
+        );
 
-.login-card {
-    width: 410px;
-    max-width: 100%;
-    background: rgba(20,23,29,.94);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 32px;
-    box-shadow: 0 30px 100px rgba(0,0,0,.5);
-}
+    border-right:1px solid var(--border);
 
-.login-logo {
-    width: 62px;
-    height: 62px;
-    border-radius: 18px;
-    display: grid;
-    place-items: center;
-    background: linear-gradient(135deg,#5865f2,#7280ff);
-    font-size: 28px;
-    font-weight: 900;
-    margin-bottom: 22px;
-}
+    display:flex;
+    flex-direction:column;
 
-.login-card h1 {
-    margin: 0;
-    font-size: 27px;
-}
+    padding:20px;
 
-.login-card p {
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.6;
-}
-
-.username-input {
-    width: 100%;
-    height: 48px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: #0d1014;
-    color: white;
-    padding: 0 14px;
-    outline: none;
-    margin: 12px 0;
-}
-
-.username-input:focus {
-    border-color: rgba(88,101,242,.7);
-}
-
-.enter {
-    width: 100%;
-    height: 48px;
-    border: 0;
-    border-radius: 10px;
-    background: var(--accent);
-    color: white;
-    font-weight: 800;
-    cursor: pointer;
-}
-
-.enter:hover {
-    background: var(--accent2);
-}
-
-.login-error {
-    color: #ff686b;
-    font-size: 12px;
-    margin-top: 10px;
+    flex-shrink:0;
 }
 
 
-/* ==============================
+/* BRAND */
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    padding:8px 4px 25px;
+}
+
+.brand-icon{
+    width:42px;
+    height:42px;
+
+    border-radius:13px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:19px;
+    font-weight:900;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--accent),
+            var(--accent2)
+        );
+
+    box-shadow:
+        0 8px 30px
+        rgba(109,124,255,.28);
+}
+
+.brand-name{
+    font-size:18px;
+    font-weight:800;
+    letter-spacing:-.4px;
+}
+
+.brand-sub{
+    font-size:11px;
+    color:var(--muted);
+    margin-top:2px;
+}
+
+
+/* CHANNEL SECTION */
+
+.section-title{
+    color:#666d7b;
+    font-size:10px;
+    font-weight:800;
+
+    text-transform:uppercase;
+    letter-spacing:1.3px;
+
+    margin:
+        5px 5px
+        10px;
+}
+
+.channel{
+    width:100%;
+
+    display:flex;
+    align-items:center;
+
+    gap:10px;
+
+    padding:11px 12px;
+
+    border-radius:10px;
+
+    color:#9da4b1;
+
+    cursor:pointer;
+
+    transition:
+        background .18s,
+        color .18s,
+        transform .18s;
+
+    user-select:none;
+}
+
+.channel:hover{
+    background:rgba(255,255,255,.045);
+    color:white;
+}
+
+.channel.active{
+    background:
+        linear-gradient(
+            90deg,
+            rgba(109,124,255,.18),
+            rgba(109,124,255,.06)
+        );
+
+    color:white;
+
+    box-shadow:
+        inset 2px 0 0 var(--accent);
+}
+
+.channel-hash{
+    font-size:20px;
+    color:#707786;
+    line-height:0;
+}
+
+.channel.active .channel-hash{
+    color:#8794ff;
+}
+
+.channel-name{
+    font-size:14px;
+    font-weight:600;
+}
+
+
+/* SIDEBAR BOTTOM */
+
+.sidebar-bottom{
+    margin-top:auto;
+
+    padding-top:15px;
+
+    border-top:1px solid var(--border);
+}
+
+.profile{
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    padding:9px;
+}
+
+.avatar{
+    width:38px;
+    height:38px;
+
+    border-radius:12px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-weight:800;
+    font-size:13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6675ff,
+            #925cff
+        );
+}
+
+.profile-name{
+    font-size:13px;
+    font-weight:700;
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.profile-status{
+    display:flex;
+    align-items:center;
+    gap:5px;
+
+    color:#727987;
+
+    font-size:11px;
+
+    margin-top:2px;
+}
+
+.profile-dot{
+    width:6px;
+    height:6px;
+
+    border-radius:50%;
+
+    background:var(--green);
+
+    box-shadow:
+        0 0 8px
+        rgba(67,224,139,.7);
+}
+
+
+/* ========================================
+   CHAT AREA
+======================================== */
+
+.chat{
+    min-width:0;
+    flex:1;
+
+    display:flex;
+    flex-direction:column;
+
+    position:relative;
+}
+
+
+/* HEADER */
+
+.header{
+    height:70px;
+
+    display:flex;
+    align-items:center;
+
+    padding:0 25px;
+
+    background:
+        rgba(13,16,23,.82);
+
+    backdrop-filter:
+        blur(18px);
+
+    border-bottom:
+        1px solid var(--border);
+
+    flex-shrink:0;
+
+    z-index:10;
+}
+
+.header-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.header-hash{
+    font-size:27px;
+    font-weight:300;
+
+    color:#6e7582;
+}
+
+.header-channel{
+    font-size:15px;
+    font-weight:800;
+}
+
+.header-description{
+    color:#626a78;
+    font-size:12px;
+
+    margin-left:7px;
+
+    padding-left:12px;
+
+    border-left:
+        1px solid var(--border);
+}
+
+
+/* CONNECTION */
+
+.connection{
+    margin-left:auto;
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    padding:8px 11px;
+
+    border:
+        1px solid var(--border);
+
+    background:
+        rgba(255,255,255,.025);
+
+    border-radius:10px;
+
+    color:#8b929f;
+
+    font-size:11px;
+}
+
+.connection-dot{
+    width:7px;
+    height:7px;
+
+    border-radius:50%;
+
+    background:#777;
+}
+
+.connection.connected .connection-dot{
+    background:var(--green);
+
+    box-shadow:
+        0 0 10px
+        rgba(67,224,139,.7);
+}
+
+.connection.error .connection-dot{
+    background:var(--danger);
+}
+
+
+/* ========================================
+   MESSAGES
+======================================== */
+
+.messages{
+    flex:1;
+
+    overflow-y:auto;
+
+    padding:
+        25px
+        clamp(15px,4vw,70px)
+        30px;
+
+    scroll-behavior:smooth;
+}
+
+
+/* SCROLLBAR */
+
+.messages::-webkit-scrollbar{
+    width:7px;
+}
+
+.messages::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+.messages::-webkit-scrollbar-thumb{
+    background:#252a35;
+    border-radius:20px;
+}
+
+.messages::-webkit-scrollbar-thumb:hover{
+    background:#323846;
+}
+
+
+/* MESSAGE */
+
+.message{
+    display:flex;
+
+    gap:13px;
+
+    max-width:900px;
+
+    margin:
+        0 auto
+        20px;
+
+    animation:
+        messageIn
+        .25s
+        ease;
+}
+
+@keyframes messageIn{
+
+    from{
+        opacity:0;
+        transform:translateY(6px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+.message-avatar{
+    width:40px;
+    height:40px;
+
+    flex-shrink:0;
+
+    border-radius:12px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:13px;
+    font-weight:800;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6675ff,
+            #925cff
+        );
+
+    box-shadow:
+        0 5px 18px
+        rgba(0,0,0,.25);
+}
+
+.message-content{
+    min-width:0;
+}
+
+.message-meta{
+    display:flex;
+    align-items:baseline;
+
+    gap:8px;
+
+    margin-bottom:4px;
+}
+
+.message-user{
+    font-size:14px;
+    font-weight:800;
+}
+
+.message-time{
+    color:#555c69;
+    font-size:10px;
+}
+
+.message-text{
+    color:#d7dae1;
+
+    font-size:14px;
+
+    line-height:1.6;
+
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+}
+
+
+/* EMPTY */
+
+.empty{
+    height:100%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+
+    color:#737a88;
+}
+
+.empty-icon{
+    width:70px;
+    height:70px;
+
+    border-radius:22px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    margin:
+        0 auto
+        18px;
+
+    font-size:32px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(109,124,255,.15),
+            rgba(139,92,246,.12)
+        );
+
+    border:
+        1px solid
+        rgba(109,124,255,.15);
+}
+
+.empty-title{
+    color:#e7e9ef;
+    font-size:17px;
+    font-weight:800;
+
+    margin-bottom:6px;
+}
+
+.empty-text{
+    font-size:12px;
+    color:#686f7d;
+}
+
+
+/* ========================================
+   COMPOSER
+======================================== */
+
+.composer{
+    padding:
+        10px
+        clamp(15px,4vw,70px)
+        22px;
+
+    flex-shrink:0;
+}
+
+.composer-inner{
+    max-width:900px;
+
+    margin:auto;
+
+    display:flex;
+    align-items:flex-end;
+
+    padding:6px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+
+    background:
+        rgba(24,28,37,.9);
+
+    border-radius:16px;
+
+    box-shadow:
+        0 15px 50px
+        rgba(0,0,0,.25);
+
+    transition:
+        border .2s,
+        box-shadow .2s;
+}
+
+.composer-inner:focus-within{
+    border-color:
+        rgba(109,124,255,.4);
+
+    box-shadow:
+        0 15px 50px
+        rgba(0,0,0,.3),
+        0 0 0 3px
+        rgba(109,124,255,.06);
+}
+
+textarea{
+    flex:1;
+
+    min-height:44px;
+    max-height:150px;
+
+    resize:none;
+
+    border:0;
+    outline:0;
+
+    background:transparent;
+
+    color:white;
+
+    padding:
+        12px
+        13px;
+
+    font:
+        inherit;
+
+    font-size:14px;
+}
+
+textarea::placeholder{
+    color:#666d7b;
+}
+
+.send{
+    width:44px;
+    height:44px;
+
+    border:0;
+
+    border-radius:12px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--accent),
+            var(--accent2)
+        );
+
+    color:white;
+
+    cursor:pointer;
+
+    transition:
+        transform .15s,
+        filter .15s;
+
+    font-size:18px;
+}
+
+.send:hover{
+    filter:brightness(1.12);
+    transform:translateY(-1px);
+}
+
+.send:active{
+    transform:scale(.95);
+}
+
+.send:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+}
+
+
+/* ========================================
+   LOGIN
+======================================== */
+
+.login{
+    position:fixed;
+    inset:0;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:
+        radial-gradient(
+            circle at 50% 30%,
+            rgba(109,124,255,.12),
+            transparent 40%
+        ),
+        #07090d;
+
+    z-index:1000;
+}
+
+.login-box{
+    width:430px;
+    max-width:
+        calc(100% - 30px);
+
+    padding:38px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+
+    border-radius:24px;
+
+    background:
+        rgba(17,20,28,.88);
+
+    backdrop-filter:
+        blur(25px);
+
+    box-shadow:
+        0 30px 100px
+        rgba(0,0,0,.55);
+
+    animation:
+        loginIn
+        .35s
+        ease;
+}
+
+@keyframes loginIn{
+
+    from{
+        opacity:0;
+        transform:
+            translateY(15px)
+            scale(.98);
+    }
+
+    to{
+        opacity:1;
+        transform:
+            translateY(0)
+            scale(1);
+    }
+
+}
+
+.login-logo{
+    width:60px;
+    height:60px;
+
+    border-radius:19px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    margin-bottom:22px;
+
+    font-size:26px;
+    font-weight:900;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--accent),
+            var(--accent2)
+        );
+
+    box-shadow:
+        0 12px 40px
+        rgba(109,124,255,.3);
+}
+
+.login-title{
+    font-size:28px;
+    font-weight:900;
+
+    letter-spacing:-1px;
+
+    margin-bottom:8px;
+}
+
+.login-description{
+    color:#818895;
+
+    font-size:13px;
+
+    line-height:1.6;
+
+    margin-bottom:25px;
+}
+
+.login-input{
+    width:100%;
+    height:50px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+
+    border-radius:12px;
+
+    background:#0b0e14;
+
+    color:white;
+
+    outline:0;
+
+    padding:0 15px;
+
+    font-size:14px;
+
+    transition:
+        border .2s,
+        box-shadow .2s;
+}
+
+.login-input:focus{
+    border-color:
+        rgba(109,124,255,.6);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(109,124,255,.08);
+}
+
+.login-button{
+    width:100%;
+    height:50px;
+
+    margin-top:12px;
+
+    border:0;
+
+    border-radius:12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--accent),
+            var(--accent2)
+        );
+
+    color:white;
+
+    font-size:14px;
+    font-weight:800;
+
+    cursor:pointer;
+
+    transition:
+        transform .15s,
+        filter .15s;
+}
+
+.login-button:hover{
+    filter:brightness(1.1);
+    transform:translateY(-1px);
+}
+
+.login-error{
+    color:var(--danger);
+    font-size:12px;
+    margin-top:12px;
+}
+
+
+/* ========================================
    ERROR
-============================== */
+======================================== */
 
-.error-screen {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 500;
-    background: rgba(0,0,0,.86);
-    backdrop-filter: blur(8px);
-    padding: 20px;
-    place-items: center;
+.error-screen{
+    position:fixed;
+    inset:0;
+
+    display:none;
+
+    justify-content:center;
+    align-items:center;
+
+    padding:20px;
+
+    background:
+        rgba(0,0,0,.8);
+
+    backdrop-filter:
+        blur(12px);
+
+    z-index:2000;
 }
 
-.error-card {
-    width: 650px;
-    max-width: 100%;
-    background: #181b21;
-    border: 1px solid rgba(237,66,69,.4);
-    border-radius: 16px;
-    padding: 25px;
+.error-box{
+    width:700px;
+    max-width:100%;
+
+    padding:28px;
+
+    border:
+        1px solid
+        rgba(255,93,108,.3);
+
+    border-radius:18px;
+
+    background:#11151d;
+
+    box-shadow:
+        0 30px 100px
+        rgba(0,0,0,.5);
 }
 
-.error-title {
-    color: #ff686b;
-    font-size: 20px;
-    font-weight: 900;
+.error-title{
+    color:#ff6877;
+
+    font-size:20px;
+    font-weight:900;
+
+    margin-bottom:15px;
 }
 
-.error-code {
-    margin-top: 15px;
-    background: #0a0c0f;
-    border-radius: 10px;
-    padding: 15px;
-    color: #ff898b;
-    font-family: monospace;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-    max-height: 300px;
-    overflow: auto;
+.error-code{
+    padding:15px;
+
+    background:#080a0e;
+
+    border-radius:10px;
+
+    color:#ff8a96;
+
+    font:
+        12px/1.6
+        monospace;
+
+    white-space:pre-wrap;
+
+    overflow:auto;
+
+    max-height:250px;
 }
 
-.error-fix {
-    color: #aeb4bd;
-    font-size: 13px;
-    line-height: 1.6;
-    margin-top: 15px;
+.error-fix{
+    margin-top:15px;
+
+    color:#a6acb7;
+
+    font-size:12px;
+
+    line-height:1.7;
+
+    white-space:pre-wrap;
 }
 
-.error-close {
-    margin-top: 18px;
-    border: 0;
-    border-radius: 8px;
-    padding: 10px 16px;
-    background: #30343c;
-    color: white;
-    cursor: pointer;
+.error-buttons{
+    display:flex;
+    gap:8px;
+
+    margin-top:20px;
+}
+
+.error-button{
+    border:0;
+
+    padding:
+        10px
+        15px;
+
+    border-radius:9px;
+
+    background:#242936;
+
+    color:white;
+
+    cursor:pointer;
+}
+
+.error-button.primary{
+    background:var(--accent);
+}
+
+.copy-success{
+    color:var(--green);
+
+    font-size:11px;
+
+    margin-top:10px;
+
+    display:none;
 }
 
 
-/* ==============================
-   IMAGE VIEWER
-============================== */
-
-.viewer {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 400;
-    background: rgba(0,0,0,.92);
-    place-items: center;
-    padding: 25px;
-    cursor: zoom-out;
-}
-
-.viewer img {
-    max-width: 95vw;
-    max-height: 90vh;
-    object-fit: contain;
-    border-radius: 10px;
-}
-
-
-/* ==============================
+/* ========================================
    MOBILE
-============================== */
+======================================== */
 
-@media(max-width:700px) {
+@media(max-width:700px){
 
-    .sidebar {
-        display: none;
+    .sidebar{
+        width:72px;
+        padding:12px 8px;
     }
 
-    .header {
-        padding: 0 15px;
+    .brand{
+        justify-content:center;
+        padding-bottom:18px;
     }
 
-    .header-description {
-        display: none;
+    .brand-text{
+        display:none;
     }
 
-    .messages {
-        padding: 15px 10px;
+    .section-title{
+        display:none;
     }
 
-    .composer-wrap {
-        padding: 7px 8px 10px;
+    .channel{
+        justify-content:center;
+        padding:13px 5px;
     }
 
-    .send {
-        padding: 0 12px;
+    .channel-name{
+        display:none;
     }
 
-    .message-image {
-        max-height: 300px;
+    .sidebar-bottom{
+        display:none;
     }
+
+    .header{
+        height:62px;
+        padding:0 15px;
+    }
+
+    .header-description{
+        display:none;
+    }
+
+    .connection-text{
+        display:none;
+    }
+
+    .messages{
+        padding:
+            18px
+            12px
+            20px;
+    }
+
+    .composer{
+        padding:
+            8px
+            10px
+            12px;
+    }
+
+    .message{
+        gap:9px;
+        margin-bottom:17px;
+    }
+
+    .message-avatar{
+        width:35px;
+        height:35px;
+        border-radius:10px;
+    }
+
+    .message-text{
+        font-size:13px;
+    }
+
+    .login-box{
+        padding:28px;
+    }
+
 }
+
+
+/* ========================================
+   HIDE
+======================================== */
+
+.hidden{
+    display:none!important;
+}
+
 </style>
 </head>
+
 
 <body>
 
 
-<!-- LOGIN -->
+<!-- ========================================
+     LOGIN
+======================================== -->
 
-<div id="loginScreen" class="login-screen">
+<div
+    id="login"
+    class="login">
 
-    <div class="login-card">
+    <div class="login-box">
 
         <div class="login-logo">
-            #
+            M
         </div>
 
-        <h1>Welcome to General</h1>
+        <div class="login-title">
+            Welcome to MyChat
+        </div>
 
-        <p>
-            Choose a username and start chatting.
-            Everyone in this room can see your messages.
-        </p>
+        <div class="login-description">
+            Choose a username to join the conversation.
+            Your username will be saved on this device.
+        </div>
 
         <input
-            id="usernameInput"
-            class="username-input"
+            id="username"
+            class="login-input"
             maxlength="24"
             autocomplete="off"
-            placeholder="Your username">
+            placeholder="Enter your username">
 
         <button
-            class="enter"
-            onclick="enterChat()">
+            class="login-button"
+            onclick="login()">
 
-            Enter Chat
+            Enter MyChat
 
         </button>
 
@@ -746,229 +1189,15 @@ textarea::placeholder {
 </div>
 
 
-<!-- APP -->
-
-<div class="app">
-
-
-    <!-- SIDEBAR -->
-
-    <aside class="sidebar">
-
-        <div class="brand">
-
-            <div class="brand-icon">
-                #
-            </div>
-
-            <div>
-                <div class="brand-title">
-                    General Chat
-                </div>
-
-                <div class="brand-sub">
-                    Community
-                </div>
-            </div>
-
-        </div>
-
-
-        <div class="section-title">
-            CHANNEL
-        </div>
-
-
-        <div class="channel active">
-
-            <span class="channel-icon">
-                #
-            </span>
-
-            <span>
-                general
-            </span>
-
-        </div>
-
-
-        <div id="userCard" class="user-card">
-
-            <div id="userAvatar" class="avatar">
-                ?
-            </div>
-
-            <div style="min-width:0">
-
-                <div
-                    id="userName"
-                    class="user-name">
-                    Guest
-                </div>
-
-                <div class="user-status">
-                    ● Online
-                </div>
-
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <!-- MAIN -->
-
-    <main class="main">
-
-
-        <!-- HEADER -->
-
-        <header class="header">
-
-            <div class="header-channel">
-
-                <span class="header-hash">
-                    #
-                </span>
-
-                <span class="header-name">
-                    general
-                </span>
-
-            </div>
-
-            <div class="header-description">
-                Chat with everyone
-            </div>
-
-
-            <div
-                id="connection"
-                class="connection loading">
-
-                <span class="connection-dot"></span>
-
-                <span id="connectionText">
-                    Connecting
-                </span>
-
-            </div>
-
-        </header>
-
-
-        <!-- MESSAGES -->
-
-        <section
-            id="messages"
-            class="messages">
-
-            <div class="welcome">
-
-                <div class="welcome-icon">
-                    #
-                </div>
-
-                <h1>
-                    Welcome to #general
-                </h1>
-
-                <p>
-                    This is the beginning of the conversation.
-                </p>
-
-            </div>
-
-        </section>
-
-
-        <!-- COMPOSER -->
-
-        <div class="composer-wrap">
-
-            <div class="composer">
-
-
-                <!-- IMAGE PREVIEW -->
-
-                <div
-                    id="preview"
-                    class="preview">
-
-                    <img
-                        id="previewImage"
-                        alt="Image preview">
-
-                    <button
-                        class="remove-image"
-                        onclick="removeImage()">
-
-                        ×
-
-                    </button>
-
-                </div>
-
-
-                <div class="composer-row">
-
-                    <button
-                        class="attach"
-                        onclick="openFilePicker()"
-                        title="Attach image">
-
-                        ＋
-
-                    </button>
-
-
-                    <input
-                        id="fileInput"
-                        type="file"
-                        accept="image/png,image/jpeg,image/gif,image/webp"
-                        hidden>
-
-
-                    <textarea
-                        id="messageInput"
-                        maxlength="2000"
-                        rows="1"
-                        placeholder="Message #general"></textarea>
-
-
-                    <button
-                        id="sendButton"
-                        class="send"
-                        onclick="sendMessage()">
-
-                        Send
-
-                    </button>
-
-                </div>
-
-
-                <div class="composer-help">
-                    Enter to send • Shift + Enter for a new line • You can paste or attach an image
-                </div>
-
-            </div>
-
-        </div>
-
-    </main>
-
-</div>
-
-
-<!-- ERROR -->
+<!-- ========================================
+     ERROR
+======================================== -->
 
 <div
     id="errorScreen"
     class="error-screen">
 
-    <div class="error-card">
+    <div class="error-box">
 
         <div class="error-title">
             Connection Error
@@ -984,29 +1213,245 @@ textarea::placeholder {
             class="error-fix">
         </div>
 
-        <button
-            class="error-close"
-            onclick="closeError()">
+        <div class="error-buttons">
 
-            Close
+            <button
+                class="error-button primary"
+                onclick="testServer()">
 
-        </button>
+                Retry
+
+            </button>
+
+            <button
+                class="error-button"
+                onclick="copyError()">
+
+                Copy Error
+
+            </button>
+
+            <button
+                class="error-button"
+                onclick="closeError()">
+
+                Close
+
+            </button>
+
+        </div>
+
+        <div
+            id="copySuccess"
+            class="copy-success">
+
+            Error copied.
+
+        </div>
 
     </div>
 
 </div>
 
 
-<!-- IMAGE VIEWER -->
+<!-- ========================================
+     APP
+======================================== -->
 
-<div
-    id="viewer"
-    class="viewer"
-    onclick="closeViewer()">
+<div class="app">
 
-    <img
-        id="viewerImage"
-        alt="Full size image">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                M
+            </div>
+
+            <div class="brand-text">
+
+                <div class="brand-name">
+                    MyChat
+                </div>
+
+                <div class="brand-sub">
+                    Community
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="section-title">
+            Channel
+        </div>
+
+
+        <div
+            class="channel active">
+
+            <span class="channel-hash">
+                #
+            </span>
+
+            <span class="channel-name">
+                general
+            </span>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="profile">
+
+                <div
+                    id="profileAvatar"
+                    class="avatar">
+
+                    ?
+
+                </div>
+
+                <div>
+
+                    <div
+                        id="profileName"
+                        class="profile-name">
+
+                        User
+
+                    </div>
+
+                    <div class="profile-status">
+
+                        <span class="profile-dot">
+                        </span>
+
+                        Online
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- CHAT -->
+
+    <main class="chat">
+
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <div class="header-left">
+
+                <span class="header-hash">
+                    #
+                </span>
+
+                <span class="header-channel">
+                    general
+                </span>
+
+                <span class="header-description">
+                    Chat with everyone
+                </span>
+
+            </div>
+
+
+            <div
+                id="connection"
+                class="connection">
+
+                <span
+                    id="connectionDot"
+                    class="connection-dot">
+                </span>
+
+                <span
+                    id="connectionText"
+                    class="connection-text">
+
+                    Connecting
+
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- MESSAGES -->
+
+        <div
+            id="messages"
+            class="messages">
+
+            <div class="empty">
+
+                <div>
+
+                    <div class="empty-icon">
+                        #
+                    </div>
+
+                    <div class="empty-title">
+                        Welcome to #general
+                    </div>
+
+                    <div class="empty-text">
+                        This is the beginning of the conversation.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- COMPOSER -->
+
+        <div class="composer">
+
+            <div class="composer-inner">
+
+                <textarea
+                    id="messageInput"
+                    maxlength="2000"
+                    rows="1"
+                    placeholder="Message #general">
+                </textarea>
+
+
+                <button
+                    id="sendButton"
+                    class="send"
+                    onclick="sendMessage()"
+                    title="Send">
+
+                    ↑
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
 
 </div>
 
@@ -1014,68 +1459,32 @@ textarea::placeholder {
 <script>
 
 
-/* =====================================
-   SETTINGS
-===================================== */
+/* ========================================
+   API
+======================================== */
 
 const API_URL =
     "/api/messages";
 
-const CHANNEL =
-    "general";
-
-const MAX_IMAGE_SIZE =
-    2 * 1024 * 1024;
 
 let username =
     localStorage.getItem(
         "chat_username"
     ) || "";
 
-let selectedImage =
-    null;
 
-let lastMessageSignature =
-    "";
-
-
-/* =====================================
+/* ========================================
    ELEMENTS
-===================================== */
+======================================== */
 
-const loginScreen =
-    document.getElementById(
-        "loginScreen"
-    );
-
-const usernameInput =
-    document.getElementById(
-        "usernameInput"
-    );
-
-const messageInput =
-    document.getElementById(
-        "messageInput"
-    );
-
-const fileInput =
-    document.getElementById(
-        "fileInput"
-    );
-
-const preview =
-    document.getElementById(
-        "preview"
-    );
-
-const previewImage =
-    document.getElementById(
-        "previewImage"
-    );
-
-const messages =
+const messagesElement =
     document.getElementById(
         "messages"
+    );
+
+const input =
+    document.getElementById(
+        "messageInput"
     );
 
 const sendButton =
@@ -1094,290 +1503,14 @@ const connectionText =
     );
 
 
-/* =====================================
-   USER
-===================================== */
-
-function enterChat() {
-
-    const name =
-        usernameInput.value
-            .trim();
-
-    if (!name) {
-
-        document.getElementById(
-            "loginError"
-        ).textContent =
-            "Enter a username.";
-
-        return;
-
-    }
-
-    if (name.length < 2) {
-
-        document.getElementById(
-            "loginError"
-        ).textContent =
-            "Username must be at least 2 characters.";
-
-        return;
-
-    }
-
-    username =
-        name.substring(
-            0,
-            24
-        );
-
-    localStorage.setItem(
-        "chat_username",
-        username
-    );
-
-    setupUser();
-
-    loginScreen.style.display =
-        "none";
-
-    loadMessages();
-
-}
-
-
-function setupUser() {
-
-    document.getElementById(
-        "userName"
-    ).textContent =
-        username;
-
-    document.getElementById(
-        "userAvatar"
-    ).textContent =
-        username
-            .charAt(0)
-            .toUpperCase();
-
-}
-
-
-/* =====================================
-   FILE PICKER
-===================================== */
-
-function openFilePicker() {
-
-    fileInput.click();
-
-}
-
-
-fileInput.addEventListener(
-    "change",
-    function() {
-
-        if (
-            this.files &&
-            this.files[0]
-        ) {
-
-            processImage(
-                this.files[0]
-            );
-
-        }
-
-    }
-);
-
-
-/* =====================================
-   IMAGE PROCESSING
-===================================== */
-
-function processImage(
-    file
-) {
-
-    if (
-        !file.type.startsWith(
-            "image/"
-        )
-    ) {
-
-        showError(
-            "Only image files are supported."
-        );
-
-        return;
-
-    }
-
-    if (
-        file.size >
-        MAX_IMAGE_SIZE
-    ) {
-
-        showError(
-            "Image is too large.\n\n" +
-            "Maximum size is 2 MB."
-        );
-
-        return;
-
-    }
-
-
-    const reader =
-        new FileReader();
-
-
-    reader.onload =
-        function(event) {
-
-            selectedImage =
-                event.target.result;
-
-            previewImage.src =
-                selectedImage;
-
-            preview.style.display =
-                "block";
-
-        };
-
-
-    reader.onerror =
-        function() {
-
-            showError(
-                "The image could not be read."
-            );
-
-        };
-
-
-    reader.readAsDataURL(
-        file
-    );
-
-}
-
-
-/* =====================================
-   REMOVE IMAGE
-===================================== */
-
-function removeImage() {
-
-    selectedImage =
-        null;
-
-    previewImage.src =
-        "";
-
-    preview.style.display =
-        "none";
-
-    fileInput.value =
-        "";
-
-}
-
-
-/* =====================================
-   PASTE IMAGE
-===================================== */
-
-messageInput.addEventListener(
-    "paste",
-    function(event) {
-
-        const items =
-            event.clipboardData?.items;
-
-        if (!items)
-            return;
-
-
-        for (
-            const item of items
-        ) {
-
-            if (
-                item.type.startsWith(
-                    "image/"
-                )
-            ) {
-
-                const file =
-                    item.getAsFile();
-
-                if (file) {
-
-                    processImage(
-                        file
-                    );
-
-                }
-
-                break;
-
-            }
-
-        }
-
-    }
-);
-
-
-/* =====================================
-   DRAG AND DROP
-===================================== */
-
-messageInput.addEventListener(
-    "dragover",
-    function(event) {
-
-        event.preventDefault();
-
-    }
-);
-
-
-messageInput.addEventListener(
-    "drop",
-    function(event) {
-
-        event.preventDefault();
-
-        const file =
-            event.dataTransfer
-                ?.files?.[0];
-
-        if (file) {
-
-            processImage(
-                file
-            );
-
-        }
-
-    }
-);
-
-
-/* =====================================
-   CONNECTION STATUS
-===================================== */
+/* ========================================
+   STATUS
+======================================== */
 
 function setConnection(
-    text,
-    state
-) {
+    state,
+    text
+){
 
     connection.className =
         "connection " +
@@ -1389,40 +1522,143 @@ function setConnection(
 }
 
 
-/* =====================================
-   LOAD
-===================================== */
+/* ========================================
+   AVATAR
+======================================== */
 
-async function loadMessages() {
+function avatarLetter(
+    name
+){
 
-    if (!username)
+    return (
+        name ||
+        "?"
+    )
+    .trim()
+    .charAt(0)
+    .toUpperCase();
+
+}
+
+
+/* ========================================
+   LOGIN
+======================================== */
+
+function login(){
+
+    const usernameInput =
+        document.getElementById(
+            "username"
+        );
+
+    const error =
+        document.getElementById(
+            "loginError"
+        );
+
+    const name =
+        usernameInput.value.trim();
+
+
+    if(!name){
+
+        error.textContent =
+            "Please enter a username.";
+
         return;
 
+    }
 
-    setConnection(
-        "Connecting",
-        "loading"
+
+    if(name.length < 2){
+
+        error.textContent =
+            "Username must be at least 2 characters.";
+
+        return;
+
+    }
+
+
+    username =
+        name.substring(
+            0,
+            24
+        );
+
+
+    localStorage.setItem(
+        "chat_username",
+        username
     );
 
 
-    try {
+    document.getElementById(
+        "login"
+    ).classList.add(
+        "hidden"
+    );
+
+
+    updateProfile();
+
+    loadMessages();
+
+}
+
+
+/* ========================================
+   PROFILE
+======================================== */
+
+function updateProfile(){
+
+    document.getElementById(
+        "profileName"
+    ).textContent =
+        username;
+
+
+    document.getElementById(
+        "profileAvatar"
+    ).textContent =
+        avatarLetter(
+            username
+        );
+
+}
+
+
+/* ========================================
+   LOAD MESSAGES
+======================================== */
+
+async function loadMessages(){
+
+    setConnection(
+        "",
+        "Connecting"
+    );
+
+
+    try{
 
         const response =
             await fetch(
                 API_URL +
-                "?channel=" +
-                encodeURIComponent(
-                    CHANNEL
-                ) +
+                "?channel=general" +
                 "&t=" +
                 Date.now(),
                 {
-                    method: "GET",
-                    cache: "no-store",
-                    headers: {
+                    method:"GET",
+
+                    headers:{
                         "Accept":
                             "application/json"
-                    }
+                    },
+
+                    cache:"no-store"
                 }
             );
 
@@ -1434,18 +1670,20 @@ async function loadMessages() {
         let data;
 
 
-        try {
+        try{
 
             data =
                 JSON.parse(
                     text
                 );
 
-        }
-        catch {
+        }catch{
 
             throw new Error(
                 "Server did not return JSON.\n\n" +
+                "HTTP: " +
+                response.status +
+                "\n\n" +
                 text.substring(
                     0,
                     2000
@@ -1455,7 +1693,7 @@ async function loadMessages() {
         }
 
 
-        if (!response.ok) {
+        if(!response.ok){
 
             throw new Error(
                 "HTTP " +
@@ -1463,7 +1701,7 @@ async function loadMessages() {
                 "\n\n" +
                 (
                     data.error ||
-                    "Unknown server error"
+                    "Server error"
                 )
             );
 
@@ -1471,35 +1709,52 @@ async function loadMessages() {
 
 
         displayMessages(
-            Array.isArray(
-                data.messages
-            )
-                ? data.messages
-                : []
+            data.messages || []
         );
 
 
         setConnection(
-            "Connected",
-            ""
+            "connected",
+            "Connected"
         );
 
 
-    }
-    catch (error) {
+    }catch(error){
 
         console.error(
             error
         );
 
+
+        let message =
+            error.message ||
+            String(error);
+
+
+        if(
+            message ===
+            "Failed to fetch"
+        ){
+
+            message =
+                "FAILED TO FETCH\n\n" +
+                "The browser could not reach:\n" +
+                window.location.origin +
+                API_URL +
+                "\n\n" +
+                "Make sure this page is opened from your Vercel website, not from file://.";
+
+        }
+
+
         setConnection(
-            "Connection error",
-            "error"
+            "error",
+            "Offline"
         );
 
+
         showError(
-            error.message ||
-            String(error)
+            message
         );
 
     }
@@ -1507,70 +1762,42 @@ async function loadMessages() {
 }
 
 
-/* =====================================
-   DISPLAY
-===================================== */
+/* ========================================
+   DISPLAY MESSAGES
+======================================== */
 
 function displayMessages(
-    list
-) {
+    messages
+){
 
-    const atBottom =
-        messages.scrollHeight -
-        messages.scrollTop -
-        messages.clientHeight <
-        150;
-
-
-    const signature =
-        list.map(
-            m =>
-                [
-                    m.id,
-                    m.username,
-                    m.message,
-                    m.image_data
-                ].join("|")
-        ).join("||");
-
-
-    if (
-        signature ===
-        lastMessageSignature
-    ) {
-
-        return;
-
-    }
-
-
-    lastMessageSignature =
-        signature;
-
-
-    messages.innerHTML =
+    messagesElement.innerHTML =
         "";
 
 
-    if (
-        list.length === 0
-    ) {
+    if(
+        !Array.isArray(messages) ||
+        messages.length === 0
+    ){
 
-        messages.innerHTML = `
+        messagesElement.innerHTML = `
 
-            <div class="welcome">
+            <div class="empty">
 
-                <div class="welcome-icon">
-                    #
+                <div>
+
+                    <div class="empty-icon">
+                        #
+                    </div>
+
+                    <div class="empty-title">
+                        Welcome to #general
+                    </div>
+
+                    <div class="empty-text">
+                        Be the first person to send a message.
+                    </div>
+
                 </div>
-
-                <h1>
-                    Welcome to #general
-                </h1>
-
-                <p>
-                    No messages yet. Be the first to say hello!
-                </p>
 
             </div>
 
@@ -1581,8 +1808,8 @@ function displayMessages(
     }
 
 
-    list.forEach(
-        msg => {
+    messages.forEach(
+        message => {
 
             const wrapper =
                 document.createElement(
@@ -1602,12 +1829,9 @@ function displayMessages(
                 "message-avatar";
 
             avatar.textContent =
-                (
-                    msg.username ||
-                    "?"
-                )
-                .charAt(0)
-                .toUpperCase();
+                avatarLetter(
+                    message.username
+                );
 
 
             const content =
@@ -1619,13 +1843,13 @@ function displayMessages(
                 "message-content";
 
 
-            const top =
+            const meta =
                 document.createElement(
                     "div"
                 );
 
-            top.className =
-                "message-top";
+            meta.className =
+                "message-meta";
 
 
             const name =
@@ -1637,7 +1861,7 @@ function displayMessages(
                 "message-user";
 
             name.textContent =
-                msg.username ||
+                message.username ||
                 "Unknown";
 
 
@@ -1650,14 +1874,15 @@ function displayMessages(
                 "message-time";
 
 
-            if (
-                msg.created_at
-            ) {
+            if(
+                message.created_at
+            ){
 
                 const date =
                     new Date(
-                        msg.created_at
+                        message.created_at
                     );
+
 
                 time.textContent =
                     date.toLocaleString();
@@ -1665,78 +1890,35 @@ function displayMessages(
             }
 
 
-            top.appendChild(
+            const text =
+                document.createElement(
+                    "div"
+                );
+
+            text.className =
+                "message-text";
+
+            text.textContent =
+                message.message ||
+                "";
+
+
+            meta.appendChild(
                 name
             );
 
-            top.appendChild(
+            meta.appendChild(
                 time
             );
 
 
             content.appendChild(
-                top
+                meta
             );
 
-
-            if (
-                msg.message
-            ) {
-
-                const text =
-                    document.createElement(
-                        "div"
-                    );
-
-                text.className =
-                    "message-text";
-
-                text.textContent =
-                    msg.message;
-
-                content.appendChild(
-                    text
-                );
-
-            }
-
-
-            if (
-                msg.image_data
-            ) {
-
-                const image =
-                    document.createElement(
-                        "img"
-                    );
-
-                image.className =
-                    "message-image";
-
-                image.src =
-                    msg.image_data;
-
-                image.alt =
-                    "Shared image";
-
-                image.loading =
-                    "lazy";
-
-                image.onclick =
-                    function() {
-
-                        openViewer(
-                            msg.image_data
-                        );
-
-                    };
-
-
-                content.appendChild(
-                    image
-                );
-
-            }
+            content.appendChild(
+                text
+            );
 
 
             wrapper.appendChild(
@@ -1747,7 +1929,8 @@ function displayMessages(
                 content
             );
 
-            messages.appendChild(
+
+            messagesElement.appendChild(
                 wrapper
             );
 
@@ -1755,31 +1938,36 @@ function displayMessages(
     );
 
 
-    if (atBottom) {
-
-        messages.scrollTop =
-            messages.scrollHeight;
-
-    }
+    messagesElement.scrollTop =
+        messagesElement.scrollHeight;
 
 }
 
 
-/* =====================================
+/* ========================================
    SEND
-===================================== */
+======================================== */
 
-async function sendMessage() {
+async function sendMessage(){
 
-    const text =
-        messageInput.value
-            .trim();
+    const message =
+        input.value.trim();
 
 
-    if (
-        !text &&
-        !selectedImage
-    ) {
+    if(!username){
+
+        document.getElementById(
+            "login"
+        ).classList.remove(
+            "hidden"
+        );
+
+        return;
+
+    }
+
+
+    if(!message){
 
         return;
 
@@ -1791,28 +1979,26 @@ async function sendMessage() {
 
 
     setConnection(
-        "Sending",
-        "loading"
+        "",
+        "Sending"
     );
 
 
-    try {
+    try{
 
         const response =
             await fetch(
                 API_URL,
                 {
 
-                    method: "POST",
+                    method:"POST",
 
-                    headers: {
-
+                    headers:{
                         "Content-Type":
                             "application/json",
 
                         "Accept":
                             "application/json"
-
                     },
 
                     body:
@@ -1822,13 +2008,10 @@ async function sendMessage() {
                                 username,
 
                             channel:
-                                CHANNEL,
+                                "general",
 
                             message:
-                                text,
-
-                            image_data:
-                                selectedImage
+                                message
 
                         })
 
@@ -1836,26 +2019,28 @@ async function sendMessage() {
             );
 
 
-        const resultText =
+        const text =
             await response.text();
 
 
         let data;
 
 
-        try {
+        try{
 
             data =
                 JSON.parse(
-                    resultText
+                    text
                 );
 
-        }
-        catch {
+        }catch{
 
             throw new Error(
                 "Server did not return JSON.\n\n" +
-                resultText.substring(
+                "HTTP: " +
+                response.status +
+                "\n\n" +
+                text.substring(
                     0,
                     2000
                 )
@@ -1864,45 +2049,69 @@ async function sendMessage() {
         }
 
 
-        if (!response.ok) {
+        if(!response.ok){
 
             throw new Error(
+
                 "HTTP " +
                 response.status +
                 "\n\n" +
+
                 (
                     data.error ||
-                    "Message rejected"
+                    "Message was rejected."
                 ) +
+
                 (
                     data.fix
-                        ? "\n\n" +
-                          data.fix
-                        : ""
+                    ? "\n\n" +
+                      data.fix
+                    : ""
                 )
+
             );
 
         }
 
 
-        messageInput.value =
+        input.value =
             "";
 
-        removeImage();
+
+        autoResize();
+
 
         await loadMessages();
 
 
-    }
-    catch (error) {
+    }catch(error){
 
         console.error(
             error
         );
 
-        showError(
+
+        let message =
             error.message ||
-            String(error)
+            String(error);
+
+
+        if(
+            message ===
+            "Failed to fetch"
+        ){
+
+            message =
+                "FAILED TO FETCH\n\n" +
+                "The browser could not reach " +
+                window.location.origin +
+                API_URL;
+
+        }
+
+
+        showError(
+            message
         );
 
     }
@@ -1914,18 +2123,43 @@ async function sendMessage() {
 }
 
 
-/* =====================================
+/* ========================================
+   TEXTAREA RESIZE
+======================================== */
+
+function autoResize(){
+
+    input.style.height =
+        "auto";
+
+    input.style.height =
+        Math.min(
+            input.scrollHeight,
+            150
+        ) +
+        "px";
+
+}
+
+
+input.addEventListener(
+    "input",
+    autoResize
+);
+
+
+/* ========================================
    ENTER
-===================================== */
+======================================== */
 
-messageInput.addEventListener(
+input.addEventListener(
     "keydown",
-    function(event) {
+    event => {
 
-        if (
+        if(
             event.key === "Enter" &&
             !event.shiftKey
-        ) {
+        ){
 
             event.preventDefault();
 
@@ -1937,35 +2171,45 @@ messageInput.addEventListener(
 );
 
 
-/* =====================================
+/* ========================================
    ERROR
-===================================== */
+======================================== */
+
+let lastError =
+    "";
+
 
 function showError(
     error
-) {
+){
+
+    lastError =
+        String(error);
+
 
     document.getElementById(
         "errorCode"
     ).textContent =
-        error;
+        lastError;
 
 
     document.getElementById(
         "errorFix"
     ).textContent =
-        "If this is a Supabase error, copy the exact error and send it to me. Do not send your private Supabase key.";
+        getErrorFix(
+            lastError
+        );
 
 
     document.getElementById(
         "errorScreen"
     ).style.display =
-        "grid";
+        "flex";
 
 }
 
 
-function closeError() {
+function closeError(){
 
     document.getElementById(
         "errorScreen"
@@ -1975,83 +2219,169 @@ function closeError() {
 }
 
 
-/* =====================================
-   VIEWER
-===================================== */
+function getErrorFix(
+    error
+){
 
-function openViewer(
-    src
-) {
-
-    document.getElementById(
-        "viewerImage"
-    ).src =
-        src;
-
-    document.getElementById(
-        "viewer"
-    ).style.display =
-        "grid";
-
-}
+    const e =
+        error.toLowerCase();
 
 
-function closeViewer() {
+    if(
+        e.includes("row-level security") ||
+        e.includes("rls")
+    ){
 
-    document.getElementById(
-        "viewer"
-    ).style.display =
-        "none";
-
-}
-
-
-/* =====================================
-   START
-===================================== */
-
-if (username) {
-
-    setupUser();
-
-    loginScreen.style.display =
-        "none";
-
-} else {
-
-    loginScreen.style.display =
-        "grid";
-
-}
-
-
-usernameInput.addEventListener(
-    "keydown",
-    function(event) {
-
-        if (
-            event.key === "Enter"
-        ) {
-
-            enterChat();
-
-        }
+        return (
+            "Supabase RLS is blocking the message.\n\n" +
+            "Make sure your messages table has an INSERT policy " +
+            "with the expression:\n\n" +
+            "true"
+        );
 
     }
-);
+
+
+    if(
+        e.includes("401") ||
+        e.includes("api key")
+    ){
+
+        return (
+            "Supabase rejected the API key.\n\n" +
+            "Check your Supabase API key and Vercel configuration."
+        );
+
+    }
+
+
+    if(
+        e.includes("404")
+    ){
+
+        return (
+            "The /api/messages endpoint was not found.\n\n" +
+            "Make sure messages.js is inside:\n\n" +
+            "api/messages.js"
+        );
+
+    }
+
+
+    if(
+        e.includes("failed to fetch")
+    ){
+
+        return (
+            "The browser could not reach the server.\n\n" +
+            "Make sure you're using your Vercel website URL " +
+            "and not opening index.html directly."
+        );
+
+    }
+
+
+    return (
+        "Check the exact error above. " +
+        "Your private Supabase key should never be placed in the HTML."
+    );
+
+}
+
+
+async function testServer(){
+
+    closeError();
+
+    await loadMessages();
+
+}
+
+
+async function copyError(){
+
+    try{
+
+        await navigator.clipboard.writeText(
+            lastError
+        );
+
+
+        const success =
+            document.getElementById(
+                "copySuccess"
+            );
+
+
+        success.style.display =
+            "block";
+
+
+        setTimeout(
+            () => {
+
+                success.style.display =
+                    "none";
+
+            },
+            2000
+        );
+
+    }catch{
+
+        alert(
+            lastError
+        );
+
+    }
+
+}
+
+
+/* ========================================
+   START
+======================================== */
+
+if(username){
+
+    document.getElementById(
+        "login"
+    ).classList.add(
+        "hidden"
+    );
+
+    updateProfile();
+
+}else{
+
+    document.getElementById(
+        "login"
+    ).classList.remove(
+        "hidden"
+    );
+
+}
 
 
 loadMessages();
 
 
-/* =====================================
+/* ========================================
    AUTO REFRESH
-===================================== */
+======================================== */
 
 setInterval(
-    function() {
+    () => {
 
-        if (username) {
+        if(
+            username &&
+            document
+                .getElementById(
+                    "errorScreen"
+                )
+                .style
+                .display !== "flex"
+        ){
 
             loadMessages();
 
