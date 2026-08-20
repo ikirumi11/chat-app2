@@ -3,32 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="theme-color" content="#0b0d10">
 <title>Chat</title>
 
 <style>
 *{box-sizing:border-box}
 
 :root{
-    --bg:#080a0d;
-    --panel:#101318;
-    --panel2:#171b21;
-    --panel3:#1d2229;
+    --bg:#0b0d10;
+    --panel:#111419;
+    --panel2:#181c22;
     --border:#292f38;
-    --border2:#363d47;
     --text:#edf0f4;
-    --text2:#d5dae1;
-    --muted:#7f8995;
+    --muted:#7e8793;
     --accent:#e8eaed;
-    --danger:#ff6868;
-    --success:#70d69a;
+    --danger:#ff7070;
     --radius:12px;
     --ui-scale:1;
     --text-size:16px;
     --word-spacing:0px;
     --line-spacing:1.45;
     --message-gap:17px;
-    --avatar-size:40px;
 }
 
 html,body{
@@ -53,10 +47,6 @@ button{
     cursor:pointer;
 }
 
-button:disabled{
-    cursor:not-allowed;
-}
-
 .app{
     width:100%;
     height:100vh;
@@ -75,8 +65,6 @@ button:disabled{
     justify-content:space-between;
     background:var(--panel);
     border-bottom:1px solid var(--border);
-    position:relative;
-    z-index:10;
 }
 
 .logo{
@@ -101,32 +89,6 @@ button:disabled{
     font-weight:400;
 }
 
-.header-right{
-    display:flex;
-    align-items:center;
-    gap:7px;
-}
-
-.connection{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    margin-right:5px;
-    color:var(--muted);
-    font-size:11px;
-}
-
-.connection-dot{
-    width:7px;
-    height:7px;
-    border-radius:50%;
-    background:var(--success);
-}
-
-.connection-dot.offline{
-    background:var(--danger);
-}
-
 .icon-btn{
     width:39px;
     height:39px;
@@ -146,46 +108,22 @@ button:disabled{
     flex:1;
     overflow-y:auto;
     padding:20px;
-    scroll-behavior:smooth;
 }
 
 .message{
     display:flex;
     gap:11px;
     margin-bottom:var(--message-gap);
-    animation:messageIn .16s ease;
-}
-
-@keyframes messageIn{
-    from{
-        opacity:0;
-        transform:translateY(4px);
-    }
-    to{
-        opacity:1;
-        transform:none;
-    }
 }
 
 .message.compact{
-    margin-bottom:5px;
-}
-
-.message.compact .avatar{
-    width:28px;
-    height:28px;
-    flex-basis:28px;
-    font-size:11px;
-}
-
-.message.compact .message-top{
-    margin-bottom:0;
+    margin-bottom:7px;
 }
 
 .avatar{
-    flex:0 0 var(--avatar-size);
-    width:var(--avatar-size);
-    height:var(--avatar-size);
+    flex:0 0 40px;
+    width:40px;
+    height:40px;
     display:grid;
     place-items:center;
     border-radius:var(--radius);
@@ -204,7 +142,6 @@ button:disabled{
     align-items:baseline;
     gap:8px;
     margin-bottom:3px;
-    flex-wrap:wrap;
 }
 
 .username{
@@ -217,7 +154,7 @@ button:disabled{
 }
 
 .message-text{
-    color:var(--text2);
+    color:#d8dde4;
     white-space:pre-wrap;
     overflow-wrap:anywhere;
     font-size:var(--text-size);
@@ -225,10 +162,14 @@ button:disabled{
     line-height:var(--line-spacing);
 }
 
-.message-text a{
-    color:#82b9ff;
+.message-link{
+    color:#8eb9ff;
     text-decoration:underline;
     cursor:pointer;
+}
+
+.message-link:hover{
+    filter:brightness(1.25);
 }
 
 .message-image{
@@ -241,41 +182,6 @@ button:disabled{
     background:#000;
     object-fit:contain;
     cursor:pointer;
-}
-
-.message-link-card{
-    margin-top:8px;
-    padding:10px;
-    border:1px solid var(--border);
-    background:var(--panel2);
-    border-radius:10px;
-    max-width:520px;
-}
-
-.message-link-card a{
-    color:#82b9ff;
-    overflow-wrap:anywhere;
-}
-
-/* NEW MESSAGE BUTTON */
-
-.new-message{
-    position:absolute;
-    bottom:90px;
-    left:50%;
-    transform:translateX(-50%);
-    display:none;
-    z-index:20;
-    border:1px solid var(--border2);
-    background:var(--panel3);
-    color:var(--text);
-    padding:8px 14px;
-    border-radius:20px;
-    box-shadow:0 10px 30px #0008;
-}
-
-.new-message.show{
-    display:block;
 }
 
 /* COMPOSER */
@@ -337,9 +243,10 @@ textarea{
 
 .send-btn:disabled{
     opacity:.5;
+    cursor:not-allowed;
 }
 
-/* SETTINGS */
+/* OVERLAYS */
 
 .overlay{
     position:fixed;
@@ -349,7 +256,6 @@ textarea{
     justify-content:center;
     background:rgba(0,0,0,.72);
     z-index:100;
-    padding:12px;
 }
 
 .overlay.show{
@@ -357,7 +263,7 @@ textarea{
 }
 
 .panel{
-    width:min(620px,calc(100vw - 25px));
+    width:min(560px,calc(100vw - 25px));
     max-height:calc(100vh - 25px);
     overflow-y:auto;
     background:var(--panel);
@@ -372,10 +278,6 @@ textarea{
     align-items:center;
     padding:18px;
     border-bottom:1px solid var(--border);
-    position:sticky;
-    top:0;
-    background:var(--panel);
-    z-index:2;
 }
 
 .panel-header h2{
@@ -386,7 +288,7 @@ textarea{
     padding:18px;
 }
 
-/* CATEGORIES */
+/* SETTINGS */
 
 .category{
     margin-bottom:12px;
@@ -453,13 +355,6 @@ textarea{
     margin-top:5px;
 }
 
-.setting-help{
-    color:var(--muted);
-    font-size:11px;
-    line-height:1.4;
-    margin-top:5px;
-}
-
 .save-btn,
 .test-btn{
     width:100%;
@@ -476,29 +371,13 @@ textarea{
 }
 
 .test-btn{
-    background:var(--panel3);
+    background:#242b34;
     border:1px solid var(--border);
-    color:var(--text);
+    color:white;
 }
 
-/* NOTIFICATION PREVIEW */
-
-.notification-preview{
-    margin-top:12px;
-    padding:13px;
-    border:1px solid var(--border);
-    background:#191d23;
-    border-radius:12px;
-}
-
-.preview-title{
-    font-weight:700;
-    margin-bottom:4px;
-}
-
-.preview-text{
-    color:#aeb6c0;
-    font-size:13px;
+.test-btn:hover{
+    filter:brightness(1.15);
 }
 
 /* DANGER */
@@ -529,7 +408,7 @@ textarea{
     color:#ff8585;
 }
 
-/* CONTEXT MENU */
+/* CONTEXT */
 
 .context-menu{
     position:fixed;
@@ -652,87 +531,10 @@ textarea{
     margin-bottom:5px;
 }
 
-/* TOAST */
-
-.toast-container{
-    position:fixed;
-    top:75px;
-    right:16px;
-    z-index:500;
-    display:flex;
-    flex-direction:column;
-    gap:9px;
-    pointer-events:none;
-}
-
-.toast{
-    width:min(360px,calc(100vw - 32px));
-    padding:13px;
-    border:1px solid var(--border2);
-    border-radius:12px;
-    background:var(--panel2);
-    box-shadow:0 15px 40px #0009;
-    animation:toastIn .2s ease;
-}
-
-.toast-title{
-    font-weight:700;
-    margin-bottom:3px;
-}
-
-.toast-text{
-    color:#aeb6c0;
-    font-size:13px;
-    overflow-wrap:anywhere;
-}
-
-@keyframes toastIn{
-    from{
-        opacity:0;
-        transform:translateX(20px);
-    }
-    to{
-        opacity:1;
-        transform:none;
-    }
-}
-
-/* SEARCH */
-
-.search-box{
-    display:none;
-    position:absolute;
-    top:64px;
-    left:0;
-    right:0;
-    padding:10px 16px;
-    background:var(--panel);
-    border-bottom:1px solid var(--border);
-    z-index:9;
-}
-
-.search-box.show{
-    display:block;
-}
-
-.search-box input{
-    width:100%;
-    padding:10px 12px;
-    border:1px solid var(--border);
-    border-radius:9px;
-    background:var(--panel2);
-    color:white;
-    outline:none;
-}
-
-@media(max-width:700px){
+@media(max-width:600px){
 
     .header{
-        padding:0 10px;
-    }
-
-    .connection{
-        display:none;
+        padding:0 11px;
     }
 
     .messages{
@@ -747,13 +549,6 @@ textarea{
         max-width:calc(100vw - 70px);
     }
 
-    .composer{
-        padding:8px;
-    }
-
-    .send-btn{
-        padding:0 13px;
-    }
 }
 </style>
 </head>
@@ -764,89 +559,47 @@ textarea{
 
 <header class="header">
 
-    <div class="logo">
-        <div class="logo-icon">💬</div>
-        <span>Chat</span>
-        <span class="channel"># general</span>
-    </div>
+<div class="logo">
+<div class="logo-icon">💬</div>
+<span>Chat</span>
+<span class="channel"># general</span>
+</div>
 
-    <div class="header-right">
-
-        <div class="connection">
-            <span
-                class="connection-dot"
-                id="connectionDot"
-            ></span>
-            <span id="connectionText">Online</span>
-        </div>
-
-        <button
-            class="icon-btn"
-            id="searchBtn"
-            title="Search"
-        >⌕</button>
-
-        <button
-            class="icon-btn"
-            id="settingsBtn"
-            title="Settings"
-        >⚙</button>
-
-    </div>
+<button class="icon-btn" id="settingsBtn">⚙</button>
 
 </header>
 
-<div
-    class="search-box"
-    id="searchBox"
->
-    <input
-        id="searchInput"
-        placeholder="Search messages..."
-    >
-</div>
-
-<main
-    class="messages"
-    id="messages"
-></main>
-
-<button
-    class="new-message"
-    id="newMessageBtn"
->
-    ↓ New messages
-</button>
+<main class="messages" id="messages"></main>
 
 <div class="composer">
 
-    <div class="composer-box">
+<div class="composer-box">
 
-        <input
-            type="file"
-            id="imageInput"
-            accept="image/*"
-            hidden
-        >
+<input
+type="file"
+id="imageInput"
+accept="image/*"
+hidden
+>
 
-        <button
-            class="attach-btn"
-            id="attachBtn"
-            title="Choose image"
-        >＋</button>
+<button
+class="attach-btn"
+id="attachBtn"
+title="Choose image"
+>＋</button>
 
-        <textarea
-            id="messageInput"
-            rows="1"
-            placeholder="Message #general"
-        ></textarea>
+<textarea
+id="messageInput"
+rows="1"
+placeholder="Message #general"
+></textarea>
 
-        <button
-            class="send-btn"
-            id="sendBtn"
-        >Send</button>
+<button
+class="send-btn"
+id="sendBtn"
+>Send</button>
 
-    </div>
+</div>
 
 </div>
 
@@ -855,21 +608,15 @@ textarea{
 
 <!-- SETTINGS -->
 
-<div
-    class="overlay"
-    id="settingsOverlay"
->
+<div class="overlay" id="settingsOverlay">
 
 <div class="panel">
 
 <div class="panel-header">
 
-    <h2>Settings</h2>
+<h2>Settings</h2>
 
-    <button
-        class="icon-btn"
-        id="closeSettings"
-    >×</button>
+<button class="icon-btn" id="closeSettings">×</button>
 
 </div>
 
@@ -881,19 +628,15 @@ textarea{
 <div class="category open">
 
 <button class="category-title">
-    <span>👤 Profile</span>
-    <span>⌄</span>
+<span>👤 Profile</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
 
 <div class="setting">
 <label>Your name</label>
-<input
-    id="usernameInput"
-    maxlength="24"
-    placeholder="Enter your name"
->
+<input id="usernameInput" maxlength="24" placeholder="Enter your name">
 </div>
 
 <div class="setting">
@@ -910,46 +653,37 @@ textarea{
 <div class="category">
 
 <button class="category-title">
-    <span>📝 Text</span>
-    <span>⌄</span>
+<span>📝 Text</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
 
 <div class="setting">
 <label>Text size</label>
-<input
-    id="textSize"
-    type="range"
-    min="12"
-    max="28"
-    step="1"
->
+<input id="textSize" type="range" min="12" max="28" step="1">
 <div class="setting-value" id="textSizeValue"></div>
 </div>
 
 <div class="setting">
 <label>Word spacing</label>
-<input
-    id="wordSpacing"
-    type="range"
-    min="0"
-    max="15"
-    step="1"
->
+<input id="wordSpacing" type="range" min="0" max="12" step="1">
 <div class="setting-value" id="wordSpacingValue"></div>
 </div>
 
 <div class="setting">
 <label>Line spacing</label>
-<input
-    id="lineSpacing"
-    type="range"
-    min="1"
-    max="2"
-    step=".05"
->
+<input id="lineSpacing" type="range" min="1" max="2" step=".05">
 <div class="setting-value" id="lineSpacingValue"></div>
+</div>
+
+<div class="setting">
+<label>Message density</label>
+<select id="messageDensity">
+<option value="normal">Normal</option>
+<option value="compact">Compact</option>
+<option value="spacious">Spacious</option>
+</select>
 </div>
 
 </div>
@@ -961,8 +695,8 @@ textarea{
 <div class="category">
 
 <button class="category-title">
-    <span>💬 Chat</span>
-    <span>⌄</span>
+<span>💬 Chat</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
@@ -989,10 +723,11 @@ textarea{
 </div>
 
 <div class="setting">
-<label>Compact messages</label>
-<select id="compactMessages">
-<option value="false">Off</option>
-<option value="true">On</option>
+<label>Timestamp format</label>
+<select id="timestampFormat">
+<option value="short">12:34</option>
+<option value="seconds">12:34:56</option>
+<option value="full">Date + time</option>
 </select>
 </div>
 
@@ -1013,15 +748,17 @@ textarea{
 <div class="category">
 
 <button class="category-title">
-    <span>🎨 Appearance</span>
-    <span>⌄</span>
+<span>🎨 Appearance</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
 
 <div class="setting">
 <label>Theme</label>
+
 <select id="themeSelect">
+
 <option value="dark">Dark</option>
 <option value="midnight">Midnight</option>
 <option value="slate">Slate</option>
@@ -1033,29 +770,23 @@ textarea{
 <option value="gray">Classic Gray</option>
 <option value="light">Light</option>
 <option value="oled">OLED</option>
+<option value="carbon">Carbon</option>
+<option value="steel">Steel</option>
+<option value="terminal">Terminal</option>
+<option value="brown">Dark Brown</option>
+
 </select>
 </div>
 
 <div class="setting">
 <label>Corner roundness</label>
-<input
-    id="cornerRadius"
-    type="range"
-    min="0"
-    max="25"
->
+<input id="cornerRadius" type="range" min="0" max="25">
 <div class="setting-value" id="cornerRadiusValue"></div>
 </div>
 
 <div class="setting">
 <label>UI scale</label>
-<input
-    id="uiScale"
-    type="range"
-    min=".8"
-    max="1.2"
-    step=".05"
->
+<input id="uiScale" type="range" min=".8" max="1.2" step=".05">
 <div class="setting-value" id="uiScaleValue"></div>
 </div>
 
@@ -1068,19 +799,11 @@ textarea{
 <div class="category">
 
 <button class="category-title">
-    <span>🔔 Notifications</span>
-    <span>⌄</span>
+<span>🔔 Notifications</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
-
-<div class="setting">
-<label>Notification sound</label>
-<select id="notificationSound">
-<option value="false">Off</option>
-<option value="true">On</option>
-</select>
-</div>
 
 <div class="setting">
 <label>Desktop notifications</label>
@@ -1088,67 +811,143 @@ textarea{
 <option value="false">Off</option>
 <option value="true">On</option>
 </select>
-<div class="setting-help">
-Notifications work while this page is open, including when the tab is in the background.
-</div>
 </div>
 
 <div class="setting">
-<label>Notification sound</label>
-<select id="soundType">
-<option value="windows">Windows</option>
-<option value="ding">Ding</option>
-<option value="pop">Pop</option>
-<option value="bell">Bell</option>
-<option value="double">Double</option>
-<option value="digital">Digital</option>
-<option value="soft">Soft</option>
-<option value="alert">Alert</option>
-<option value="chime">Chime</option>
-<option value="pulse">Pulse</option>
-<option value="alarm">Alarm</option>
-<option value="opera">Opera</option>
+<label>Notify only when chat is hidden</label>
+<select id="hiddenOnly">
+<option value="true">On</option>
+<option value="false">Off</option>
 </select>
 </div>
 
 <div class="setting">
-<label>Notification volume</label>
-<input
-    id="notificationVolume"
-    type="range"
-    min="0"
-    max="1"
-    step=".01"
->
-<div class="setting-value" id="notificationVolumeValue"></div>
+<label>Notification sound</label>
+<select id="notificationSound">
+
+<option value="false">Off</option>
+<option value="true">On</option>
+
+</select>
 </div>
 
 <div class="setting">
-<label>Notification duration</label>
+<label>Sound theme</label>
+
+<select id="soundTheme">
+
+<option value="classic">1 — Classic</option>
+<option value="soft">2 — Soft</option>
+<option value="digital">3 — Digital</option>
+<option value="pop">4 — Pop</option>
+<option value="bell">5 — Bell</option>
+<option value="chime">6 — Chime</option>
+<option value="retro">7 — Retro</option>
+<option value="computer">8 — Computer</option>
+<option value="alert">9 — Alert</option>
+<option value="warning">10 — Warning</option>
+<option value="alarm">11 — Nuclear Alarm</option>
+<option value="opera">12 — Opera</option>
+<option value="synth">13 — Synth</option>
+<option value="pulse">14 — Pulse</option>
+<option value="space">15 — Space</option>
+
+</select>
+</div>
+
+<div class="setting">
+<label>Sound duration</label>
+
 <input
-    id="notificationDuration"
-    type="range"
-    min="100"
-    max="5000"
-    step="100"
+id="soundDuration"
+type="range"
+min="100"
+max="5000"
+step="100"
 >
-<div class="setting-value" id="notificationDurationValue"></div>
+
+<div
+class="setting-value"
+id="soundDurationValue"
+></div>
+
+</div>
+
+<div class="setting">
+<label>Sound volume</label>
+
+<input
+id="soundVolume"
+type="range"
+min="0"
+max="100"
+step="1"
+>
+
+<div
+class="setting-value"
+id="soundVolumeValue"
+></div>
+
+</div>
+
+<div class="setting">
+<label>Notification preview</label>
+
+<select id="notificationPreview">
+<option value="full">Show message</option>
+<option value="name">Name only</option>
+<option value="generic">New message</option>
+</select>
 </div>
 
 <button
-    class="test-btn"
-    id="testNotification"
+class="test-btn"
+id="testNotification"
 >
-    🔔 Test Windows notification
+🔔 Test Windows notification
 </button>
 
-<div class="notification-preview">
-    <div class="preview-title">
-        💬 Chat
-    </div>
-    <div class="preview-text">
-        This is what your notification will look like.
-    </div>
+</div>
+</div>
+
+
+<!-- LINKS -->
+
+<div class="category">
+
+<button class="category-title">
+<span>🔗 Links & Media</span>
+<span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+<label>Clickable links</label>
+
+<select id="clickableLinks">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
+</div>
+
+<div class="setting">
+<label>Automatic image links</label>
+
+<select id="imageLinks">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
+</div>
+
+<div class="setting">
+<label>Open links in new tab</label>
+
+<select id="newTabLinks">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
 </div>
 
 </div>
@@ -1160,14 +959,15 @@ Notifications work while this page is open, including when the tab is in the bac
 <div class="category">
 
 <button class="category-title">
-    <span>⚙️ Behavior</span>
-    <span>⌄</span>
+<span>⚙️ Behavior</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
 
 <div class="setting">
 <label>Enter to send</label>
+
 <select id="enterToSend">
 <option value="true">On</option>
 <option value="false">Off</option>
@@ -1176,6 +976,7 @@ Notifications work while this page is open, including when the tab is in the bac
 
 <div class="setting">
 <label>Confirm before deleting</label>
+
 <select id="confirmDelete">
 <option value="true">On</option>
 <option value="false">Off</option>
@@ -1183,8 +984,9 @@ Notifications work while this page is open, including when the tab is in the bac
 </div>
 
 <div class="setting">
-<label>Show new-message button</label>
-<select id="showNewMessageButton">
+<label>Keep composer text after failed send</label>
+
+<select id="keepText">
 <option value="true">On</option>
 <option value="false">Off</option>
 </select>
@@ -1194,88 +996,7 @@ Notifications work while this page is open, including when the tab is in the bac
 </div>
 
 
-<!-- LINKS -->
-
-<div class="category">
-
-<button class="category-title">
-    <span>🔗 Links & Media</span>
-    <span>⌄</span>
-</button>
-
-<div class="category-body">
-
-<div class="setting">
-<label>Clickable links</label>
-<select id="clickableLinks">
-<option value="true">On</option>
-<option value="false">Off</option>
-</select>
-</div>
-
-<div class="setting">
-<label>Image previews</label>
-<select id="imagePreviews">
-<option value="true">On</option>
-<option value="false">Off</option>
-</select>
-</div>
-
-<div class="setting">
-<label>GIF previews</label>
-<select id="gifPreviews">
-<option value="true">On</option>
-<option value="false">Off</option>
-</select>
-</div>
-
-</div>
-</div>
-
-
-<!-- ACCESSIBILITY -->
-
-<div class="category">
-
-<button class="category-title">
-    <span>♿ Accessibility</span>
-    <span>⌄</span>
-</button>
-
-<div class="category-body">
-
-<div class="setting">
-<label>Reduce animations</label>
-<select id="reduceAnimations">
-<option value="false">Off</option>
-<option value="true">On</option>
-</select>
-</div>
-
-<div class="setting">
-<label>Large buttons</label>
-<select id="largeButtons">
-<option value="false">Off</option>
-<option value="true">On</option>
-</select>
-</div>
-
-<div class="setting">
-<label>High contrast</label>
-<select id="highContrast">
-<option value="false">Off</option>
-<option value="true">On</option>
-</select>
-</div>
-
-</div>
-</div>
-
-
-<button
-    class="save-btn"
-    id="saveSettings"
->
+<button class="save-btn" id="saveSettings">
 Save settings
 </button>
 
@@ -1285,7 +1006,7 @@ Save settings
 <div class="danger-zone">
 
 <div class="danger-title">
-    ⚠ Danger Zone
+⚠ Danger Zone
 </div>
 
 <p>
@@ -1293,10 +1014,7 @@ Remove every message from the chat permanently.
 This affects everyone using the chat.
 </p>
 
-<button
-    class="danger-btn"
-    id="removeEverything"
->
+<button class="danger-btn" id="removeEverything">
 Remove everything
 </button>
 
@@ -1309,16 +1027,13 @@ Remove everything
 
 <!-- CONTEXT MENU -->
 
-<div
-    class="context-menu"
-    id="contextMenu"
->
+<div class="context-menu" id="contextMenu">
 
 <button id="editMessage">Edit</button>
 
 <button
-    class="delete-option"
-    id="deleteMessage"
+class="delete-option"
+id="deleteMessage"
 >
 Delete
 </button>
@@ -1328,22 +1043,19 @@ Delete
 
 <!-- IMAGE VIEWER -->
 
-<div
-    class="image-viewer"
-    id="imageViewer"
->
+<div class="image-viewer" id="imageViewer">
 
 <button
-    class="back-image"
-    id="backImage"
+class="back-image"
+id="backImage"
 >
 ← Back
 </button>
 
 <img
-    class="full-image"
-    id="fullImage"
-    alt="Full image"
+class="full-image"
+id="fullImage"
+alt="Full image"
 >
 
 </div>
@@ -1351,10 +1063,7 @@ Delete
 
 <!-- DIALOG -->
 
-<div
-    class="overlay"
-    id="dialogOverlay"
->
+<div class="overlay" id="dialogOverlay">
 
 <div class="dialog">
 
@@ -1369,8 +1078,8 @@ Cancel
 </button>
 
 <button
-    class="danger"
-    id="dialogConfirm"
+class="danger"
+id="dialogConfirm"
 >
 Yes
 </button>
@@ -1381,2463 +1090,2357 @@ Yes
 </div>
 
 
-<div
-    class="toast-container"
-    id="toastContainer"
-></div>
-
-
 <script>
 
 const API_URL="/api/messages";
 const CHANNEL="general";
 
 
-/* =========================================================
-   DEVICE ID
-========================================================= */
+/* DEVICE */
 
 let deviceId=localStorage.getItem("chat_device_id");
 
 if(!deviceId){
 
     deviceId=
-        crypto.randomUUID
-        ?crypto.randomUUID()
-        :"device-"+Date.now()+"-"+Math.random();
+        crypto.randomUUID();
 
     localStorage.setItem(
         "chat_device_id",
         deviceId
     );
+
 }
 
 
-/* =========================================================
-   SETTINGS
-========================================================= */
+/* SETTINGS */
 
 const defaults={
 
-    username:"",
+username:"",
 
-    theme:"dark",
+theme:"dark",
 
-    refreshRate:500,
+refreshRate:500,
 
-    showTimestamps:true,
+showTimestamps:true,
 
-    compactMessages:false,
+timestampFormat:"short",
 
-    textSize:16,
+autoScroll:true,
 
-    wordSpacing:0,
+textSize:16,
 
-    lineSpacing:1.45,
+wordSpacing:0,
 
-    cornerRadius:12,
+lineSpacing:1.45,
 
-    uiScale:1,
+messageDensity:"normal",
 
-    notificationSound:true,
+cornerRadius:12,
 
-    desktopNotifications:true,
+uiScale:1,
 
-    soundType:"windows",
+desktopNotifications:false,
 
-    notificationVolume:.7,
+hiddenOnly:true,
 
-    notificationDuration:1000,
+notificationSound:true,
 
-    enterToSend:true,
+soundTheme:"classic",
 
-    autoScroll:true,
+soundDuration:1000,
 
-    confirmDelete:true,
+soundVolume:70,
 
-    showNewMessageButton:true,
+notificationPreview:"full",
 
-    clickableLinks:true,
+clickableLinks:true,
 
-    imagePreviews:true,
+imageLinks:true,
 
-    gifPreviews:true,
+newTabLinks:true,
 
-    reduceAnimations:false,
+enterToSend:true,
 
-    largeButtons:false,
+confirmDelete:true,
 
-    highContrast:false
+keepText:true
+
 };
 
 
 function getSetting(key){
 
-    const value=
-        localStorage.getItem("chat_"+key);
+const value=
+localStorage.getItem(
+"chat_"+key
+);
 
-    if(value===null){
-        return defaults[key];
-    }
+if(value===null){
 
-    if(
-        value==="true"||
-        value==="false"
-    ){
-        return value==="true";
-    }
+return defaults[key];
 
-    const number=Number(value);
+}
 
-    return Number.isNaN(number)
-        ?value
-        :number;
+if(
+value==="true"||
+value==="false"
+){
+
+return value==="true";
+
+}
+
+const number=Number(value);
+
+return Number.isNaN(number)
+?value
+:number;
+
 }
 
 
 let settings={};
 
-Object.keys(defaults).forEach(key=>{
-    settings[key]=getSetting(key);
+Object.keys(defaults).forEach(
+key=>{
+settings[key]=getSetting(key);
 });
 
 
-/* =========================================================
-   ELEMENTS
-========================================================= */
+/* ELEMENTS */
 
 const messagesEl=
-    document.getElementById("messages");
+document.getElementById("messages");
 
 const messageInput=
-    document.getElementById("messageInput");
+document.getElementById("messageInput");
 
 const sendBtn=
-    document.getElementById("sendBtn");
+document.getElementById("sendBtn");
 
 const imageInput=
-    document.getElementById("imageInput");
+document.getElementById("imageInput");
 
 const attachBtn=
-    document.getElementById("attachBtn");
+document.getElementById("attachBtn");
 
 const settingsBtn=
-    document.getElementById("settingsBtn");
+document.getElementById("settingsBtn");
 
 const settingsOverlay=
-    document.getElementById("settingsOverlay");
+document.getElementById("settingsOverlay");
 
 const closeSettings=
-    document.getElementById("closeSettings");
+document.getElementById("closeSettings");
 
 const saveSettings=
-    document.getElementById("saveSettings");
+document.getElementById("saveSettings");
 
 const usernameInput=
-    document.getElementById("usernameInput");
+document.getElementById("usernameInput");
 
 const deviceIdInput=
-    document.getElementById("deviceIdInput");
+document.getElementById("deviceIdInput");
 
 const themeSelect=
-    document.getElementById("themeSelect");
+document.getElementById("themeSelect");
 
 const refreshRate=
-    document.getElementById("refreshRate");
+document.getElementById("refreshRate");
 
 const showTimestamps=
-    document.getElementById("showTimestamps");
+document.getElementById("showTimestamps");
 
-const compactMessages=
-    document.getElementById("compactMessages");
-
-const textSize=
-    document.getElementById("textSize");
-
-const wordSpacing=
-    document.getElementById("wordSpacing");
-
-const lineSpacing=
-    document.getElementById("lineSpacing");
-
-const cornerRadius=
-    document.getElementById("cornerRadius");
-
-const uiScale=
-    document.getElementById("uiScale");
-
-const notificationSound=
-    document.getElementById("notificationSound");
-
-const desktopNotifications=
-    document.getElementById("desktopNotifications");
-
-const soundType=
-    document.getElementById("soundType");
-
-const notificationVolume=
-    document.getElementById("notificationVolume");
-
-const notificationDuration=
-    document.getElementById("notificationDuration");
-
-const enterToSend=
-    document.getElementById("enterToSend");
+const timestampFormat=
+document.getElementById("timestampFormat");
 
 const autoScroll=
-    document.getElementById("autoScroll");
+document.getElementById("autoScroll");
 
-const confirmDelete=
-    document.getElementById("confirmDelete");
+const textSize=
+document.getElementById("textSize");
 
-const showNewMessageButton=
-    document.getElementById("showNewMessageButton");
+const wordSpacing=
+document.getElementById("wordSpacing");
+
+const lineSpacing=
+document.getElementById("lineSpacing");
+
+const messageDensity=
+document.getElementById("messageDensity");
+
+const cornerRadius=
+document.getElementById("cornerRadius");
+
+const uiScale=
+document.getElementById("uiScale");
+
+const desktopNotifications=
+document.getElementById("desktopNotifications");
+
+const hiddenOnly=
+document.getElementById("hiddenOnly");
+
+const notificationSound=
+document.getElementById("notificationSound");
+
+const soundTheme=
+document.getElementById("soundTheme");
+
+const soundDuration=
+document.getElementById("soundDuration");
+
+const soundVolume=
+document.getElementById("soundVolume");
+
+const notificationPreview=
+document.getElementById("notificationPreview");
 
 const clickableLinks=
-    document.getElementById("clickableLinks");
+document.getElementById("clickableLinks");
 
-const imagePreviews=
-    document.getElementById("imagePreviews");
+const imageLinks=
+document.getElementById("imageLinks");
 
-const gifPreviews=
-    document.getElementById("gifPreviews");
+const newTabLinks=
+document.getElementById("newTabLinks");
 
-const reduceAnimations=
-    document.getElementById("reduceAnimations");
+const enterToSend=
+document.getElementById("enterToSend");
 
-const largeButtons=
-    document.getElementById("largeButtons");
+const confirmDelete=
+document.getElementById("confirmDelete");
 
-const highContrast=
-    document.getElementById("highContrast");
+const keepText=
+document.getElementById("keepText");
 
 const testNotification=
-    document.getElementById("testNotification");
-
-const removeEverything=
-    document.getElementById("removeEverything");
+document.getElementById("testNotification");
 
 const contextMenu=
-    document.getElementById("contextMenu");
+document.getElementById("contextMenu");
 
 const editMessageBtn=
-    document.getElementById("editMessage");
+document.getElementById("editMessage");
 
 const deleteMessageBtn=
-    document.getElementById("deleteMessage");
+document.getElementById("deleteMessage");
 
 const imageViewer=
-    document.getElementById("imageViewer");
+document.getElementById("imageViewer");
 
 const fullImage=
-    document.getElementById("fullImage");
+document.getElementById("fullImage");
 
 const backImage=
-    document.getElementById("backImage");
+document.getElementById("backImage");
 
 const dialogOverlay=
-    document.getElementById("dialogOverlay");
+document.getElementById("dialogOverlay");
 
 const dialogTitle=
-    document.getElementById("dialogTitle");
+document.getElementById("dialogTitle");
 
 const dialogText=
-    document.getElementById("dialogText");
+document.getElementById("dialogText");
 
 const dialogCancel=
-    document.getElementById("dialogCancel");
+document.getElementById("dialogCancel");
 
 const dialogConfirm=
-    document.getElementById("dialogConfirm");
+document.getElementById("dialogConfirm");
 
-const toastContainer=
-    document.getElementById("toastContainer");
-
-const connectionDot=
-    document.getElementById("connectionDot");
-
-const connectionText=
-    document.getElementById("connectionText");
-
-const searchBtn=
-    document.getElementById("searchBtn");
-
-const searchBox=
-    document.getElementById("searchBox");
-
-const searchInput=
-    document.getElementById("searchInput");
-
-const newMessageBtn=
-    document.getElementById("newMessageBtn");
+const removeEverything=
+document.getElementById("removeEverything");
 
 
 const textSizeValue=
-    document.getElementById("textSizeValue");
+document.getElementById("textSizeValue");
 
 const wordSpacingValue=
-    document.getElementById("wordSpacingValue");
+document.getElementById("wordSpacingValue");
 
 const lineSpacingValue=
-    document.getElementById("lineSpacingValue");
+document.getElementById("lineSpacingValue");
 
 const cornerRadiusValue=
-    document.getElementById("cornerRadiusValue");
+document.getElementById("cornerRadiusValue");
 
 const uiScaleValue=
-    document.getElementById("uiScaleValue");
+document.getElementById("uiScaleValue");
 
-const notificationVolumeValue=
-    document.getElementById("notificationVolumeValue");
+const soundDurationValue=
+document.getElementById("soundDurationValue");
 
-const notificationDurationValue=
-    document.getElementById("notificationDurationValue");
+const soundVolumeValue=
+document.getElementById("soundVolumeValue");
 
-
-/* =========================================================
-   STATE
-========================================================= */
 
 let selectedFile=null;
 let selectedMessage=null;
 let currentMessages=[];
 let confirmCallback=null;
 let refreshTimer=null;
-let firstLoad=true;
-let knownMessageIds=new Set();
 let audioContext=null;
 
 
-/* =========================================================
-   SETTINGS APPLY
-========================================================= */
+/* APPLY SETTINGS */
 
 function applySettings(){
 
-    document.documentElement.style.setProperty(
-        "--text-size",
-        settings.textSize+"px"
-    );
+document.documentElement.style.setProperty(
+"--text-size",
+settings.textSize+"px"
+);
 
-    document.documentElement.style.setProperty(
-        "--word-spacing",
-        settings.wordSpacing+"px"
-    );
+document.documentElement.style.setProperty(
+"--word-spacing",
+settings.wordSpacing+"px"
+);
 
-    document.documentElement.style.setProperty(
-        "--line-spacing",
-        settings.lineSpacing
-    );
+document.documentElement.style.setProperty(
+"--line-spacing",
+settings.lineSpacing
+);
 
-    document.documentElement.style.setProperty(
-        "--radius",
-        settings.cornerRadius+"px"
-    );
+document.documentElement.style.setProperty(
+"--radius",
+settings.cornerRadius+"px"
+);
 
-    document.documentElement.style.setProperty(
-        "--ui-scale",
-        settings.uiScale
-    );
+document.documentElement.style.setProperty(
+"--ui-scale",
+settings.uiScale
+);
 
-    applyTheme(settings.theme);
+let gap=17;
 
-    document.body.classList.toggle(
-        "reduce-motion",
-        settings.reduceAnimations
-    );
+if(settings.messageDensity==="compact")
+gap=7;
 
-    document.body.classList.toggle(
-        "high-contrast",
-        settings.highContrast
-    );
+if(settings.messageDensity==="spacious")
+gap=28;
 
-    if(settings.largeButtons){
+document.documentElement.style.setProperty(
+"--message-gap",
+gap+"px"
+);
 
-        document.documentElement.style.setProperty(
-            "--avatar-size",
-            "46px"
-        );
+applyTheme(settings.theme);
 
-    }else{
+renderMessages();
 
-        document.documentElement.style.setProperty(
-            "--avatar-size",
-            "40px"
-        );
+startRefreshTimer();
 
-    }
-
-    renderMessages();
-
-    startRefreshTimer();
 }
 
 
-/* =========================================================
-   THEMES
-========================================================= */
+/* THEMES */
 
 function applyTheme(name){
 
-    const themes={
+const themes={
 
-        dark:[
-            "#080a0d",
-            "#101318"
-        ],
+dark:["#0b0d10","#111419"],
 
-        midnight:[
-            "#070a13",
-            "#0d1220"
-        ],
+midnight:["#080b14","#101522"],
 
-        slate:[
-            "#101418",
-            "#171d22"
-        ],
+slate:["#101418","#171d22"],
 
-        black:[
-            "#000000",
-            "#090909"
-        ],
+black:["#000","#090909"],
 
-        blue:[
-            "#091018",
-            "#101c29"
-        ],
+blue:["#091018","#101c29"],
 
-        purple:[
-            "#100b17",
-            "#191021"
-        ],
+purple:["#100b17","#191021"],
 
-        green:[
-            "#09120d",
-            "#101b15"
-        ],
+green:["#09120d","#101b15"],
 
-        red:[
-            "#140b0b",
-            "#1e1111"
-        ],
+red:["#140b0b","#1e1111"],
 
-        gray:[
-            "#151515",
-            "#202020"
-        ],
+gray:["#151515","#202020"],
 
-        light:[
-            "#eeeeee",
-            "#ffffff"
-        ],
+light:["#eeeeee","#fff"],
 
-        oled:[
-            "#000000",
-            "#000000"
-        ]
-    };
+oled:["#000","#000"],
 
-    const t=
-        themes[name]||themes.dark;
+carbon:["#0d0d0d","#161616"],
 
-    document.documentElement.style.setProperty(
-        "--bg",
-        t[0]
-    );
+steel:["#101214","#1b1e21"],
 
-    document.documentElement.style.setProperty(
-        "--panel",
-        t[1]
-    );
+terminal:["#030903","#071007"],
 
-    document.body.style.background=t[0];
+brown:["#120e0b","#1d1611"]
+
+};
+
+const t=themes[name]||themes.dark;
+
+document.documentElement.style.setProperty(
+"--bg",t[0]
+);
+
+document.documentElement.style.setProperty(
+"--panel",t[1]
+);
+
+document.body.style.background=t[0];
+
 }
 
 
-/* =========================================================
-   SETTINGS UI
-========================================================= */
+/* SETTINGS UI */
 
 function loadSettingsUI(){
 
-    usernameInput.value=settings.username;
+usernameInput.value=settings.username;
 
-    deviceIdInput.value=deviceId;
+deviceIdInput.value=deviceId;
 
-    themeSelect.value=settings.theme;
+themeSelect.value=settings.theme;
 
-    refreshRate.value=
-        String(settings.refreshRate);
+refreshRate.value=settings.refreshRate;
 
-    showTimestamps.value=
-        String(settings.showTimestamps);
+showTimestamps.value=
+String(settings.showTimestamps);
 
-    compactMessages.value=
-        String(settings.compactMessages);
+timestampFormat.value=
+settings.timestampFormat;
 
-    textSize.value=settings.textSize;
+autoScroll.value=
+String(settings.autoScroll);
 
-    wordSpacing.value=settings.wordSpacing;
+textSize.value=settings.textSize;
 
-    lineSpacing.value=settings.lineSpacing;
+wordSpacing.value=settings.wordSpacing;
 
-    cornerRadius.value=settings.cornerRadius;
+lineSpacing.value=settings.lineSpacing;
 
-    uiScale.value=settings.uiScale;
+messageDensity.value=
+settings.messageDensity;
 
-    notificationSound.value=
-        String(settings.notificationSound);
+cornerRadius.value=
+settings.cornerRadius;
 
-    desktopNotifications.value=
-        String(settings.desktopNotifications);
+uiScale.value=
+settings.uiScale;
 
-    soundType.value=settings.soundType;
+desktopNotifications.value=
+String(settings.desktopNotifications);
 
-    notificationVolume.value=
-        settings.notificationVolume;
+hiddenOnly.value=
+String(settings.hiddenOnly);
 
-    notificationDuration.value=
-        settings.notificationDuration;
+notificationSound.value=
+String(settings.notificationSound);
 
-    enterToSend.value=
-        String(settings.enterToSend);
+soundTheme.value=
+settings.soundTheme;
 
-    autoScroll.value=
-        String(settings.autoScroll);
+soundDuration.value=
+settings.soundDuration;
 
-    confirmDelete.value=
-        String(settings.confirmDelete);
+soundVolume.value=
+settings.soundVolume;
 
-    showNewMessageButton.value=
-        String(settings.showNewMessageButton);
+notificationPreview.value=
+settings.notificationPreview;
 
-    clickableLinks.value=
-        String(settings.clickableLinks);
+clickableLinks.value=
+String(settings.clickableLinks);
 
-    imagePreviews.value=
-        String(settings.imagePreviews);
+imageLinks.value=
+String(settings.imageLinks);
 
-    gifPreviews.value=
-        String(settings.gifPreviews);
+newTabLinks.value=
+String(settings.newTabLinks);
 
-    reduceAnimations.value=
-        String(settings.reduceAnimations);
+enterToSend.value=
+String(settings.enterToSend);
 
-    largeButtons.value=
-        String(settings.largeButtons);
+confirmDelete.value=
+String(settings.confirmDelete);
 
-    highContrast.value=
-        String(settings.highContrast);
+keepText.value=
+String(settings.keepText);
 
-    updateRangeLabels();
+updateRangeLabels();
+
 }
 
 
 function updateRangeLabels(){
 
-    textSizeValue.textContent=
-        settings.textSize+"px";
+textSizeValue.textContent=
+settings.textSize+"px";
 
-    wordSpacingValue.textContent=
-        settings.wordSpacing+"px";
+wordSpacingValue.textContent=
+settings.wordSpacing+"px";
 
-    lineSpacingValue.textContent=
-        settings.lineSpacing;
+lineSpacingValue.textContent=
+settings.lineSpacing;
 
-    cornerRadiusValue.textContent=
-        settings.cornerRadius+"px";
+cornerRadiusValue.textContent=
+settings.cornerRadius+"px";
 
-    uiScaleValue.textContent=
-        Math.round(settings.uiScale*100)+"%";
+uiScaleValue.textContent=
+Math.round(settings.uiScale*100)+"%";
 
-    notificationVolumeValue.textContent=
-        Math.round(
-            settings.notificationVolume*100
-        )+"%";
+soundDurationValue.textContent=
+(settings.soundDuration/1000)
+.toFixed(1)+" seconds";
 
-    notificationDurationValue.textContent=
-        settings.notificationDuration+" ms";
+soundVolumeValue.textContent=
+settings.soundVolume+"%";
+
 }
 
 
-/* =========================================================
-   SETTINGS OPEN/CLOSE
-========================================================= */
+/* SETTINGS */
 
 settingsBtn.onclick=()=>{
 
-    loadSettingsUI();
+loadSettingsUI();
 
-    settingsOverlay.classList.add("show");
+settingsOverlay.classList.add("show");
 
 };
 
 
 closeSettings.onclick=()=>{
 
-    settingsOverlay.classList.remove("show");
+settingsOverlay.classList.remove("show");
 
 };
 
-
-settingsOverlay.addEventListener(
-    "click",
-    event=>{
-
-        if(event.target===settingsOverlay){
-
-            settingsOverlay.classList.remove(
-                "show"
-            );
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   SAVE SETTINGS
-========================================================= */
 
 saveSettings.onclick=async()=>{
 
-    settings.username=
-        usernameInput.value
-        .trim()
-        .substring(0,24);
+settings.username=
+usernameInput.value
+.trim()
+.substring(0,24);
 
-    settings.theme=
-        themeSelect.value;
+settings.theme=
+themeSelect.value;
 
-    settings.refreshRate=
-        Number(refreshRate.value);
+settings.refreshRate=
+Number(refreshRate.value);
 
-    settings.showTimestamps=
-        showTimestamps.value==="true";
+settings.showTimestamps=
+showTimestamps.value==="true";
 
-    settings.compactMessages=
-        compactMessages.value==="true";
+settings.timestampFormat=
+timestampFormat.value;
 
-    settings.textSize=
-        Number(textSize.value);
+settings.autoScroll=
+autoScroll.value==="true";
 
-    settings.wordSpacing=
-        Number(wordSpacing.value);
+settings.textSize=
+Number(textSize.value);
 
-    settings.lineSpacing=
-        Number(lineSpacing.value);
+settings.wordSpacing=
+Number(wordSpacing.value);
 
-    settings.cornerRadius=
-        Number(cornerRadius.value);
+settings.lineSpacing=
+Number(lineSpacing.value);
 
-    settings.uiScale=
-        Number(uiScale.value);
+settings.messageDensity=
+messageDensity.value;
 
-    settings.notificationSound=
-        notificationSound.value==="true";
+settings.cornerRadius=
+Number(cornerRadius.value);
 
-    settings.desktopNotifications=
-        desktopNotifications.value==="true";
+settings.uiScale=
+Number(uiScale.value);
 
-    settings.soundType=
-        soundType.value;
+settings.desktopNotifications=
+desktopNotifications.value==="true";
 
-    settings.notificationVolume=
-        Number(notificationVolume.value);
+settings.hiddenOnly=
+hiddenOnly.value==="true";
 
-    settings.notificationDuration=
-        Number(notificationDuration.value);
+settings.notificationSound=
+notificationSound.value==="true";
 
-    settings.enterToSend=
-        enterToSend.value==="true";
+settings.soundTheme=
+soundTheme.value;
 
-    settings.autoScroll=
-        autoScroll.value==="true";
+settings.soundDuration=
+Number(soundDuration.value);
 
-    settings.confirmDelete=
-        confirmDelete.value==="true";
+settings.soundVolume=
+Number(soundVolume.value);
 
-    settings.showNewMessageButton=
-        showNewMessageButton.value==="true";
+settings.notificationPreview=
+notificationPreview.value;
 
-    settings.clickableLinks=
-        clickableLinks.value==="true";
+settings.clickableLinks=
+clickableLinks.value==="true";
 
-    settings.imagePreviews=
-        imagePreviews.value==="true";
+settings.imageLinks=
+imageLinks.value==="true";
 
-    settings.gifPreviews=
-        gifPreviews.value==="true";
+settings.newTabLinks=
+newTabLinks.value==="true";
 
-    settings.reduceAnimations=
-        reduceAnimations.value==="true";
+settings.enterToSend=
+enterToSend.value==="true";
 
-    settings.largeButtons=
-        largeButtons.value==="true";
+settings.confirmDelete=
+confirmDelete.value==="true";
 
-    settings.highContrast=
-        highContrast.value==="true";
-
-
-    Object.keys(settings).forEach(key=>{
-
-        localStorage.setItem(
-            "chat_"+key,
-            settings[key]
-        );
-
-    });
+settings.keepText=
+keepText.value==="true";
 
 
-    if(
-        settings.desktopNotifications &&
-        "Notification" in window &&
-        Notification.permission==="default"
-    ){
+Object.keys(settings).forEach(key=>{
 
-        try{
-            await Notification.requestPermission();
-        }catch(e){}
-
-    }
-
-
-    applySettings();
-
-    settingsOverlay.classList.remove("show");
-
-    showToast(
-        "Settings saved",
-        "Your settings have been updated."
-    );
-};
-
-
-/* =========================================================
-   CATEGORY ACCORDIONS
-========================================================= */
-
-document.querySelectorAll(
-    ".category-title"
-).forEach(btn=>{
-
-    btn.onclick=()=>{
-
-        btn.parentElement.classList.toggle(
-            "open"
-        );
-
-    };
+localStorage.setItem(
+"chat_"+key,
+settings[key]
+);
 
 });
 
 
-/* =========================================================
-   RANGE PREVIEWS
-========================================================= */
+applySettings();
+
+settingsOverlay.classList.remove("show");
+
+
+if(settings.desktopNotifications){
+
+await requestNotificationPermission();
+
+}
+
+};
+
+
+/* ACCORDIONS */
+
+document.querySelectorAll(".category-title")
+.forEach(btn=>{
+
+btn.onclick=()=>{
+
+btn.parentElement.classList.toggle("open");
+
+};
+
+});
+
+
+/* RANGE PREVIEWS */
 
 textSize.oninput=()=>{
-    textSizeValue.textContent=
-        textSize.value+"px";
+textSizeValue.textContent=
+textSize.value+"px";
 };
 
 wordSpacing.oninput=()=>{
-    wordSpacingValue.textContent=
-        wordSpacing.value+"px";
+wordSpacingValue.textContent=
+wordSpacing.value+"px";
 };
 
 lineSpacing.oninput=()=>{
-    lineSpacingValue.textContent=
-        lineSpacing.value;
+lineSpacingValue.textContent=
+lineSpacing.value;
 };
 
 cornerRadius.oninput=()=>{
-    cornerRadiusValue.textContent=
-        cornerRadius.value+"px";
+cornerRadiusValue.textContent=
+cornerRadius.value+"px";
 };
 
 uiScale.oninput=()=>{
-    uiScaleValue.textContent=
-        Math.round(uiScale.value*100)+"%";
+uiScaleValue.textContent=
+Math.round(uiScale.value*100)+"%";
 };
 
-notificationVolume.oninput=()=>{
-    notificationVolumeValue.textContent=
-        Math.round(
-            notificationVolume.value*100
-        )+"%";
+soundDuration.oninput=()=>{
+soundDurationValue.textContent=
+(Number(soundDuration.value)/1000)
+.toFixed(1)+" seconds";
 };
 
-notificationDuration.oninput=()=>{
-    notificationDurationValue.textContent=
-        notificationDuration.value+" ms";
-};
-
-
-/* =========================================================
-   NOTIFICATION PERMISSION
-========================================================= */
-
-async function requestNotificationPermission(){
-
-    if(
-        !("Notification" in window)
-    ){
-        return false;
-    }
-
-    if(Notification.permission==="granted"){
-        return true;
-    }
-
-    if(Notification.permission==="denied"){
-        return false;
-    }
-
-    try{
-
-        const result=
-            await Notification.requestPermission();
-
-        return result==="granted";
-
-    }catch(error){
-
-        return false;
-
-    }
-}
-
-
-/* =========================================================
-   AUDIO ENGINE
-========================================================= */
-
-function getAudioContext(){
-
-    if(!audioContext){
-
-        const AudioContext=
-            window.AudioContext||
-            window.webkitAudioContext;
-
-        if(!AudioContext){
-            return null;
-        }
-
-        audioContext=
-            new AudioContext();
-
-    }
-
-    if(audioContext.state==="suspended"){
-
-        audioContext.resume().catch(()=>{});
-
-    }
-
-    return audioContext;
-}
-
-
-function tone(
-    ctx,
-    frequency,
-    start,
-    duration,
-    volume,
-    type="sine"
-){
-
-    const oscillator=
-        ctx.createOscillator();
-
-    const gain=
-        ctx.createGain();
-
-    oscillator.type=type;
-
-    oscillator.frequency.setValueAtTime(
-        frequency,
-        start
-    );
-
-    gain.gain.setValueAtTime(
-        0,
-        start
-    );
-
-    gain.gain.linearRampToValueAtTime(
-        volume,
-        start+.01
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        .001,
-        start+duration
-    );
-
-    oscillator.connect(gain);
-
-    gain.connect(ctx.destination);
-
-    oscillator.start(start);
-
-    oscillator.stop(
-        start+duration+.03
-    );
-}
-
-
-function playNotificationSound(type){
-
-    if(!settings.notificationSound){
-        return;
-    }
-
-    const ctx=getAudioContext();
-
-    if(!ctx){
-        return;
-    }
-
-    const now=ctx.currentTime;
-
-    const volume=
-        Math.max(
-            .001,
-            settings.notificationVolume
-        );
-
-    switch(type){
-
-        case "windows":
-
-            tone(ctx,659,now,.13,volume,"sine");
-            tone(ctx,784,now+.09,.18,volume,"sine");
-
-            break;
-
-
-        case "ding":
-
-            tone(ctx,880,now,.45,volume,"sine");
-
-            break;
-
-
-        case "pop":
-
-            tone(ctx,240,now,.08,volume,"triangle");
-            tone(ctx,520,now+.04,.12,volume,"triangle");
-
-            break;
-
-
-        case "bell":
-
-            tone(ctx,700,now,.5,volume,"sine");
-            tone(ctx,1050,now,.45,volume*.45,"sine");
-
-            break;
-
-
-        case "double":
-
-            tone(ctx,720,now,.15,volume,"sine");
-            tone(ctx,720,now+.2,.15,volume,"sine");
-
-            break;
-
-
-        case "digital":
-
-            tone(ctx,950,now,.07,volume,"square");
-            tone(ctx,1200,now+.08,.07,volume,"square");
-            tone(ctx,1500,now+.16,.08,volume,"square");
-
-            break;
-
-
-        case "soft":
-
-            tone(ctx,440,now,.4,volume*.5,"sine");
-            tone(ctx,660,now+.1,.45,volume*.35,"sine");
-
-            break;
-
-
-        case "alert":
-
-            tone(ctx,800,now,.18,volume,"square");
-            tone(ctx,500,now+.2,.18,volume,"square");
-            tone(ctx,800,now+.4,.18,volume,"square");
-
-            break;
-
-
-        case "chime":
-
-            tone(ctx,523,now,.4,volume,"sine");
-            tone(ctx,659,now+.12,.5,volume*.8,"sine");
-            tone(ctx,784,now+.24,.6,volume*.6,"sine");
-
-            break;
-
-
-        case "pulse":
-
-            tone(ctx,150,now,.12,volume,"sine");
-            tone(ctx,300,now+.16,.12,volume,"sine");
-            tone(ctx,600,now+.32,.12,volume,"sine");
-
-            break;
-
-
-        case "alarm":
-
-            for(let i=0;i<7;i++){
-
-                const f=
-                    i%2===0
-                    ?650
-                    :950;
-
-                tone(
-                    ctx,
-                    f,
-                    now+i*.35,
-                    .27,
-                    volume,
-                    "sawtooth"
-                );
-
-            }
-
-            break;
-
-
-        case "opera":
-
-            /*
-             * Original generated vocal-like
-             * musical notification.
-             */
-
-            const notes=[
-                392,
-                440,
-                523,
-                494,
-                523,
-                659,
-                587,
-                523,
-                440,
-                392
-            ];
-
-            notes.forEach((f,i)=>{
-
-                tone(
-                    ctx,
-                    f,
-                    now+i*.18,
-                    .3,
-                    volume*.45,
-                    "triangle"
-                );
-
-                tone(
-                    ctx,
-                    f*2,
-                    now+i*.18,
-                    .22,
-                    volume*.12,
-                    "sine"
-                );
-
-            });
-
-            break;
-
-    }
-}
-
-
-/* =========================================================
-   WINDOWS-STYLE NOTIFICATION
-========================================================= */
-
-async function showWindowsNotification(
-    username,
-    message,
-    isTest=false
-){
-
-    /*
-     * Do not notify while the user is actively
-     * looking at the page.
-     */
-
-    if(
-        !isTest &&
-        document.visibilityState==="visible"
-    ){
-        return;
-    }
-
-
-    if(settings.notificationSound){
-
-        playNotificationSound(
-            settings.soundType
-        );
-
-    }
-
-
-    if(
-        !settings.desktopNotifications ||
-        !("Notification" in window)
-    ){
-
-        if(!isTest){
-            showToast(
-                username||"Chat",
-                message||"New message"
-            );
-        }
-
-        return;
-    }
-
-
-    let permission=
-        Notification.permission;
-
-
-    if(permission==="default"){
-
-        permission=
-            await requestNotificationPermission();
-
-    }
-
-
-    if(permission!=="granted"){
-
-        showToast(
-            username||"Chat",
-            message||"New message"
-        );
-
-        return;
-    }
-
-
-    try{
-
-        const notification=
-            new Notification(
-                username||"Chat",
-                {
-                    body:
-                        message||
-                        "Sent an image",
-                    tag:
-                        isTest
-                        ?"chat-test"
-                        :"chat-"+Date.now(),
-                    renotify:true,
-                    silent:true
-                }
-            );
-
-
-        notification.onclick=()=>{
-
-            window.focus();
-
-            notification.close();
-
-        };
-
-
-        setTimeout(
-            ()=>{
-                try{
-                    notification.close();
-                }catch(e){}
-            },
-            Math.max(
-                1000,
-                settings.notificationDuration
-            )
-        );
-
-    }catch(error){
-
-        showToast(
-            username||"Chat",
-            message||"New message"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   TEST NOTIFICATION
-========================================================= */
-
-testNotification.onclick=async()=>{
-
-    /*
-     * A click is a user gesture, so this also
-     * unlocks the WebAudio system.
-     */
-
-    getAudioContext();
-
-    playNotificationSound(
-        settings.soundType
-    );
-
-    await showWindowsNotification(
-        "Chat",
-        "This is a test Windows notification.",
-        true
-    );
-
+soundVolume.oninput=()=>{
+soundVolumeValue.textContent=
+soundVolume.value+"%";
 };
 
 
-/* =========================================================
-   TOAST
-========================================================= */
-
-function showToast(title,text){
-
-    const toast=
-        document.createElement("div");
-
-    toast.className="toast";
-
-    const titleEl=
-        document.createElement("div");
-
-    titleEl.className="toast-title";
-
-    titleEl.textContent=title;
-
-    const textEl=
-        document.createElement("div");
-
-    textEl.className="toast-text";
-
-    textEl.textContent=text;
-
-    toast.appendChild(titleEl);
-
-    toast.appendChild(textEl);
-
-    toastContainer.appendChild(toast);
-
-    setTimeout(()=>{
-
-        toast.style.opacity="0";
-
-        setTimeout(
-            ()=>toast.remove(),
-            250
-        );
-
-    },3500);
-
-}
-
-
-/* =========================================================
-   USER INTERACTION UNLOCKS AUDIO
-========================================================= */
-
-document.addEventListener(
-    "pointerdown",
-    ()=>{
-        getAudioContext();
-    },
-    {
-        once:false,
-        passive:true
-    }
-);
-
-
-/* =========================================================
-   TEXTAREA
-========================================================= */
+/* TEXTAREA */
 
 messageInput.addEventListener(
-    "input",
-    ()=>{
+"input",
+()=>{
 
-        messageInput.style.height="auto";
+messageInput.style.height="auto";
 
-        messageInput.style.height=
-            Math.min(
-                messageInput.scrollHeight,
-                150
-            )+"px";
+messageInput.style.height=
+Math.min(
+messageInput.scrollHeight,
+150
+)+"px";
 
-    }
-);
+});
 
 
-/* =========================================================
-   IMAGE
-========================================================= */
+/* IMAGE */
 
 attachBtn.onclick=()=>{
-    imageInput.click();
+imageInput.click();
 };
-
 
 imageInput.onchange=()=>{
 
-    selectedFile=
-        imageInput.files[0]||null;
+selectedFile=
+imageInput.files[0]||null;
 
-    attachBtn.textContent=
-        selectedFile
-        ?"✓"
-        :"＋";
+attachBtn.textContent=
+selectedFile?"✓":"＋";
 
 };
 
 
-/* =========================================================
-   IMAGE RESIZE
-========================================================= */
+/* IMAGE RESIZE */
 
 function resizeImage(file){
 
-    return new Promise(
-        (resolve,reject)=>{
+return new Promise(
+(resolve,reject)=>{
 
-            const reader=
-                new FileReader();
+const reader=new FileReader();
 
-            reader.onload=()=>{
+reader.onload=()=>{
 
-                const img=
-                    new Image();
+const img=new Image();
 
-                img.onload=()=>{
+img.onload=()=>{
 
-                    let width=img.width;
-                    let height=img.height;
+let width=img.width;
+let height=img.height;
 
-                    const max=1500;
+const max=1500;
 
-                    if(
-                        width>max||
-                        height>max
-                    ){
+if(width>max||height>max){
 
-                        const scale=
-                            Math.min(
-                                max/width,
-                                max/height
-                            );
+const scale=Math.min(
+max/width,
+max/height
+);
 
-                        width=
-                            Math.round(
-                                width*scale
-                            );
+width=Math.round(width*scale);
+height=Math.round(height*scale);
 
-                        height=
-                            Math.round(
-                                height*scale
-                            );
+}
 
-                    }
+const canvas=
+document.createElement("canvas");
 
+canvas.width=width;
+canvas.height=height;
 
-                    const canvas=
-                        document.createElement(
-                            "canvas"
-                        );
+const ctx=
+canvas.getContext("2d");
 
-                    canvas.width=width;
+ctx.drawImage(
+img,
+0,
+0,
+width,
+height
+);
 
-                    canvas.height=height;
+resolve(
+canvas.toDataURL(
+"image/jpeg",
+.78
+)
+);
 
-                    const ctx=
-                        canvas.getContext("2d");
+};
 
-                    ctx.drawImage(
-                        img,
-                        0,
-                        0,
-                        width,
-                        height
-                    );
+img.onerror=reject;
 
-                    resolve(
-                        canvas.toDataURL(
-                            "image/jpeg",
-                            .78
-                        )
-                    );
+img.src=reader.result;
 
-                };
+};
 
-                img.onerror=reject;
+reader.onerror=reject;
 
-                img.src=reader.result;
+reader.readAsDataURL(file);
 
-            };
+});
 
-            reader.onerror=reject;
-
-            reader.readAsDataURL(file);
-
-        }
-    );
 }
 
 
-/* =========================================================
-   SEND
-========================================================= */
+/* SEND */
 
 sendBtn.onclick=sendMessage;
 
-
 messageInput.addEventListener(
-    "keydown",
-    event=>{
+"keydown",
+event=>{
 
-        if(
-            event.key==="Enter" &&
-            !event.shiftKey &&
-            settings.enterToSend
-        ){
+if(
+event.key==="Enter" &&
+!event.shiftKey &&
+settings.enterToSend
+){
 
-            event.preventDefault();
+event.preventDefault();
 
-            sendMessage();
+sendMessage();
 
-        }
+}
 
-    }
-);
+});
 
 
 async function sendMessage(){
 
-    const text=
-        messageInput.value.trim();
+const text=
+messageInput.value.trim();
 
+if(!settings.username){
 
-    if(!settings.username){
+settingsBtn.click();
 
-        settingsBtn.click();
+usernameInput.focus();
 
-        usernameInput.focus();
+alert(
+"Set your name in Settings first."
+);
 
-        alert(
-            "Set your name in Settings first."
-        );
+return;
 
-        return;
+}
 
-    }
+if(!text&&!selectedFile)
+return;
 
+sendBtn.disabled=true;
 
-    if(!text&&!selectedFile){
-        return;
-    }
+try{
 
+let image=null;
 
-    sendBtn.disabled=true;
+if(selectedFile){
 
+image=
+await resizeImage(selectedFile);
 
-    try{
+}
 
-        let image=null;
+const response=
+await fetch(API_URL,{
 
-        if(selectedFile){
+method:"POST",
 
-            image=
-                await resizeImage(
-                    selectedFile
-                );
+headers:{
+"Content-Type":"application/json"
+},
 
-        }
+body:JSON.stringify({
 
+username:settings.username,
 
-        const response=
-            await fetch(
-                API_URL,
-                {
-                    method:"POST",
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-                    body:JSON.stringify({
+channel:CHANNEL,
 
-                        username:
-                            settings.username,
+message:text,
 
-                        channel:
-                            CHANNEL,
+image:image,
 
-                        message:
-                            text,
+device_id:deviceId
 
-                        image:
-                            image,
+})
 
-                        device_id:
-                            deviceId
+});
 
-                    })
-                }
-            );
+const data=
+await response.json();
 
+if(!response.ok){
 
-        const data=
-            await response.json();
+throw new Error(
+data.error||
+"Failed to send message."
+);
 
+}
 
-        if(!response.ok){
+messageInput.value="";
 
-            throw new Error(
-                data.error||
-                "Failed to send message."
-            );
+messageInput.style.height="auto";
 
-        }
+selectedFile=null;
 
+imageInput.value="";
 
-        messageInput.value="";
+attachBtn.textContent="＋";
 
-        messageInput.style.height=
-            "auto";
+await loadMessages();
 
-        selectedFile=null;
+}catch(error){
 
-        imageInput.value="";
+if(!settings.keepText){
 
-        attachBtn.textContent="＋";
+messageInput.value="";
 
+}
 
-        await loadMessages();
+alert(
+"Failed to send:\n\n"+
+error.message
+);
 
+}finally{
 
-    }catch(error){
+sendBtn.disabled=false;
 
-        alert(
-            "Failed to send:\n\n"+
-            error.message
-        );
-
-    }finally{
-
-        sendBtn.disabled=false;
-
-    }
+}
 
 }
 
 
-/* =========================================================
-   LOAD MESSAGES
-========================================================= */
+/* LOAD */
 
 async function loadMessages(){
 
-    try{
+try{
 
-        const response=
-            await fetch(
-                API_URL+
-                "?channel="+
-                encodeURIComponent(
-                    CHANNEL
-                ),
-                {
-                    cache:"no-store"
-                }
-            );
+const response=
+await fetch(
+API_URL+
+"?channel="+
+encodeURIComponent(CHANNEL)
+);
 
+const data=
+await response.json();
 
-        const data=
-            await response.json();
+if(!response.ok){
 
+throw new Error(
+data.error||
+"Failed to load messages."
+);
 
-        if(!response.ok){
+}
 
-            throw new Error(
-                data.error||
-                "Failed to load messages."
-            );
+const oldMessages=
+currentMessages;
 
-        }
-
-
-        const newMessages=
-            Array.isArray(data.messages)
-            ?data.messages
-            :[];
+currentMessages=
+Array.isArray(data.messages)
+?data.messages
+:[];
 
 
-        /*
-         * Detect new messages.
-         */
+/*
+Detect newly received messages.
+*/
 
-        if(!firstLoad){
+if(oldMessages.length){
 
-            const newOnes=
-                newMessages.filter(
-                    message=>
-                        message.id &&
-                        !knownMessageIds.has(
-                            String(message.id)
-                        )
-                );
+const oldIds=
+new Set(
+oldMessages.map(m=>String(m.id))
+);
 
+const newMessages=
+currentMessages.filter(
+m=>!oldIds.has(String(m.id))
+);
 
-            const foreignNewOnes=
-                newOnes.filter(
-                    message=>
-                        message.device_id!==
-                        deviceId
-                );
+for(const message of newMessages){
 
+handleIncomingNotification(message);
 
-            if(foreignNewOnes.length){
+}
 
-                const latest=
-                    foreignNewOnes[
-                        foreignNewOnes.length-1
-                    ];
+}
 
+renderMessages();
 
-                /*
-                 * Notification ONLY when
-                 * the site is open but not
-                 * currently being viewed.
-                 */
+}catch(error){
 
-                if(
-                    document.visibilityState!==
-                    "visible"
-                ){
+messagesEl.innerHTML=`
 
-                    showWindowsNotification(
-                        latest.username||
-                            "New message",
-                        latest.message||
-                            "Sent an image"
-                    );
+<div class="empty">
 
-                }
+<div>
 
-            }
+<strong>
+Unable to load messages
+</strong>
 
-        }
+${escapeHtml(error.message)}
 
+</div>
 
-        currentMessages=
-            newMessages;
+</div>
 
+`;
 
-        knownMessageIds.clear();
-
-        currentMessages.forEach(
-            message=>{
-
-                if(message.id){
-
-                    knownMessageIds.add(
-                        String(message.id)
-                    );
-
-                }
-
-            }
-        );
-
-
-        firstLoad=false;
-
-
-        setConnection(true);
-
-        renderMessages();
-
-
-    }catch(error){
-
-        setConnection(false);
-
-
-        messagesEl.innerHTML=`
-            <div class="empty">
-                <div>
-                    <strong>
-                        Unable to load messages
-                    </strong>
-                    ${escapeHtml(
-                        error.message
-                    )}
-                </div>
-            </div>
-        `;
-
-    }
+}
 
 }
 
 
-/* =========================================================
-   CONNECTION
-========================================================= */
+/* NOTIFICATION PERMISSION */
 
-function setConnection(online){
+async function requestNotificationPermission(){
 
-    connectionDot.classList.toggle(
-        "offline",
-        !online
-    );
+if(!("Notification" in window)){
 
-    connectionText.textContent=
-        online
-        ?"Online"
-        :"Offline";
+alert(
+"Your browser does not support desktop notifications."
+);
+
+return false;
+
+}
+
+if(Notification.permission==="granted")
+return true;
+
+if(Notification.permission==="denied"){
+
+alert(
+"Notifications are blocked in your browser. Allow notifications for this site in browser settings."
+);
+
+return false;
+
+}
+
+const permission=
+await Notification.requestPermission();
+
+return permission==="granted";
 
 }
 
 
-/* =========================================================
-   LINK PARSER
-========================================================= */
+/* NOTIFICATION */
 
-function createMessageText(text){
+let lastNotificationId=null;
 
-    const wrapper=
-        document.createElement("div");
+function handleIncomingNotification(message){
 
-    wrapper.className="message-text";
+if(!message)
+return;
 
+if(
+String(message.device_id)===
+String(deviceId)
+)
+return;
 
-    if(!settings.clickableLinks){
+if(
+settings.hiddenOnly &&
+document.visibilityState!=="hidden"
+)
+return;
 
-        wrapper.textContent=text;
-
-        return wrapper;
-
-    }
-
-
-    const urlRegex=
-        /(https?:\/\/[^\s<]+)/gi;
-
-    let lastIndex=0;
-
-    let match;
-
-
-    while(
-        (match=urlRegex.exec(text))!==null
-    ){
-
-        const before=
-            text.slice(
-                lastIndex,
-                match.index
-            );
-
-        if(before){
-
-            wrapper.appendChild(
-                document.createTextNode(
-                    before
-                )
-            );
-
-        }
-
-
-        let url=
-            match[0];
-
-        let punctuation="";
-
-
-        while(
-            /[.,!?;:)]+$/.test(url)
-        ){
-
-            punctuation=
-                url.slice(-1)+
-                punctuation;
-
-            url=
-                url.slice(0,-1);
-
-        }
-
-
-        const link=
-            document.createElement("a");
-
-        link.href=url;
-
-        link.target="_blank";
-
-        link.rel="noopener noreferrer";
-
-        link.textContent=url;
-
-        wrapper.appendChild(link);
-
-
-        if(punctuation){
-
-            wrapper.appendChild(
-                document.createTextNode(
-                    punctuation
-                )
-            );
-
-        }
-
-
-        lastIndex=
-            match.index+
-            match[0].length;
-
-    }
-
-
-    if(lastIndex<text.length){
-
-        wrapper.appendChild(
-            document.createTextNode(
-                text.slice(lastIndex)
-            )
-        );
-
-    }
-
-
-    return wrapper;
-
-}
-
-
-/* =========================================================
-   URL IMAGE PREVIEW
-========================================================= */
-
-function addURLPreview(
-    content,
-    text
+if(
+settings.desktopNotifications
 ){
 
-    if(
-        !settings.imagePreviews
-    ){
-        return;
-    }
+showWindowsNotification(message);
 
+}
 
-    const regex=
-        /(https?:\/\/[^\s<]+)/gi;
+if(
+settings.notificationSound
+){
 
-    const matches=
-        text.match(regex)||[];
+if(document.visibilityState==="hidden"){
 
+playNotificationSound(
+settings.soundTheme,
+settings.soundDuration,
+settings.soundVolume
+);
 
-    matches.forEach(raw=>{
+}
 
-        const url=
-            raw.replace(
-                /[.,!?;:)]+$/,
-                ""
-            );
-
-
-        if(
-            !settings.gifPreviews &&
-            /\.gif(\?|$)/i.test(url)
-        ){
-            return;
-        }
-
-
-        if(
-            !/\.(png|jpe?g|gif|webp|bmp)(\?|$)/i
-                .test(url)
-        ){
-            return;
-        }
-
-
-        const img=
-            document.createElement("img");
-
-        img.className=
-            "message-image";
-
-        img.src=url;
-
-        img.alt="Linked image";
-
-        img.loading="lazy";
-
-        img.onclick=()=>{
-            openImage(url);
-        };
-
-        img.onerror=()=>{
-            img.remove();
-        };
-
-        content.appendChild(img);
-
-    });
+}
 
 }
 
 
-/* =========================================================
-   RENDER
-========================================================= */
+/* WINDOWS NOTIFICATION */
+
+async function showWindowsNotification(message){
+
+const allowed=
+await requestNotificationPermission();
+
+if(!allowed)
+return;
+
+let body="New message";
+
+if(settings.notificationPreview==="name"){
+
+body=
+(message.username||"Someone")+
+" sent a message";
+
+}
+
+else if(
+settings.notificationPreview==="full"
+){
+
+body=
+(message.message||
+(message.image?"📷 Image":"New message"))
+.substring(0,180);
+
+}
+
+const title=
+(message.username||"Chat")+
+" • #"+CHANNEL;
+
+
+/*
+Browser notifications behave like Windows
+notifications on supported Windows browsers.
+*/
+
+try{
+
+const notification=
+new Notification(
+title,
+{
+body:body,
+tag:"chat-"+message.id,
+renotify:true,
+silent:true
+}
+);
+
+notification.onclick=()=>{
+
+window.focus();
+
+notification.close();
+
+};
+
+}catch(error){
+
+console.warn(
+"Notification failed:",
+error
+);
+
+}
+
+}
+
+
+/* TEST NOTIFICATION */
+
+testNotification.onclick=async()=>{
+
+const allowed=
+await requestNotificationPermission();
+
+if(!allowed)
+return;
+
+const testMessage={
+
+id:"test-"+Date.now(),
+
+username:settings.username||
+"Chat",
+
+message:
+"This is a Windows notification test."
+
+};
+
+showWindowsNotification(
+testMessage
+);
+
+if(settings.notificationSound){
+
+playNotificationSound(
+settings.soundTheme,
+settings.soundDuration,
+settings.soundVolume
+);
+
+}
+
+};
+
+
+/* AUDIO */
+
+function getAudioContext(){
+
+if(!audioContext){
+
+audioContext=
+new (
+window.AudioContext||
+window.webkitAudioContext
+)();
+
+}
+
+if(
+audioContext.state==="suspended"
+){
+
+audioContext.resume();
+
+}
+
+return audioContext;
+
+}
+
+
+/*
+These sounds are synthesized locally.
+No external audio files are needed.
+*/
+
+function playTone(
+ctx,
+frequency,
+start,
+duration,
+volume,
+type="sine"
+){
+
+const oscillator=
+ctx.createOscillator();
+
+const gain=
+ctx.createGain();
+
+oscillator.type=type;
+
+oscillator.frequency
+.setValueAtTime(
+frequency,
+start
+);
+
+gain.gain.setValueAtTime(
+0,
+start
+);
+
+gain.gain.linearRampToValueAtTime(
+volume,
+start+.015
+);
+
+gain.gain.exponentialRampToValueAtTime(
+.001,
+start+duration
+);
+
+oscillator.connect(gain);
+
+gain.connect(ctx.destination);
+
+oscillator.start(start);
+
+oscillator.stop(
+start+duration+.03
+);
+
+}
+
+
+/* 15 SOUND THEMES */
+
+function playNotificationSound(
+theme,
+duration,
+volume
+){
+
+const ctx=
+getAudioContext();
+
+const now=
+ctx.currentTime;
+
+const maxDuration=
+Math.max(
+.1,
+duration/1000
+);
+
+const master=
+Math.max(
+0,
+Math.min(1,volume/100)
+)*.25;
+
+
+/* 1 CLASSIC */
+
+if(theme==="classic"){
+
+playTone(
+ctx,
+880,
+now,
+Math.min(.18,maxDuration),
+master
+);
+
+playTone(
+ctx,
+1175,
+now+.19,
+Math.min(.22,maxDuration-.19),
+master
+);
+
+return;
+
+}
+
+
+/* 2 SOFT */
+
+if(theme==="soft"){
+
+playTone(
+ctx,
+523.25,
+now,
+Math.min(.35,maxDuration),
+master*.65
+);
+
+playTone(
+ctx,
+659.25,
+now+.25,
+Math.min(.45,maxDuration-.25),
+master*.65
+);
+
+return;
+
+}
+
+
+/* 3 DIGITAL */
+
+if(theme==="digital"){
+
+playTone(
+ctx,
+1000,
+now,
+.07,
+master,
+"square"
+);
+
+playTone(
+ctx,
+1500,
+now+.09,
+.09,
+master,
+"square"
+);
+
+return;
+
+}
+
+
+/* 4 POP */
+
+if(theme==="pop"){
+
+playTone(
+ctx,
+660,
+now,
+.12,
+master,
+"sine"
+);
+
+playTone(
+ctx,
+880,
+now+.12,
+.16,
+master,
+"sine"
+);
+
+return;
+
+}
+
+
+/* 5 BELL */
+
+if(theme==="bell"){
+
+playTone(
+ctx,
+784,
+now,
+.7,
+master*.7
+);
+
+playTone(
+ctx,
+1174,
+now,
+.9,
+master*.45
+);
+
+return;
+
+}
+
+
+/* 6 CHIME */
+
+if(theme==="chime"){
+
+const notes=[
+523.25,
+659.25,
+783.99
+];
+
+notes.forEach(
+(f,i)=>{
+
+playTone(
+ctx,
+f,
+now+i*.18,
+Math.min(
+.7,
+maxDuration-i*.18
+),
+master*.6
+);
+
+});
+
+return;
+
+}
+
+
+/* 7 RETRO */
+
+if(theme==="retro"){
+
+playTone(
+ctx,
+440,
+now,
+.1,
+master,
+"square"
+);
+
+playTone(
+ctx,
+660,
+now+.12,
+.1,
+master,
+"square"
+);
+
+playTone(
+ctx,
+880,
+now+.24,
+.13,
+master,
+"square"
+);
+
+return;
+
+}
+
+
+/* 8 COMPUTER */
+
+if(theme==="computer"){
+
+playTone(
+ctx,
+600,
+now,
+.06,
+master,
+"square"
+);
+
+playTone(
+ctx,
+900,
+now+.08,
+.06,
+master,
+"square"
+);
+
+playTone(
+ctx,
+1200,
+now+.16,
+.08,
+master,
+"square"
+);
+
+return;
+
+}
+
+
+/* 9 ALERT */
+
+if(theme==="alert"){
+
+playTone(
+ctx,
+740,
+now,
+.18,
+master,
+"sawtooth"
+);
+
+playTone(
+ctx,
+540,
+now+.2,
+.18,
+master,
+"sawtooth"
+);
+
+return;
+
+}
+
+
+/* 10 WARNING */
+
+if(theme==="warning"){
+
+playTone(
+ctx,
+500,
+now,
+.3,
+master,
+"sawtooth"
+);
+
+playTone(
+ctx,
+500,
+now+.35,
+.3,
+master,
+"sawtooth"
+);
+
+return;
+
+}
+
+
+/* 11 NUCLEAR ALARM */
+
+if(theme==="alarm"){
+
+const cycles=
+Math.max(
+1,
+Math.ceil(maxDuration/.8)
+);
+
+for(let i=0;i<cycles;i++){
+
+const t=
+now+i*.8;
+
+playTone(
+ctx,
+420,
+t,
+.35,
+master,
+"sawtooth"
+);
+
+playTone(
+ctx,
+820,
+t+.35,
+.35,
+master,
+"sawtooth"
+);
+
+}
+
+return;
+
+}
+
+
+/* 12 OPERA */
+
+if(theme==="opera"){
+
+/*
+A synthetic vocal-like sequence.
+It is an original melody, not a recording.
+*/
+
+const notes=[
+261.63,
+329.63,
+392,
+329.63,
+293.66,
+349.23,
+440,
+392,
+329.63,
+392,
+523.25
+];
+
+const noteLength=
+Math.min(
+.28,
+maxDuration/notes.length
+);
+
+notes.forEach(
+(f,i)=>{
+
+const t=
+now+i*noteLength;
+
+playTone(
+ctx,
+f,
+t,
+Math.max(
+.08,
+noteLength*.9
+),
+master*.55,
+"sine"
+);
+
+});
+
+return;
+
+}
+
+
+/* 13 SYNTH */
+
+if(theme==="synth"){
+
+const notes=[
+220,
+330,
+440,
+660
+];
+
+notes.forEach(
+(f,i)=>{
+
+playTone(
+ctx,
+f,
+now+i*.12,
+.2,
+master,
+"triangle"
+);
+
+});
+
+return;
+
+}
+
+
+/* 14 PULSE */
+
+if(theme==="pulse"){
+
+for(
+let i=0;
+i<4;
+i++
+){
+
+playTone(
+ctx,
+700,
+now+i*.16,
+.07,
+master,
+"square"
+);
+
+}
+
+return;
+
+}
+
+
+/* 15 SPACE */
+
+if(theme==="space"){
+
+playTone(
+ctx,
+180,
+now,
+.5,
+master*.5,
+"sine"
+);
+
+playTone(
+ctx,
+270,
+now+.2,
+.7,
+master*.4,
+"triangle"
+);
+
+playTone(
+ctx,
+540,
+now+.4,
+.8,
+master*.3,
+"sine"
+);
+
+}
+
+}
+
+
+/* RENDER */
 
 function renderMessages(){
 
-    const wasBottom=
-        messagesEl.scrollHeight-
-        messagesEl.scrollTop-
-        messagesEl.clientHeight<
-        100;
+const wasBottom=
+messagesEl.scrollHeight-
+messagesEl.scrollTop-
+messagesEl.clientHeight<100;
 
+if(!currentMessages.length){
 
-    const search=
-        searchInput.value
-        .trim()
-        .toLowerCase();
+messagesEl.innerHTML=`
 
+<div class="empty">
 
-    let filtered=
-        currentMessages;
+<div>
 
+<strong>No messages yet</strong>
 
-    if(search){
+Be the first to send something.
 
-        filtered=
-            currentMessages.filter(
-                message=>
-                    String(
-                        message.username||""
-                    )
-                    .toLowerCase()
-                    .includes(search)||
-                    String(
-                        message.message||""
-                    )
-                    .toLowerCase()
-                    .includes(search)
-            );
+</div>
 
-    }
+</div>
 
+`;
 
-    if(!filtered.length){
+return;
 
-        messagesEl.innerHTML=`
+}
 
-            <div class="empty">
+const fragment=
+document.createDocumentFragment();
 
-                <div>
+currentMessages.forEach(
+message=>{
 
-                    <strong>
-                        ${
-                            search
-                            ?"No matching messages"
-                            :"No messages yet"
-                        }
-                    </strong>
+const item=
+document.createElement("div");
 
-                    ${
-                        search
-                        ?"Try another search."
-                        :"Be the first to send something."
-                    }
+item.className="message";
 
-                </div>
+if(settings.messageDensity==="compact")
+item.classList.add("compact");
 
-            </div>
-        `;
+item.dataset.id=
+message.id;
 
-        return;
+const avatar=
+document.createElement("div");
 
-    }
+avatar.className="avatar";
 
+avatar.textContent=
+(message.username||"?")
+.charAt(0)
+.toUpperCase();
 
-    const fragment=
-        document.createDocumentFragment();
+const content=
+document.createElement("div");
 
+content.className=
+"message-content";
 
-    filtered.forEach(message=>{
+const top=
+document.createElement("div");
 
-        const item=
-            document.createElement("div");
+top.className=
+"message-top";
 
-        item.className="message";
+const name=
+document.createElement("span");
 
-        if(settings.compactMessages){
+name.className=
+"username";
 
-            item.classList.add(
-                "compact"
-            );
+name.textContent=
+message.username||"User";
 
-        }
+top.appendChild(name);
 
 
-        item.dataset.id=
-            message.id;
+if(settings.showTimestamps){
 
+const time=
+document.createElement("span");
 
-        const avatar=
-            document.createElement("div");
+time.className="time";
 
-        avatar.className="avatar";
+time.textContent=
+formatTime(
+message.created_at
+);
 
-        avatar.textContent=
-            (message.username||"?")
-            .charAt(0)
-            .toUpperCase();
-
-
-        const content=
-            document.createElement("div");
-
-        content.className=
-            "message-content";
-
-
-        const top=
-            document.createElement("div");
-
-        top.className="message-top";
-
-
-        const name=
-            document.createElement("span");
-
-        name.className="username";
-
-        name.textContent=
-            message.username||
-            "User";
-
-        top.appendChild(name);
-
-
-        if(settings.showTimestamps){
-
-            const time=
-                document.createElement("span");
-
-            time.className="time";
-
-            time.textContent=
-                formatTime(
-                    message.created_at
-                );
-
-            top.appendChild(time);
-
-        }
-
-
-        if(message.edited){
-
-            const edited=
-                document.createElement("span");
-
-            edited.className="edited";
-
-            edited.textContent=
-                "(edited)";
-
-            top.appendChild(edited);
-
-        }
-
-
-        content.appendChild(top);
-
-
-        if(message.message){
-
-            const text=
-                createMessageText(
-                    message.message
-                );
-
-            content.appendChild(text);
-
-            addURLPreview(
-                content,
-                message.message
-            );
-
-        }
-
-
-        if(message.image){
-
-            const img=
-                document.createElement("img");
-
-            img.className=
-                "message-image";
-
-            img.src=
-                message.image;
-
-            img.alt="Image";
-
-            img.loading="lazy";
-
-            img.onclick=()=>{
-
-                openImage(
-                    message.image
-                );
-
-            };
-
-            content.appendChild(img);
-
-        }
-
-
-        item.appendChild(avatar);
-
-        item.appendChild(content);
-
-
-        /*
-         * Only the owner gets the
-         * edit/delete context menu.
-         */
-
-        if(
-            message.device_id &&
-            message.device_id===deviceId
-        ){
-
-            item.addEventListener(
-                "contextmenu",
-                event=>{
-
-                    event.preventDefault();
-
-                    showContextMenu(
-                        event.clientX,
-                        event.clientY,
-                        message
-                    );
-
-                }
-            );
-
-        }
-
-
-        fragment.appendChild(item);
-
-    });
-
-
-    messagesEl.replaceChildren(
-        fragment
-    );
-
-
-    if(
-        wasBottom &&
-        settings.autoScroll
-    ){
-
-        messagesEl.scrollTop=
-            messagesEl.scrollHeight;
-
-    }
+top.appendChild(time);
 
 }
 
 
-/* =========================================================
-   CONTEXT MENU
-========================================================= */
+if(message.edited){
 
-function showContextMenu(
-    x,
-    y,
-    message
+const edited=
+document.createElement("span");
+
+edited.className="edited";
+
+edited.textContent=
+"(edited)";
+
+top.appendChild(edited);
+
+}
+
+content.appendChild(top);
+
+
+/* TEXT + LINKS */
+
+if(message.message){
+
+const text=
+createMessageContent(
+message.message
+);
+
+content.appendChild(text);
+
+}
+
+
+/* STORED IMAGE */
+
+if(message.image){
+
+const img=
+document.createElement("img");
+
+img.className=
+"message-image";
+
+img.src=
+message.image;
+
+img.alt="Image";
+
+img.onclick=()=>{
+openImage(message.image);
+};
+
+content.appendChild(img);
+
+}
+
+
+item.appendChild(avatar);
+
+item.appendChild(content);
+
+
+/* ONLY OWNER CONTEXT MENU */
+
+if(
+message.device_id &&
+message.device_id===deviceId
 ){
 
-    selectedMessage=message;
+item.addEventListener(
+"contextmenu",
+event=>{
+
+event.preventDefault();
+
+showContextMenu(
+event.clientX,
+event.clientY,
+message
+);
+
+});
+
+}
+
+fragment.appendChild(item);
+
+});
+
+messagesEl.replaceChildren(fragment);
+
+if(
+wasBottom &&
+settings.autoScroll
+){
+
+messagesEl.scrollTop=
+messagesEl.scrollHeight;
+
+}
+
+}
 
 
-    contextMenu.style.left=
-        Math.min(
-            x,
-            window.innerWidth-170
-        )+"px";
+/* LINK PARSER */
+
+function createMessageContent(text){
+
+const container=
+document.createElement("div");
+
+container.className=
+"message-text";
+
+if(!settings.clickableLinks){
+
+container.textContent=text;
+
+return container;
+
+}
+
+const urlRegex=
+/(https?:\/\/[^\s<]+)/gi;
+
+let last=0;
+
+let match;
+
+while(
+(match=urlRegex.exec(text))!==null
+){
+
+const before=
+text.slice(
+last,
+match.index
+);
+
+if(before){
+
+container.appendChild(
+document.createTextNode(before)
+);
+
+}
+
+let url=
+match[0];
+
+let punctuation="";
+
+/*
+Remove common punctuation from the URL.
+*/
+
+while(
+/[.,!?;:)\]}]$/.test(url)
+){
+
+punctuation=
+url.slice(-1)+
+punctuation;
+
+url=url.slice(0,-1);
+
+}
+
+const isImage=
+settings.imageLinks &&
+isImageUrl(url);
+
+if(isImage){
+
+const img=
+document.createElement("img");
+
+img.className=
+"message-image";
+
+img.src=url;
+
+img.alt="Linked image";
+
+img.loading="lazy";
+
+img.onclick=()=>{
+openImage(url);
+};
+
+container.appendChild(img);
+
+}else{
+
+const link=
+document.createElement("a");
+
+link.className=
+"message-link";
+
+link.href=url;
+
+link.textContent=url;
+
+link.rel=
+"noopener noreferrer";
+
+if(settings.newTabLinks){
+
+link.target="_blank";
+
+}
+
+container.appendChild(link);
+
+}
+
+if(punctuation){
+
+container.appendChild(
+document.createTextNode(
+punctuation
+)
+);
+
+}
+
+last=
+match.index+
+match[0].length;
+
+}
+
+const after=
+text.slice(last);
+
+if(after){
+
+container.appendChild(
+document.createTextNode(after)
+);
+
+}
+
+return container;
+
+}
 
 
-    contextMenu.style.top=
-        Math.min(
-            y,
-            window.innerHeight-100
-        )+"px";
+function isImageUrl(url){
+
+return /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?.*)?$/i
+.test(url);
+
+}
 
 
-    contextMenu.classList.add(
-        "show"
-    );
+/* CONTEXT MENU */
+
+function showContextMenu(
+x,
+y,
+message
+){
+
+selectedMessage=message;
+
+contextMenu.style.left=
+Math.min(
+x,
+window.innerWidth-170
+)+"px";
+
+contextMenu.style.top=
+Math.min(
+y,
+window.innerHeight-100
+)+"px";
+
+contextMenu.classList.add("show");
 
 }
 
 
 document.addEventListener(
-    "click",
-    ()=>{
-        contextMenu.classList.remove(
-            "show"
-        );
-    }
+"click",
+()=>{
+contextMenu.classList.remove("show");
+}
 );
 
 
-/* =========================================================
-   EDIT
-========================================================= */
+/* EDIT */
 
-editMessageBtn.onclick=async event=>{
+editMessageBtn.onclick=
+async event=>{
 
-    event.stopPropagation();
+event.stopPropagation();
 
-    contextMenu.classList.remove(
-        "show"
-    );
+contextMenu.classList.remove("show");
 
+if(!selectedMessage)
+return;
 
-    if(!selectedMessage){
-        return;
-    }
+const newText=
+prompt(
+"Edit message:",
+selectedMessage.message||""
+);
 
+if(newText===null)
+return;
 
-    const newText=
-        prompt(
-            "Edit message:",
-            selectedMessage.message||""
-        );
+try{
 
+const response=
+await fetch(
+API_URL,
+{
 
-    if(newText===null){
-        return;
-    }
+method:"PATCH",
 
+headers:{
+"Content-Type":
+"application/json"
+},
 
-    try{
+body:JSON.stringify({
 
-        const response=
-            await fetch(
-                API_URL,
-                {
-                    method:"PATCH",
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-                    body:JSON.stringify({
+id:selectedMessage.id,
 
-                        id:
-                            selectedMessage.id,
+device_id:deviceId,
 
-                        device_id:
-                            deviceId,
+message:newText.trim()
 
-                        message:
-                            newText.trim()
+})
 
-                    })
-                }
-            );
+});
 
+const data=
+await response.json();
 
-        const data=
-            await response.json();
+if(!response.ok){
 
+throw new Error(
+data.error||
+"Failed to edit message."
+);
 
-        if(!response.ok){
+}
 
-            throw new Error(
-                data.error||
-                "Failed to edit message."
-            );
+await loadMessages();
 
-        }
+}catch(error){
 
+alert(
+"Failed to edit:\n\n"+
+error.message
+);
 
-        await loadMessages();
-
-
-    }catch(error){
-
-        alert(
-            "Failed to edit:\n\n"+
-            error.message
-        );
-
-    }
+}
 
 };
 
 
-/* =========================================================
-   DELETE OWN MESSAGE
-========================================================= */
+/* DELETE */
 
-deleteMessageBtn.onclick=event=>{
+deleteMessageBtn.onclick=
+event=>{
 
-    event.stopPropagation();
+event.stopPropagation();
 
-    contextMenu.classList.remove(
-        "show"
-    );
+contextMenu.classList.remove(
+"show"
+);
 
+if(!selectedMessage)
+return;
 
-    if(!selectedMessage){
-        return;
-    }
+if(settings.confirmDelete){
 
+openConfirm(
+"Delete message?",
+"This message will be permanently removed.",
+deleteSelectedMessage
+);
 
-    if(settings.confirmDelete){
+}else{
 
-        openConfirm(
-            "Delete message?",
-            "This message will be permanently removed.",
-            deleteSelectedMessage
-        );
+deleteSelectedMessage();
 
-    }else{
-
-        deleteSelectedMessage();
-
-    }
+}
 
 };
 
 
 async function deleteSelectedMessage(){
 
-    if(!selectedMessage){
-        return;
-    }
+if(!selectedMessage)
+return;
 
+try{
 
-    try{
+const response=
+await fetch(
+API_URL,
+{
 
-        const response=
-            await fetch(
-                API_URL,
-                {
-                    method:"DELETE",
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-                    body:JSON.stringify({
+method:"DELETE",
 
-                        id:
-                            selectedMessage.id,
+headers:{
+"Content-Type":
+"application/json"
+},
 
-                        device_id:
-                            deviceId
+body:JSON.stringify({
 
-                    })
-                }
-            );
+id:selectedMessage.id,
 
+device_id:deviceId
 
-        const data=
-            await response.json();
+})
 
+});
 
-        if(!response.ok){
+const data=
+await response.json();
 
-            throw new Error(
-                data.error||
-                "Failed to delete message."
-            );
+if(!response.ok){
 
-        }
+throw new Error(
+data.error||
+"Failed to delete message."
+);
 
+}
 
-        selectedMessage=null;
+selectedMessage=null;
 
-        await loadMessages();
+await loadMessages();
 
+}catch(error){
 
-    }catch(error){
+alert(
+"Failed to delete:\n\n"+
+error.message
+);
 
-        alert(
-            "Failed to delete:\n\n"+
-            error.message
-        );
-
-    }
+}
 
 }
 
 
-/* =========================================================
-   IMAGE VIEWER
-========================================================= */
+/* IMAGE VIEWER */
 
 function openImage(src){
 
-    fullImage.src=src;
+fullImage.src=src;
 
-    imageViewer.classList.add(
-        "show"
-    );
+imageViewer.classList.add(
+"show"
+);
 
 }
 
 
 function closeImage(){
 
-    imageViewer.classList.remove(
-        "show"
-    );
+imageViewer.classList.remove(
+"show"
+);
 
-    fullImage.src="";
+fullImage.src="";
 
 }
 
@@ -3847,389 +3450,302 @@ backImage.onclick=closeImage;
 
 imageViewer.onclick=event=>{
 
-    if(event.target===imageViewer){
+if(event.target===imageViewer){
 
-        closeImage();
+closeImage();
 
-    }
+}
 
 };
 
 
 document.addEventListener(
-    "keydown",
-    event=>{
+"keydown",
+event=>{
 
-        if(
-            event.key==="Escape" &&
-            imageViewer.classList.contains(
-                "show"
-            )
-        ){
-
-            closeImage();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   CONFIRM DIALOG
-========================================================= */
-
-function openConfirm(
-    title,
-    text,
-    callback
+if(
+event.key==="Escape" &&
+imageViewer.classList.contains("show")
 ){
 
-    dialogTitle.textContent=title;
+closeImage();
 
-    dialogText.textContent=text;
+}
 
-    confirmCallback=callback;
+});
 
-    dialogOverlay.classList.add(
-        "show"
-    );
+
+/* CONFIRM */
+
+function openConfirm(
+title,
+text,
+callback
+){
+
+dialogTitle.textContent=
+title;
+
+dialogText.textContent=
+text;
+
+confirmCallback=
+callback;
+
+dialogOverlay.classList.add(
+"show"
+);
 
 }
 
 
 dialogCancel.onclick=()=>{
 
-    dialogOverlay.classList.remove(
-        "show"
-    );
+dialogOverlay.classList.remove(
+"show"
+);
 
-    confirmCallback=null;
-
-};
-
-
-dialogConfirm.onclick=async()=>{
-
-    const callback=
-        confirmCallback;
-
-    dialogOverlay.classList.remove(
-        "show"
-    );
-
-    confirmCallback=null;
-
-    if(callback){
-
-        await callback();
-
-    }
+confirmCallback=null;
 
 };
 
 
-/* =========================================================
-   WIPE EVERYTHING
-========================================================= */
+dialogConfirm.onclick=
+async()=>{
+
+const callback=
+confirmCallback;
+
+dialogOverlay.classList.remove(
+"show"
+);
+
+confirmCallback=null;
+
+if(callback){
+
+await callback();
+
+}
+
+};
+
+
+/* REMOVE EVERYTHING */
 
 removeEverything.onclick=()=>{
 
-    openConfirm(
-        "Remove everything?",
-        "This will permanently remove every message and image from the chat for EVERYONE.",
-        ()=>{
-            openConfirm(
-                "I know",
-                "You understand that the entire chat history will be deleted.",
-                ()=>{
-                    openConfirm(
-                        "Are you ultra sure?",
-                        "Last warning: every stored message will be permanently removed.",
-                        permanentlyDeleteEverything
-                    );
-                }
-            );
-        }
-    );
+openConfirm(
+"Remove everything?",
+"This will permanently remove every message and image from the chat for EVERYONE.",
+()=>{
+
+openConfirm(
+"I know",
+"You understand that the entire chat history will be deleted.",
+()=>{
+
+openConfirm(
+"Are you ultra sure?",
+"Every stored message will be permanently removed.",
+permanentlyDeleteEverything
+);
+
+});
+
+}
+);
 
 };
 
 
 async function permanentlyDeleteEverything(){
 
-    try{
+try{
 
-        const response=
-            await fetch(
-                API_URL,
-                {
-                    method:"DELETE",
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-                    body:JSON.stringify({
-                        delete_all:true
-                    })
-                }
-            );
+const response=
+await fetch(
+API_URL,
+{
 
+method:"DELETE",
 
-        const data=
-            await response.json();
+headers:{
+"Content-Type":
+"application/json"
+},
 
+body:JSON.stringify({
+delete_all:true
+})
 
-        if(!response.ok){
+});
 
-            throw new Error(
-                data.error||
-                "Failed to remove everything."
-            );
+const data=
+await response.json();
 
-        }
+if(!response.ok){
 
+throw new Error(
+data.error||
+"Failed to remove everything."
+);
 
-        currentMessages=[];
+}
 
-        knownMessageIds.clear();
+currentMessages=[];
 
-        renderMessages();
+renderMessages();
 
+alert(
+"The entire chat has been wiped."
+);
 
-        showToast(
-            "Chat wiped",
-            "The entire chat has been removed for everyone."
-        );
+}catch(error){
 
+alert(
+"Failed to wipe chat:\n\n"+
+error.message
+);
 
-    }catch(error){
-
-        alert(
-            "Failed to wipe chat:\n\n"+
-            error.message
-        );
-
-    }
+}
 
 }
 
 
-/* =========================================================
-   REFRESH
-========================================================= */
+/* REFRESH */
 
 function startRefreshTimer(){
 
-    if(refreshTimer){
+if(refreshTimer){
 
-        clearInterval(
-            refreshTimer
-        );
+clearInterval(refreshTimer);
 
-    }
+}
 
-
-    refreshTimer=
-        setInterval(
-            loadMessages,
-            Number(
-                settings.refreshRate
-            )
-        );
+refreshTimer=
+setInterval(
+loadMessages,
+Number(settings.refreshRate)
+);
 
 }
 
 
-/* =========================================================
-   SEARCH
-========================================================= */
-
-searchBtn.onclick=()=>{
-
-    searchBox.classList.toggle(
-        "show"
-    );
-
-    if(
-        searchBox.classList.contains(
-            "show"
-        )
-    ){
-
-        searchInput.focus();
-
-    }else{
-
-        searchInput.value="";
-
-        renderMessages();
-
-    }
-
-};
-
-
-searchInput.addEventListener(
-    "input",
-    renderMessages
-);
-
-
-/* =========================================================
-   NEW MESSAGE BUTTON
-========================================================= */
-
-messagesEl.addEventListener(
-    "scroll",
-    ()=>{
-
-        const atBottom=
-            messagesEl.scrollHeight-
-            messagesEl.scrollTop-
-            messagesEl.clientHeight<
-            100;
-
-
-        newMessageBtn.classList.toggle(
-            "show",
-            !atBottom &&
-            settings.showNewMessageButton
-        );
-
-    }
-);
-
-
-newMessageBtn.onclick=()=>{
-
-    messagesEl.scrollTo({
-        top:messagesEl.scrollHeight,
-        behavior:"smooth"
-    });
-
-};
-
-
-/* =========================================================
-   PAGE VISIBILITY
-========================================================= */
-
-document.addEventListener(
-    "visibilitychange",
-    ()=>{
-
-        /*
-         * When returning to the chat, refresh
-         * immediately so the user sees the newest
-         * messages.
-         */
-
-        if(
-            document.visibilityState==="visible"
-        ){
-
-            loadMessages();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   ONLINE/OFFLINE
-========================================================= */
-
-window.addEventListener(
-    "online",
-    ()=>{
-        setConnection(true);
-        loadMessages();
-    }
-);
-
-
-window.addEventListener(
-    "offline",
-    ()=>{
-        setConnection(false);
-    }
-);
-
-
-/* =========================================================
-   HELPERS
-========================================================= */
+/* TIME */
 
 function formatTime(date){
 
-    if(!date){
-        return "";
-    }
+if(!date)
+return "";
 
+const d=
+new Date(date);
 
-    const parsed=
-        new Date(date);
+if(settings.timestampFormat==="full"){
 
-
-    if(
-        Number.isNaN(
-            parsed.getTime()
-        )
-    ){
-
-        return "";
-
-    }
-
-
-    return parsed.toLocaleTimeString(
-        [],
-        {
-            hour:"2-digit",
-            minute:"2-digit"
-        }
-    );
+return d.toLocaleString();
 
 }
 
+if(settings.timestampFormat==="seconds"){
+
+return d.toLocaleTimeString(
+[],
+{
+hour:"2-digit",
+minute:"2-digit",
+second:"2-digit"
+}
+);
+
+}
+
+return d.toLocaleTimeString(
+[],
+{
+hour:"2-digit",
+minute:"2-digit"
+}
+);
+
+}
+
+
+/* ESCAPE */
 
 function escapeHtml(value){
 
-    return String(value)
-
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-
-        .replaceAll(
-            "'",
-            "&#039;"
-        );
+return String(value)
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
 
 }
 
 
-/* =========================================================
-   START
-========================================================= */
+/*
+IMPORTANT:
+Audio must be unlocked by a user interaction
+because browsers block autoplay.
+*/
+
+document.addEventListener(
+"click",
+()=>{
+
+try{
+
+if(audioContext &&
+audioContext.state==="suspended"
+){
+
+audioContext.resume();
+
+}
+
+}catch(e){}
+
+},
+{passive:true}
+);
+
+
+/*
+Register service worker if you create /sw.js.
+
+This is required for real background
+push notifications when the page is closed.
+*/
+
+if("serviceWorker" in navigator){
+
+window.addEventListener(
+"load",
+()=>{
+
+navigator.serviceWorker
+.register("/sw.js")
+.then(
+()=>console.log(
+"Service worker registered."
+)
+)
+.catch(
+error=>console.warn(
+"Service worker registration failed:",
+error
+)
+);
+
+});
+
+}
+
+
+/* START */
 
 loadSettingsUI();
 
