@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="theme-color" content="#0b0d12">
+<meta name="theme-color" content="#0b0905">
 
 <title>MyChat</title>
 
@@ -14,17 +14,23 @@
 }
 
 :root{
-    --bg:#080a0f;
-    --panel:#0d1017;
-    --panel2:#11151d;
-    --panel3:#171b24;
-    --border:rgba(255,255,255,.07);
-    --text:#f5f7fb;
-    --muted:#858c9a;
-    --accent:#6d7cff;
-    --accent2:#8b5cf6;
-    --green:#43e08b;
-    --danger:#ff5d6c;
+    --bg:#0b0905;
+    --bg2:#100d08;
+    --panel:#151109;
+    --panel2:#1b160c;
+    --panel3:#211a0d;
+
+    --gold:#d6a84f;
+    --gold2:#f0c96a;
+    --gold-dark:#8c692b;
+
+    --text:#f1e8d2;
+    --muted:#91846d;
+
+    --border:rgba(214,168,79,.14);
+
+    --danger:#d95b52;
+    --green:#62c783;
 }
 
 html,
@@ -35,254 +41,317 @@ body{
 }
 
 body{
-    background:
-        radial-gradient(
-            circle at 20% 0%,
-            rgba(109,124,255,.09),
-            transparent 35%
-        ),
-        radial-gradient(
-            circle at 100% 100%,
-            rgba(139,92,246,.07),
-            transparent 35%
-        ),
-        var(--bg);
 
     color:var(--text);
 
     font-family:
         Inter,
-        ui-sans-serif,
         system-ui,
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
         sans-serif;
 
+    background:
+        radial-gradient(
+            circle at 50% -20%,
+            rgba(214,168,79,.10),
+            transparent 45%
+        ),
+        linear-gradient(
+            135deg,
+            #090704,
+            #110d07 50%,
+            #080704
+        );
+
     overflow:hidden;
 }
 
 
-/* ========================================
+/* =========================================
    APP
-======================================== */
+========================================= */
 
 .app{
     width:100%;
     height:100%;
+
     display:flex;
 }
 
 
-/* ========================================
+/* =========================================
    SIDEBAR
-======================================== */
+========================================= */
 
 .sidebar{
-    width:270px;
+
+    width:275px;
     height:100%;
 
-    background:
-        linear-gradient(
-            180deg,
-            rgba(18,21,29,.98),
-            rgba(9,11,16,.98)
-        );
-
-    border-right:1px solid var(--border);
+    flex-shrink:0;
 
     display:flex;
     flex-direction:column;
 
-    padding:20px;
+    padding:20px 15px;
 
-    flex-shrink:0;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(24,19,11,.98),
+            rgba(11,9,5,.98)
+        );
+
+    border-right:
+        1px solid
+        var(--border);
+
+    box-shadow:
+        8px 0 40px
+        rgba(0,0,0,.25);
+
 }
 
 
 /* BRAND */
 
 .brand{
+
     display:flex;
     align-items:center;
+
     gap:12px;
 
-    padding:8px 4px 25px;
+    padding:
+        5px
+        8px
+        24px;
+
 }
 
 .brand-icon{
-    width:42px;
-    height:42px;
+
+    width:45px;
+    height:45px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
     border-radius:13px;
 
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    color:#160f04;
 
-    font-size:19px;
-    font-weight:900;
+    font-weight:1000;
+    font-size:20px;
 
     background:
         linear-gradient(
-            135deg,
-            var(--accent),
-            var(--accent2)
+            145deg,
+            var(--gold2),
+            var(--gold)
         );
 
     box-shadow:
-        0 8px 30px
-        rgba(109,124,255,.28);
+        0 7px 25px
+        rgba(214,168,79,.18);
+
 }
 
 .brand-name{
+
+    font-weight:900;
     font-size:18px;
-    font-weight:800;
-    letter-spacing:-.4px;
+
+    color:#f0dfb8;
+
 }
 
 .brand-sub{
-    font-size:11px;
-    color:var(--muted);
-    margin-top:2px;
-}
 
-
-/* CHANNEL SECTION */
-
-.section-title{
-    color:#666d7b;
+    color:#766a54;
     font-size:10px;
-    font-weight:800;
+
+    margin-top:2px;
 
     text-transform:uppercase;
-    letter-spacing:1.3px;
+    letter-spacing:1px;
 
-    margin:
-        5px 5px
-        10px;
 }
 
+
+/* CHANNEL TITLE */
+
+.section-title{
+
+    padding:
+        0
+        8px
+        9px;
+
+    color:#665b49;
+
+    font-size:10px;
+    font-weight:900;
+
+    text-transform:uppercase;
+
+    letter-spacing:1.5px;
+
+}
+
+
+/* CHANNEL */
+
 .channel{
-    width:100%;
 
     display:flex;
     align-items:center;
 
     gap:10px;
 
-    padding:11px 12px;
+    padding:
+        11px
+        12px;
 
-    border-radius:10px;
+    border-radius:9px;
 
-    color:#9da4b1;
+    color:#9b8e77;
 
     cursor:pointer;
 
     transition:
-        background .18s,
-        color .18s,
-        transform .18s;
+        .2s ease;
 
-    user-select:none;
 }
 
 .channel:hover{
-    background:rgba(255,255,255,.045);
-    color:white;
+
+    color:#ead9b5;
+
+    background:
+        rgba(214,168,79,.06);
+
 }
 
 .channel.active{
+
+    color:
+        var(--gold2);
+
     background:
         linear-gradient(
             90deg,
-            rgba(109,124,255,.18),
-            rgba(109,124,255,.06)
+            rgba(214,168,79,.14),
+            rgba(214,168,79,.04)
         );
 
-    color:white;
-
     box-shadow:
-        inset 2px 0 0 var(--accent);
+        inset 2px 0
+        var(--gold);
+
 }
 
 .channel-hash{
-    font-size:20px;
-    color:#707786;
-    line-height:0;
+
+    font-size:19px;
+    color:#796a51;
+
 }
 
 .channel.active .channel-hash{
-    color:#8794ff;
-}
 
-.channel-name{
-    font-size:14px;
-    font-weight:600;
+    color:var(--gold);
+
 }
 
 
 /* SIDEBAR BOTTOM */
 
 .sidebar-bottom{
+
     margin-top:auto;
 
     padding-top:15px;
 
-    border-top:1px solid var(--border);
+    border-top:
+        1px solid
+        var(--border);
+
 }
+
 
 .profile{
+
     display:flex;
     align-items:center;
+
     gap:10px;
 
-    padding:9px;
+    padding:8px;
+
 }
 
+
 .avatar{
+
     width:38px;
     height:38px;
 
-    border-radius:12px;
-
     display:flex;
-    justify-content:center;
     align-items:center;
+    justify-content:center;
 
-    font-weight:800;
-    font-size:13px;
+    border-radius:11px;
+
+    color:#171005;
+
+    font-weight:900;
 
     background:
         linear-gradient(
             135deg,
-            #6675ff,
-            #925cff
+            var(--gold2),
+            var(--gold-dark)
         );
+
 }
 
+
 .profile-name{
-    font-size:13px;
-    font-weight:700;
+
+    max-width:160px;
 
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
+
+    font-size:13px;
+    font-weight:800;
+
+    color:#e8d8b7;
+
 }
+
 
 .profile-status{
+
     display:flex;
     align-items:center;
+
     gap:5px;
 
-    color:#727987;
+    color:#706651;
 
-    font-size:11px;
+    font-size:10px;
 
-    margin-top:2px;
 }
 
+
 .profile-dot{
+
     width:6px;
     height:6px;
 
@@ -290,331 +359,461 @@ body{
 
     background:var(--green);
 
-    box-shadow:
-        0 0 8px
-        rgba(67,224,139,.7);
 }
 
 
-/* ========================================
-   CHAT AREA
-======================================== */
+/* SETTINGS */
+
+.settings-button{
+
+    margin-top:7px;
+
+    width:100%;
+
+    border:0;
+
+    padding:10px;
+
+    border-radius:9px;
+
+    background:
+        rgba(255,255,255,.025);
+
+    color:#81755f;
+
+    text-align:left;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.settings-button:hover{
+
+    color:var(--gold2);
+
+    background:
+        rgba(214,168,79,.07);
+
+}
+
+
+/* =========================================
+   CHAT
+========================================= */
 
 .chat{
-    min-width:0;
+
     flex:1;
+    min-width:0;
 
     display:flex;
     flex-direction:column;
 
-    position:relative;
 }
 
 
 /* HEADER */
 
 .header{
+
     height:70px;
+
+    flex-shrink:0;
 
     display:flex;
     align-items:center;
 
-    padding:0 25px;
+    padding:
+        0 25px;
 
     background:
-        rgba(13,16,23,.82);
+        rgba(15,12,7,.84);
 
     backdrop-filter:
         blur(18px);
 
     border-bottom:
-        1px solid var(--border);
+        1px solid
+        var(--border);
 
-    flex-shrink:0;
-
-    z-index:10;
 }
 
+
 .header-left{
+
     display:flex;
     align-items:center;
-    gap:12px;
+
+    gap:10px;
+
 }
 
 .header-hash{
-    font-size:27px;
-    font-weight:300;
 
-    color:#6e7582;
+    color:
+        var(--gold-dark);
+
+    font-size:27px;
+
 }
 
 .header-channel{
+
+    color:
+        #eadab9;
+
+    font-weight:900;
     font-size:15px;
-    font-weight:800;
+
 }
 
 .header-description{
-    color:#626a78;
-    font-size:12px;
 
-    margin-left:7px;
+    color:#665c4c;
+
+    font-size:11px;
+
+    margin-left:5px;
 
     padding-left:12px;
 
     border-left:
-        1px solid var(--border);
+        1px solid
+        var(--border);
+
 }
 
 
-/* CONNECTION */
+/* STATUS */
 
 .connection{
+
     margin-left:auto;
 
     display:flex;
     align-items:center;
-    gap:8px;
 
-    padding:8px 11px;
+    gap:7px;
 
-    border:
-        1px solid var(--border);
+    color:#756a55;
 
-    background:
-        rgba(255,255,255,.025);
+    font-size:10px;
 
-    border-radius:10px;
-
-    color:#8b929f;
-
-    font-size:11px;
 }
 
 .connection-dot{
+
     width:7px;
     height:7px;
 
     border-radius:50%;
 
-    background:#777;
+    background:#716957;
+
 }
 
 .connection.connected .connection-dot{
+
     background:var(--green);
 
     box-shadow:
-        0 0 10px
-        rgba(67,224,139,.7);
+        0 0 9px
+        rgba(98,199,131,.5);
+
 }
 
 .connection.error .connection-dot{
+
     background:var(--danger);
+
 }
 
 
-/* ========================================
+/* =========================================
    MESSAGES
-======================================== */
+========================================= */
 
 .messages{
+
     flex:1;
 
     overflow-y:auto;
 
     padding:
-        25px
+        28px
         clamp(15px,4vw,70px)
-        30px;
+        25px;
 
     scroll-behavior:smooth;
+
 }
 
 
-/* SCROLLBAR */
+/* scrollbar */
 
 .messages::-webkit-scrollbar{
-    width:7px;
-}
 
-.messages::-webkit-scrollbar-track{
-    background:transparent;
+    width:6px;
+
 }
 
 .messages::-webkit-scrollbar-thumb{
-    background:#252a35;
+
+    background:#332915;
+
     border-radius:20px;
-}
 
-.messages::-webkit-scrollbar-thumb:hover{
-    background:#323846;
 }
 
 
-/* MESSAGE */
+/* message */
 
 .message{
-    display:flex;
-
-    gap:13px;
 
     max-width:900px;
 
     margin:
         0 auto
-        20px;
+        18px;
+
+    display:flex;
+
+    gap:12px;
 
     animation:
         messageIn
         .25s
         ease;
+
 }
+
 
 @keyframes messageIn{
 
     from{
+
         opacity:0;
-        transform:translateY(6px);
+        transform:
+            translateY(8px);
+
     }
 
     to{
+
         opacity:1;
-        transform:translateY(0);
+        transform:
+            translateY(0);
+
     }
 
 }
 
+
 .message-avatar{
-    width:40px;
-    height:40px;
+
+    width:39px;
+    height:39px;
 
     flex-shrink:0;
-
-    border-radius:12px;
 
     display:flex;
     align-items:center;
     justify-content:center;
 
-    font-size:13px;
-    font-weight:800;
+    border-radius:11px;
+
+    color:#1b1205;
+
+    font-weight:900;
 
     background:
         linear-gradient(
-            135deg,
-            #6675ff,
-            #925cff
+            145deg,
+            var(--gold2),
+            var(--gold-dark)
         );
 
-    box-shadow:
-        0 5px 18px
-        rgba(0,0,0,.25);
 }
+
 
 .message-content{
+
     min-width:0;
+
 }
 
+
 .message-meta{
+
     display:flex;
     align-items:baseline;
 
     gap:8px;
 
-    margin-bottom:4px;
+    margin-bottom:3px;
+
 }
+
 
 .message-user{
-    font-size:14px;
-    font-weight:800;
+
+    color:#e8d5ad;
+
+    font-size:13px;
+    font-weight:900;
+
 }
+
 
 .message-time{
-    color:#555c69;
-    font-size:10px;
+
+    color:#514937;
+
+    font-size:9px;
+
 }
+
 
 .message-text{
-    color:#d7dae1;
 
-    font-size:14px;
+    color:#c9bda5;
 
-    line-height:1.6;
+    font-size:13px;
+
+    line-height:1.65;
 
     white-space:pre-wrap;
+
     overflow-wrap:anywhere;
+
 }
 
 
-/* EMPTY */
+/* IMAGE */
 
-.empty{
-    height:100%;
+.message-image{
 
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    display:block;
 
-    text-align:center;
+    max-width:
+        min(520px,80vw);
 
-    color:#737a88;
-}
+    max-height:500px;
 
-.empty-icon{
-    width:70px;
-    height:70px;
+    margin-top:9px;
 
-    border-radius:22px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    margin:
-        0 auto
-        18px;
-
-    font-size:32px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(109,124,255,.15),
-            rgba(139,92,246,.12)
-        );
+    border-radius:10px;
 
     border:
         1px solid
-        rgba(109,124,255,.15);
+        rgba(214,168,79,.16);
+
+    box-shadow:
+        0 12px 35px
+        rgba(0,0,0,.35);
+
+    cursor:pointer;
+
+    transition:
+        transform .2s,
+        box-shadow .2s;
+
+}
+
+.message-image:hover{
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 16px 45px
+        rgba(0,0,0,.5);
+
+}
+
+
+/* =========================================
+   EMPTY
+========================================= */
+
+.empty{
+
+    height:100%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    text-align:center;
+
+}
+
+.empty-icon{
+
+    width:65px;
+    height:65px;
+
+    margin:
+        0 auto
+        15px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:18px;
+
+    color:var(--gold);
+
+    background:
+        rgba(214,168,79,.07);
+
+    border:
+        1px solid
+        rgba(214,168,79,.13);
+
+    font-size:28px;
+
 }
 
 .empty-title{
-    color:#e7e9ef;
-    font-size:17px;
-    font-weight:800;
 
-    margin-bottom:6px;
+    color:#d9c9a7;
+
+    font-size:16px;
+    font-weight:900;
+
 }
 
 .empty-text{
-    font-size:12px;
-    color:#686f7d;
+
+    color:#655b4b;
+
+    margin-top:6px;
+
+    font-size:11px;
+
 }
 
 
-/* ========================================
+/* =========================================
    COMPOSER
-======================================== */
+========================================= */
 
 .composer{
-    padding:
-        10px
-        clamp(15px,4vw,70px)
-        22px;
 
-    flex-shrink:0;
+    padding:
+        8px
+        clamp(15px,4vw,70px)
+        20px;
+
 }
 
+
 .composer-inner{
+
     max-width:900px;
 
     margin:auto;
@@ -622,152 +821,290 @@ body{
     display:flex;
     align-items:flex-end;
 
-    padding:6px;
+    gap:4px;
+
+    padding:5px;
 
     border:
         1px solid
-        rgba(255,255,255,.08);
+        rgba(214,168,79,.13);
 
     background:
-        rgba(24,28,37,.9);
+        rgba(24,19,11,.95);
 
-    border-radius:16px;
+    border-radius:14px;
 
     box-shadow:
-        0 15px 50px
+        0 15px 45px
         rgba(0,0,0,.25);
 
     transition:
-        border .2s,
-        box-shadow .2s;
+        .2s;
+
 }
 
 .composer-inner:focus-within{
+
     border-color:
-        rgba(109,124,255,.4);
+        rgba(214,168,79,.35);
 
     box-shadow:
-        0 15px 50px
+        0 15px 45px
         rgba(0,0,0,.3),
         0 0 0 3px
-        rgba(109,124,255,.06);
+        rgba(214,168,79,.035);
+
 }
 
-textarea{
-    flex:1;
 
-    min-height:44px;
-    max-height:150px;
+/* ATTACH */
 
-    resize:none;
+.attach{
+
+    width:43px;
+    height:43px;
 
     border:0;
-    outline:0;
+
+    border-radius:10px;
 
     background:transparent;
 
-    color:white;
+    color:#766a54;
+
+    cursor:pointer;
+
+    font-size:19px;
+
+    transition:.2s;
+
+}
+
+.attach:hover{
+
+    color:var(--gold2);
+
+    background:
+        rgba(214,168,79,.07);
+
+}
+
+
+/* TEXTAREA */
+
+textarea{
+
+    flex:1;
+
+    min-height:43px;
+    max-height:140px;
+
+    resize:none;
+
+    outline:0;
+    border:0;
+
+    background:transparent;
+
+    color:#e7dcc5;
 
     padding:
         12px
-        13px;
+        8px;
 
     font:
         inherit;
 
-    font-size:14px;
+    font-size:13px;
+
 }
 
 textarea::placeholder{
-    color:#666d7b;
+
+    color:#5f5545;
+
 }
 
+
+/* SEND */
+
 .send{
-    width:44px;
-    height:44px;
+
+    width:43px;
+    height:43px;
 
     border:0;
 
-    border-radius:12px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    border-radius:10px;
 
     background:
         linear-gradient(
-            135deg,
-            var(--accent),
-            var(--accent2)
+            145deg,
+            var(--gold2),
+            var(--gold)
         );
 
-    color:white;
+    color:#1a1003;
+
+    font-weight:1000;
 
     cursor:pointer;
 
     transition:
-        transform .15s,
-        filter .15s;
+        .18s;
 
-    font-size:18px;
 }
 
 .send:hover{
-    filter:brightness(1.12);
-    transform:translateY(-1px);
+
+    transform:
+        translateY(-1px);
+
+    filter:brightness(1.08);
+
 }
 
 .send:active{
-    transform:scale(.95);
+
+    transform:
+        scale(.94);
+
 }
 
 .send:disabled{
-    opacity:.4;
+
+    opacity:.35;
+
     cursor:not-allowed;
+
 }
 
 
-/* ========================================
-   LOGIN
-======================================== */
+/* =========================================
+   IMAGE PREVIEW
+========================================= */
 
-.login{
-    position:fixed;
-    inset:0;
+.image-preview{
 
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    max-width:900px;
 
-    background:
-        radial-gradient(
-            circle at 50% 30%,
-            rgba(109,124,255,.12),
-            transparent 40%
-        ),
-        #07090d;
+    margin:
+        0 auto
+        8px;
 
-    z-index:1000;
-}
+    display:none;
 
-.login-box{
-    width:430px;
-    max-width:
-        calc(100% - 30px);
-
-    padding:38px;
+    padding:8px;
 
     border:
         1px solid
-        rgba(255,255,255,.08);
-
-    border-radius:24px;
+        var(--border);
 
     background:
-        rgba(17,20,28,.88);
+        rgba(25,20,12,.9);
 
-    backdrop-filter:
-        blur(25px);
+    border-radius:10px;
+
+}
+
+.preview-image{
+
+    width:80px;
+    height:80px;
+
+    object-fit:cover;
+
+    border-radius:7px;
+
+}
+
+.preview-info{
+
+    flex:1;
+
+    padding-left:10px;
+
+}
+
+.preview-name{
+
+    color:#d9c8a5;
+
+    font-size:11px;
+    font-weight:800;
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+}
+
+.preview-size{
+
+    color:#665b4a;
+
+    font-size:10px;
+
+    margin-top:4px;
+
+}
+
+.preview-remove{
+
+    border:0;
+
+    background:transparent;
+
+    color:#765e50;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+}
+
+
+/* =========================================
+   LOGIN
+========================================= */
+
+.login{
+
+    position:fixed;
+    inset:0;
+
+    z-index:1000;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(214,168,79,.10),
+            transparent 40%
+        ),
+        #080604;
+
+}
+
+
+.login-box{
+
+    width:420px;
+    max-width:
+        calc(100% - 30px);
+
+    padding:36px;
+
+    border:
+        1px solid
+        rgba(214,168,79,.15);
+
+    border-radius:20px;
+
+    background:
+        rgba(21,17,10,.94);
 
     box-shadow:
         0 30px 100px
@@ -775,9 +1112,11 @@ textarea::placeholder{
 
     animation:
         loginIn
-        .35s
+        .3s
         ease;
+
 }
+
 
 @keyframes loginIn{
 
@@ -797,139 +1136,313 @@ textarea::placeholder{
 
 }
 
-.login-logo{
-    width:60px;
-    height:60px;
 
-    border-radius:19px;
+.login-logo{
+
+    width:58px;
+    height:58px;
 
     display:flex;
     align-items:center;
     justify-content:center;
 
-    margin-bottom:22px;
+    border-radius:17px;
 
-    font-size:26px;
-    font-weight:900;
+    color:#1a1003;
+
+    font-weight:1000;
+    font-size:25px;
 
     background:
         linear-gradient(
-            135deg,
-            var(--accent),
-            var(--accent2)
+            145deg,
+            var(--gold2),
+            var(--gold)
         );
 
-    box-shadow:
-        0 12px 40px
-        rgba(109,124,255,.3);
+    margin-bottom:20px;
+
 }
+
 
 .login-title{
-    font-size:28px;
-    font-weight:900;
 
-    letter-spacing:-1px;
+    color:#ead9b6;
 
-    margin-bottom:8px;
+    font-size:27px;
+    font-weight:1000;
+
 }
 
-.login-description{
-    color:#818895;
 
-    font-size:13px;
+.login-description{
+
+    color:#756b58;
+
+    font-size:12px;
 
     line-height:1.6;
 
-    margin-bottom:25px;
+    margin:
+        8px
+        0
+        23px;
+
 }
 
+
 .login-input{
+
     width:100%;
-    height:50px;
+    height:48px;
+
+    padding:
+        0 14px;
 
     border:
         1px solid
-        rgba(255,255,255,.08);
+        rgba(214,168,79,.12);
 
-    border-radius:12px;
-
-    background:#0b0e14;
-
-    color:white;
+    border-radius:10px;
 
     outline:0;
 
-    padding:0 15px;
+    background:#0d0a06;
 
-    font-size:14px;
+    color:#e9dcc1;
 
-    transition:
-        border .2s,
-        box-shadow .2s;
 }
+
 
 .login-input:focus{
-    border-color:
-        rgba(109,124,255,.6);
 
-    box-shadow:
-        0 0 0 3px
-        rgba(109,124,255,.08);
+    border-color:
+        rgba(214,168,79,.4);
+
 }
 
-.login-button{
-    width:100%;
-    height:50px;
 
-    margin-top:12px;
+.login-button{
+
+    width:100%;
+    height:48px;
+
+    margin-top:10px;
 
     border:0;
 
-    border-radius:12px;
+    border-radius:10px;
 
     background:
         linear-gradient(
-            135deg,
-            var(--accent),
-            var(--accent2)
+            145deg,
+            var(--gold2),
+            var(--gold)
         );
 
-    color:white;
+    color:#1a1003;
 
-    font-size:14px;
-    font-weight:800;
+    font-weight:900;
 
     cursor:pointer;
 
-    transition:
-        transform .15s,
-        filter .15s;
-}
-
-.login-button:hover{
-    filter:brightness(1.1);
-    transform:translateY(-1px);
-}
-
-.login-error{
-    color:var(--danger);
-    font-size:12px;
-    margin-top:12px;
 }
 
 
-/* ========================================
-   ERROR
-======================================== */
+/* =========================================
+   SETTINGS
+========================================= */
 
-.error-screen{
+.modal{
+
     position:fixed;
     inset:0;
 
+    z-index:1500;
+
     display:none;
 
-    justify-content:center;
     align-items:center;
+    justify-content:center;
+
+    padding:20px;
+
+    background:
+        rgba(0,0,0,.65);
+
+    backdrop-filter:
+        blur(10px);
+
+}
+
+
+.settings-box{
+
+    width:500px;
+    max-width:100%;
+
+    padding:25px;
+
+    border:
+        1px solid
+        rgba(214,168,79,.17);
+
+    border-radius:17px;
+
+    background:#151109;
+
+    box-shadow:
+        0 30px 100px
+        rgba(0,0,0,.5);
+
+}
+
+
+.settings-header{
+
+    display:flex;
+    align-items:center;
+
+    justify-content:space-between;
+
+    margin-bottom:20px;
+
+}
+
+
+.settings-title{
+
+    color:#e8d7b2;
+
+    font-size:20px;
+    font-weight:900;
+
+}
+
+
+.close{
+
+    width:34px;
+    height:34px;
+
+    border:0;
+
+    border-radius:8px;
+
+    background:
+        rgba(255,255,255,.04);
+
+    color:#83755d;
+
+    cursor:pointer;
+
+}
+
+
+.setting{
+
+    padding:
+        15px 0;
+
+    border-top:
+        1px solid
+        var(--border);
+
+}
+
+
+.setting-name{
+
+    color:#d9c8a7;
+
+    font-size:13px;
+    font-weight:800;
+
+}
+
+
+.setting-description{
+
+    color:#716651;
+
+    font-size:10px;
+
+    margin-top:4px;
+
+}
+
+
+.gold-toggle{
+
+    margin-top:10px;
+
+    width:45px;
+    height:24px;
+
+    border:0;
+
+    border-radius:20px;
+
+    background:#3b301e;
+
+    cursor:pointer;
+
+}
+
+
+.gold-toggle.active{
+
+    background:
+        var(--gold);
+
+}
+
+
+.gold-toggle::after{
+
+    content:"";
+
+    display:block;
+
+    width:18px;
+    height:18px;
+
+    margin:3px;
+
+    border-radius:50%;
+
+    background:#d7c7a8;
+
+    transition:.2s;
+
+}
+
+
+.gold-toggle.active::after{
+
+    transform:
+        translateX(21px);
+
+    background:#201405;
+
+}
+
+
+/* =========================================
+   ERROR
+========================================= */
+
+.error-screen{
+
+    position:fixed;
+    inset:0;
+
+    z-index:3000;
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
 
     padding:20px;
 
@@ -937,50 +1450,53 @@ textarea::placeholder{
         rgba(0,0,0,.8);
 
     backdrop-filter:
-        blur(12px);
+        blur(10px);
 
-    z-index:2000;
 }
 
+
 .error-box{
+
     width:700px;
     max-width:100%;
 
-    padding:28px;
+    padding:25px;
 
     border:
         1px solid
-        rgba(255,93,108,.3);
+        rgba(217,91,82,.3);
 
-    border-radius:18px;
+    border-radius:15px;
 
-    background:#11151d;
+    background:#15110c;
 
-    box-shadow:
-        0 30px 100px
-        rgba(0,0,0,.5);
 }
+
 
 .error-title{
-    color:#ff6877;
 
-    font-size:20px;
+    color:#e06b61;
+
+    font-size:18px;
     font-weight:900;
 
-    margin-bottom:15px;
+    margin-bottom:12px;
+
 }
 
+
 .error-code{
-    padding:15px;
 
-    background:#080a0e;
+    padding:14px;
 
-    border-radius:10px;
+    background:#090704;
 
-    color:#ff8a96;
+    border-radius:8px;
+
+    color:#d87a70;
 
     font:
-        12px/1.6
+        11px/1.6
         monospace;
 
     white-space:pre-wrap;
@@ -988,166 +1504,146 @@ textarea::placeholder{
     overflow:auto;
 
     max-height:250px;
+
 }
+
 
 .error-fix{
-    margin-top:15px;
 
-    color:#a6acb7;
-
-    font-size:12px;
-
-    line-height:1.7;
-
-    white-space:pre-wrap;
-}
-
-.error-buttons{
-    display:flex;
-    gap:8px;
-
-    margin-top:20px;
-}
-
-.error-button{
-    border:0;
-
-    padding:
-        10px
-        15px;
-
-    border-radius:9px;
-
-    background:#242936;
-
-    color:white;
-
-    cursor:pointer;
-}
-
-.error-button.primary{
-    background:var(--accent);
-}
-
-.copy-success{
-    color:var(--green);
+    color:#93866f;
 
     font-size:11px;
 
-    margin-top:10px;
+    line-height:1.6;
 
-    display:none;
+    margin-top:12px;
+
 }
 
 
-/* ========================================
+.error-buttons{
+
+    display:flex;
+
+    gap:7px;
+
+    margin-top:15px;
+
+}
+
+
+.error-button{
+
+    border:0;
+
+    border-radius:8px;
+
+    padding:
+        9px
+        13px;
+
+    background:#2a2216;
+
+    color:#cbbd9f;
+
+    cursor:pointer;
+
+}
+
+
+.error-button.primary{
+
+    background:
+        var(--gold);
+
+    color:#1b1002;
+
+}
+
+
+.hidden{
+
+    display:none!important;
+
+}
+
+
+/* =========================================
    MOBILE
-======================================== */
+========================================= */
 
 @media(max-width:700px){
 
     .sidebar{
-        width:72px;
-        padding:12px 8px;
+
+        width:66px;
+
+        padding:
+            12px 7px;
+
     }
 
     .brand{
+
         justify-content:center;
-        padding-bottom:18px;
+
     }
 
-    .brand-text{
-        display:none;
-    }
+    .brand-text,
+    .section-title,
+    .channel-name,
+    .sidebar-bottom{
 
-    .section-title{
         display:none;
+
     }
 
     .channel{
+
         justify-content:center;
-        padding:13px 5px;
-    }
 
-    .channel-name{
-        display:none;
-    }
-
-    .sidebar-bottom{
-        display:none;
     }
 
     .header{
-        height:62px;
-        padding:0 15px;
+
+        padding:
+            0 14px;
+
     }
 
     .header-description{
-        display:none;
-    }
 
-    .connection-text{
         display:none;
+
     }
 
     .messages{
+
         padding:
-            18px
-            12px
-            20px;
+            18px 12px;
+
     }
 
     .composer{
+
         padding:
-            8px
-            10px
-            12px;
+            7px 9px 12px;
+
     }
 
-    .message{
-        gap:9px;
-        margin-bottom:17px;
-    }
-
-    .message-avatar{
-        width:35px;
-        height:35px;
-        border-radius:10px;
-    }
-
-    .message-text{
-        font-size:13px;
-    }
-
-    .login-box{
-        padding:28px;
-    }
-
-}
-
-
-/* ========================================
-   HIDE
-======================================== */
-
-.hidden{
-    display:none!important;
 }
 
 </style>
 </head>
 
-
 <body>
 
 
-<!-- ========================================
+<!-- =========================================
      LOGIN
-======================================== -->
+========================================= -->
 
-<div
-    id="login"
-    class="login">
+<div id="login" class="login">
 
     <div class="login-box">
 
@@ -1160,8 +1656,7 @@ textarea::placeholder{
         </div>
 
         <div class="login-description">
-            Choose a username to join the conversation.
-            Your username will be saved on this device.
+            Choose a username and join the conversation.
         </div>
 
         <input
@@ -1169,7 +1664,7 @@ textarea::placeholder{
             class="login-input"
             maxlength="24"
             autocomplete="off"
-            placeholder="Enter your username">
+            placeholder="Username">
 
         <button
             class="login-button"
@@ -1180,8 +1675,7 @@ textarea::placeholder{
         </button>
 
         <div
-            id="loginError"
-            class="login-error">
+            id="loginError">
         </div>
 
     </div>
@@ -1189,9 +1683,9 @@ textarea::placeholder{
 </div>
 
 
-<!-- ========================================
+<!-- =========================================
      ERROR
-======================================== -->
+========================================= -->
 
 <div
     id="errorScreen"
@@ -1217,17 +1711,9 @@ textarea::placeholder{
 
             <button
                 class="error-button primary"
-                onclick="testServer()">
+                onclick="loadMessages()">
 
                 Retry
-
-            </button>
-
-            <button
-                class="error-button"
-                onclick="copyError()">
-
-                Copy Error
 
             </button>
 
@@ -1241,11 +1727,80 @@ textarea::placeholder{
 
         </div>
 
-        <div
-            id="copySuccess"
-            class="copy-success">
+    </div>
 
-            Error copied.
+</div>
+
+
+<!-- =========================================
+     SETTINGS
+========================================= -->
+
+<div
+    id="settingsModal"
+    class="modal">
+
+    <div class="settings-box">
+
+        <div class="settings-header">
+
+            <div class="settings-title">
+                Settings
+            </div>
+
+            <button
+                class="close"
+                onclick="closeSettings()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <div class="setting">
+
+            <div class="setting-name">
+                Smooth animations
+            </div>
+
+            <div class="setting-description">
+                Adds subtle animations to messages and interface elements.
+            </div>
+
+            <button
+                id="animationToggle"
+                class="gold-toggle active"
+                onclick="toggleAnimations()">
+            </button>
+
+        </div>
+
+
+        <div class="setting">
+
+            <div class="setting-name">
+                Username
+            </div>
+
+            <div
+                id="settingsUsername"
+                class="setting-description">
+            </div>
+
+        </div>
+
+
+        <div class="setting">
+
+            <div class="setting-name">
+                Channel
+            </div>
+
+            <div class="setting-description">
+                #general
+            </div>
 
         </div>
 
@@ -1254,9 +1809,9 @@ textarea::placeholder{
 </div>
 
 
-<!-- ========================================
+<!-- =========================================
      APP
-======================================== -->
+========================================= -->
 
 <div class="app">
 
@@ -1264,7 +1819,6 @@ textarea::placeholder{
     <!-- SIDEBAR -->
 
     <aside class="sidebar">
-
 
         <div class="brand">
 
@@ -1292,8 +1846,7 @@ textarea::placeholder{
         </div>
 
 
-        <div
-            class="channel active">
+        <div class="channel active">
 
             <span class="channel-hash">
                 #
@@ -1313,9 +1866,7 @@ textarea::placeholder{
                 <div
                     id="profileAvatar"
                     class="avatar">
-
                     ?
-
                 </div>
 
                 <div>
@@ -1323,9 +1874,7 @@ textarea::placeholder{
                     <div
                         id="profileName"
                         class="profile-name">
-
                         User
-
                     </div>
 
                     <div class="profile-status">
@@ -1341,6 +1890,15 @@ textarea::placeholder{
 
             </div>
 
+
+            <button
+                class="settings-button"
+                onclick="openSettings()">
+
+                ⚙ Settings
+
+            </button>
+
         </div>
 
     </aside>
@@ -1350,8 +1908,6 @@ textarea::placeholder{
 
     <main class="chat">
 
-
-        <!-- HEADER -->
 
         <header class="header">
 
@@ -1377,24 +1933,17 @@ textarea::placeholder{
                 class="connection">
 
                 <span
-                    id="connectionDot"
                     class="connection-dot">
                 </span>
 
-                <span
-                    id="connectionText"
-                    class="connection-text">
-
+                <span id="connectionText">
                     Connecting
-
                 </span>
 
             </div>
 
         </header>
 
-
-        <!-- MESSAGES -->
 
         <div
             id="messages"
@@ -1413,12 +1962,47 @@ textarea::placeholder{
                     </div>
 
                     <div class="empty-text">
-                        This is the beginning of the conversation.
+                        Loading messages...
                     </div>
 
                 </div>
 
             </div>
+
+        </div>
+
+
+        <!-- IMAGE PREVIEW -->
+
+        <div
+            id="imagePreview"
+            class="image-preview">
+
+            <img
+                id="previewImage"
+                class="preview-image">
+
+            <div class="preview-info">
+
+                <div
+                    id="previewName"
+                    class="preview-name">
+                </div>
+
+                <div
+                    id="previewSize"
+                    class="preview-size">
+                </div>
+
+            </div>
+
+            <button
+                class="preview-remove"
+                onclick="removeImage()">
+
+                ×
+
+            </button>
 
         </div>
 
@@ -1429,10 +2013,26 @@ textarea::placeholder{
 
             <div class="composer-inner">
 
+                <button
+                    class="attach"
+                    onclick="chooseImage()"
+                    title="Send image">
+
+                    +
+
+                </button>
+
+                <input
+                    id="imageInput"
+                    type="file"
+                    accept="image/*"
+                    hidden>
+
+
                 <textarea
                     id="messageInput"
-                    maxlength="2000"
                     rows="1"
+                    maxlength="2000"
                     placeholder="Message #general">
                 </textarea>
 
@@ -1440,8 +2040,7 @@ textarea::placeholder{
                 <button
                     id="sendButton"
                     class="send"
-                    onclick="sendMessage()"
-                    title="Send">
+                    onclick="sendMessage()">
 
                     ↑
 
@@ -1459,12 +2058,16 @@ textarea::placeholder{
 <script>
 
 
-/* ========================================
+/* =========================================
    API
-======================================== */
+========================================= */
 
 const API_URL =
     "/api/messages";
+
+
+const CHANNEL =
+    "general";
 
 
 let username =
@@ -1473,60 +2076,102 @@ let username =
     ) || "";
 
 
-/* ========================================
-   ELEMENTS
-======================================== */
+let selectedImage =
+    null;
 
-const messagesElement =
-    document.getElementById(
-        "messages"
-    );
+
+let animationsEnabled =
+    true;
+
+
+let lastMessagesSignature =
+    "";
+
+
+/* =========================================
+   ELEMENTS
+========================================= */
 
 const input =
     document.getElementById(
         "messageInput"
     );
 
-const sendButton =
+const imageInput =
     document.getElementById(
-        "sendButton"
-    );
-
-const connection =
-    document.getElementById(
-        "connection"
-    );
-
-const connectionText =
-    document.getElementById(
-        "connectionText"
+        "imageInput"
     );
 
 
-/* ========================================
-   STATUS
-======================================== */
+/* =========================================
+   LOGIN
+========================================= */
 
-function setConnection(
-    state,
-    text
-){
+function login(){
 
-    connection.className =
-        "connection " +
-        state;
+    const value =
+        document
+        .getElementById("username")
+        .value
+        .trim();
 
-    connectionText.textContent =
-        text;
+
+    const error =
+        document.getElementById(
+            "loginError"
+        );
+
+
+    if(!value){
+
+        error.textContent =
+            "Enter a username.";
+
+        return;
+
+    }
+
+
+    if(value.length < 2){
+
+        error.textContent =
+            "Username must contain at least 2 characters.";
+
+        return;
+
+    }
+
+
+    username =
+        value.substring(
+            0,
+            24
+        );
+
+
+    localStorage.setItem(
+        "chat_username",
+        username
+    );
+
+
+    document
+        .getElementById("login")
+        .classList.add("hidden");
+
+
+    updateProfile();
+
+    loadMessages();
 
 }
 
 
-/* ========================================
-   AVATAR
-======================================== */
+/* =========================================
+   PROFILE
+========================================= */
 
-function avatarLetter(
+function getInitial(
     name
 ){
 
@@ -1541,103 +2186,43 @@ function avatarLetter(
 }
 
 
-/* ========================================
-   LOGIN
-======================================== */
-
-function login(){
-
-    const usernameInput =
-        document.getElementById(
-            "username"
-        );
-
-    const error =
-        document.getElementById(
-            "loginError"
-        );
-
-    const name =
-        usernameInput.value.trim();
-
-
-    if(!name){
-
-        error.textContent =
-            "Please enter a username.";
-
-        return;
-
-    }
-
-
-    if(name.length < 2){
-
-        error.textContent =
-            "Username must be at least 2 characters.";
-
-        return;
-
-    }
-
-
-    username =
-        name.substring(
-            0,
-            24
-        );
-
-
-    localStorage.setItem(
-        "chat_username",
-        username
-    );
-
-
-    document.getElementById(
-        "login"
-    ).classList.add(
-        "hidden"
-    );
-
-
-    updateProfile();
-
-    loadMessages();
-
-}
-
-
-/* ========================================
-   PROFILE
-======================================== */
-
 function updateProfile(){
 
-    document.getElementById(
-        "profileName"
-    ).textContent =
-        username;
+    document
+        .getElementById(
+            "profileName"
+        )
+        .textContent =
+            username;
 
 
-    document.getElementById(
-        "profileAvatar"
-    ).textContent =
-        avatarLetter(
-            username
-        );
+    document
+        .getElementById(
+            "profileAvatar"
+        )
+        .textContent =
+            getInitial(
+                username
+            );
+
+
+    document
+        .getElementById(
+            "settingsUsername"
+        )
+        .textContent =
+            username;
 
 }
 
 
-/* ========================================
-   LOAD MESSAGES
-======================================== */
+/* =========================================
+   LOAD
+========================================= */
 
 async function loadMessages(){
 
     setConnection(
-        "",
         "Connecting"
     );
 
@@ -1647,17 +2232,9 @@ async function loadMessages(){
         const response =
             await fetch(
                 API_URL +
-                "?channel=general" +
-                "&t=" +
+                "?channel=general&t=" +
                 Date.now(),
                 {
-                    method:"GET",
-
-                    headers:{
-                        "Accept":
-                            "application/json"
-                    },
-
                     cache:"no-store"
                 }
             );
@@ -1681,12 +2258,12 @@ async function loadMessages(){
 
             throw new Error(
                 "Server did not return JSON.\n\n" +
-                "HTTP: " +
+                "HTTP " +
                 response.status +
                 "\n\n" +
                 text.substring(
                     0,
-                    2000
+                    1500
                 )
             );
 
@@ -1708,14 +2285,13 @@ async function loadMessages(){
         }
 
 
-        displayMessages(
-            data.messages || []
+        setConnection(
+            "Connected"
         );
 
 
-        setConnection(
-            "connected",
-            "Connected"
+        displayMessages(
+            data.messages || []
         );
 
 
@@ -1726,35 +2302,15 @@ async function loadMessages(){
         );
 
 
-        let message =
-            error.message ||
-            String(error);
-
-
-        if(
-            message ===
-            "Failed to fetch"
-        ){
-
-            message =
-                "FAILED TO FETCH\n\n" +
-                "The browser could not reach:\n" +
-                window.location.origin +
-                API_URL +
-                "\n\n" +
-                "Make sure this page is opened from your Vercel website, not from file://.";
-
-        }
-
-
         setConnection(
-            "error",
-            "Offline"
+            "Offline",
+            true
         );
 
 
         showError(
-            message
+            error.message ||
+            String(error)
         );
 
     }
@@ -1762,24 +2318,96 @@ async function loadMessages(){
 }
 
 
-/* ========================================
-   DISPLAY MESSAGES
-======================================== */
+/* =========================================
+   CONNECTION
+========================================= */
+
+function setConnection(
+    text,
+    error=false
+){
+
+    const element =
+        document.getElementById(
+            "connection"
+        );
+
+
+    element.className =
+        "connection " +
+        (
+            error
+            ? "error"
+            : text === "Connected"
+            ? "connected"
+            : ""
+        );
+
+
+    document
+        .getElementById(
+            "connectionText"
+        )
+        .textContent =
+            text;
+
+}
+
+
+/* =========================================
+   DISPLAY
+========================================= */
 
 function displayMessages(
     messages
 ){
 
-    messagesElement.innerHTML =
-        "";
+    const container =
+        document.getElementById(
+            "messages"
+        );
+
+
+    if(!Array.isArray(messages)){
+
+        messages = [];
+
+    }
+
+
+    const signature =
+        JSON.stringify(
+            messages.map(
+                m => [
+                    m.id,
+                    m.message,
+                    m.image
+                ]
+            )
+        );
 
 
     if(
-        !Array.isArray(messages) ||
-        messages.length === 0
+        signature ===
+        lastMessagesSignature
     ){
 
-        messagesElement.innerHTML = `
+        return;
+
+    }
+
+
+    lastMessagesSignature =
+        signature;
+
+
+    container.innerHTML =
+        "";
+
+
+    if(messages.length === 0){
+
+        container.innerHTML = `
 
             <div class="empty">
 
@@ -1794,7 +2422,7 @@ function displayMessages(
                     </div>
 
                     <div class="empty-text">
-                        Be the first person to send a message.
+                        Be the first to send something.
                     </div>
 
                 </div>
@@ -1829,7 +2457,7 @@ function displayMessages(
                 "message-avatar";
 
             avatar.textContent =
-                avatarLetter(
+                getInitial(
                     message.username
                 );
 
@@ -1874,33 +2502,15 @@ function displayMessages(
                 "message-time";
 
 
-            if(
-                message.created_at
-            ){
-
-                const date =
-                    new Date(
-                        message.created_at
-                    );
-
+            if(message.created_at){
 
                 time.textContent =
-                    date.toLocaleString();
+                    new Date(
+                        message.created_at
+                    )
+                    .toLocaleString();
 
             }
-
-
-            const text =
-                document.createElement(
-                    "div"
-                );
-
-            text.className =
-                "message-text";
-
-            text.textContent =
-                message.message ||
-                "";
 
 
             meta.appendChild(
@@ -1916,9 +2526,70 @@ function displayMessages(
                 meta
             );
 
-            content.appendChild(
-                text
-            );
+
+            /*
+             * NORMAL TEXT
+             */
+
+            if(message.message){
+
+                const text =
+                    document.createElement(
+                        "div"
+                    );
+
+                text.className =
+                    "message-text";
+
+                text.textContent =
+                    message.message;
+
+                content.appendChild(
+                    text
+                );
+
+            }
+
+
+            /*
+             * IMAGE BASE64
+             */
+
+            if(message.image){
+
+                const image =
+                    document.createElement(
+                        "img"
+                    );
+
+                image.className =
+                    "message-image";
+
+
+                image.src =
+                    message.image;
+
+
+                image.alt =
+                    "Shared image";
+
+
+                image.onclick =
+                    () => {
+
+                        window.open(
+                            image.src,
+                            "_blank"
+                        );
+
+                    };
+
+
+                content.appendChild(
+                    image
+                );
+
+            }
 
 
             wrapper.appendChild(
@@ -1930,7 +2601,7 @@ function displayMessages(
             );
 
 
-            messagesElement.appendChild(
+            container.appendChild(
                 wrapper
             );
 
@@ -1938,50 +2609,293 @@ function displayMessages(
     );
 
 
-    messagesElement.scrollTop =
-        messagesElement.scrollHeight;
+    container.scrollTop =
+        container.scrollHeight;
 
 }
 
 
-/* ========================================
+/* =========================================
+   CHOOSE IMAGE
+========================================= */
+
+function chooseImage(){
+
+    imageInput.click();
+
+}
+
+
+imageInput.addEventListener(
+    "change",
+    handleImage
+);
+
+
+/* =========================================
+   IMAGE PROCESSING
+========================================= */
+
+function handleImage(){
+
+    const file =
+        imageInput.files[0];
+
+
+    if(!file){
+
+        return;
+
+    }
+
+
+    /*
+     * 2 MB original limit
+     */
+
+    if(
+        file.size >
+        2 * 1024 * 1024
+    ){
+
+        alert(
+            "Image is too large.\n\nMaximum size: 2 MB."
+        );
+
+        imageInput.value =
+            "";
+
+        return;
+
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        event => {
+
+            compressImage(
+                event.target.result,
+                file.name
+            );
+
+        };
+
+
+    reader.readAsDataURL(
+        file
+    );
+
+}
+
+
+/* =========================================
+   COMPRESS IMAGE
+========================================= */
+
+function compressImage(
+    source,
+    fileName
+){
+
+    const image =
+        new Image();
+
+
+    image.onload =
+        () => {
+
+            const maxWidth =
+                1400;
+
+
+            let width =
+                image.width;
+
+            let height =
+                image.height;
+
+
+            if(width > maxWidth){
+
+                const ratio =
+                    maxWidth /
+                    width;
+
+                width =
+                    Math.round(
+                        width * ratio
+                    );
+
+                height =
+                    Math.round(
+                        height * ratio
+                    );
+
+            }
+
+
+            const canvas =
+                document.createElement(
+                    "canvas"
+                );
+
+
+            canvas.width =
+                width;
+
+            canvas.height =
+                height;
+
+
+            const ctx =
+                canvas.getContext(
+                    "2d"
+                );
+
+
+            ctx.drawImage(
+                image,
+                0,
+                0,
+                width,
+                height
+            );
+
+
+            selectedImage =
+                canvas.toDataURL(
+                    "image/jpeg",
+                    .82
+                );
+
+
+            showImagePreview(
+                selectedImage,
+                fileName
+            );
+
+        };
+
+
+    image.src =
+        source;
+
+}
+
+
+/* =========================================
+   PREVIEW
+========================================= */
+
+function showImagePreview(
+    data,
+    name
+){
+
+    const preview =
+        document.getElementById(
+            "imagePreview"
+        );
+
+
+    document
+        .getElementById(
+            "previewImage"
+        )
+        .src =
+            data;
+
+
+    document
+        .getElementById(
+            "previewName"
+        )
+        .textContent =
+            name;
+
+
+    document
+        .getElementById(
+            "previewSize"
+        )
+        .textContent =
+            Math.round(
+                data.length / 1024
+            ) +
+            " KB compressed";
+
+
+    preview.style.display =
+        "flex";
+
+}
+
+
+function removeImage(){
+
+    selectedImage =
+        null;
+
+    imageInput.value =
+        "";
+
+    document
+        .getElementById(
+            "imagePreview"
+        )
+        .style.display =
+            "none";
+
+}
+
+
+/* =========================================
    SEND
-======================================== */
+========================================= */
 
 async function sendMessage(){
 
-    const message =
+    const text =
         input.value.trim();
+
+
+    if(
+        !text &&
+        !selectedImage
+    ){
+
+        return;
+
+    }
 
 
     if(!username){
 
+        document
+            .getElementById(
+                "login"
+            )
+            .classList.remove(
+                "hidden"
+            );
+
+        return;
+
+    }
+
+
+    const button =
         document.getElementById(
-            "login"
-        ).classList.remove(
-            "hidden"
+            "sendButton"
         );
 
-        return;
 
-    }
-
-
-    if(!message){
-
-        return;
-
-    }
-
-
-    sendButton.disabled =
+    button.disabled =
         true;
-
-
-    setConnection(
-        "",
-        "Sending"
-    );
 
 
     try{
@@ -1995,9 +2909,6 @@ async function sendMessage(){
 
                     headers:{
                         "Content-Type":
-                            "application/json",
-
-                        "Accept":
                             "application/json"
                     },
 
@@ -2008,10 +2919,13 @@ async function sendMessage(){
                                 username,
 
                             channel:
-                                "general",
+                                CHANNEL,
 
                             message:
-                                message
+                                text,
+
+                            image:
+                                selectedImage
 
                         })
 
@@ -2019,7 +2933,7 @@ async function sendMessage(){
             );
 
 
-        const text =
+        const responseText =
             await response.text();
 
 
@@ -2030,19 +2944,19 @@ async function sendMessage(){
 
             data =
                 JSON.parse(
-                    text
+                    responseText
                 );
 
         }catch{
 
             throw new Error(
                 "Server did not return JSON.\n\n" +
-                "HTTP: " +
+                "HTTP " +
                 response.status +
                 "\n\n" +
-                text.substring(
+                responseText.substring(
                     0,
-                    2000
+                    1500
                 )
             );
 
@@ -2052,23 +2966,19 @@ async function sendMessage(){
         if(!response.ok){
 
             throw new Error(
-
                 "HTTP " +
                 response.status +
                 "\n\n" +
-
                 (
                     data.error ||
-                    "Message was rejected."
+                    "Message rejected."
                 ) +
-
                 (
                     data.fix
                     ? "\n\n" +
                       data.fix
                     : ""
                 )
-
             );
 
         }
@@ -2077,8 +2987,15 @@ async function sendMessage(){
         input.value =
             "";
 
+        input.style.height =
+            "auto";
 
-        autoResize();
+
+        removeImage();
+
+
+        lastMessagesSignature =
+            "";
 
 
         await loadMessages();
@@ -2086,71 +3003,23 @@ async function sendMessage(){
 
     }catch(error){
 
-        console.error(
-            error
-        );
-
-
-        let message =
-            error.message ||
-            String(error);
-
-
-        if(
-            message ===
-            "Failed to fetch"
-        ){
-
-            message =
-                "FAILED TO FETCH\n\n" +
-                "The browser could not reach " +
-                window.location.origin +
-                API_URL;
-
-        }
-
-
         showError(
-            message
+            error.message ||
+            String(error)
         );
 
     }
 
 
-    sendButton.disabled =
+    button.disabled =
         false;
 
 }
 
 
-/* ========================================
-   TEXTAREA RESIZE
-======================================== */
-
-function autoResize(){
-
-    input.style.height =
-        "auto";
-
-    input.style.height =
-        Math.min(
-            input.scrollHeight,
-            150
-        ) +
-        "px";
-
-}
-
-
-input.addEventListener(
-    "input",
-    autoResize
-);
-
-
-/* ========================================
-   ENTER
-======================================== */
+/* =========================================
+   ENTER TO SEND
+========================================= */
 
 input.addEventListener(
     "keydown",
@@ -2171,50 +3040,122 @@ input.addEventListener(
 );
 
 
-/* ========================================
+input.addEventListener(
+    "input",
+    () => {
+
+        input.style.height =
+            "auto";
+
+        input.style.height =
+            Math.min(
+                input.scrollHeight,
+                140
+            ) +
+            "px";
+
+    }
+);
+
+
+/* =========================================
+   SETTINGS
+========================================= */
+
+function openSettings(){
+
+    document
+        .getElementById(
+            "settingsModal"
+        )
+        .style.display =
+            "flex";
+
+}
+
+
+function closeSettings(){
+
+    document
+        .getElementById(
+            "settingsModal"
+        )
+        .style.display =
+            "none";
+
+}
+
+
+function toggleAnimations(){
+
+    animationsEnabled =
+        !animationsEnabled;
+
+
+    document
+        .getElementById(
+            "animationToggle"
+        )
+        .classList.toggle(
+            "active",
+            animationsEnabled
+        );
+
+
+    document.body.style.setProperty(
+        "--animation-speed",
+        animationsEnabled
+            ? "1"
+            : "0"
+    );
+
+}
+
+
+/* =========================================
    ERROR
-======================================== */
-
-let lastError =
-    "";
-
+========================================= */
 
 function showError(
     error
 ){
 
-    lastError =
-        String(error);
+    document
+        .getElementById(
+            "errorCode"
+        )
+        .textContent =
+            error;
 
 
-    document.getElementById(
-        "errorCode"
-    ).textContent =
-        lastError;
+    document
+        .getElementById(
+            "errorFix"
+        )
+        .textContent =
+            getErrorFix(
+                error
+            );
 
 
-    document.getElementById(
-        "errorFix"
-    ).textContent =
-        getErrorFix(
-            lastError
-        );
-
-
-    document.getElementById(
-        "errorScreen"
-    ).style.display =
-        "flex";
+    document
+        .getElementById(
+            "errorScreen"
+        )
+        .style.display =
+            "flex";
 
 }
 
 
 function closeError(){
 
-    document.getElementById(
-        "errorScreen"
-    ).style.display =
-        "none";
+    document
+        .getElementById(
+            "errorScreen"
+        )
+        .style.display =
+            "none";
 
 }
 
@@ -2224,19 +3165,22 @@ function getErrorFix(
 ){
 
     const e =
-        error.toLowerCase();
+        String(
+            error
+        )
+        .toLowerCase();
 
 
     if(
-        e.includes("row-level security") ||
-        e.includes("rls")
+        e.includes(
+            "row-level security"
+        )
     ){
 
         return (
-            "Supabase RLS is blocking the message.\n\n" +
-            "Make sure your messages table has an INSERT policy " +
-            "with the expression:\n\n" +
-            "true"
+            "Your Supabase RLS policy is blocking INSERT.\n\n" +
+            "Your INSERT policy should use:\n\n" +
+            "with check (true)"
         );
 
     }
@@ -2248,8 +3192,9 @@ function getErrorFix(
     ){
 
         return (
-            "Supabase rejected the API key.\n\n" +
-            "Check your Supabase API key and Vercel configuration."
+            "Supabase rejected the publishable key.\n\n" +
+            "Check that the key in messages.js is your current " +
+            "sb_publishable_ key."
         );
 
     }
@@ -2260,8 +3205,8 @@ function getErrorFix(
     ){
 
         return (
-            "The /api/messages endpoint was not found.\n\n" +
-            "Make sure messages.js is inside:\n\n" +
+            "Vercel cannot find /api/messages.\n\n" +
+            "Make sure the file is exactly:\n\n" +
             "api/messages.js"
         );
 
@@ -2269,96 +3214,51 @@ function getErrorFix(
 
 
     if(
-        e.includes("failed to fetch")
+        e.includes(
+            "failed to fetch"
+        )
     ){
 
         return (
-            "The browser could not reach the server.\n\n" +
-            "Make sure you're using your Vercel website URL " +
-            "and not opening index.html directly."
+            "The browser could not reach the API.\n\n" +
+            "Make sure you're using the deployed Vercel website."
         );
 
     }
 
 
     return (
-        "Check the exact error above. " +
-        "Your private Supabase key should never be placed in the HTML."
+        "Check the error above and your Vercel/Supabase configuration."
     );
 
 }
 
 
-async function testServer(){
-
-    closeError();
-
-    await loadMessages();
-
-}
-
-
-async function copyError(){
-
-    try{
-
-        await navigator.clipboard.writeText(
-            lastError
-        );
-
-
-        const success =
-            document.getElementById(
-                "copySuccess"
-            );
-
-
-        success.style.display =
-            "block";
-
-
-        setTimeout(
-            () => {
-
-                success.style.display =
-                    "none";
-
-            },
-            2000
-        );
-
-    }catch{
-
-        alert(
-            lastError
-        );
-
-    }
-
-}
-
-
-/* ========================================
+/* =========================================
    START
-======================================== */
+========================================= */
 
 if(username){
 
-    document.getElementById(
-        "login"
-    ).classList.add(
-        "hidden"
-    );
+    document
+        .getElementById(
+            "login"
+        )
+        .classList.add(
+            "hidden"
+        );
 
     updateProfile();
 
 }else{
 
-    document.getElementById(
-        "login"
-    ).classList.remove(
-        "hidden"
-    );
+    document
+        .getElementById(
+            "login"
+        )
+        .classList.remove(
+            "hidden"
+        );
 
 }
 
@@ -2366,9 +3266,9 @@ if(username){
 loadMessages();
 
 
-/* ========================================
+/* =========================================
    AUTO REFRESH
-======================================== */
+========================================= */
 
 setInterval(
     () => {
@@ -2380,7 +3280,8 @@ setInterval(
                     "errorScreen"
                 )
                 .style
-                .display !== "flex"
+                .display !==
+                    "flex"
         ){
 
             loadMessages();

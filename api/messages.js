@@ -1,8 +1,8 @@
 export default async function handler(req, res) {
 
-    // ==========================================
-    // SETTINGS
-    // ==========================================
+    // ==================================================
+    // SERVER SETTINGS
+    // ==================================================
 
     res.setHeader(
         "Content-Type",
@@ -25,43 +25,53 @@ export default async function handler(req, res) {
     );
 
 
-    // ==========================================
-    // CORS PREFLIGHT
-    // ==========================================
+    // ==================================================
+    // OPTIONS / CORS
+    // ==================================================
 
     if (req.method === "OPTIONS") {
-        return res.status(200).end();
+
+        return res
+            .status(200)
+            .end();
+
     }
 
 
     try {
 
-        // ==========================================
-        // SUPABASE URL
-        // ==========================================
+        // ==================================================
+        // SUPABASE SETTINGS
+        // ==================================================
 
         const supabaseUrl =
             "https://wlvbkdzcueqkknysisfw.supabase.co";
 
 
-        // ==========================================
-        // SUPABASE PUBLISHABLE KEY
-        // ==========================================
+        // YOUR PUBLISHABLE SUPABASE KEY
+        //
+        // This is the sb_publishable_ key.
+        //
+        // Do NOT put your sb_secret_ key here.
+        //
 
         const supabaseKey =
             "sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL";
 
 
-        // ==========================================
+        // ==================================================
         // CHECK SETTINGS
-        // ==========================================
+        // ==================================================
 
         if (!supabaseUrl) {
 
             return res.status(500).json({
 
                 error:
-                    "Supabase URL is missing."
+                    "SUPABASE URL is missing.",
+
+                fix:
+                    "Put your Supabase project URL in supabaseUrl."
 
             });
 
@@ -73,7 +83,10 @@ export default async function handler(req, res) {
             return res.status(500).json({
 
                 error:
-                    "Supabase publishable key is missing."
+                    "SUPABASE publishable key is missing.",
+
+                fix:
+                    "Put your sb_publishable_ key in supabaseKey."
 
             });
 
@@ -81,30 +94,38 @@ export default async function handler(req, res) {
 
 
         const cleanUrl =
-            supabaseUrl.replace(/\/+$/, "");
+            supabaseUrl.replace(
+                /\/+$/,
+                ""
+            );
 
 
-        // ==========================================
+        // ==================================================
         // GET MESSAGES
-        // ==========================================
+        // ==================================================
 
         if (req.method === "GET") {
 
             const channel =
                 String(
-                    req.query?.channel ||
+                    req.query.channel ||
                     "general"
                 )
                 .trim()
-                .substring(0, 32);
+                .substring(
+                    0,
+                    32
+                );
 
 
             const query =
                 cleanUrl +
                 "/rest/v1/messages" +
-                "?select=id,username,channel,message,created_at" +
+                "?select=id,username,channel,message,image,created_at" +
                 "&channel=eq." +
-                encodeURIComponent(channel) +
+                encodeURIComponent(
+                    channel
+                ) +
                 "&order=created_at.asc";
 
 
@@ -113,7 +134,8 @@ export default async function handler(req, res) {
                     query,
                     {
 
-                        method: "GET",
+                        method:
+                            "GET",
 
                         headers: {
 
@@ -140,10 +162,16 @@ export default async function handler(req, res) {
             let data;
 
 
+            // ==================================================
+            // PARSE RESPONSE
+            // ==================================================
+
             try {
 
                 data =
-                    JSON.parse(text);
+                    JSON.parse(
+                        text
+                    );
 
             } catch {
 
@@ -158,13 +186,20 @@ export default async function handler(req, res) {
                     response:
                         text.substring(
                             0,
-                            1500
-                        )
+                            2000
+                        ),
+
+                    fix:
+                        "Check your Supabase URL and publishable key."
 
                 });
 
             }
 
+
+            // ==================================================
+            // SUPABASE ERROR
+            // ==================================================
 
             if (!response.ok) {
 
@@ -176,64 +211,125 @@ export default async function handler(req, res) {
                         data.message ||
                         data.error ||
                         data.hint ||
-                        "Supabase request failed.",
+                        "Supabase GET request failed.",
 
                     details:
-                        data
+                        data,
+
+                    fix:
+                        getSupabaseFix(
+                            response.status,
+                            data
+                        )
 
                 });
 
             }
 
 
+            // ==================================================
+            // SUCCESS
+            // ==================================================
+
             return res.status(200).json({
 
-                success: true,
+                success:
+                    true,
 
                 messages:
-                    Array.isArray(data)
-                        ? data
-                        : []
+                    Array.isArray(
+                        data
+                    )
+                    ? data
+                    : []
 
             });
 
         }
 
 
-        // ==========================================
-        // SEND MESSAGE
-        // ==========================================
+        // ==================================================
+        // POST MESSAGE
+        // ==================================================
 
         if (req.method === "POST") {
 
             const body =
-                req.body || {};
+                req.body ||
+                {};
 
+
+            // ==================================================
+            // USERNAME
+            // ==================================================
 
             const username =
                 String(
-                    body.username || ""
+                    body.username ||
+                    ""
                 )
                 .trim()
-                .substring(0, 24);
+                .substring(
+                    0,
+                    24
+                );
 
 
-            // Only one channel
+            // ==================================================
+            // CHANNEL
+            // ==================================================
+
             const channel =
-                "general";
+                String(
+                    body.channel ||
+                    "general"
+                )
+                .trim()
+                .substring(
+                    0,
+                    32
+                );
 
+
+            // ==================================================
+            // MESSAGE
+            // ==================================================
 
             const message =
                 String(
-                    body.message || ""
+                    body.message ||
+                    ""
                 )
                 .trim()
-                .substring(0, 2000);
+                .substring(
+                    0,
+                    2000
+                );
 
 
-            // ==========================================
+            // ==================================================
+            // IMAGE
+            // ==================================================
+
+            let image =
+                null;
+
+
+            if (
+                body.image &&
+                typeof body.image ===
+                    "string"
+            ) {
+
+                image =
+                    body.image;
+
+            }
+
+
+            // ==================================================
             // VALIDATION
-            // ==========================================
+            // ==================================================
 
             if (!username) {
 
@@ -250,24 +346,79 @@ export default async function handler(req, res) {
             }
 
 
-            if (!message) {
+            if (
+                !message &&
+                !image
+            ) {
 
                 return res.status(400).json({
 
                     error:
-                        "Message is required.",
+                        "Message or image is required.",
 
                     fix:
-                        "Type a message before pressing Send."
+                        "Type a message or choose an image."
 
                 });
 
             }
 
 
-            // ==========================================
-            // MESSAGE DATA
-            // ==========================================
+            // ==================================================
+            // IMAGE SIZE PROTECTION
+            // ==================================================
+
+            if (
+                image &&
+                image.length >
+                    5_000_000
+            ) {
+
+                return res.status(413).json({
+
+                    error:
+                        "Image is too large.",
+
+                    fix:
+                        "Choose a smaller image. The server allows approximately 5 MB of Base64 data."
+
+                });
+
+            }
+
+
+            // ==================================================
+            // IMAGE FORMAT CHECK
+            // ==================================================
+
+            if (image) {
+
+                const validImage =
+                    image.startsWith(
+                        "data:image/"
+                    );
+
+
+                if (!validImage) {
+
+                    return res.status(400).json({
+
+                        error:
+                            "Invalid image data.",
+
+                        fix:
+                            "The image must be sent as a Base64 data URL."
+
+                    });
+
+                }
+
+            }
+
+
+            // ==================================================
+            // DATA TO SUPABASE
+            // ==================================================
 
             const messageData = {
 
@@ -278,14 +429,17 @@ export default async function handler(req, res) {
                     channel,
 
                 message:
-                    message
+                    message,
+
+                image:
+                    image
 
             };
 
 
-            // ==========================================
-            // INSERT INTO SUPABASE
-            // ==========================================
+            // ==================================================
+            // SEND TO SUPABASE
+            // ==================================================
 
             const response =
                 await fetch(
@@ -293,7 +447,8 @@ export default async function handler(req, res) {
                     "/rest/v1/messages",
                     {
 
-                        method: "POST",
+                        method:
+                            "POST",
 
                         headers: {
 
@@ -331,10 +486,16 @@ export default async function handler(req, res) {
             let data;
 
 
+            // ==================================================
+            // PARSE RESPONSE
+            // ==================================================
+
             try {
 
                 data =
-                    JSON.parse(text);
+                    JSON.parse(
+                        text
+                    );
 
             } catch {
 
@@ -349,17 +510,20 @@ export default async function handler(req, res) {
                     response:
                         text.substring(
                             0,
-                            1500
-                        )
+                            2000
+                        ),
+
+                    fix:
+                        "Check your Supabase URL, key, and database."
 
                 });
 
             }
 
 
-            // ==========================================
+            // ==================================================
             // SUPABASE ERROR
-            // ==========================================
+            // ==================================================
 
             if (!response.ok) {
 
@@ -377,34 +541,40 @@ export default async function handler(req, res) {
                         data,
 
                     fix:
-                        "Check your messages table and RLS INSERT policy."
+                        getSupabaseFix(
+                            response.status,
+                            data
+                        )
 
                 });
 
             }
 
 
-            // ==========================================
+            // ==================================================
             // SUCCESS
-            // ==========================================
+            // ==================================================
 
             return res.status(200).json({
 
-                success: true,
+                success:
+                    true,
 
                 message:
-                    Array.isArray(data)
-                        ? data[0]
-                        : data
+                    Array.isArray(
+                        data
+                    )
+                    ? data[0]
+                    : data
 
             });
 
         }
 
 
-        // ==========================================
+        // ==================================================
         // METHOD NOT ALLOWED
-        // ==========================================
+        // ==================================================
 
         return res.status(405).json({
 
@@ -412,12 +582,19 @@ export default async function handler(req, res) {
                 "Method not allowed.",
 
             method:
-                req.method
+                req.method,
+
+            fix:
+                "Use GET to read messages or POST to send messages."
 
         });
 
 
     } catch (error) {
+
+        // ==================================================
+        // SERVER ERROR
+        // ==================================================
 
         console.error(
             "SERVER ERROR:",
@@ -436,10 +613,119 @@ export default async function handler(req, res) {
                 "Error",
 
             fix:
-                "Check the Vercel function logs."
+                "Check your Vercel deployment and Supabase configuration. Do not send your secret key."
 
         });
 
     }
+
+}
+
+
+// ======================================================
+// SUPABASE ERROR HELPER
+// ======================================================
+
+function getSupabaseFix(
+    status,
+    data
+) {
+
+    const message =
+        String(
+            data.message ||
+            data.error ||
+            data.hint ||
+            ""
+        )
+        .toLowerCase();
+
+
+    // --------------------------------------------------
+    // RLS
+    // --------------------------------------------------
+
+    if (
+        message.includes(
+            "row-level security"
+        )
+    ) {
+
+        return (
+            "Supabase RLS is blocking this operation.\n\n" +
+
+            "For sending messages, your INSERT policy " +
+            "must allow public inserts.\n\n" +
+
+            "The INSERT policy can use:\n" +
+
+            "with check (true)"
+        );
+
+    }
+
+
+    // --------------------------------------------------
+    // API KEY
+    // --------------------------------------------------
+
+    if (
+        status === 401 ||
+        message.includes(
+            "api key"
+        ) ||
+        message.includes(
+            "unregistered api key"
+        )
+    ) {
+
+        return (
+            "Supabase rejected the API key.\n\n" +
+
+            "Check that supabaseKey contains your current " +
+            "sb_publishable_ key.\n\n" +
+
+            "Do NOT use the sb_secret_ key in this file."
+        );
+
+    }
+
+
+    // --------------------------------------------------
+    // TABLE
+    // --------------------------------------------------
+
+    if (
+        message.includes(
+            "relation"
+        ) ||
+        message.includes(
+            "messages"
+        )
+    ) {
+
+        return (
+            "Check that the public.messages table exists " +
+            "and contains these columns:\n\n" +
+
+            "id\n" +
+            "username\n" +
+            "channel\n" +
+            "message\n" +
+            "image\n" +
+            "created_at"
+        );
+
+    }
+
+
+    // --------------------------------------------------
+    // DEFAULT
+    // --------------------------------------------------
+
+    return (
+        "Check your Supabase URL, publishable key, " +
+        "messages table, and RLS policies."
+    );
 
 }
