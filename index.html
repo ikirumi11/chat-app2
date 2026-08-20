@@ -22,6 +22,7 @@
     --text-size:16px;
     --word-spacing:0px;
     --line-spacing:1.45;
+    --message-gap:17px;
 }
 
 html,body{
@@ -112,11 +113,11 @@ button{
 .message{
     display:flex;
     gap:11px;
-    margin-bottom:17px;
+    margin-bottom:var(--message-gap);
 }
 
 .message.compact{
-    margin-bottom:6px;
+    margin-bottom:7px;
 }
 
 .avatar{
@@ -159,6 +160,16 @@ button{
     font-size:var(--text-size);
     word-spacing:var(--word-spacing);
     line-height:var(--line-spacing);
+}
+
+.message-link{
+    color:#8eb9ff;
+    text-decoration:underline;
+    cursor:pointer;
+}
+
+.message-link:hover{
+    filter:brightness(1.25);
 }
 
 .message-image{
@@ -252,7 +263,7 @@ textarea{
 }
 
 .panel{
-    width:min(520px,calc(100vw - 25px));
+    width:min(560px,calc(100vw - 25px));
     max-height:calc(100vh - 25px);
     overflow-y:auto;
     background:var(--panel);
@@ -344,15 +355,29 @@ textarea{
     margin-top:5px;
 }
 
-.save-btn{
+.save-btn,
+.test-btn{
     width:100%;
     margin-top:8px;
     padding:12px;
     border:0;
     border-radius:9px;
+    font-weight:700;
+}
+
+.save-btn{
     background:var(--accent);
     color:#111;
-    font-weight:700;
+}
+
+.test-btn{
+    background:#242b34;
+    border:1px solid var(--border);
+    color:white;
+}
+
+.test-btn:hover{
+    filter:brightness(1.15);
 }
 
 /* DANGER */
@@ -383,7 +408,7 @@ textarea{
     color:#ff8585;
 }
 
-/* CONTEXT MENU */
+/* CONTEXT */
 
 .context-menu{
     position:fixed;
@@ -506,79 +531,6 @@ textarea{
     margin-bottom:5px;
 }
 
-/* WINDOWS NOTIFICATION PREVIEW */
-
-.windows-notification{
-    position:fixed;
-    right:18px;
-    bottom:18px;
-    width:min(390px,calc(100vw - 30px));
-    background:#202020;
-    border:1px solid #4b4b4b;
-    border-radius:8px;
-    box-shadow:0 18px 50px #000b;
-    padding:14px;
-    z-index:1000;
-    display:none;
-    animation:notificationIn .25s ease;
-}
-
-.windows-notification.show{
-    display:block;
-}
-
-.notification-top{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:9px;
-}
-
-.notification-icon{
-    width:30px;
-    height:30px;
-    display:grid;
-    place-items:center;
-    background:#303030;
-    border-radius:5px;
-}
-
-.notification-title{
-    font-weight:700;
-    flex:1;
-}
-
-.notification-close{
-    background:none;
-    border:0;
-    color:#aaa;
-    font-size:18px;
-}
-
-.notification-body{
-    color:#e5e5e5;
-    font-size:14px;
-    line-height:1.4;
-    overflow-wrap:anywhere;
-}
-
-.notification-link{
-    color:#58a6ff;
-    text-decoration:underline;
-    cursor:pointer;
-}
-
-@keyframes notificationIn{
-    from{
-        opacity:0;
-        transform:translateY(20px);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
-
 @media(max-width:600px){
 
     .header{
@@ -597,10 +549,6 @@ textarea{
         max-width:calc(100vw - 70px);
     }
 
-    .windows-notification{
-        right:10px;
-        bottom:10px;
-    }
 }
 </style>
 </head>
@@ -611,17 +559,13 @@ textarea{
 
 <header class="header">
 
-    <div class="logo">
-        <div class="logo-icon">💬</div>
-        <span>Chat</span>
-        <span class="channel"># general</span>
-    </div>
+<div class="logo">
+<div class="logo-icon">💬</div>
+<span>Chat</span>
+<span class="channel"># general</span>
+</div>
 
-    <button
-        class="icon-btn"
-        id="settingsBtn"
-        title="Settings"
-    >⚙</button>
+<button class="icon-btn" id="settingsBtn">⚙</button>
 
 </header>
 
@@ -629,33 +573,33 @@ textarea{
 
 <div class="composer">
 
-    <div class="composer-box">
+<div class="composer-box">
 
-        <input
-            type="file"
-            id="imageInput"
-            accept="image/*"
-            hidden
-        >
+<input
+type="file"
+id="imageInput"
+accept="image/*"
+hidden
+>
 
-        <button
-            class="attach-btn"
-            id="attachBtn"
-            title="Choose image"
-        >＋</button>
+<button
+class="attach-btn"
+id="attachBtn"
+title="Choose image"
+>＋</button>
 
-        <textarea
-            id="messageInput"
-            rows="1"
-            placeholder="Message #general"
-        ></textarea>
+<textarea
+id="messageInput"
+rows="1"
+placeholder="Message #general"
+></textarea>
 
-        <button
-            class="send-btn"
-            id="sendBtn"
-        >Send</button>
+<button
+class="send-btn"
+id="sendBtn"
+>Send</button>
 
-    </div>
+</div>
 
 </div>
 
@@ -670,21 +614,22 @@ textarea{
 
 <div class="panel-header">
 
-    <h2>Settings</h2>
+<h2>Settings</h2>
 
-    <button class="icon-btn" id="closeSettings">×</button>
+<button class="icon-btn" id="closeSettings">×</button>
 
 </div>
 
 <div class="panel-body">
+
 
 <!-- PROFILE -->
 
 <div class="category open">
 
 <button class="category-title">
-    <span>👤 Profile</span>
-    <span>⌄</span>
+<span>👤 Profile</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
@@ -708,15 +653,15 @@ textarea{
 <div class="category">
 
 <button class="category-title">
-    <span>📝 Text</span>
-    <span>⌄</span>
+<span>📝 Text</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
 
 <div class="setting">
 <label>Text size</label>
-<input id="textSize" type="range" min="12" max="24" step="1">
+<input id="textSize" type="range" min="12" max="28" step="1">
 <div class="setting-value" id="textSizeValue"></div>
 </div>
 
@@ -732,6 +677,15 @@ textarea{
 <div class="setting-value" id="lineSpacingValue"></div>
 </div>
 
+<div class="setting">
+<label>Message density</label>
+<select id="messageDensity">
+<option value="normal">Normal</option>
+<option value="compact">Compact</option>
+<option value="spacious">Spacious</option>
+</select>
+</div>
+
 </div>
 </div>
 
@@ -741,15 +695,14 @@ textarea{
 <div class="category">
 
 <button class="category-title">
-    <span>💬 Chat</span>
-    <span>⌄</span>
+<span>💬 Chat</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
 
 <div class="setting">
 <label>Refresh rate</label>
-
 <select id="refreshRate">
 <option value="10000">10 seconds</option>
 <option value="5000">5 seconds</option>
@@ -770,10 +723,19 @@ textarea{
 </div>
 
 <div class="setting">
-<label>Compact messages</label>
-<select id="compactMessages">
-<option value="false">Off</option>
+<label>Timestamp format</label>
+<select id="timestampFormat">
+<option value="short">12:34</option>
+<option value="seconds">12:34:56</option>
+<option value="full">Date + time</option>
+</select>
+</div>
+
+<div class="setting">
+<label>Auto-scroll</label>
+<select id="autoScroll">
 <option value="true">On</option>
+<option value="false">Off</option>
 </select>
 </div>
 
@@ -786,8 +748,8 @@ textarea{
 <div class="category">
 
 <button class="category-title">
-    <span>🎨 Appearance</span>
-    <span>⌄</span>
+<span>🎨 Appearance</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
@@ -796,6 +758,7 @@ textarea{
 <label>Theme</label>
 
 <select id="themeSelect">
+
 <option value="dark">Dark</option>
 <option value="midnight">Midnight</option>
 <option value="slate">Slate</option>
@@ -807,6 +770,11 @@ textarea{
 <option value="gray">Classic Gray</option>
 <option value="light">Light</option>
 <option value="oled">OLED</option>
+<option value="carbon">Carbon</option>
+<option value="steel">Steel</option>
+<option value="terminal">Terminal</option>
+<option value="brown">Dark Brown</option>
+
 </select>
 </div>
 
@@ -831,62 +799,14 @@ textarea{
 <div class="category">
 
 <button class="category-title">
-    <span>🔔 Notifications</span>
-    <span>⌄</span>
+<span>🔔 Notifications</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
 
 <div class="setting">
-<label>Notification sound</label>
-
-<select id="notificationSound">
-<option value="false">Off</option>
-<option value="true">On</option>
-</select>
-</div>
-
-<div class="setting">
-<label>Sound</label>
-
-<select id="notificationSoundType">
-<option value="1">1 — Classic</option>
-<option value="2">2 — Soft</option>
-<option value="3">3 — Double Beep</option>
-<option value="4">4 — Digital</option>
-<option value="5">5 — Bell</option>
-<option value="6">6 — Rising</option>
-<option value="7">7 — Falling</option>
-<option value="8">8 — Pulse</option>
-<option value="9">9 — Alert</option>
-<option value="10">10 — Deep</option>
-<option value="11">11 — Nuclear Alarm</option>
-<option value="12">12 — Opera</option>
-</select>
-</div>
-
-<div class="setting">
-<label>Sound volume</label>
-<input id="notificationVolume" type="range" min="0" max="100" value="70">
-<div class="setting-value" id="notificationVolumeValue">70%</div>
-</div>
-
-<div class="setting">
-<label>Sound duration</label>
-
-<select id="notificationDuration">
-<option value="500">0.5 second</option>
-<option value="1000">1 second</option>
-<option value="2000">2 seconds</option>
-<option value="3000">3 seconds</option>
-<option value="5000">5 seconds</option>
-<option value="10000">10 seconds</option>
-</select>
-</div>
-
-<div class="setting">
 <label>Desktop notifications</label>
-
 <select id="desktopNotifications">
 <option value="false">Off</option>
 <option value="true">On</option>
@@ -894,24 +814,140 @@ textarea{
 </div>
 
 <div class="setting">
-<label>Mention notifications</label>
-
-<select id="mentionNotifications">
-<option value="false">Off</option>
+<label>Notify only when chat is hidden</label>
+<select id="hiddenOnly">
 <option value="true">On</option>
+<option value="false">Off</option>
 </select>
 </div>
 
 <div class="setting">
+<label>Notification sound</label>
+<select id="notificationSound">
+
+<option value="false">Off</option>
+<option value="true">On</option>
+
+</select>
+</div>
+
+<div class="setting">
+<label>Sound theme</label>
+
+<select id="soundTheme">
+
+<option value="classic">1 — Classic</option>
+<option value="soft">2 — Soft</option>
+<option value="digital">3 — Digital</option>
+<option value="pop">4 — Pop</option>
+<option value="bell">5 — Bell</option>
+<option value="chime">6 — Chime</option>
+<option value="retro">7 — Retro</option>
+<option value="computer">8 — Computer</option>
+<option value="alert">9 — Alert</option>
+<option value="warning">10 — Warning</option>
+<option value="alarm">11 — Nuclear Alarm</option>
+<option value="opera">12 — Opera</option>
+<option value="synth">13 — Synth</option>
+<option value="pulse">14 — Pulse</option>
+<option value="space">15 — Space</option>
+
+</select>
+</div>
+
+<div class="setting">
+<label>Sound duration</label>
+
+<input
+id="soundDuration"
+type="range"
+min="100"
+max="5000"
+step="100"
+>
+
+<div
+class="setting-value"
+id="soundDurationValue"
+></div>
+
+</div>
+
+<div class="setting">
+<label>Sound volume</label>
+
+<input
+id="soundVolume"
+type="range"
+min="0"
+max="100"
+step="1"
+>
+
+<div
+class="setting-value"
+id="soundVolumeValue"
+></div>
+
+</div>
+
+<div class="setting">
+<label>Notification preview</label>
+
+<select id="notificationPreview">
+<option value="full">Show message</option>
+<option value="name">Name only</option>
+<option value="generic">New message</option>
+</select>
+</div>
 
 <button
-    class="save-btn"
-    id="testNotification"
-    type="button"
+class="test-btn"
+id="testNotification"
 >
-Test Windows notification
+🔔 Test Windows notification
 </button>
 
+</div>
+</div>
+
+
+<!-- LINKS -->
+
+<div class="category">
+
+<button class="category-title">
+<span>🔗 Links & Media</span>
+<span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+<label>Clickable links</label>
+
+<select id="clickableLinks">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
+</div>
+
+<div class="setting">
+<label>Automatic image links</label>
+
+<select id="imageLinks">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
+</div>
+
+<div class="setting">
+<label>Open links in new tab</label>
+
+<select id="newTabLinks">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
 </div>
 
 </div>
@@ -923,14 +959,15 @@ Test Windows notification
 <div class="category">
 
 <button class="category-title">
-    <span>⚙️ Behavior</span>
-    <span>⌄</span>
+<span>⚙️ Behavior</span>
+<span>⌄</span>
 </button>
 
 <div class="category-body">
 
 <div class="setting">
 <label>Enter to send</label>
+
 <select id="enterToSend">
 <option value="true">On</option>
 <option value="false">Off</option>
@@ -938,16 +975,18 @@ Test Windows notification
 </div>
 
 <div class="setting">
-<label>Auto-scroll</label>
-<select id="autoScroll">
+<label>Confirm before deleting</label>
+
+<select id="confirmDelete">
 <option value="true">On</option>
 <option value="false">Off</option>
 </select>
 </div>
 
 <div class="setting">
-<label>Confirm before deleting</label>
-<select id="confirmDelete">
+<label>Keep composer text after failed send</label>
+
+<select id="keepText">
 <option value="true">On</option>
 <option value="false">Off</option>
 </select>
@@ -967,7 +1006,7 @@ Save settings
 <div class="danger-zone">
 
 <div class="danger-title">
-    ⚠ Danger Zone
+⚠ Danger Zone
 </div>
 
 <p>
@@ -990,11 +1029,12 @@ Remove everything
 
 <div class="context-menu" id="contextMenu">
 
-<button id="editMessage">
-Edit
-</button>
+<button id="editMessage">Edit</button>
 
-<button class="delete-option" id="deleteMessage">
+<button
+class="delete-option"
+id="deleteMessage"
+>
 Delete
 </button>
 
@@ -1005,11 +1045,18 @@ Delete
 
 <div class="image-viewer" id="imageViewer">
 
-<button class="back-image" id="backImage">
+<button
+class="back-image"
+id="backImage"
+>
 ← Back
 </button>
 
-<img class="full-image" id="fullImage" alt="Full image">
+<img
+class="full-image"
+id="fullImage"
+alt="Full image"
+>
 
 </div>
 
@@ -1030,7 +1077,10 @@ Delete
 Cancel
 </button>
 
-<button class="danger" id="dialogConfirm">
+<button
+class="danger"
+id="dialogConfirm"
+>
 Yes
 </button>
 
@@ -1040,335 +1090,292 @@ Yes
 </div>
 
 
-<!-- WINDOWS STYLE NOTIFICATION -->
-
-<div
-    class="windows-notification"
-    id="windowsNotification"
->
-
-<div class="notification-top">
-
-<div class="notification-icon">
-💬
-</div>
-
-<div class="notification-title">
-Chat
-</div>
-
-<button
-    class="notification-close"
-    id="notificationClose"
->
-×
-</button>
-
-</div>
-
-<div
-    class="notification-body"
-    id="notificationBody"
->
-New message
-</div>
-
-</div>
-
-
 <script>
 
 const API_URL="/api/messages";
 const CHANNEL="general";
 
 
-/* =========================================================
-DEVICE
-========================================================= */
+/* DEVICE */
 
 let deviceId=localStorage.getItem("chat_device_id");
 
 if(!deviceId){
 
-    deviceId=crypto.randomUUID();
+    deviceId=
+        crypto.randomUUID();
 
     localStorage.setItem(
         "chat_device_id",
         deviceId
     );
+
 }
 
 
-/* =========================================================
-SETTINGS
-========================================================= */
+/* SETTINGS */
 
 const defaults={
 
-    username:"",
+username:"",
 
-    theme:"dark",
+theme:"dark",
 
-    refreshRate:500,
+refreshRate:500,
 
-    showTimestamps:true,
+showTimestamps:true,
 
-    compactMessages:false,
+timestampFormat:"short",
 
-    textSize:16,
+autoScroll:true,
 
-    wordSpacing:0,
+textSize:16,
 
-    lineSpacing:1.45,
+wordSpacing:0,
 
-    cornerRadius:12,
+lineSpacing:1.45,
 
-    uiScale:1,
+messageDensity:"normal",
 
-    notificationSound:true,
+cornerRadius:12,
 
-    notificationSoundType:1,
+uiScale:1,
 
-    notificationVolume:70,
+desktopNotifications:false,
 
-    notificationDuration:1000,
+hiddenOnly:true,
 
-    desktopNotifications:true,
+notificationSound:true,
 
-    mentionNotifications:true,
+soundTheme:"classic",
 
-    enterToSend:true,
+soundDuration:1000,
 
-    autoScroll:true,
+soundVolume:70,
 
-    confirmDelete:true
+notificationPreview:"full",
+
+clickableLinks:true,
+
+imageLinks:true,
+
+newTabLinks:true,
+
+enterToSend:true,
+
+confirmDelete:true,
+
+keepText:true
 
 };
 
 
 function getSetting(key){
 
-    const value=
-        localStorage.getItem(
-            "chat_"+key
-        );
+const value=
+localStorage.getItem(
+"chat_"+key
+);
 
-    if(value===null){
-        return defaults[key];
-    }
+if(value===null){
 
-    if(
-        value==="true"||
-        value==="false"
-    ){
-        return value==="true";
-    }
+return defaults[key];
 
-    const number=Number(value);
+}
 
-    return Number.isNaN(number)
-        ?value
-        :number;
+if(
+value==="true"||
+value==="false"
+){
+
+return value==="true";
+
+}
+
+const number=Number(value);
+
+return Number.isNaN(number)
+?value
+:number;
+
 }
 
 
 let settings={};
 
 Object.keys(defaults).forEach(
-    key=>{
-        settings[key]=getSetting(key);
-    }
-);
+key=>{
+settings[key]=getSetting(key);
+});
 
 
-/* =========================================================
-ELEMENTS
-========================================================= */
+/* ELEMENTS */
 
 const messagesEl=
-    document.getElementById("messages");
+document.getElementById("messages");
 
 const messageInput=
-    document.getElementById("messageInput");
+document.getElementById("messageInput");
 
 const sendBtn=
-    document.getElementById("sendBtn");
+document.getElementById("sendBtn");
 
 const imageInput=
-    document.getElementById("imageInput");
+document.getElementById("imageInput");
 
 const attachBtn=
-    document.getElementById("attachBtn");
+document.getElementById("attachBtn");
 
 const settingsBtn=
-    document.getElementById("settingsBtn");
+document.getElementById("settingsBtn");
 
 const settingsOverlay=
-    document.getElementById("settingsOverlay");
+document.getElementById("settingsOverlay");
 
 const closeSettings=
-    document.getElementById("closeSettings");
+document.getElementById("closeSettings");
 
 const saveSettings=
-    document.getElementById("saveSettings");
+document.getElementById("saveSettings");
 
 const usernameInput=
-    document.getElementById("usernameInput");
+document.getElementById("usernameInput");
 
 const deviceIdInput=
-    document.getElementById("deviceIdInput");
+document.getElementById("deviceIdInput");
 
 const themeSelect=
-    document.getElementById("themeSelect");
+document.getElementById("themeSelect");
 
 const refreshRate=
-    document.getElementById("refreshRate");
+document.getElementById("refreshRate");
 
 const showTimestamps=
-    document.getElementById("showTimestamps");
+document.getElementById("showTimestamps");
 
-const compactMessages=
-    document.getElementById("compactMessages");
-
-const textSize=
-    document.getElementById("textSize");
-
-const wordSpacing=
-    document.getElementById("wordSpacing");
-
-const lineSpacing=
-    document.getElementById("lineSpacing");
-
-const cornerRadius=
-    document.getElementById("cornerRadius");
-
-const uiScale=
-    document.getElementById("uiScale");
-
-const notificationSound=
-    document.getElementById("notificationSound");
-
-const notificationSoundType=
-    document.getElementById(
-        "notificationSoundType"
-    );
-
-const notificationVolume=
-    document.getElementById(
-        "notificationVolume"
-    );
-
-const notificationDuration=
-    document.getElementById(
-        "notificationDuration"
-    );
-
-const desktopNotifications=
-    document.getElementById(
-        "desktopNotifications"
-    );
-
-const mentionNotifications=
-    document.getElementById(
-        "mentionNotifications"
-    );
-
-const testNotification=
-    document.getElementById(
-        "testNotification"
-    );
-
-const enterToSend=
-    document.getElementById("enterToSend");
+const timestampFormat=
+document.getElementById("timestampFormat");
 
 const autoScroll=
-    document.getElementById("autoScroll");
+document.getElementById("autoScroll");
+
+const textSize=
+document.getElementById("textSize");
+
+const wordSpacing=
+document.getElementById("wordSpacing");
+
+const lineSpacing=
+document.getElementById("lineSpacing");
+
+const messageDensity=
+document.getElementById("messageDensity");
+
+const cornerRadius=
+document.getElementById("cornerRadius");
+
+const uiScale=
+document.getElementById("uiScale");
+
+const desktopNotifications=
+document.getElementById("desktopNotifications");
+
+const hiddenOnly=
+document.getElementById("hiddenOnly");
+
+const notificationSound=
+document.getElementById("notificationSound");
+
+const soundTheme=
+document.getElementById("soundTheme");
+
+const soundDuration=
+document.getElementById("soundDuration");
+
+const soundVolume=
+document.getElementById("soundVolume");
+
+const notificationPreview=
+document.getElementById("notificationPreview");
+
+const clickableLinks=
+document.getElementById("clickableLinks");
+
+const imageLinks=
+document.getElementById("imageLinks");
+
+const newTabLinks=
+document.getElementById("newTabLinks");
+
+const enterToSend=
+document.getElementById("enterToSend");
 
 const confirmDelete=
-    document.getElementById("confirmDelete");
+document.getElementById("confirmDelete");
+
+const keepText=
+document.getElementById("keepText");
+
+const testNotification=
+document.getElementById("testNotification");
 
 const contextMenu=
-    document.getElementById("contextMenu");
+document.getElementById("contextMenu");
 
 const editMessageBtn=
-    document.getElementById("editMessage");
+document.getElementById("editMessage");
 
 const deleteMessageBtn=
-    document.getElementById("deleteMessage");
+document.getElementById("deleteMessage");
 
 const imageViewer=
-    document.getElementById("imageViewer");
+document.getElementById("imageViewer");
 
 const fullImage=
-    document.getElementById("fullImage");
+document.getElementById("fullImage");
 
 const backImage=
-    document.getElementById("backImage");
+document.getElementById("backImage");
 
 const dialogOverlay=
-    document.getElementById("dialogOverlay");
+document.getElementById("dialogOverlay");
 
 const dialogTitle=
-    document.getElementById("dialogTitle");
+document.getElementById("dialogTitle");
 
 const dialogText=
-    document.getElementById("dialogText");
+document.getElementById("dialogText");
 
 const dialogCancel=
-    document.getElementById("dialogCancel");
+document.getElementById("dialogCancel");
 
 const dialogConfirm=
-    document.getElementById("dialogConfirm");
+document.getElementById("dialogConfirm");
 
 const removeEverything=
-    document.getElementById(
-        "removeEverything"
-    );
+document.getElementById("removeEverything");
 
-const windowsNotification=
-    document.getElementById(
-        "windowsNotification"
-    );
-
-const notificationBody=
-    document.getElementById(
-        "notificationBody"
-    );
-
-const notificationClose=
-    document.getElementById(
-        "notificationClose"
-    );
 
 const textSizeValue=
-    document.getElementById(
-        "textSizeValue"
-    );
+document.getElementById("textSizeValue");
 
 const wordSpacingValue=
-    document.getElementById(
-        "wordSpacingValue"
-    );
+document.getElementById("wordSpacingValue");
 
 const lineSpacingValue=
-    document.getElementById(
-        "lineSpacingValue"
-    );
+document.getElementById("lineSpacingValue");
 
 const cornerRadiusValue=
-    document.getElementById(
-        "cornerRadiusValue"
-    );
+document.getElementById("cornerRadiusValue");
 
 const uiScaleValue=
-    document.getElementById(
-        "uiScaleValue"
-    );
+document.getElementById("uiScaleValue");
 
-const notificationVolumeValue=
-    document.getElementById(
-        "notificationVolumeValue"
-    );
+const soundDurationValue=
+document.getElementById("soundDurationValue");
+
+const soundVolumeValue=
+document.getElementById("soundVolumeValue");
 
 
 let selectedFile=null;
@@ -1376,2368 +1383,2369 @@ let selectedMessage=null;
 let currentMessages=[];
 let confirmCallback=null;
 let refreshTimer=null;
-
-let lastKnownMessageIds=
-    new Set();
-
-let firstMessageLoad=true;
-
-let notificationTimeout=null;
+let audioContext=null;
 
 
-/* =========================================================
-SETTINGS APPLY
-========================================================= */
+/* APPLY SETTINGS */
 
 function applySettings(){
 
-    document.documentElement.style.setProperty(
-        "--text-size",
-        settings.textSize+"px"
-    );
+document.documentElement.style.setProperty(
+"--text-size",
+settings.textSize+"px"
+);
 
-    document.documentElement.style.setProperty(
-        "--word-spacing",
-        settings.wordSpacing+"px"
-    );
+document.documentElement.style.setProperty(
+"--word-spacing",
+settings.wordSpacing+"px"
+);
 
-    document.documentElement.style.setProperty(
-        "--line-spacing",
-        settings.lineSpacing
-    );
+document.documentElement.style.setProperty(
+"--line-spacing",
+settings.lineSpacing
+);
 
-    document.documentElement.style.setProperty(
-        "--radius",
-        settings.cornerRadius+"px"
-    );
+document.documentElement.style.setProperty(
+"--radius",
+settings.cornerRadius+"px"
+);
 
-    document.documentElement.style.setProperty(
-        "--ui-scale",
-        settings.uiScale
-    );
+document.documentElement.style.setProperty(
+"--ui-scale",
+settings.uiScale
+);
 
-    applyTheme(settings.theme);
+let gap=17;
 
-    renderMessages();
+if(settings.messageDensity==="compact")
+gap=7;
 
-    startRefreshTimer();
+if(settings.messageDensity==="spacious")
+gap=28;
+
+document.documentElement.style.setProperty(
+"--message-gap",
+gap+"px"
+);
+
+applyTheme(settings.theme);
+
+renderMessages();
+
+startRefreshTimer();
+
 }
 
 
-/* =========================================================
-THEMES
-========================================================= */
+/* THEMES */
 
 function applyTheme(name){
 
-    const themes={
+const themes={
 
-        dark:["#0b0d10","#111419"],
+dark:["#0b0d10","#111419"],
 
-        midnight:["#080b14","#101522"],
+midnight:["#080b14","#101522"],
 
-        slate:["#101418","#171d22"],
+slate:["#101418","#171d22"],
 
-        black:["#000","#090909"],
+black:["#000","#090909"],
 
-        blue:["#091018","#101c29"],
+blue:["#091018","#101c29"],
 
-        purple:["#100b17","#191021"],
+purple:["#100b17","#191021"],
 
-        green:["#09120d","#101b15"],
+green:["#09120d","#101b15"],
 
-        red:["#140b0b","#1e1111"],
+red:["#140b0b","#1e1111"],
 
-        gray:["#151515","#202020"],
+gray:["#151515","#202020"],
 
-        light:["#eeeeee","#fff"],
+light:["#eeeeee","#fff"],
 
-        oled:["#000","#000"]
+oled:["#000","#000"],
 
-    };
+carbon:["#0d0d0d","#161616"],
 
-    const t=
-        themes[name]||
-        themes.dark;
+steel:["#101214","#1b1e21"],
 
-    document.documentElement.style.setProperty(
-        "--bg",
-        t[0]
-    );
+terminal:["#030903","#071007"],
 
-    document.documentElement.style.setProperty(
-        "--panel",
-        t[1]
-    );
+brown:["#120e0b","#1d1611"]
 
-    document.body.style.background=t[0];
+};
+
+const t=themes[name]||themes.dark;
+
+document.documentElement.style.setProperty(
+"--bg",t[0]
+);
+
+document.documentElement.style.setProperty(
+"--panel",t[1]
+);
+
+document.body.style.background=t[0];
+
 }
 
 
-/* =========================================================
-LOAD SETTINGS UI
-========================================================= */
+/* SETTINGS UI */
 
 function loadSettingsUI(){
 
-    usernameInput.value=
-        settings.username;
+usernameInput.value=settings.username;
 
-    deviceIdInput.value=
-        deviceId;
+deviceIdInput.value=deviceId;
 
-    themeSelect.value=
-        settings.theme;
+themeSelect.value=settings.theme;
 
-    refreshRate.value=
-        settings.refreshRate;
+refreshRate.value=settings.refreshRate;
 
-    showTimestamps.value=
-        String(settings.showTimestamps);
+showTimestamps.value=
+String(settings.showTimestamps);
 
-    compactMessages.value=
-        String(settings.compactMessages);
+timestampFormat.value=
+settings.timestampFormat;
 
-    textSize.value=
-        settings.textSize;
+autoScroll.value=
+String(settings.autoScroll);
 
-    wordSpacing.value=
-        settings.wordSpacing;
+textSize.value=settings.textSize;
 
-    lineSpacing.value=
-        settings.lineSpacing;
+wordSpacing.value=settings.wordSpacing;
 
-    cornerRadius.value=
-        settings.cornerRadius;
+lineSpacing.value=settings.lineSpacing;
 
-    uiScale.value=
-        settings.uiScale;
+messageDensity.value=
+settings.messageDensity;
 
-    notificationSound.value=
-        String(settings.notificationSound);
+cornerRadius.value=
+settings.cornerRadius;
 
-    notificationSoundType.value=
-        settings.notificationSoundType;
+uiScale.value=
+settings.uiScale;
 
-    notificationVolume.value=
-        settings.notificationVolume;
+desktopNotifications.value=
+String(settings.desktopNotifications);
 
-    notificationDuration.value=
-        settings.notificationDuration;
+hiddenOnly.value=
+String(settings.hiddenOnly);
 
-    desktopNotifications.value=
-        String(settings.desktopNotifications);
+notificationSound.value=
+String(settings.notificationSound);
 
-    mentionNotifications.value=
-        String(settings.mentionNotifications);
+soundTheme.value=
+settings.soundTheme;
 
-    enterToSend.value=
-        String(settings.enterToSend);
+soundDuration.value=
+settings.soundDuration;
 
-    autoScroll.value=
-        String(settings.autoScroll);
+soundVolume.value=
+settings.soundVolume;
 
-    confirmDelete.value=
-        String(settings.confirmDelete);
+notificationPreview.value=
+settings.notificationPreview;
 
-    updateRangeLabels();
+clickableLinks.value=
+String(settings.clickableLinks);
+
+imageLinks.value=
+String(settings.imageLinks);
+
+newTabLinks.value=
+String(settings.newTabLinks);
+
+enterToSend.value=
+String(settings.enterToSend);
+
+confirmDelete.value=
+String(settings.confirmDelete);
+
+keepText.value=
+String(settings.keepText);
+
+updateRangeLabels();
+
 }
 
 
 function updateRangeLabels(){
 
-    textSizeValue.textContent=
-        settings.textSize+"px";
+textSizeValue.textContent=
+settings.textSize+"px";
 
-    wordSpacingValue.textContent=
-        settings.wordSpacing+"px";
+wordSpacingValue.textContent=
+settings.wordSpacing+"px";
 
-    lineSpacingValue.textContent=
-        settings.lineSpacing;
+lineSpacingValue.textContent=
+settings.lineSpacing;
 
-    cornerRadiusValue.textContent=
-        settings.cornerRadius+"px";
+cornerRadiusValue.textContent=
+settings.cornerRadius+"px";
 
-    uiScaleValue.textContent=
-        Math.round(
-            settings.uiScale*100
-        )+"%";
+uiScaleValue.textContent=
+Math.round(settings.uiScale*100)+"%";
 
-    notificationVolumeValue.textContent=
-        notificationVolume.value+"%";
+soundDurationValue.textContent=
+(settings.soundDuration/1000)
+.toFixed(1)+" seconds";
+
+soundVolumeValue.textContent=
+settings.soundVolume+"%";
+
 }
 
 
-/* =========================================================
-SETTINGS PANEL
-========================================================= */
+/* SETTINGS */
 
 settingsBtn.onclick=()=>{
 
-    loadSettingsUI();
+loadSettingsUI();
 
-    settingsOverlay.classList.add("show");
+settingsOverlay.classList.add("show");
+
 };
 
 
 closeSettings.onclick=()=>{
 
-    settingsOverlay.classList.remove(
-        "show"
-    );
+settingsOverlay.classList.remove("show");
+
 };
 
 
-saveSettings.onclick=()=>{
+saveSettings.onclick=async()=>{
 
-    settings.username=
-        usernameInput.value
-        .trim()
-        .substring(0,24);
+settings.username=
+usernameInput.value
+.trim()
+.substring(0,24);
 
-    settings.theme=
-        themeSelect.value;
+settings.theme=
+themeSelect.value;
 
-    settings.refreshRate=
-        Number(refreshRate.value);
+settings.refreshRate=
+Number(refreshRate.value);
 
-    settings.showTimestamps=
-        showTimestamps.value==="true";
+settings.showTimestamps=
+showTimestamps.value==="true";
 
-    settings.compactMessages=
-        compactMessages.value==="true";
+settings.timestampFormat=
+timestampFormat.value;
 
-    settings.textSize=
-        Number(textSize.value);
+settings.autoScroll=
+autoScroll.value==="true";
 
-    settings.wordSpacing=
-        Number(wordSpacing.value);
+settings.textSize=
+Number(textSize.value);
 
-    settings.lineSpacing=
-        Number(lineSpacing.value);
+settings.wordSpacing=
+Number(wordSpacing.value);
 
-    settings.cornerRadius=
-        Number(cornerRadius.value);
+settings.lineSpacing=
+Number(lineSpacing.value);
 
-    settings.uiScale=
-        Number(uiScale.value);
+settings.messageDensity=
+messageDensity.value;
 
-    settings.notificationSound=
-        notificationSound.value==="true";
+settings.cornerRadius=
+Number(cornerRadius.value);
 
-    settings.notificationSoundType=
-        Number(
-            notificationSoundType.value
-        );
+settings.uiScale=
+Number(uiScale.value);
 
-    settings.notificationVolume=
-        Number(
-            notificationVolume.value
-        );
+settings.desktopNotifications=
+desktopNotifications.value==="true";
 
-    settings.notificationDuration=
-        Number(
-            notificationDuration.value
-        );
+settings.hiddenOnly=
+hiddenOnly.value==="true";
 
-    settings.desktopNotifications=
-        desktopNotifications.value==="true";
+settings.notificationSound=
+notificationSound.value==="true";
 
-    settings.mentionNotifications=
-        mentionNotifications.value==="true";
+settings.soundTheme=
+soundTheme.value;
 
-    settings.enterToSend=
-        enterToSend.value==="true";
+settings.soundDuration=
+Number(soundDuration.value);
 
-    settings.autoScroll=
-        autoScroll.value==="true";
+settings.soundVolume=
+Number(soundVolume.value);
 
-    settings.confirmDelete=
-        confirmDelete.value==="true";
+settings.notificationPreview=
+notificationPreview.value;
 
-    Object.keys(settings).forEach(
-        key=>{
+settings.clickableLinks=
+clickableLinks.value==="true";
 
-            localStorage.setItem(
-                "chat_"+key,
-                settings[key]
-            );
+settings.imageLinks=
+imageLinks.value==="true";
 
-        }
-    );
+settings.newTabLinks=
+newTabLinks.value==="true";
 
-    applySettings();
+settings.enterToSend=
+enterToSend.value==="true";
 
-    settingsOverlay.classList.remove(
-        "show"
-    );
-};
+settings.confirmDelete=
+confirmDelete.value==="true";
+
+settings.keepText=
+keepText.value==="true";
 
 
-/* =========================================================
-ACCORDIONS
-========================================================= */
+Object.keys(settings).forEach(key=>{
 
-document
-.querySelectorAll(".category-title")
-.forEach(btn=>{
-
-    btn.onclick=()=>{
-
-        btn.parentElement
-        .classList
-        .toggle("open");
-
-    };
+localStorage.setItem(
+"chat_"+key,
+settings[key]
+);
 
 });
 
 
-/* =========================================================
-RANGE PREVIEW
-========================================================= */
+applySettings();
+
+settingsOverlay.classList.remove("show");
+
+
+if(settings.desktopNotifications){
+
+await requestNotificationPermission();
+
+}
+
+};
+
+
+/* ACCORDIONS */
+
+document.querySelectorAll(".category-title")
+.forEach(btn=>{
+
+btn.onclick=()=>{
+
+btn.parentElement.classList.toggle("open");
+
+};
+
+});
+
+
+/* RANGE PREVIEWS */
 
 textSize.oninput=()=>{
-
-    textSizeValue.textContent=
-        textSize.value+"px";
-
+textSizeValue.textContent=
+textSize.value+"px";
 };
 
 wordSpacing.oninput=()=>{
-
-    wordSpacingValue.textContent=
-        wordSpacing.value+"px";
-
+wordSpacingValue.textContent=
+wordSpacing.value+"px";
 };
 
 lineSpacing.oninput=()=>{
-
-    lineSpacingValue.textContent=
-        lineSpacing.value;
-
+lineSpacingValue.textContent=
+lineSpacing.value;
 };
 
 cornerRadius.oninput=()=>{
-
-    cornerRadiusValue.textContent=
-        cornerRadius.value+"px";
-
+cornerRadiusValue.textContent=
+cornerRadius.value+"px";
 };
 
 uiScale.oninput=()=>{
-
-    uiScaleValue.textContent=
-        Math.round(
-            uiScale.value*100
-        )+"%";
-
+uiScaleValue.textContent=
+Math.round(uiScale.value*100)+"%";
 };
 
-notificationVolume.oninput=()=>{
+soundDuration.oninput=()=>{
+soundDurationValue.textContent=
+(Number(soundDuration.value)/1000)
+.toFixed(1)+" seconds";
+};
 
-    notificationVolumeValue.textContent=
-        notificationVolume.value+"%";
-
+soundVolume.oninput=()=>{
+soundVolumeValue.textContent=
+soundVolume.value+"%";
 };
 
 
-/* =========================================================
-TEXTAREA
-========================================================= */
+/* TEXTAREA */
 
 messageInput.addEventListener(
-    "input",
-    ()=>{
+"input",
+()=>{
 
-        messageInput.style.height=
-            "auto";
+messageInput.style.height="auto";
 
-        messageInput.style.height=
-            Math.min(
-                messageInput.scrollHeight,
-                150
-            )+"px";
+messageInput.style.height=
+Math.min(
+messageInput.scrollHeight,
+150
+)+"px";
 
-    }
-);
+});
 
 
-/* =========================================================
-IMAGE
-========================================================= */
+/* IMAGE */
 
 attachBtn.onclick=()=>{
-
-    imageInput.click();
-
+imageInput.click();
 };
-
 
 imageInput.onchange=()=>{
 
-    selectedFile=
-        imageInput.files[0]||null;
+selectedFile=
+imageInput.files[0]||null;
 
-    attachBtn.textContent=
-        selectedFile
-        ?"✓"
-        :"＋";
+attachBtn.textContent=
+selectedFile?"✓":"＋";
 
 };
 
 
-/* =========================================================
-IMAGE RESIZE
-========================================================= */
+/* IMAGE RESIZE */
 
 function resizeImage(file){
 
-    return new Promise(
-        (resolve,reject)=>{
+return new Promise(
+(resolve,reject)=>{
 
-            const reader=
-                new FileReader();
+const reader=new FileReader();
 
-            reader.onload=()=>{
+reader.onload=()=>{
 
-                const img=
-                    new Image();
+const img=new Image();
 
-                img.onload=()=>{
+img.onload=()=>{
 
-                    let width=
-                        img.width;
+let width=img.width;
+let height=img.height;
 
-                    let height=
-                        img.height;
+const max=1500;
 
-                    const max=1500;
+if(width>max||height>max){
 
-                    if(
-                        width>max||
-                        height>max
-                    ){
+const scale=Math.min(
+max/width,
+max/height
+);
 
-                        const scale=
-                            Math.min(
-                                max/width,
-                                max/height
-                            );
+width=Math.round(width*scale);
+height=Math.round(height*scale);
 
-                        width=
-                            Math.round(
-                                width*scale
-                            );
+}
 
-                        height=
-                            Math.round(
-                                height*scale
-                            );
-                    }
+const canvas=
+document.createElement("canvas");
 
-                    const canvas=
-                        document.createElement(
-                            "canvas"
-                        );
+canvas.width=width;
+canvas.height=height;
 
-                    canvas.width=
-                        width;
+const ctx=
+canvas.getContext("2d");
 
-                    canvas.height=
-                        height;
+ctx.drawImage(
+img,
+0,
+0,
+width,
+height
+);
 
-                    const ctx=
-                        canvas.getContext(
-                            "2d"
-                        );
+resolve(
+canvas.toDataURL(
+"image/jpeg",
+.78
+)
+);
 
-                    ctx.drawImage(
-                        img,
-                        0,
-                        0,
-                        width,
-                        height
-                    );
+};
 
-                    resolve(
-                        canvas.toDataURL(
-                            "image/jpeg",
-                            .78
-                        )
-                    );
+img.onerror=reject;
 
-                };
+img.src=reader.result;
 
-                img.onerror=reject;
+};
 
-                img.src=
-                    reader.result;
-            };
+reader.onerror=reject;
 
-            reader.onerror=reject;
+reader.readAsDataURL(file);
 
-            reader.readAsDataURL(file);
+});
 
-        }
-    );
 }
 
 
-/* =========================================================
-SEND
-========================================================= */
+/* SEND */
 
-sendBtn.onclick=
-    sendMessage;
-
+sendBtn.onclick=sendMessage;
 
 messageInput.addEventListener(
-    "keydown",
-    event=>{
+"keydown",
+event=>{
 
-        if(
-            event.key==="Enter" &&
-            !event.shiftKey &&
-            settings.enterToSend
-        ){
+if(
+event.key==="Enter" &&
+!event.shiftKey &&
+settings.enterToSend
+){
 
-            event.preventDefault();
+event.preventDefault();
 
-            sendMessage();
+sendMessage();
 
-        }
+}
 
-    }
-);
+});
 
 
 async function sendMessage(){
 
-    const text=
-        messageInput.value.trim();
+const text=
+messageInput.value.trim();
 
-    if(!settings.username){
+if(!settings.username){
 
-        settingsBtn.click();
+settingsBtn.click();
 
-        usernameInput.focus();
+usernameInput.focus();
 
-        alert(
-            "Set your name in Settings first."
-        );
+alert(
+"Set your name in Settings first."
+);
 
-        return;
-    }
+return;
 
-    if(!text&&!selectedFile){
-        return;
-    }
+}
 
-    sendBtn.disabled=true;
+if(!text&&!selectedFile)
+return;
 
-    try{
+sendBtn.disabled=true;
 
-        let image=null;
+try{
 
-        if(selectedFile){
+let image=null;
 
-            image=
-                await resizeImage(
-                    selectedFile
-                );
-        }
+if(selectedFile){
 
-        const response=
-            await fetch(
-                API_URL,
-                {
-                    method:"POST",
+image=
+await resizeImage(selectedFile);
 
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
+}
 
-                    body:JSON.stringify({
+const response=
+await fetch(API_URL,{
 
-                        username:
-                            settings.username,
+method:"POST",
 
-                        channel:
-                            CHANNEL,
+headers:{
+"Content-Type":"application/json"
+},
 
-                        message:
-                            text,
+body:JSON.stringify({
 
-                        image:
-                            image,
+username:settings.username,
 
-                        device_id:
-                            deviceId
+channel:CHANNEL,
 
-                    })
-                }
-            );
+message:text,
 
-        const data=
-            await response.json();
+image:image,
 
-        if(!response.ok){
+device_id:deviceId
 
-            throw new Error(
-                data.error||
-                "Failed to send message."
-            );
-        }
+})
 
-        messageInput.value="";
+});
 
-        messageInput.style.height=
-            "auto";
+const data=
+await response.json();
 
-        selectedFile=null;
+if(!response.ok){
 
-        imageInput.value="";
+throw new Error(
+data.error||
+"Failed to send message."
+);
 
-        attachBtn.textContent="＋";
+}
 
-        await loadMessages();
+messageInput.value="";
 
-    }catch(error){
+messageInput.style.height="auto";
 
-        alert(
-            "Failed to send:\n\n"+
-            error.message
-        );
+selectedFile=null;
 
-    }finally{
+imageInput.value="";
 
-        sendBtn.disabled=false;
+attachBtn.textContent="＋";
 
-    }
+await loadMessages();
+
+}catch(error){
+
+if(!settings.keepText){
+
+messageInput.value="";
+
+}
+
+alert(
+"Failed to send:\n\n"+
+error.message
+);
+
+}finally{
+
+sendBtn.disabled=false;
+
+}
+
 }
 
 
-/* =========================================================
-LOAD
-========================================================= */
+/* LOAD */
 
 async function loadMessages(){
 
-    try{
+try{
 
-        const response=
-            await fetch(
-                API_URL+
-                "?channel="+
-                encodeURIComponent(
-                    CHANNEL
-                ),
-                {
-                    cache:"no-store"
-                }
-            );
+const response=
+await fetch(
+API_URL+
+"?channel="+
+encodeURIComponent(CHANNEL)
+);
 
-        const data=
-            await response.json();
+const data=
+await response.json();
 
-        if(!response.ok){
+if(!response.ok){
 
-            throw new Error(
-                data.error||
-                "Failed to load messages."
-            );
-        }
+throw new Error(
+data.error||
+"Failed to load messages."
+);
 
-        const newMessages=
-            Array.isArray(data.messages)
-            ?data.messages
-            :[];
+}
 
-        /*
-         * Detect messages that appeared since
-         * the previous refresh.
-         */
+const oldMessages=
+currentMessages;
 
-        if(!firstMessageLoad){
+currentMessages=
+Array.isArray(data.messages)
+?data.messages
+:[];
 
-            const newOnes=
-                newMessages.filter(
-                    msg=>
-                        msg.id &&
-                        !lastKnownMessageIds.has(
-                            msg.id
-                        )
-                );
 
-            for(
-                const message
-                of newOnes
-            ){
+/*
+Detect newly received messages.
+*/
 
-                handleIncomingMessage(
-                    message
-                );
+if(oldMessages.length){
 
-            }
-        }
+const oldIds=
+new Set(
+oldMessages.map(m=>String(m.id))
+);
 
-        currentMessages=
-            newMessages;
+const newMessages=
+currentMessages.filter(
+m=>!oldIds.has(String(m.id))
+);
 
-        lastKnownMessageIds=
-            new Set(
-                currentMessages
-                .map(
-                    message=>message.id
-                )
-                .filter(Boolean)
-            );
+for(const message of newMessages){
 
-        firstMessageLoad=false;
+handleIncomingNotification(message);
 
-        renderMessages();
+}
 
-    }catch(error){
+}
 
-        messagesEl.innerHTML=`
-            <div class="empty">
-                <div>
-                    <strong>
-                        Unable to load messages
-                    </strong>
-                    ${escapeHtml(
-                        error.message
-                    )}
-                </div>
-            </div>
-        `;
+renderMessages();
 
-    }
+}catch(error){
+
+messagesEl.innerHTML=`
+
+<div class="empty">
+
+<div>
+
+<strong>
+Unable to load messages
+</strong>
+
+${escapeHtml(error.message)}
+
+</div>
+
+</div>
+
+`;
+
+}
 
 }
 
 
-/* =========================================================
-INCOMING MESSAGE
-========================================================= */
+/* NOTIFICATION PERMISSION */
 
-function handleIncomingMessage(
-    message
+async function requestNotificationPermission(){
+
+if(!("Notification" in window)){
+
+alert(
+"Your browser does not support desktop notifications."
+);
+
+return false;
+
+}
+
+if(Notification.permission==="granted")
+return true;
+
+if(Notification.permission==="denied"){
+
+alert(
+"Notifications are blocked in your browser. Allow notifications for this site in browser settings."
+);
+
+return false;
+
+}
+
+const permission=
+await Notification.requestPermission();
+
+return permission==="granted";
+
+}
+
+
+/* NOTIFICATION */
+
+let lastNotificationId=null;
+
+function handleIncomingNotification(message){
+
+if(!message)
+return;
+
+if(
+String(message.device_id)===
+String(deviceId)
+)
+return;
+
+if(
+settings.hiddenOnly &&
+document.visibilityState!=="hidden"
+)
+return;
+
+if(
+settings.desktopNotifications
 ){
 
-    /*
-     * Do not notify for your own messages.
-     */
+showWindowsNotification(message);
 
-    if(
-        message.device_id &&
-        message.device_id===deviceId
-    ){
-
-        return;
-    }
-
-    /*
-     * IMPORTANT:
-     *
-     * When the user is actively looking at
-     * the page, don't play a sound and don't
-     * show a desktop notification.
-     */
-
-    if(
-        document.visibilityState==="visible" &&
-        document.hasFocus()
-    ){
-
-        return;
-    }
-
-    /*
-     * Mention filtering.
-     */
-
-    if(
-        settings.mentionNotifications &&
-        settings.username &&
-        message.message
-    ){
-
-        const escaped=
-            settings.username
-            .replace(
-                /[.*+?^${}()|[\]\\]/g,
-                "\\$&"
-            );
-
-        const mentionRegex=
-            new RegExp(
-                "(^|\\s)@?"+
-                escaped+
-                "(\\s|$)",
-                "i"
-            );
-
-        if(
-            !mentionRegex.test(
-                message.message
-            )
-        ){
-
-            /*
-             * If mention notifications
-             * are specifically enabled,
-             * normal messages still notify.
-             *
-             * This intentionally does not
-             * suppress normal messages.
-             */
-
-        }
-    }
-
-    const preview=
-        message.message||
-        (
-            message.image
-            ?"📷 Image"
-            :"New message"
-        );
-
-    showWindowsNotification(
-        message.username||
-        "Chat",
-        preview
-    );
-
-    if(
-        settings.notificationSound
-    ){
-
-        playNotificationSound(
-            settings.notificationSoundType,
-            settings.notificationVolume/100,
-            settings.notificationDuration
-        );
-
-    }
 }
 
-
-/* =========================================================
-WINDOWS STYLE NOTIFICATION
-========================================================= */
-
-function showWindowsNotification(
-    title,
-    body
+if(
+settings.notificationSound
 ){
 
-    if(
-        settings.desktopNotifications
-    ){
+if(document.visibilityState==="hidden"){
 
-        requestDesktopPermission()
-        .then(permission=>{
+playNotificationSound(
+settings.soundTheme,
+settings.soundDuration,
+settings.soundVolume
+);
 
-            if(
-                permission==="granted" &&
-                "Notification" in window
-            ){
+}
 
-                try{
+}
 
-                    const notification=
-                        new Notification(
-                            title,
-                            {
-                                body:
-                                    stripHtml(
-                                        body
-                                    ),
-                                icon:
-                                    "data:image/svg+xml,"+
-                                    encodeURIComponent(
-                                        `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
-                                        <rect width="64" height="64" rx="12" fill="#202020"/>
-                                        <text x="32" y="43" text-anchor="middle" font-size="32">💬</text>
-                                        </svg>`
-                                    ),
-                                tag:"chat-message"
-                            }
-                        );
-
-                    notification.onclick=()=>{
-                        window.focus();
-                        notification.close();
-                    };
-
-                }catch(error){
-
-                    console.warn(
-                        "Desktop notification failed:",
-                        error
-                    );
-
-                }
-
-            }
-
-        });
-
-    }
-
-
-    /*
-     * Also show our custom Windows-style
-     * notification while the page exists.
-     */
-
-    notificationBody.textContent=
-        body;
-
-    windowsNotification
-        .classList
-        .add("show");
-
-    if(notificationTimeout){
-
-        clearTimeout(
-            notificationTimeout
-        );
-
-    }
-
-    notificationTimeout=
-        setTimeout(
-            ()=>{
-                windowsNotification
-                    .classList
-                    .remove("show");
-            },
-            Math.max(
-                3000,
-                settings.notificationDuration
-            )
-        );
 }
 
 
-notificationClose.onclick=()=>{
+/* WINDOWS NOTIFICATION */
 
-    windowsNotification
-        .classList
-        .remove("show");
+async function showWindowsNotification(message){
+
+const allowed=
+await requestNotificationPermission();
+
+if(!allowed)
+return;
+
+let body="New message";
+
+if(settings.notificationPreview==="name"){
+
+body=
+(message.username||"Someone")+
+" sent a message";
+
+}
+
+else if(
+settings.notificationPreview==="full"
+){
+
+body=
+(message.message||
+(message.image?"📷 Image":"New message"))
+.substring(0,180);
+
+}
+
+const title=
+(message.username||"Chat")+
+" • #"+CHANNEL;
+
+
+/*
+Browser notifications behave like Windows
+notifications on supported Windows browsers.
+*/
+
+try{
+
+const notification=
+new Notification(
+title,
+{
+body:body,
+tag:"chat-"+message.id,
+renotify:true,
+silent:true
+}
+);
+
+notification.onclick=()=>{
+
+window.focus();
+
+notification.close();
+
+};
+
+}catch(error){
+
+console.warn(
+"Notification failed:",
+error
+);
+
+}
+
+}
+
+
+/* TEST NOTIFICATION */
+
+testNotification.onclick=async()=>{
+
+const allowed=
+await requestNotificationPermission();
+
+if(!allowed)
+return;
+
+const testMessage={
+
+id:"test-"+Date.now(),
+
+username:settings.username||
+"Chat",
+
+message:
+"This is a Windows notification test."
+
+};
+
+showWindowsNotification(
+testMessage
+);
+
+if(settings.notificationSound){
+
+playNotificationSound(
+settings.soundTheme,
+settings.soundDuration,
+settings.soundVolume
+);
+
+}
 
 };
 
 
-async function requestDesktopPermission(){
-
-    if(
-        !("Notification" in window)
-    ){
-
-        return "denied";
-    }
-
-    if(
-        Notification.permission===
-        "granted"
-    ){
-
-        return "granted";
-    }
-
-    if(
-        Notification.permission===
-        "denied"
-    ){
-
-        return "denied";
-    }
-
-    try{
-
-        return await Notification.requestPermission();
-
-    }catch{
-
-        return "denied";
-    }
-}
-
-
-/* =========================================================
-NOTIFICATION LINKS
-========================================================= */
-
-function linkifyNotificationText(
-    text
-){
-
-    const escaped=
-        escapeHtml(text);
-
-    return escaped.replace(
-        /(https?:\/\/[^\s<]+)/gi,
-        match=>{
-
-            return `
-                <a
-                    class="notification-link"
-                    href="${match}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >${match}</a>
-            `;
-
-        }
-    );
-}
-
-
-/* =========================================================
-AUDIO ENGINE
-========================================================= */
-
-let audioContext=null;
-
+/* AUDIO */
 
 function getAudioContext(){
 
-    if(!audioContext){
+if(!audioContext){
 
-        const AudioCtx=
-            window.AudioContext||
-            window.webkitAudioContext;
+audioContext=
+new (
+window.AudioContext||
+window.webkitAudioContext
+)();
 
-        if(!AudioCtx){
-            return null;
-        }
+}
 
-        audioContext=
-            new AudioCtx();
-    }
+if(
+audioContext.state==="suspended"
+){
 
-    if(
-        audioContext.state==="suspended"
-    ){
+audioContext.resume();
 
-        audioContext.resume()
-        .catch(()=>{});
+}
 
-    }
+return audioContext;
 
-    return audioContext;
 }
 
 
 /*
- * Creates one synthesized note.
- */
+These sounds are synthesized locally.
+No external audio files are needed.
+*/
 
 function playTone(
-    frequency,
-    startTime,
-    duration,
-    volume,
-    type="sine"
+ctx,
+frequency,
+start,
+duration,
+volume,
+type="sine"
 ){
 
-    const ctx=
-        getAudioContext();
+const oscillator=
+ctx.createOscillator();
 
-    if(!ctx){
-        return;
-    }
+const gain=
+ctx.createGain();
 
-    const oscillator=
-        ctx.createOscillator();
+oscillator.type=type;
 
-    const gain=
-        ctx.createGain();
+oscillator.frequency
+.setValueAtTime(
+frequency,
+start
+);
 
-    oscillator.type=type;
+gain.gain.setValueAtTime(
+0,
+start
+);
 
-    oscillator.frequency.setValueAtTime(
-        frequency,
-        startTime
-    );
+gain.gain.linearRampToValueAtTime(
+volume,
+start+.015
+);
 
-    gain.gain.setValueAtTime(
-        0,
-        startTime
-    );
+gain.gain.exponentialRampToValueAtTime(
+.001,
+start+duration
+);
 
-    gain.gain.linearRampToValueAtTime(
-        volume,
-        startTime+0.015
-    );
+oscillator.connect(gain);
 
-    gain.gain.exponentialRampToValueAtTime(
-        0.0001,
-        startTime+duration
-    );
+gain.connect(ctx.destination);
 
-    oscillator.connect(gain);
+oscillator.start(start);
 
-    gain.connect(ctx.destination);
+oscillator.stop(
+start+duration+.03
+);
 
-    oscillator.start(startTime);
-
-    oscillator.stop(
-        startTime+duration+0.03
-    );
 }
 
 
-/* =========================================================
-12 NOTIFICATION SOUNDS
-========================================================= */
+/* 15 SOUND THEMES */
 
 function playNotificationSound(
-    type,
-    volume,
-    duration
+theme,
+duration,
+volume
 ){
 
-    const ctx=
-        getAudioContext();
+const ctx=
+getAudioContext();
+
+const now=
+ctx.currentTime;
+
+const maxDuration=
+Math.max(
+.1,
+duration/1000
+);
+
+const master=
+Math.max(
+0,
+Math.min(1,volume/100)
+)*.25;
+
+
+/* 1 CLASSIC */
+
+if(theme==="classic"){
+
+playTone(
+ctx,
+880,
+now,
+Math.min(.18,maxDuration),
+master
+);
+
+playTone(
+ctx,
+1175,
+now+.19,
+Math.min(.22,maxDuration-.19),
+master
+);
+
+return;
 
-    if(!ctx){
-        return;
-    }
-
-    const now=
-        ctx.currentTime+0.02;
-
-    const maxDuration=
-        Math.max(
-            0.1,
-            duration/1000
-        );
-
-    /*
-     * 1 Classic
-     */
-
-    if(type===1){
-
-        playTone(
-            880,
-            now,
-            maxDuration*.45,
-            volume*.35,
-            "sine"
-        );
-
-        playTone(
-            1175,
-            now+maxDuration*.45,
-            maxDuration*.45,
-            volume*.3,
-            "sine"
-        );
-
-    }
-
-
-    /*
-     * 2 Soft
-     */
-
-    else if(type===2){
-
-        playTone(
-            523.25,
-            now,
-            maxDuration*.8,
-            volume*.22,
-            "sine"
-        );
-
-    }
-
-
-    /*
-     * 3 Double beep
-     */
-
-    else if(type===3){
-
-        playTone(
-            740,
-            now,
-            maxDuration*.25,
-            volume*.35,
-            "square"
-        );
-
-        playTone(
-            740,
-            now+maxDuration*.35,
-            maxDuration*.25,
-            volume*.35,
-            "square"
-        );
-
-    }
-
-
-    /*
-     * 4 Digital
-     */
-
-    else if(type===4){
-
-        playTone(
-            1000,
-            now,
-            maxDuration*.18,
-            volume*.28,
-            "square"
-        );
-
-        playTone(
-            1500,
-            now+maxDuration*.22,
-            maxDuration*.18,
-            volume*.25,
-            "square"
-        );
-
-        playTone(
-            2000,
-            now+maxDuration*.44,
-            maxDuration*.18,
-            volume*.2,
-            "square"
-        );
-
-    }
-
-
-    /*
-     * 5 Bell
-     */
-
-    else if(type===5){
-
-        playTone(
-            784,
-            now,
-            maxDuration*.9,
-            volume*.3,
-            "sine"
-        );
-
-        playTone(
-            1174,
-            now,
-            maxDuration*.7,
-            volume*.13,
-            "sine"
-        );
-
-    }
-
-
-    /*
-     * 6 Rising
-     */
-
-    else if(type===6){
-
-        const notes=[
-            440,
-            554,
-            659,
-            880
-        ];
-
-        notes.forEach(
-            (freq,i)=>{
-
-                playTone(
-                    freq,
-                    now+
-                    i*
-                    Math.min(
-                        .16,
-                        maxDuration/
-                        notes.length
-                    ),
-                    maxDuration*.3,
-                    volume*.22,
-                    "sine"
-                );
-
-            }
-        );
-
-    }
-
-
-    /*
-     * 7 Falling
-     */
-
-    else if(type===7){
-
-        const notes=[
-            880,
-            659,
-            554,
-            440
-        ];
-
-        notes.forEach(
-            (freq,i)=>{
-
-                playTone(
-                    freq,
-                    now+
-                    i*
-                    Math.min(
-                        .16,
-                        maxDuration/
-                        notes.length
-                    ),
-                    maxDuration*.3,
-                    volume*.22,
-                    "sine"
-                );
-
-            }
-        );
-
-    }
-
-
-    /*
-     * 8 Pulse
-     */
-
-    else if(type===8){
-
-        for(
-            let i=0;
-            i<5;
-            i++
-        ){
-
-            playTone(
-                600,
-                now+i*.13,
-                .08,
-                volume*.3,
-                "square"
-            );
-
-        }
-
-    }
-
-
-    /*
-     * 9 Alert
-     */
-
-    else if(type===9){
-
-        for(
-            let i=0;
-            i<4;
-            i++
-        ){
-
-            playTone(
-                i%2===0
-                ?900
-                :650,
-                now+i*.18,
-                .14,
-                volume*.35,
-                "square"
-            );
-
-        }
-
-    }
-
-
-    /*
-     * 10 Deep
-     */
-
-    else if(type===10){
-
-        playTone(
-            130,
-            now,
-            maxDuration*.85,
-            volume*.35,
-            "sine"
-        );
-
-        playTone(
-            196,
-            now+maxDuration*.25,
-            maxDuration*.55,
-            volume*.18,
-            "triangle"
-        );
-
-    }
-
-
-    /*
-     * 11 Nuclear alarm
-     *
-     * Fast alternating alarm pattern.
-     */
-
-    else if(type===11){
-
-        const end=
-            now+maxDuration;
-
-        let t=now;
-
-        let high=false;
-
-        while(t<end){
-
-            const frequency=
-                high
-                ?1050
-                :620;
-
-            playTone(
-                frequency,
-                t,
-                .38,
-                volume*.32,
-                "sawtooth"
-            );
-
-            t+=.42;
-
-            high=!high;
-        }
-
-    }
-
-
-    /*
-     * 12 Opera
-     *
-     * A completely synthesized original
-     * vocal-like melody made from many notes.
-     */
-
-    else if(type===12){
-
-        /*
-         * Notes are based on a dramatic
-         * original melody.
-         */
-
-        const melody=[
-
-            [392,.20],
-            [440,.20],
-            [523.25,.25],
-            [587.33,.28],
-
-            [659.25,.30],
-            [587.33,.20],
-            [523.25,.20],
-            [440,.30],
-
-            [392,.20],
-            [523.25,.20],
-            [659.25,.28],
-            [783.99,.35],
-
-            [659.25,.22],
-            [587.33,.22],
-            [523.25,.28],
-            [440,.35],
-
-            [392,.22],
-            [440,.22],
-            [493.88,.25],
-            [587.33,.30],
-
-            [659.25,.25],
-            [783.99,.30],
-            [659.25,.20],
-            [587.33,.30],
-
-            [523.25,.25],
-            [440,.25],
-            [392,.45]
-
-        ];
-
-        let position=now;
-
-        const scale=
-            Math.min(
-                1,
-                maxDuration/4
-            );
-
-        melody.forEach(
-            ([frequency,length])=>{
-
-                if(
-                    position>
-                    now+maxDuration
-                ){
-
-                    return;
-                }
-
-                const actual=
-                    Math.min(
-                        length*scale,
-                        now+
-                        maxDuration-
-                        position
-                    );
-
-                if(actual<=0){
-                    return;
-                }
-
-                /*
-                 * Main "voice"
-                 */
-
-                playTone(
-                    frequency,
-                    position,
-                    actual,
-                    volume*.16,
-                    "triangle"
-                );
-
-                /*
-                 * Harmonic voice.
-                 */
-
-                playTone(
-                    frequency*2,
-                    position,
-                    actual*.8,
-                    volume*.055,
-                    "sine"
-                );
-
-                position+=
-                    length*scale;
-            }
-        );
-
-    }
 }
 
 
-/* =========================================================
-TEST NOTIFICATION
-========================================================= */
+/* 2 SOFT */
 
-testNotification.onclick=async()=>{
+if(theme==="soft"){
 
-    await requestDesktopPermission();
+playTone(
+ctx,
+523.25,
+now,
+Math.min(.35,maxDuration),
+master*.65
+);
 
-    showWindowsNotification(
-        "Chat",
-        "This is a test Windows notification."
-    );
+playTone(
+ctx,
+659.25,
+now+.25,
+Math.min(.45,maxDuration-.25),
+master*.65
+);
 
-    if(settings.notificationSound){
+return;
 
-        playNotificationSound(
-            settings.notificationSoundType,
-            settings.notificationVolume/100,
-            settings.notificationDuration
-        );
-
-    }
-
-};
+}
 
 
-/* =========================================================
-RENDER
-========================================================= */
+/* 3 DIGITAL */
+
+if(theme==="digital"){
+
+playTone(
+ctx,
+1000,
+now,
+.07,
+master,
+"square"
+);
+
+playTone(
+ctx,
+1500,
+now+.09,
+.09,
+master,
+"square"
+);
+
+return;
+
+}
+
+
+/* 4 POP */
+
+if(theme==="pop"){
+
+playTone(
+ctx,
+660,
+now,
+.12,
+master,
+"sine"
+);
+
+playTone(
+ctx,
+880,
+now+.12,
+.16,
+master,
+"sine"
+);
+
+return;
+
+}
+
+
+/* 5 BELL */
+
+if(theme==="bell"){
+
+playTone(
+ctx,
+784,
+now,
+.7,
+master*.7
+);
+
+playTone(
+ctx,
+1174,
+now,
+.9,
+master*.45
+);
+
+return;
+
+}
+
+
+/* 6 CHIME */
+
+if(theme==="chime"){
+
+const notes=[
+523.25,
+659.25,
+783.99
+];
+
+notes.forEach(
+(f,i)=>{
+
+playTone(
+ctx,
+f,
+now+i*.18,
+Math.min(
+.7,
+maxDuration-i*.18
+),
+master*.6
+);
+
+});
+
+return;
+
+}
+
+
+/* 7 RETRO */
+
+if(theme==="retro"){
+
+playTone(
+ctx,
+440,
+now,
+.1,
+master,
+"square"
+);
+
+playTone(
+ctx,
+660,
+now+.12,
+.1,
+master,
+"square"
+);
+
+playTone(
+ctx,
+880,
+now+.24,
+.13,
+master,
+"square"
+);
+
+return;
+
+}
+
+
+/* 8 COMPUTER */
+
+if(theme==="computer"){
+
+playTone(
+ctx,
+600,
+now,
+.06,
+master,
+"square"
+);
+
+playTone(
+ctx,
+900,
+now+.08,
+.06,
+master,
+"square"
+);
+
+playTone(
+ctx,
+1200,
+now+.16,
+.08,
+master,
+"square"
+);
+
+return;
+
+}
+
+
+/* 9 ALERT */
+
+if(theme==="alert"){
+
+playTone(
+ctx,
+740,
+now,
+.18,
+master,
+"sawtooth"
+);
+
+playTone(
+ctx,
+540,
+now+.2,
+.18,
+master,
+"sawtooth"
+);
+
+return;
+
+}
+
+
+/* 10 WARNING */
+
+if(theme==="warning"){
+
+playTone(
+ctx,
+500,
+now,
+.3,
+master,
+"sawtooth"
+);
+
+playTone(
+ctx,
+500,
+now+.35,
+.3,
+master,
+"sawtooth"
+);
+
+return;
+
+}
+
+
+/* 11 NUCLEAR ALARM */
+
+if(theme==="alarm"){
+
+const cycles=
+Math.max(
+1,
+Math.ceil(maxDuration/.8)
+);
+
+for(let i=0;i<cycles;i++){
+
+const t=
+now+i*.8;
+
+playTone(
+ctx,
+420,
+t,
+.35,
+master,
+"sawtooth"
+);
+
+playTone(
+ctx,
+820,
+t+.35,
+.35,
+master,
+"sawtooth"
+);
+
+}
+
+return;
+
+}
+
+
+/* 12 OPERA */
+
+if(theme==="opera"){
+
+/*
+A synthetic vocal-like sequence.
+It is an original melody, not a recording.
+*/
+
+const notes=[
+261.63,
+329.63,
+392,
+329.63,
+293.66,
+349.23,
+440,
+392,
+329.63,
+392,
+523.25
+];
+
+const noteLength=
+Math.min(
+.28,
+maxDuration/notes.length
+);
+
+notes.forEach(
+(f,i)=>{
+
+const t=
+now+i*noteLength;
+
+playTone(
+ctx,
+f,
+t,
+Math.max(
+.08,
+noteLength*.9
+),
+master*.55,
+"sine"
+);
+
+});
+
+return;
+
+}
+
+
+/* 13 SYNTH */
+
+if(theme==="synth"){
+
+const notes=[
+220,
+330,
+440,
+660
+];
+
+notes.forEach(
+(f,i)=>{
+
+playTone(
+ctx,
+f,
+now+i*.12,
+.2,
+master,
+"triangle"
+);
+
+});
+
+return;
+
+}
+
+
+/* 14 PULSE */
+
+if(theme==="pulse"){
+
+for(
+let i=0;
+i<4;
+i++
+){
+
+playTone(
+ctx,
+700,
+now+i*.16,
+.07,
+master,
+"square"
+);
+
+}
+
+return;
+
+}
+
+
+/* 15 SPACE */
+
+if(theme==="space"){
+
+playTone(
+ctx,
+180,
+now,
+.5,
+master*.5,
+"sine"
+);
+
+playTone(
+ctx,
+270,
+now+.2,
+.7,
+master*.4,
+"triangle"
+);
+
+playTone(
+ctx,
+540,
+now+.4,
+.8,
+master*.3,
+"sine"
+);
+
+}
+
+}
+
+
+/* RENDER */
 
 function renderMessages(){
 
-    const wasBottom=
-        messagesEl.scrollHeight-
-        messagesEl.scrollTop-
-        messagesEl.clientHeight<
-        100;
+const wasBottom=
+messagesEl.scrollHeight-
+messagesEl.scrollTop-
+messagesEl.clientHeight<100;
 
-    if(!currentMessages.length){
+if(!currentMessages.length){
 
-        messagesEl.innerHTML=`
-            <div class="empty">
-                <div>
-                    <strong>No messages yet</strong>
-                    Be the first to send something.
-                </div>
-            </div>
-        `;
+messagesEl.innerHTML=`
 
-        return;
-    }
+<div class="empty">
 
-    const fragment=
-        document.createDocumentFragment();
+<div>
 
-    currentMessages.forEach(
-        message=>{
+<strong>No messages yet</strong>
 
-            const item=
-                document.createElement(
-                    "div"
-                );
+Be the first to send something.
 
-            item.className=
-                "message"+
-                (
-                    settings.compactMessages
-                    ?" compact"
-                    :""
-                );
+</div>
 
-            item.dataset.id=
-                message.id;
+</div>
 
-            const avatar=
-                document.createElement(
-                    "div"
-                );
+`;
 
-            avatar.className="avatar";
+return;
 
-            avatar.textContent=
-                (
-                    message.username||
-                    "?"
-                )
-                .charAt(0)
-                .toUpperCase();
+}
 
-            const content=
-                document.createElement(
-                    "div"
-                );
+const fragment=
+document.createDocumentFragment();
 
-            content.className=
-                "message-content";
+currentMessages.forEach(
+message=>{
 
-            const top=
-                document.createElement(
-                    "div"
-                );
+const item=
+document.createElement("div");
 
-            top.className=
-                "message-top";
+item.className="message";
 
-            const name=
-                document.createElement(
-                    "span"
-                );
+if(settings.messageDensity==="compact")
+item.classList.add("compact");
 
-            name.className=
-                "username";
+item.dataset.id=
+message.id;
 
-            name.textContent=
-                message.username||
-                "User";
+const avatar=
+document.createElement("div");
 
-            top.appendChild(name);
+avatar.className="avatar";
 
-            if(settings.showTimestamps){
+avatar.textContent=
+(message.username||"?")
+.charAt(0)
+.toUpperCase();
 
-                const time=
-                    document.createElement(
-                        "span"
-                    );
+const content=
+document.createElement("div");
 
-                time.className="time";
+content.className=
+"message-content";
 
-                time.textContent=
-                    formatTime(
-                        message.created_at
-                    );
+const top=
+document.createElement("div");
 
-                top.appendChild(time);
-            }
+top.className=
+"message-top";
 
-            if(message.edited){
+const name=
+document.createElement("span");
 
-                const edited=
-                    document.createElement(
-                        "span"
-                    );
+name.className=
+"username";
 
-                edited.className=
-                    "edited";
+name.textContent=
+message.username||"User";
 
-                edited.textContent=
-                    "(edited)";
+top.appendChild(name);
 
-                top.appendChild(edited);
-            }
 
-            content.appendChild(top);
+if(settings.showTimestamps){
 
-            if(message.message){
+const time=
+document.createElement("span");
 
-                const text=
-                    document.createElement(
-                        "div"
-                    );
+time.className="time";
 
-                text.className=
-                    "message-text";
+time.textContent=
+formatTime(
+message.created_at
+);
 
-                text.textContent=
-                    message.message;
+top.appendChild(time);
 
-                content.appendChild(text);
-            }
-
-            if(message.image){
-
-                const img=
-                    document.createElement(
-                        "img"
-                    );
-
-                img.className=
-                    "message-image";
-
-                img.src=
-                    message.image;
-
-                img.alt="Image";
-
-                img.onclick=()=>{
-                    openImage(
-                        message.image
-                    );
-                };
-
-                content.appendChild(img);
-            }
-
-            item.appendChild(avatar);
-
-            item.appendChild(content);
-
-            if(
-                message.device_id &&
-                message.device_id===deviceId
-            ){
-
-                item.addEventListener(
-                    "contextmenu",
-                    event=>{
-
-                        event.preventDefault();
-
-                        showContextMenu(
-                            event.clientX,
-                            event.clientY,
-                            message
-                        );
-
-                    }
-                );
-
-            }
-
-            fragment.appendChild(item);
-
-        }
-    );
-
-    messagesEl.replaceChildren(
-        fragment
-    );
-
-    if(
-        wasBottom &&
-        settings.autoScroll
-    ){
-
-        messagesEl.scrollTop=
-            messagesEl.scrollHeight;
-
-    }
 }
 
 
-/* =========================================================
-CONTEXT MENU
-========================================================= */
+if(message.edited){
 
-function showContextMenu(
-    x,
-    y,
-    message
+const edited=
+document.createElement("span");
+
+edited.className="edited";
+
+edited.textContent=
+"(edited)";
+
+top.appendChild(edited);
+
+}
+
+content.appendChild(top);
+
+
+/* TEXT + LINKS */
+
+if(message.message){
+
+const text=
+createMessageContent(
+message.message
+);
+
+content.appendChild(text);
+
+}
+
+
+/* STORED IMAGE */
+
+if(message.image){
+
+const img=
+document.createElement("img");
+
+img.className=
+"message-image";
+
+img.src=
+message.image;
+
+img.alt="Image";
+
+img.onclick=()=>{
+openImage(message.image);
+};
+
+content.appendChild(img);
+
+}
+
+
+item.appendChild(avatar);
+
+item.appendChild(content);
+
+
+/* ONLY OWNER CONTEXT MENU */
+
+if(
+message.device_id &&
+message.device_id===deviceId
 ){
 
-    selectedMessage=
-        message;
+item.addEventListener(
+"contextmenu",
+event=>{
 
-    contextMenu.style.left=
-        Math.min(
-            x,
-            window.innerWidth-170
-        )+"px";
+event.preventDefault();
 
-    contextMenu.style.top=
-        Math.min(
-            y,
-            window.innerHeight-100
-        )+"px";
+showContextMenu(
+event.clientX,
+event.clientY,
+message
+);
 
-    contextMenu.classList.add(
-        "show"
-    );
+});
+
+}
+
+fragment.appendChild(item);
+
+});
+
+messagesEl.replaceChildren(fragment);
+
+if(
+wasBottom &&
+settings.autoScroll
+){
+
+messagesEl.scrollTop=
+messagesEl.scrollHeight;
+
+}
+
+}
+
+
+/* LINK PARSER */
+
+function createMessageContent(text){
+
+const container=
+document.createElement("div");
+
+container.className=
+"message-text";
+
+if(!settings.clickableLinks){
+
+container.textContent=text;
+
+return container;
+
+}
+
+const urlRegex=
+/(https?:\/\/[^\s<]+)/gi;
+
+let last=0;
+
+let match;
+
+while(
+(match=urlRegex.exec(text))!==null
+){
+
+const before=
+text.slice(
+last,
+match.index
+);
+
+if(before){
+
+container.appendChild(
+document.createTextNode(before)
+);
+
+}
+
+let url=
+match[0];
+
+let punctuation="";
+
+/*
+Remove common punctuation from the URL.
+*/
+
+while(
+/[.,!?;:)\]}]$/.test(url)
+){
+
+punctuation=
+url.slice(-1)+
+punctuation;
+
+url=url.slice(0,-1);
+
+}
+
+const isImage=
+settings.imageLinks &&
+isImageUrl(url);
+
+if(isImage){
+
+const img=
+document.createElement("img");
+
+img.className=
+"message-image";
+
+img.src=url;
+
+img.alt="Linked image";
+
+img.loading="lazy";
+
+img.onclick=()=>{
+openImage(url);
+};
+
+container.appendChild(img);
+
+}else{
+
+const link=
+document.createElement("a");
+
+link.className=
+"message-link";
+
+link.href=url;
+
+link.textContent=url;
+
+link.rel=
+"noopener noreferrer";
+
+if(settings.newTabLinks){
+
+link.target="_blank";
+
+}
+
+container.appendChild(link);
+
+}
+
+if(punctuation){
+
+container.appendChild(
+document.createTextNode(
+punctuation
+)
+);
+
+}
+
+last=
+match.index+
+match[0].length;
+
+}
+
+const after=
+text.slice(last);
+
+if(after){
+
+container.appendChild(
+document.createTextNode(after)
+);
+
+}
+
+return container;
+
+}
+
+
+function isImageUrl(url){
+
+return /\.(jpg|jpeg|png|gif|webp|bmp|svg)(\?.*)?$/i
+.test(url);
+
+}
+
+
+/* CONTEXT MENU */
+
+function showContextMenu(
+x,
+y,
+message
+){
+
+selectedMessage=message;
+
+contextMenu.style.left=
+Math.min(
+x,
+window.innerWidth-170
+)+"px";
+
+contextMenu.style.top=
+Math.min(
+y,
+window.innerHeight-100
+)+"px";
+
+contextMenu.classList.add("show");
+
 }
 
 
 document.addEventListener(
-    "click",
-    ()=>{
-        contextMenu.classList.remove(
-            "show"
-        );
-    }
+"click",
+()=>{
+contextMenu.classList.remove("show");
+}
 );
 
 
-/* =========================================================
-EDIT
-========================================================= */
+/* EDIT */
 
 editMessageBtn.onclick=
-    async event=>{
+async event=>{
 
-        event.stopPropagation();
+event.stopPropagation();
 
-        contextMenu.classList.remove(
-            "show"
-        );
+contextMenu.classList.remove("show");
 
-        if(!selectedMessage){
-            return;
-        }
+if(!selectedMessage)
+return;
 
-        const newText=
-            prompt(
-                "Edit message:",
-                selectedMessage.message||
-                ""
-            );
+const newText=
+prompt(
+"Edit message:",
+selectedMessage.message||""
+);
 
-        if(newText===null){
-            return;
-        }
+if(newText===null)
+return;
 
-        try{
+try{
 
-            const response=
-                await fetch(
-                    API_URL,
-                    {
-                        method:"PATCH",
+const response=
+await fetch(
+API_URL,
+{
 
-                        headers:{
-                            "Content-Type":
-                                "application/json"
-                        },
+method:"PATCH",
 
-                        body:JSON.stringify({
+headers:{
+"Content-Type":
+"application/json"
+},
 
-                            id:
-                                selectedMessage.id,
+body:JSON.stringify({
 
-                            device_id:
-                                deviceId,
+id:selectedMessage.id,
 
-                            message:
-                                newText.trim()
+device_id:deviceId,
 
-                        })
-                    }
-                );
+message:newText.trim()
 
-            const data=
-                await response.json();
+})
 
-            if(!response.ok){
+});
 
-                throw new Error(
-                    data.error||
-                    "Failed to edit message."
-                );
-            }
+const data=
+await response.json();
 
-            await loadMessages();
+if(!response.ok){
 
-        }catch(error){
+throw new Error(
+data.error||
+"Failed to edit message."
+);
 
-            alert(
-                "Failed to edit:\n\n"+
-                error.message
-            );
+}
 
-        }
-    };
+await loadMessages();
+
+}catch(error){
+
+alert(
+"Failed to edit:\n\n"+
+error.message
+);
+
+}
+
+};
 
 
-/* =========================================================
-DELETE
-========================================================= */
+/* DELETE */
 
 deleteMessageBtn.onclick=
-    event=>{
+event=>{
 
-        event.stopPropagation();
+event.stopPropagation();
 
-        contextMenu.classList.remove(
-            "show"
-        );
+contextMenu.classList.remove(
+"show"
+);
 
-        if(!selectedMessage){
-            return;
-        }
+if(!selectedMessage)
+return;
 
-        if(settings.confirmDelete){
+if(settings.confirmDelete){
 
-            openConfirm(
-                "Delete message?",
-                "This message will be permanently removed.",
-                deleteSelectedMessage
-            );
+openConfirm(
+"Delete message?",
+"This message will be permanently removed.",
+deleteSelectedMessage
+);
 
-        }else{
+}else{
 
-            deleteSelectedMessage();
+deleteSelectedMessage();
 
-        }
-    };
+}
+
+};
 
 
 async function deleteSelectedMessage(){
 
-    if(!selectedMessage){
-        return;
-    }
+if(!selectedMessage)
+return;
 
-    try{
+try{
 
-        const response=
-            await fetch(
-                API_URL,
-                {
-                    method:"DELETE",
+const response=
+await fetch(
+API_URL,
+{
 
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
+method:"DELETE",
 
-                    body:JSON.stringify({
+headers:{
+"Content-Type":
+"application/json"
+},
 
-                        id:
-                            selectedMessage.id,
+body:JSON.stringify({
 
-                        device_id:
-                            deviceId
+id:selectedMessage.id,
 
-                    })
-                }
-            );
+device_id:deviceId
 
-        const data=
-            await response.json();
+})
 
-        if(!response.ok){
+});
 
-            throw new Error(
-                data.error||
-                "Failed to delete message."
-            );
-        }
+const data=
+await response.json();
 
-        selectedMessage=null;
+if(!response.ok){
 
-        await loadMessages();
+throw new Error(
+data.error||
+"Failed to delete message."
+);
 
-    }catch(error){
+}
 
-        alert(
-            "Failed to delete:\n\n"+
-            error.message
-        );
+selectedMessage=null;
 
-    }
+await loadMessages();
+
+}catch(error){
+
+alert(
+"Failed to delete:\n\n"+
+error.message
+);
+
+}
+
 }
 
 
-/* =========================================================
-IMAGE VIEWER
-========================================================= */
+/* IMAGE VIEWER */
 
 function openImage(src){
 
-    fullImage.src=
-        src;
+fullImage.src=src;
 
-    imageViewer.classList.add(
-        "show"
-    );
+imageViewer.classList.add(
+"show"
+);
+
 }
 
 
 function closeImage(){
 
-    imageViewer.classList.remove(
-        "show"
-    );
+imageViewer.classList.remove(
+"show"
+);
 
-    fullImage.src="";
+fullImage.src="";
+
 }
 
 
-backImage.onclick=
-    closeImage;
+backImage.onclick=closeImage;
 
 
-imageViewer.onclick=
-    event=>{
+imageViewer.onclick=event=>{
 
-        if(
-            event.target===
-            imageViewer
-        ){
+if(event.target===imageViewer){
 
-            closeImage();
+closeImage();
 
-        }
+}
 
-    };
+};
 
 
 document.addEventListener(
-    "keydown",
-    event=>{
+"keydown",
+event=>{
 
-        if(
-            event.key==="Escape" &&
-            imageViewer.classList.contains(
-                "show"
-            )
-        ){
-
-            closeImage();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-CONFIRM
-========================================================= */
-
-function openConfirm(
-    title,
-    text,
-    callback
+if(
+event.key==="Escape" &&
+imageViewer.classList.contains("show")
 ){
 
-    dialogTitle.textContent=
-        title;
+closeImage();
 
-    dialogText.textContent=
-        text;
+}
 
-    confirmCallback=
-        callback;
+});
 
-    dialogOverlay.classList.add(
-        "show"
-    );
+
+/* CONFIRM */
+
+function openConfirm(
+title,
+text,
+callback
+){
+
+dialogTitle.textContent=
+title;
+
+dialogText.textContent=
+text;
+
+confirmCallback=
+callback;
+
+dialogOverlay.classList.add(
+"show"
+);
+
 }
 
 
 dialogCancel.onclick=()=>{
 
-    dialogOverlay.classList.remove(
-        "show"
-    );
+dialogOverlay.classList.remove(
+"show"
+);
 
-    confirmCallback=null;
+confirmCallback=null;
 
 };
 
 
 dialogConfirm.onclick=
-    async()=>{
+async()=>{
 
-        const callback=
-            confirmCallback;
+const callback=
+confirmCallback;
 
-        dialogOverlay.classList.remove(
-            "show"
-        );
+dialogOverlay.classList.remove(
+"show"
+);
 
-        confirmCallback=null;
+confirmCallback=null;
 
-        if(callback){
+if(callback){
 
-            await callback();
+await callback();
 
-        }
+}
 
-    };
+};
 
 
-/* =========================================================
-REMOVE EVERYTHING
-========================================================= */
+/* REMOVE EVERYTHING */
 
 removeEverything.onclick=()=>{
 
-    openConfirm(
-        "Remove everything?",
-        "This will permanently remove every message and image from the chat for EVERYONE.",
-        ()=>{
-            openConfirm(
-                "I know",
-                "You understand that the entire chat history will be deleted.",
-                ()=>{
-                    openConfirm(
-                        "Are you ultra sure?",
-                        "Last time: every stored message and image will be permanently removed.",
-                        permanentlyDeleteEverything
-                    );
-                }
-            );
-        }
-    );
+openConfirm(
+"Remove everything?",
+"This will permanently remove every message and image from the chat for EVERYONE.",
+()=>{
+
+openConfirm(
+"I know",
+"You understand that the entire chat history will be deleted.",
+()=>{
+
+openConfirm(
+"Are you ultra sure?",
+"Every stored message will be permanently removed.",
+permanentlyDeleteEverything
+);
+
+});
+
+}
+);
 
 };
 
 
 async function permanentlyDeleteEverything(){
 
-    try{
+try{
 
-        const response=
-            await fetch(
-                API_URL,
-                {
-                    method:"DELETE",
+const response=
+await fetch(
+API_URL,
+{
 
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
+method:"DELETE",
 
-                    body:JSON.stringify({
-                        delete_all:true
-                    })
-                }
-            );
+headers:{
+"Content-Type":
+"application/json"
+},
 
-        const data=
-            await response.json();
+body:JSON.stringify({
+delete_all:true
+})
 
-        if(!response.ok){
+});
 
-            throw new Error(
-                data.error||
-                "Failed to remove everything."
-            );
-        }
+const data=
+await response.json();
 
-        currentMessages=[];
+if(!response.ok){
 
-        lastKnownMessageIds=
-            new Set();
+throw new Error(
+data.error||
+"Failed to remove everything."
+);
 
-        renderMessages();
+}
 
-        alert(
-            "The entire chat has been wiped."
-        );
+currentMessages=[];
 
-    }catch(error){
+renderMessages();
 
-        alert(
-            "Failed to wipe chat:\n\n"+
-            error.message
-        );
+alert(
+"The entire chat has been wiped."
+);
 
-    }
+}catch(error){
+
+alert(
+"Failed to wipe chat:\n\n"+
+error.message
+);
+
+}
+
 }
 
 
-/* =========================================================
-REFRESH
-========================================================= */
+/* REFRESH */
 
 function startRefreshTimer(){
 
-    if(refreshTimer){
+if(refreshTimer){
 
-        clearInterval(
-            refreshTimer
-        );
+clearInterval(refreshTimer);
 
-    }
+}
 
-    refreshTimer=
-        setInterval(
-            loadMessages,
-            Number(
-                settings.refreshRate
-            )
-        );
+refreshTimer=
+setInterval(
+loadMessages,
+Number(settings.refreshRate)
+);
+
 }
 
 
-/* =========================================================
-HELPERS
-========================================================= */
+/* TIME */
 
 function formatTime(date){
 
-    if(!date){
-        return "";
-    }
+if(!date)
+return "";
 
-    return new Date(date)
-        .toLocaleTimeString(
-            [],
-            {
-                hour:"2-digit",
-                minute:"2-digit"
-            }
-        );
+const d=
+new Date(date);
+
+if(settings.timestampFormat==="full"){
+
+return d.toLocaleString();
+
 }
 
+if(settings.timestampFormat==="seconds"){
+
+return d.toLocaleTimeString(
+[],
+{
+hour:"2-digit",
+minute:"2-digit",
+second:"2-digit"
+}
+);
+
+}
+
+return d.toLocaleTimeString(
+[],
+{
+hour:"2-digit",
+minute:"2-digit"
+}
+);
+
+}
+
+
+/* ESCAPE */
 
 function escapeHtml(value){
 
-    return String(value)
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-        .replaceAll(
-            "'",
-            "&#039;"
-        );
-}
+return String(value)
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
 
-
-function stripHtml(value){
-
-    const div=
-        document.createElement(
-            "div"
-        );
-
-    div.textContent=
-        value;
-
-    return div.textContent;
-}
-
-
-/* =========================================================
-AUDIO UNLOCK
-========================================================= */
-
-function unlockAudio(){
-
-    const ctx=
-        getAudioContext();
-
-    if(ctx){
-
-        if(
-            ctx.state===
-            "suspended"
-        ){
-
-            ctx.resume()
-            .catch(()=>{});
-
-        }
-
-    }
 }
 
 
 /*
- * Browsers require a user interaction before
- * audio can normally start.
- */
+IMPORTANT:
+Audio must be unlocked by a user interaction
+because browsers block autoplay.
+*/
 
 document.addEventListener(
-    "click",
-    unlockAudio,
-    {
-        once:false,
-        passive:true
-    }
+"click",
+()=>{
+
+try{
+
+if(audioContext &&
+audioContext.state==="suspended"
+){
+
+audioContext.resume();
+
+}
+
+}catch(e){}
+
+},
+{passive:true}
 );
 
-document.addEventListener(
-    "keydown",
-    unlockAudio,
-    {
-        once:false,
-        passive:true
-    }
+
+/*
+Register service worker if you create /sw.js.
+
+This is required for real background
+push notifications when the page is closed.
+*/
+
+if("serviceWorker" in navigator){
+
+window.addEventListener(
+"load",
+()=>{
+
+navigator.serviceWorker
+.register("/sw.js")
+.then(
+()=>console.log(
+"Service worker registered."
+)
+)
+.catch(
+error=>console.warn(
+"Service worker registration failed:",
+error
+)
 );
 
+});
 
-/* =========================================================
-START
-========================================================= */
+}
+
+
+/* START */
 
 loadSettingsUI();
 
