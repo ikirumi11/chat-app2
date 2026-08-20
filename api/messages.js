@@ -1,4 +1,3 @@
-```javascript
 export default async function handler(req, res) {
 
     res.setHeader(
@@ -630,4 +629,3 @@ export default async function handler(req, res) {
     }
 
 }
-```
