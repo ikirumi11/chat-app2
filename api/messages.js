@@ -1,286 +1,220 @@
-import { createClient } from "@supabase/supabase-js";
-
-const url = process.env.SUPABASE_URL;
-const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-function sendJSON(res, status, data) {
-
-    res.status(status);
+export default async function handler(req, res) {
 
     res.setHeader(
         "Content-Type",
         "application/json"
     );
 
-    return res.json(data);
-}
-
-
-export default async function handler(
-    req,
-    res
-) {
-
-    res.setHeader(
-        "Access-Control-Allow-Origin",
-        "*"
-    );
-
-    res.setHeader(
-        "Access-Control-Allow-Methods",
-        "GET,POST,OPTIONS"
-    );
-
-    res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Content-Type"
-    );
-
-
-    if(req.method === "OPTIONS") {
-
-        return res
-            .status(200)
-            .end();
-
+    if (req.method === "OPTIONS") {
+        return res.status(200).end();
     }
-
 
     try {
 
-        if(!url) {
+        const supabaseUrl =
+            process.env.SUPABASE_URL;
 
-            return sendJSON(
-                res,
-                500,
-                {
-                    error:
-                        "SUPABASE_URL is missing in Vercel Environment Variables."
-                }
-            );
+        const supabaseKey =
+            process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+        if (!supabaseUrl) {
+            return res.status(500).json({
+                error: "SUPABASE_URL is not configured"
+            });
         }
 
-
-        if(!key) {
-
-            return sendJSON(
-                res,
-                500,
-                {
-                    error:
-                        "SUPABASE_SERVICE_ROLE_KEY is missing in Vercel Environment Variables."
-                }
-            );
-
+        if (!supabaseKey) {
+            return res.status(500).json({
+                error: "SUPABASE_SERVICE_ROLE_KEY is not configured"
+            });
         }
 
+        /* GET MESSAGES */
 
-        const supabase =
-            createClient(
-                url,
-                key
-            );
-
-
-        /* GET */
-
-        if(req.method === "GET") {
+        if (req.method === "GET") {
 
             const channel =
                 String(
-                    req.query.channel ||
-                    "general"
-                )
-                .trim()
-                .slice(0,32);
-
-
-            const {
-                data,
-                error
-            } =
-                await supabase
-                    .from("messages")
-                    .select(
-                        "id,username,channel,message,created_at"
-                    )
-                    .eq(
-                        "channel",
-                        channel
-                    )
-                    .order(
-                        "created_at",
-                        {
-                            ascending: true
-                        }
-                    )
-                    .limit(200);
-
-
-            if(error) {
-
-                return sendJSON(
-                    res,
-                    500,
-                    {
-                        error:
-                            error.message
-                    }
+                    req.query.channel || "general"
                 );
 
+            const url =
+                supabaseUrl +
+                "/rest/v1/messages" +
+                "?select=id,username,channel,message,created_at" +
+                "&channel=eq." +
+                encodeURIComponent(channel) +
+                "&order=created_at.asc";
+
+            const response =
+                await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "apikey": supabaseKey,
+                        "Authorization":
+                            "Bearer " +
+                            supabaseKey
+                    }
+                });
+
+            const text =
+                await response.text();
+
+            let data;
+
+            try {
+                data = JSON.parse(text);
+            } catch {
+                return res.status(500).json({
+                    error:
+                        "Supabase returned invalid JSON",
+                    raw:
+                        text.substring(0, 500)
+                });
             }
 
+            if (!response.ok) {
+                return res.status(response.status).json({
+                    error:
+                        data.message ||
+                        data.error ||
+                        "Supabase error"
+                });
+            }
 
-            return sendJSON(
-                res,
-                200,
-                {
-                    messages:
-                        data || []
-                }
-            );
-
+            return res.status(200).json({
+                messages: data
+            });
         }
 
 
-        /* POST */
+        /* SEND MESSAGE */
 
-        if(req.method === "POST") {
+        if (req.method === "POST") {
 
             const body =
                 req.body || {};
-
 
             const username =
                 String(
                     body.username || ""
                 )
                 .trim()
-                .slice(0,24);
-
+                .substring(0, 24);
 
             const channel =
                 String(
-                    body.channel ||
-                    "general"
+                    body.channel || "general"
                 )
                 .trim()
-                .slice(0,32);
-
+                .substring(0, 32);
 
             const message =
                 String(
                     body.message || ""
                 )
                 .trim()
-                .slice(0,2000);
+                .substring(0, 2000);
 
+            if (!username) {
+                return res.status(400).json({
+                    error:
+                        "Username is required"
+                });
+            }
 
-            if(!username) {
+            if (!message) {
+                return res.status(400).json({
+                    error:
+                        "Message is required"
+                });
+            }
 
-                return sendJSON(
-                    res,
-                    400,
+            const response =
+                await fetch(
+                    supabaseUrl +
+                    "/rest/v1/messages",
                     {
-                        error:
-                            "Username is required."
+                        method: "POST",
+
+                        headers: {
+                            "apikey":
+                                supabaseKey,
+
+                            "Authorization":
+                                "Bearer " +
+                                supabaseKey,
+
+                            "Content-Type":
+                                "application/json",
+
+                            "Prefer":
+                                "return=representation"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                username:
+                                    username,
+
+                                channel:
+                                    channel,
+
+                                message:
+                                    message
+                            })
                     }
                 );
 
+            const text =
+                await response.text();
+
+            let data;
+
+            try {
+                data =
+                    JSON.parse(text);
+            } catch {
+                return res.status(500).json({
+                    error:
+                        "Supabase returned invalid JSON",
+                    raw:
+                        text.substring(0, 500)
+                });
             }
 
-
-            if(!message) {
-
-                return sendJSON(
-                    res,
-                    400,
-                    {
-                        error:
-                            "Message is empty."
-                    }
-                );
-
+            if (!response.ok) {
+                return res.status(response.status).json({
+                    error:
+                        data.message ||
+                        data.error ||
+                        "Supabase error"
+                });
             }
 
-
-            const {
-                data,
-                error
-            } =
-                await supabase
-                    .from("messages")
-                    .insert({
-                        username:
-                            username,
-
-                        channel:
-                            channel,
-
-                        message:
-                            message
-                    })
-                    .select(
-                        "id,username,channel,message,created_at"
-                    )
-                    .single();
-
-
-            if(error) {
-
-                return sendJSON(
-                    res,
-                    500,
-                    {
-                        error:
-                            error.message
-                    }
-                );
-
-            }
-
-
-            return sendJSON(
-                res,
-                200,
-                {
-                    success: true,
-                    message: data
-                }
-            );
-
+            return res.status(200).json({
+                success: true,
+                message:
+                    Array.isArray(data)
+                        ? data[0]
+                        : data
+            });
         }
 
 
-        return sendJSON(
-            res,
-            405,
-            {
-                error:
-                    "Method not allowed."
-            }
-        );
+        return res.status(405).json({
+            error:
+                "Method not allowed"
+        });
 
+    } catch (error) {
 
-    } catch(error) {
+        console.error(error);
 
-        console.error(
-            "API ERROR:",
-            error
-        );
-
-
-        return sendJSON(
-            res,
-            500,
-            {
-                error:
-                    error.message ||
-                    "Unknown server error."
-            }
-        );
-
+        return res.status(500).json({
+            error:
+                error.message ||
+                "Server error"
+        });
     }
-
 }

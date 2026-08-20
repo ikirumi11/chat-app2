@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
 <title>MyChat</title>
 
 <style>
+
 * {
     box-sizing: border-box;
 }
@@ -15,13 +23,9 @@ body {
     margin: 0;
     width: 100%;
     height: 100%;
+    font-family: Arial, sans-serif;
     background: #111214;
     color: white;
-    font-family: Arial, sans-serif;
-}
-
-body {
-    overflow: hidden;
 }
 
 .app {
@@ -29,39 +33,25 @@ body {
     height: 100vh;
 }
 
+/* SIDEBAR */
+
 .sidebar {
-    width: 240px;
+    width: 230px;
     background: #18191c;
-    display: flex;
-    flex-direction: column;
+    padding: 15px;
 }
 
-.sidebar-header {
-    height: 60px;
-    display: flex;
-    align-items: center;
-    padding: 0 18px;
+.logo {
+    font-size: 22px;
     font-weight: bold;
-    border-bottom: 1px solid #111214;
-}
-
-.channels {
-    padding: 15px 10px;
-    flex: 1;
-}
-
-.category {
-    color: #949ba4;
-    font-size: 11px;
-    font-weight: bold;
-    padding: 8px;
+    margin-bottom: 25px;
 }
 
 .channel {
-    padding: 10px;
-    margin: 3px 0;
+    padding: 11px;
+    margin-bottom: 5px;
     border-radius: 5px;
-    color: #949ba4;
+    color: #aaa;
     cursor: pointer;
 }
 
@@ -71,25 +61,23 @@ body {
     color: white;
 }
 
+/* CHAT */
+
 .chat {
     flex: 1;
-    min-width: 0;
     display: flex;
     flex-direction: column;
-    background: #2b2d31;
+    min-width: 0;
 }
 
-.chat-header {
+.header {
     height: 60px;
+    background: #2b2d31;
+    border-bottom: 1px solid #202225;
     display: flex;
     align-items: center;
     padding: 0 20px;
-    border-bottom: 1px solid #202225;
     font-weight: bold;
-}
-
-.chat-header span {
-    margin-left: 8px;
 }
 
 .messages {
@@ -99,81 +87,52 @@ body {
 }
 
 .message {
-    display: flex;
     margin-bottom: 18px;
 }
 
-.avatar {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    background: #5865f2;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.name {
     font-weight: bold;
 }
 
-.message-body {
-    margin-left: 12px;
-    min-width: 0;
-}
-
-.message-top {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-}
-
-.message-name {
-    font-weight: bold;
-}
-
-.message-time {
+.time {
     color: #777;
     font-size: 11px;
+    margin-left: 8px;
 }
 
-.message-text {
+.text {
     margin-top: 4px;
     color: #ddd;
     white-space: pre-wrap;
-    overflow-wrap: anywhere;
 }
 
 .input-area {
     padding: 15px;
+    background: #2b2d31;
 }
 
 .input-box {
     display: flex;
     background: #383a40;
-    border-radius: 8px;
-    padding: 7px;
+    border-radius: 7px;
+    padding: 5px;
 }
 
 textarea {
     flex: 1;
-    min-height: 40px;
-    max-height: 150px;
     resize: none;
     border: 0;
     outline: 0;
     background: transparent;
     color: white;
-    padding: 10px;
+    padding: 12px;
     font-size: 15px;
 }
 
-textarea::placeholder {
-    color: #999;
-}
-
 .send {
-    width: 70px;
+    width: 75px;
     border: 0;
-    border-radius: 6px;
+    border-radius: 5px;
     background: #5865f2;
     color: white;
     cursor: pointer;
@@ -183,162 +142,119 @@ textarea::placeholder {
     background: #4752c4;
 }
 
-.send:disabled {
-    opacity: 0.5;
+/* LOGIN */
+
+.login {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.92);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.login-box {
+    width: 350px;
+    max-width: calc(100% - 30px);
+    background: #313338;
+    padding: 30px;
+    border-radius: 8px;
+}
+
+.login-box h1 {
+    margin-top: 0;
+}
+
+.login-box input {
+    width: 100%;
+    height: 45px;
+    background: #1e1f22;
+    border: 0;
+    border-radius: 5px;
+    color: white;
+    padding: 10px;
+    margin: 15px 0;
+}
+
+.login-box button {
+    width: 100%;
+    height: 45px;
+    background: #5865f2;
+    border: 0;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
 }
 
 .status {
     position: fixed;
-    top: 10px;
     right: 10px;
-    padding: 7px 10px;
+    top: 10px;
+    padding: 7px;
     background: #18191c;
     border-radius: 5px;
     font-size: 12px;
     z-index: 20;
 }
 
-.status.ok {
-    color: #57f287;
-}
-
-.status.bad {
-    color: #ed4245;
-}
-
-.login {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-}
-
-.login-box {
-    width: 350px;
-    max-width: calc(100% - 30px);
-    padding: 30px;
-    background: #313338;
-    border-radius: 8px;
-}
-
-.login-box h1 {
-    margin-top: 0;
-    text-align: center;
-}
-
-.login-box p {
-    text-align: center;
-    color: #aaa;
-}
-
-.login-box input {
-    width: 100%;
-    height: 45px;
-    margin: 15px 0;
-    padding: 0 12px;
-    border: 0;
-    outline: 0;
-    border-radius: 5px;
-    background: #1e1f22;
-    color: white;
-}
-
-.login-box button {
-    width: 100%;
-    height: 45px;
-    border: 0;
-    border-radius: 5px;
-    background: #5865f2;
-    color: white;
-    cursor: pointer;
-}
-
 .error {
-    margin-top: 10px;
     color: #ed4245;
-    text-align: center;
+    margin-top: 10px;
     font-size: 13px;
 }
 
-.empty {
-    color: #999;
-    text-align: center;
-    margin-top: 80px;
-}
-
-@media(max-width:700px) {
-    .sidebar {
-        width: 190px;
-    }
-
-    .messages {
-        padding: 12px;
-    }
-
-    .input-area {
-        padding: 10px;
-    }
-}
 </style>
+
 </head>
 
 <body>
 
-<div id="status" class="status">
+<div
+    id="status"
+    class="status">
     Connecting...
 </div>
 
+
 <div class="app">
 
-    <aside class="sidebar">
+    <div class="sidebar">
 
-        <div class="sidebar-header">
+        <div class="logo">
             MyChat
         </div>
 
-        <div class="channels">
-
-            <div class="category">
-                TEXT CHANNELS
-            </div>
-
-            <div
-                class="channel active"
-                onclick="selectChannel('general', this)">
-                # general
-            </div>
-
-            <div
-                class="channel"
-                onclick="selectChannel('gaming', this)">
-                # gaming
-            </div>
-
-            <div
-                class="channel"
-                onclick="selectChannel('movies', this)">
-                # movies
-            </div>
-
+        <div
+            class="channel active"
+            onclick="changeChannel('general', this)">
+            # general
         </div>
 
-    </aside>
+        <div
+            class="channel"
+            onclick="changeChannel('gaming', this)">
+            # gaming
+        </div>
+
+        <div
+            class="channel"
+            onclick="changeChannel('movies', this)">
+            # movies
+        </div>
+
+    </div>
 
 
-    <main class="chat">
+    <div class="chat">
 
-        <header class="chat-header">
+        <div class="header">
 
-            #
-
-            <span id="channelName">
+            # <span id="channelName">
                 general
             </span>
 
-        </header>
+        </div>
 
 
         <div
@@ -354,6 +270,7 @@ textarea::placeholder {
                 <textarea
                     id="messageInput"
                     placeholder="Message #general"
+                    rows="1"
                     maxlength="2000">
                 </textarea>
 
@@ -368,10 +285,12 @@ textarea::placeholder {
 
         </div>
 
-    </main>
+    </div>
 
 </div>
 
+
+<!-- LOGIN -->
 
 <div
     id="login"
@@ -379,16 +298,17 @@ textarea::placeholder {
 
     <div class="login-box">
 
-        <h1>MyChat</h1>
+        <h1>
+            Welcome to MyChat
+        </h1>
 
         <p>
-            Choose your username
+            Choose a username
         </p>
 
         <input
             id="username"
             maxlength="24"
-            autocomplete="off"
             placeholder="Username">
 
         <button
@@ -408,38 +328,16 @@ textarea::placeholder {
 
 <script>
 
-const API = "/api/messages";
+const API =
+    "/api/messages";
 
 let username = "";
-let currentChannel = "general";
-let loading = false;
+
+let currentChannel =
+    "general";
 
 
-/* -------------------------
-   STATUS
-------------------------- */
-
-function setStatus(
-    text,
-    good
-) {
-
-    const status =
-        document.getElementById(
-            "status"
-        );
-
-    status.textContent = text;
-
-    status.className =
-        "status " +
-        (good ? "ok" : "bad");
-}
-
-
-/* -------------------------
-   LOGIN
-------------------------- */
+/* LOGIN */
 
 function login() {
 
@@ -448,26 +346,15 @@ function login() {
             "username"
         );
 
-    const error =
-        document.getElementById(
-            "loginError"
-        );
-
     const name =
         input.value.trim();
 
     if (!name) {
 
-        error.textContent =
+        document.getElementById(
+            "loginError"
+        ).textContent =
             "Enter a username.";
-
-        return;
-    }
-
-    if (name.length < 2) {
-
-        error.textContent =
-            "Username must be at least 2 characters.";
 
         return;
     }
@@ -475,28 +362,22 @@ function login() {
     username = name;
 
     localStorage.setItem(
-        "chatUsername",
+        "username",
         username
     );
 
     document.getElementById(
         "login"
-    ).style.display = "none";
+    ).style.display =
+        "none";
 
     loadMessages();
 }
 
 
-/* -------------------------
-   LOAD MESSAGES
-------------------------- */
+/* LOAD */
 
 async function loadMessages() {
-
-    if (!username || loading)
-        return;
-
-    loading = true;
 
     try {
 
@@ -506,20 +387,11 @@ async function loadMessages() {
                 "?channel=" +
                 encodeURIComponent(
                     currentChannel
-                ),
-                {
-                    method: "GET",
-                    headers: {
-                        "Accept":
-                            "application/json"
-                    }
-                }
+                )
             );
-
 
         const text =
             await response.text();
-
 
         let data;
 
@@ -531,14 +403,10 @@ async function loadMessages() {
         } catch {
 
             throw new Error(
-                "Server did not return JSON. HTTP " +
-                response.status +
-                "\n\n" +
+                "Server did not return JSON:\n" +
                 text.substring(0,300)
             );
-
         }
-
 
         if (!response.ok) {
 
@@ -546,43 +414,34 @@ async function loadMessages() {
                 data.error ||
                 "Server error"
             );
-
         }
-
 
         displayMessages(
             data.messages || []
         );
-
 
         setStatus(
             "● Connected",
             true
         );
 
-
     } catch(error) {
 
         console.error(error);
 
         setStatus(
-            "● Server error",
+            "● Error",
             false
         );
 
         console.error(
             error.message
         );
-
     }
-
-    loading = false;
 }
 
 
-/* -------------------------
-   DISPLAY
-------------------------- */
+/* DISPLAY */
 
 function displayMessages(
     messages
@@ -595,66 +454,16 @@ function displayMessages(
 
     container.innerHTML = "";
 
-
-    if (!messages.length) {
-
-        container.innerHTML = `
-            <div class="empty">
-                No messages yet.<br>
-                Send the first message!
-            </div>
-        `;
-
-        return;
-    }
-
-
     messages.forEach(
         message => {
 
-            const wrapper =
+            const div =
                 document.createElement(
                     "div"
                 );
 
-            wrapper.className =
+            div.className =
                 "message";
-
-
-            const avatar =
-                document.createElement(
-                    "div"
-                );
-
-            avatar.className =
-                "avatar";
-
-            avatar.textContent =
-                (
-                    message.username ||
-                    "?"
-                )
-                .charAt(0)
-                .toUpperCase();
-
-
-            const body =
-                document.createElement(
-                    "div"
-                );
-
-            body.className =
-                "message-body";
-
-
-            const top =
-                document.createElement(
-                    "div"
-                );
-
-            top.className =
-                "message-top";
-
 
             const name =
                 document.createElement(
@@ -662,11 +471,10 @@ function displayMessages(
                 );
 
             name.className =
-                "message-name";
+                "name";
 
             name.textContent =
                 message.username;
-
 
             const time =
                 document.createElement(
@@ -674,17 +482,12 @@ function displayMessages(
                 );
 
             time.className =
-                "message-time";
+                "time";
 
-            if(message.created_at) {
-
-                time.textContent =
-                    new Date(
-                        message.created_at
-                    ).toLocaleString();
-
-            }
-
+            time.textContent =
+                new Date(
+                    message.created_at
+                ).toLocaleString();
 
             const text =
                 document.createElement(
@@ -692,35 +495,28 @@ function displayMessages(
                 );
 
             text.className =
-                "message-text";
+                "text";
 
             text.textContent =
                 message.message;
 
+            div.appendChild(name);
 
-            top.appendChild(name);
-            top.appendChild(time);
+            div.appendChild(time);
 
-            body.appendChild(top);
-            body.appendChild(text);
+            div.appendChild(text);
 
-            wrapper.appendChild(avatar);
-            wrapper.appendChild(body);
-
-            container.appendChild(wrapper);
+            container.appendChild(div);
 
         }
     );
-
 
     container.scrollTop =
         container.scrollHeight;
 }
 
 
-/* -------------------------
-   SEND
-------------------------- */
+/* SEND */
 
 async function sendMessage() {
 
@@ -737,21 +533,11 @@ async function sendMessage() {
     const message =
         input.value.trim();
 
-
-    if (!username) {
-
+    if (!message)
         return;
-    }
 
-
-    if (!message) {
-
-        return;
-    }
-
-
-    button.disabled = true;
-
+    button.disabled =
+        true;
 
     try {
 
@@ -763,9 +549,6 @@ async function sendMessage() {
 
                     headers: {
                         "Content-Type":
-                            "application/json",
-
-                        "Accept":
                             "application/json"
                     },
 
@@ -785,10 +568,8 @@ async function sendMessage() {
                 }
             );
 
-
         const text =
             await response.text();
-
 
         let data;
 
@@ -800,14 +581,10 @@ async function sendMessage() {
         } catch {
 
             throw new Error(
-                "Server did not return JSON. HTTP " +
-                response.status +
-                "\n\n" +
+                "Server did not return JSON:\n" +
                 text.substring(0,300)
             );
-
         }
-
 
         if (!response.ok) {
 
@@ -815,42 +592,35 @@ async function sendMessage() {
                 data.error ||
                 "Could not send message"
             );
-
         }
-
 
         input.value = "";
 
         await loadMessages();
 
-
     } catch(error) {
-
-        console.error(error);
 
         alert(
             error.message
         );
 
+        console.error(error);
     }
 
-
-    button.disabled = false;
+    button.disabled =
+        false;
 }
 
 
-/* -------------------------
-   CHANNELS
-------------------------- */
+/* CHANNEL */
 
-function selectChannel(
+function changeChannel(
     channel,
     element
 ) {
 
     currentChannel =
         channel;
-
 
     document
         .querySelectorAll(
@@ -863,17 +633,14 @@ function selectChannel(
                 )
         );
 
-
     element.classList.add(
         "active"
     );
-
 
     document.getElementById(
         "channelName"
     ).textContent =
         channel;
-
 
     document.getElementById(
         "messageInput"
@@ -881,14 +648,33 @@ function selectChannel(
         "Message #" +
         channel;
 
-
     loadMessages();
 }
 
 
-/* -------------------------
-   ENTER KEY
-------------------------- */
+/* STATUS */
+
+function setStatus(
+    text,
+    good
+) {
+
+    const status =
+        document.getElementById(
+            "status"
+        );
+
+    status.textContent =
+        text;
+
+    status.style.color =
+        good
+            ? "#57f287"
+            : "#ed4245";
+}
+
+
+/* ENTER */
 
 document
     .getElementById(
@@ -906,27 +692,23 @@ document
                 event.preventDefault();
 
                 sendMessage();
-
             }
 
         }
     );
 
 
-/* -------------------------
-   START
-------------------------- */
+/* START */
 
-const savedUsername =
+const saved =
     localStorage.getItem(
-        "chatUsername"
+        "username"
     );
 
-
-if(savedUsername) {
+if (saved) {
 
     username =
-        savedUsername;
+        saved;
 
     document.getElementById(
         "login"
@@ -934,7 +716,6 @@ if(savedUsername) {
         "none";
 
     loadMessages();
-
 }
 
 
@@ -946,4 +727,5 @@ setInterval(
 </script>
 
 </body>
+
 </html>
