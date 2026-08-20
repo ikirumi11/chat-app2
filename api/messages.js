@@ -12,10 +12,10 @@ export default async function handler(req, res) {
     try {
 
         const supabaseUrl =
-            process.env.SUPABASE_URL;
+            process.env.https://wlvbkdzcueqkknysisfw.supabase.co/rest/v1/;
 
         const supabaseKey =
-            process.env.SUPABASE_SERVICE_ROLE_KEY;
+            process.env.sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL;
 
         if (!supabaseUrl) {
             return res.status(500).json({
