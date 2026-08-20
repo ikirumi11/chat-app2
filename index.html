@@ -12,24 +12,24 @@
 
 :root{
     --bg:#090b0f;
-    --surface:#101319;
-    --surface2:#151a21;
-    --surface3:#1b212a;
-    --surface4:#222934;
-    --border:#272e38;
-    --text:#f2f4f7;
-    --muted:#7f8997;
-    --muted2:#9ba4b0;
-    --accent:#e8ebef;
-    --accentText:#0b0d10;
-    --success:#58d890;
-    --danger:#ff6868;
-    --warning:#e4bd5d;
-
+    --sidebar:#0d1015;
+    --panel:#11151c;
+    --panel2:#171c24;
+    --panel3:#1c222c;
+    --border:#252c37;
+    --text:#f1f4f8;
+    --muted:#7e8794;
+    --muted2:#9da6b3;
+    --accent:#e9edf2;
+    --accentText:#111318;
+    --green:#69e39a;
+    --red:#ff6f78;
+    --yellow:#e5c86b;
+    --blue:#72a9ff;
     --radius:12px;
     --text-size:16px;
-    --word-spacing:0px;
     --line-spacing:1.45;
+    --word-spacing:0px;
     --ui-scale:1;
 }
 
@@ -38,7 +38,6 @@ body{
     width:100%;
     height:100%;
     margin:0;
-    padding:0;
 }
 
 body{
@@ -47,7 +46,6 @@ body{
     color:var(--text);
     font-family:
         Inter,
-        ui-sans-serif,
         system-ui,
         -apple-system,
         BlinkMacSystemFont,
@@ -68,84 +66,75 @@ button{
     cursor:pointer;
 }
 
-button:disabled{
-    cursor:not-allowed;
-    opacity:.45;
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible{
+    outline:2px solid var(--blue);
+    outline-offset:2px;
 }
 
-/* =========================================================
+/* =========================
    APP
-========================================================= */
+========================= */
 
 .app{
     width:100%;
-    height:100dvh;
+    height:100vh;
     display:flex;
     flex-direction:column;
     background:
         radial-gradient(
-            circle at top left,
-            rgba(255,255,255,.025),
+            circle at 80% -20%,
+            #ffffff08,
             transparent 35%
         ),
         var(--bg);
 }
 
-/* =========================================================
+/* =========================
    HEADER
-========================================================= */
+========================= */
 
 .header{
-    height:68px;
-    min-height:68px;
+    height:62px;
+    min-height:62px;
+    padding:0 18px;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:0 20px;
+    background:rgba(13,16,21,.92);
     border-bottom:1px solid var(--border);
-    background:rgba(16,19,25,.94);
-    backdrop-filter:blur(20px);
-    position:relative;
-    z-index:5;
+    backdrop-filter:blur(18px);
+    z-index:10;
 }
 
-.brand{
+.logo{
     display:flex;
     align-items:center;
-    gap:12px;
+    gap:11px;
     min-width:0;
 }
 
-.brand-icon{
-    width:40px;
-    height:40px;
-    border-radius:11px;
+.logo-icon{
+    width:36px;
+    height:36px;
     display:grid;
     place-items:center;
-    background:linear-gradient(
-        145deg,
-        #202630,
-        #12161c
-    );
+    border-radius:11px;
+    background:var(--panel2);
     border:1px solid var(--border);
-    box-shadow:0 5px 20px #0005;
-    font-size:19px;
+    box-shadow:0 5px 20px #0004;
 }
 
-.brand-text{
-    min-width:0;
-}
-
-.brand-name{
-    font-size:15px;
+.logo-title{
     font-weight:800;
-    letter-spacing:-.2px;
+    white-space:nowrap;
 }
 
 .channel{
-    margin-top:2px;
     color:var(--muted);
-    font-size:12px;
+    font-weight:500;
 }
 
 .header-actions{
@@ -153,64 +142,54 @@ button:disabled{
     gap:7px;
 }
 
-.icon-button{
-    width:40px;
-    height:40px;
-    border-radius:11px;
+.icon-btn{
+    width:38px;
+    height:38px;
+    border-radius:10px;
     border:1px solid var(--border);
-    background:var(--surface2);
+    background:var(--panel2);
     color:var(--text);
-    display:grid;
-    place-items:center;
-    transition:
-        background .15s,
-        transform .15s,
-        border-color .15s;
+    transition:.15s;
 }
 
-.icon-button:hover{
-    background:var(--surface3);
-    border-color:#343d49;
+.icon-btn:hover{
+    background:var(--panel3);
     transform:translateY(-1px);
 }
 
-/* =========================================================
-   CHAT
-========================================================= */
+/* =========================
+   MESSAGE AREA
+========================= */
 
 .messages{
     flex:1;
-    min-height:0;
     overflow-y:auto;
-    overflow-x:hidden;
-    padding:24px max(16px,calc((100vw - 1050px) / 2));
+    padding:22px max(18px,calc((100vw - 1050px)/2));
     scroll-behavior:auto;
 }
 
-.messages::-webkit-scrollbar{
-    width:8px;
+.messages::-webkit-scrollbar,
+.panel::-webkit-scrollbar{
+    width:9px;
 }
 
-.messages::-webkit-scrollbar-track{
-    background:transparent;
-}
-
-.messages::-webkit-scrollbar-thumb{
-    background:#252b34;
+.messages::-webkit-scrollbar-thumb,
+.panel::-webkit-scrollbar-thumb{
+    background:#ffffff14;
     border-radius:20px;
 }
 
 .message{
     display:flex;
     gap:11px;
-    margin-bottom:9px;
-    animation:messageIn .18s ease;
+    margin-bottom:8px;
+    animation:messageIn .16s ease;
 }
 
 @keyframes messageIn{
     from{
         opacity:0;
-        transform:translateY(4px);
+        transform:translateY(5px);
     }
     to{
         opacity:1;
@@ -218,197 +197,537 @@ button:disabled{
     }
 }
 
-.avatar{
-    width:37px;
-    height:37px;
-    min-width:37px;
-    border-radius:11px;
+.message-avatar{
+    width:36px;
+    height:36px;
+    flex:0 0 36px;
     display:grid;
     place-items:center;
-    background:var(--surface2);
+    border-radius:10px;
+    background:var(--panel2);
     border:1px solid var(--border);
-    color:#dce1e8;
+    color:#dce2ea;
     font-size:13px;
     font-weight:800;
 }
 
-.message-body{
+.message-content{
     min-width:0;
-    max-width:800px;
+    max-width:min(850px,calc(100vw - 100px));
 }
 
 .message-card{
     display:inline-block;
     max-width:100%;
-    padding:8px 12px 9px;
-    border:1px solid var(--border);
-    border-radius:4px 12px 12px 12px;
-    background:linear-gradient(
-        145deg,
-        rgba(27,32,40,.96),
-        rgba(20,24,30,.96)
-    );
-    box-shadow:0 3px 15px rgba(0,0,0,.12);
+    padding:9px 12px 10px;
+    border-radius:11px;
+    background:var(--panel2);
+    border:1px solid #ffffff06;
+    box-shadow:0 3px 14px #0002;
 }
 
 .message-top{
     display:flex;
-    align-items:center;
-    gap:7px;
+    align-items:baseline;
+    gap:8px;
     margin-bottom:3px;
 }
 
 .username{
-    font-size:13px;
-    font-weight:800;
-    color:#fff;
+    color:var(--text);
+    font-weight:750;
 }
 
-.time{
-    color:var(--muted);
-    font-size:10px;
-}
-
+.time,
 .edited{
     color:var(--muted);
     font-size:10px;
 }
 
 .message-text{
-    color:#d9dee5;
-    font-size:var(--text-size);
-    line-height:var(--line-spacing);
-    word-spacing:var(--word-spacing);
+    color:#d8dde5;
     white-space:pre-wrap;
     overflow-wrap:anywhere;
+    font-size:var(--text-size);
+    word-spacing:var(--word-spacing);
+    line-height:var(--line-spacing);
 }
 
 .message-image{
     display:block;
-    max-width:420px;
+    max-width:min(500px,100%);
     max-height:400px;
     margin-top:8px;
     border-radius:9px;
     border:1px solid var(--border);
 }
 
-/* =========================================================
-   EMPTY
-========================================================= */
+/* =========================
+   GAME CARDS
+========================= */
 
-.empty{
-    height:100%;
-    min-height:250px;
+.game-message{
+    width:100%;
+    max-width:900px;
+    margin:15px auto;
+    animation:gameIn .2s ease;
+}
+
+@keyframes gameIn{
+    from{
+        opacity:0;
+        transform:translateY(8px) scale(.99);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+.game-card{
+    overflow:hidden;
+    border:1px solid var(--border);
+    border-radius:17px;
+    background:
+        linear-gradient(
+            145deg,
+            var(--panel2),
+            var(--panel)
+        );
+    box-shadow:
+        0 18px 50px #0005,
+        inset 0 1px #ffffff08;
+}
+
+.game-header{
+    padding:16px 18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    border-bottom:1px solid var(--border);
+}
+
+.game-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+    font-weight:800;
+}
+
+.game-title-icon{
+    width:35px;
+    height:35px;
     display:grid;
     place-items:center;
+    border-radius:10px;
+    background:var(--panel3);
+}
+
+.game-name{
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.game-status{
+    padding:5px 9px;
+    border-radius:999px;
+    background:#ffffff08;
+    color:var(--muted2);
+    font-size:11px;
+    white-space:nowrap;
+}
+
+.game-body{
+    padding:18px;
+}
+
+.game-info{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin-bottom:14px;
+}
+
+.game-pill{
+    padding:6px 9px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#ffffff04;
+    color:var(--muted2);
+    font-size:11px;
+}
+
+.game-pill strong{
+    color:var(--text);
+}
+
+.game-description{
+    color:var(--muted2);
+    line-height:1.5;
+    margin-bottom:14px;
+}
+
+.players-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin:12px 0;
+}
+
+.player-chip{
+    padding:6px 9px;
+    border-radius:8px;
+    background:#ffffff05;
+    border:1px solid var(--border);
+    font-size:11px;
+    color:#cbd1da;
+}
+
+.player-chip.host{
+    color:var(--yellow);
+    border-color:#806b2d;
+    background:#806b2d0d;
+}
+
+.turn-banner{
+    padding:10px 12px;
+    border-radius:10px;
+    background:#ffffff05;
+    border:1px solid var(--border);
+    color:var(--muted2);
+    margin:11px 0;
+}
+
+.turn-banner strong{
+    color:white;
+}
+
+.game-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.game-btn{
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:9px 13px;
+    background:var(--panel3);
+    color:white;
+    font-weight:700;
+    transition:.15s;
+}
+
+.game-btn:hover:not(:disabled){
+    filter:brightness(1.15);
+    transform:translateY(-1px);
+}
+
+.game-btn.primary{
+    background:var(--accent);
+    color:var(--accentText);
+    border-color:transparent;
+}
+
+.game-btn.green{
+    background:#153725;
+    color:#8af0b2;
+    border-color:#2c6544;
+}
+
+.game-btn.danger{
+    background:#38191d;
+    color:#ff9198;
+    border-color:#71343b;
+}
+
+.game-btn:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+}
+
+/* =========================
+   TIC TAC TOE
+========================= */
+
+.ttt{
+    display:grid;
+    gap:5px;
+    justify-content:center;
+    margin:17px auto;
+}
+
+.ttt button{
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#0d1117;
+    color:white;
+    font-weight:900;
+    transition:.12s;
+}
+
+.ttt button:hover:not(:disabled){
+    background:#252c36;
+}
+
+.ttt button:disabled{
+    cursor:not-allowed;
+}
+
+/* =========================
+   REACTION
+========================= */
+
+.reaction-area{
     text-align:center;
+    padding:12px;
+}
+
+.reaction-box{
+    width:190px;
+    height:190px;
+    margin:15px auto;
+    border-radius:20px;
+    border:2px solid var(--border);
+    display:grid;
+    place-items:center;
+    font-size:23px;
+    font-weight:800;
+    cursor:pointer;
+    user-select:none;
+    transition:.15s;
+    background:#151a21;
     color:var(--muted);
 }
 
-.empty-icon{
-    font-size:35px;
+.reaction-box.ready{
+    background:#183a29;
+    border-color:#39734f;
+    color:#81f2ae;
+}
+
+.reaction-box.go{
+    background:#411a1d;
+    border-color:#81343b;
+    color:#ff858c;
+}
+
+.reaction-box.done{
+    background:#24274b;
+    border-color:#484d86;
+    color:#aaaefe;
+}
+
+/* =========================
+   TYPE GAME
+========================= */
+
+.type-area{
+    text-align:center;
+    padding:10px;
+}
+
+.type-sentence{
+    padding:17px;
+    margin:10px auto;
+    max-width:650px;
+    border-radius:12px;
+    background:#ffffff05;
+    border:1px solid var(--border);
+    font-size:21px;
+    font-weight:750;
+    word-break:break-word;
+}
+
+.type-input{
+    width:100%;
+    max-width:550px;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#0d1117;
+    color:white;
+    text-align:center;
+    outline:none;
+}
+
+/* =========================
+   BOSS
+========================= */
+
+.boss-area{
+    text-align:center;
+}
+
+.boss-monster-name{
+    font-size:27px;
+    font-weight:900;
+    color:#ff6472;
     margin-bottom:10px;
-    opacity:.5;
 }
 
-.empty strong{
-    display:block;
-    color:#b7bec8;
-    margin-bottom:5px;
+.boss-health-bar{
+    position:relative;
+    width:100%;
+    height:27px;
+    overflow:hidden;
+    border-radius:15px;
+    background:#090909;
+    border:1px solid var(--border);
 }
 
-/* =========================================================
+.boss-health-fill{
+    height:100%;
+    width:100%;
+    background:linear-gradient(
+        90deg,
+        #d83b49,
+        #ff764e
+    );
+    transition:width .25s;
+}
+
+.boss-health-text{
+    position:absolute;
+    inset:0;
+    display:grid;
+    place-items:center;
+    font-size:12px;
+    font-weight:800;
+}
+
+.boss-stats{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:20px;
+    margin:12px 0;
+    color:var(--muted2);
+    font-size:12px;
+}
+
+.boss-stats strong{
+    color:white;
+}
+
+.boss-damage-display{
+    font-size:29px;
+    font-weight:900;
+    color:#ff7651;
+}
+
+.boss-upgrades{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:8px;
+    margin:10px 0;
+}
+
+.boss-upgrade-btn{
+    padding:8px 13px;
+    border-radius:9px;
+    border:1px solid var(--border);
+    background:var(--panel3);
+    color:white;
+}
+
+.boss-upgrade-btn:disabled{
+    opacity:.35;
+}
+
+/* =========================
    COMPOSER
-========================================================= */
+========================= */
 
 .composer{
-    padding:12px 16px 17px;
+    padding:11px 16px 15px;
+    background:rgba(13,16,21,.94);
     border-top:1px solid var(--border);
-    background:rgba(16,19,25,.96);
-    backdrop-filter:blur(20px);
+    backdrop-filter:blur(18px);
 }
 
-.composer-inner{
-    width:min(900px,100%);
+.composer-box{
+    max-width:1050px;
     margin:auto;
     display:flex;
     align-items:flex-end;
     gap:8px;
     padding:7px;
-    background:var(--surface2);
+    border-radius:14px;
+    background:var(--panel2);
     border:1px solid var(--border);
-    border-radius:15px;
     box-shadow:0 8px 30px #0003;
 }
 
-.message-input{
+textarea{
     flex:1;
-    min-width:0;
     min-height:42px;
     max-height:150px;
-    padding:10px 11px;
+    resize:none;
     border:0;
     outline:0;
-    resize:none;
     background:transparent;
     color:white;
+    padding:10px;
 }
 
-.message-input::placeholder{
-    color:#66707d;
+textarea::placeholder{
+    color:#68717e;
 }
 
-.send-button{
+.send-btn{
     height:42px;
-    padding:0 17px;
+    padding:0 18px;
     border:0;
-    border-radius:10px;
+    border-radius:9px;
     background:var(--accent);
     color:var(--accentText);
     font-weight:800;
-    transition:transform .15s,filter .15s;
 }
 
-.send-button:hover{
+.send-btn:hover{
     filter:brightness(1.08);
-    transform:translateY(-1px);
 }
 
-/* =========================================================
-   OVERLAY
-========================================================= */
+.send-btn:disabled{
+    opacity:.45;
+}
+
+/* =========================
+   OVERLAYS
+========================= */
 
 .overlay{
     position:fixed;
     inset:0;
-    z-index:100;
     display:none;
     align-items:center;
     justify-content:center;
-    padding:14px;
-    background:rgba(0,0,0,.72);
-    backdrop-filter:blur(10px);
+    padding:15px;
+    background:#000b;
+    backdrop-filter:blur(8px);
+    z-index:100;
 }
 
 .overlay.show{
     display:flex;
 }
 
-.modal{
+.panel{
     width:min(650px,100%);
-    max-height:min(850px,calc(100dvh - 28px));
-    overflow:auto;
+    max-height:calc(100vh - 30px);
+    overflow-y:auto;
+    background:var(--panel);
     border:1px solid var(--border);
     border-radius:17px;
-    background:var(--surface);
-    box-shadow:0 30px 100px #000b;
+    box-shadow:0 30px 100px #000c;
 }
 
-.modal.large{
-    width:min(900px,100%);
-}
-
-.modal-header{
+.panel-header{
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -416,92 +735,37 @@ button:disabled{
     border-bottom:1px solid var(--border);
     position:sticky;
     top:0;
+    background:var(--panel);
     z-index:2;
-    background:rgba(16,19,25,.97);
-    backdrop-filter:blur(15px);
 }
 
-.modal-title{
-    font-size:17px;
-    font-weight:800;
+.panel-header h2{
+    margin:0;
+    font-size:19px;
 }
 
-.modal-body{
+.panel-body{
     padding:18px;
 }
 
-/* =========================================================
-   GAME CREATOR
-========================================================= */
-
-.game-grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:9px;
-}
-
-.game-choice{
-    min-height:105px;
-    padding:15px;
-    text-align:left;
-    border:1px solid var(--border);
-    border-radius:13px;
-    background:var(--surface2);
-    color:white;
-    transition:
-        background .15s,
-        transform .15s,
-        border-color .15s;
-}
-
-.game-choice:hover{
-    background:var(--surface3);
-    border-color:#37404c;
-    transform:translateY(-2px);
-}
-
-.game-choice strong{
-    display:block;
-    font-size:14px;
-    margin-bottom:5px;
-}
-
-.game-choice span{
-    display:block;
-    color:var(--muted);
-    font-size:11px;
-    line-height:1.4;
-}
-
-.game-players{
-    display:inline-block;
-    margin-top:10px;
-    padding:4px 8px;
-    border-radius:7px;
-    background:#10141a;
-    border:1px solid var(--border);
-    color:#aeb6c1;
-    font-size:10px;
-}
-
-/* =========================================================
-   SETTINGS
-========================================================= */
+/* =========================
+   CATEGORIES
+========================= */
 
 .category{
     margin-bottom:9px;
     border:1px solid var(--border);
     border-radius:12px;
     overflow:hidden;
-    background:var(--surface2);
+    background:var(--panel2);
 }
 
 .category-title{
     width:100%;
+    padding:13px;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:14px;
     border:0;
     background:transparent;
     color:white;
@@ -509,13 +773,9 @@ button:disabled{
     font-weight:750;
 }
 
-.category-title:hover{
-    background:rgba(255,255,255,.025);
-}
-
 .category-body{
     display:none;
-    padding:0 14px 15px;
+    padding:0 13px 13px;
 }
 
 .category.open .category-body{
@@ -528,28 +788,23 @@ button:disabled{
 
 .setting label{
     display:block;
-    margin-bottom:7px;
-    color:#abb4bf;
+    margin-bottom:6px;
+    color:var(--muted2);
     font-size:12px;
 }
 
 .setting input,
 .setting select{
     width:100%;
-    padding:10px 11px;
-    border:1px solid var(--border);
+    padding:10px;
     border-radius:9px;
-    outline:none;
-    background:#0e1217;
+    border:1px solid var(--border);
+    background:#0d1117;
     color:white;
+    outline:none;
 }
 
-.setting input:focus,
-.setting select:focus{
-    border-color:#515b68;
-}
-
-.setting input[type="range"]{
+.setting input[type=range]{
     padding:0;
 }
 
@@ -559,502 +814,135 @@ button:disabled{
     font-size:11px;
 }
 
-.save-button{
+.save-btn{
     width:100%;
-    margin-top:5px;
+    margin-top:7px;
     padding:12px;
     border:0;
-    border-radius:10px;
+    border-radius:9px;
     background:var(--accent);
-    color:#111;
+    color:var(--accentText);
     font-weight:800;
 }
 
-/* =========================================================
-   DANGER
-========================================================= */
+/* =========================
+   GAME CREATOR
+========================= */
 
-.danger-zone{
-    margin-top:20px;
-    padding-top:18px;
-    border-top:1px solid #42252a;
-}
-
-.danger-title{
-    color:var(--danger);
-    font-weight:800;
-}
-
-.danger-description{
-    color:var(--muted);
-    line-height:1.5;
-    font-size:12px;
-}
-
-.danger-button{
-    width:100%;
-    padding:11px;
-    border:1px solid #683039;
-    border-radius:9px;
-    background:#251519;
-    color:#ff8585;
-}
-
-/* =========================================================
-   GAME CARD
-========================================================= */
-
-.game-message{
-    margin:0 auto 15px;
-    max-width:900px;
-}
-
-.game-card{
-    overflow:hidden;
-    border:1px solid var(--border);
-    border-radius:16px;
-    background:
-        radial-gradient(
-            circle at top right,
-            rgba(255,255,255,.035),
-            transparent 35%
-        ),
-        var(--surface2);
-    box-shadow:0 12px 40px #0003;
-}
-
-.game-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    padding:15px 17px;
-    border-bottom:1px solid var(--border);
-}
-
-.game-name{
-    display:flex;
-    align-items:center;
+.game-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
     gap:9px;
-    font-size:15px;
-    font-weight:850;
 }
 
-.game-host{
-    color:var(--muted);
-    font-size:10px;
-}
-
-.game-status{
-    padding:5px 8px;
-    border-radius:999px;
+.game-choice{
+    min-height:85px;
+    padding:13px;
+    border-radius:12px;
     border:1px solid var(--border);
-    background:#10151b;
-    color:#aeb6c1;
-    font-size:10px;
-}
-
-.game-status.running{
-    color:#82e7aa;
-    border-color:#24573c;
-    background:#112319;
-}
-
-.game-status.finished{
-    color:#8f98a5;
-}
-
-.game-body{
-    padding:16px;
-}
-
-.game-description{
-    margin:0 0 13px;
-    color:var(--muted);
-    font-size:12px;
-    line-height:1.5;
-}
-
-.players{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    margin:10px 0 13px;
-}
-
-.player{
-    padding:6px 9px;
-    border:1px solid var(--border);
-    border-radius:8px;
-    background:#10151b;
-    color:#bdc5cf;
-    font-size:11px;
-}
-
-.player.host{
-    color:#e4c86f;
-    border-color:#5d4d28;
-}
-
-.game-actions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:7px;
-}
-
-.game-button{
-    padding:9px 13px;
-    border:1px solid var(--border);
-    border-radius:9px;
-    background:var(--surface3);
+    background:var(--panel2);
     color:white;
-    font-weight:750;
-    font-size:12px;
-}
-
-.game-button:hover:not(:disabled){
-    filter:brightness(1.12);
-}
-
-.game-button.primary{
-    background:#e9ebee;
-    color:#101216;
-}
-
-.game-button.success{
-    background:#173525;
-    border-color:#285c40;
-    color:#91edb3;
-}
-
-.game-button.danger{
-    background:#351a1e;
-    border-color:#683139;
-    color:#ff8a8a;
-}
-
-.game-button.small{
-    padding:6px 9px;
-    font-size:10px;
-}
-
-/* =========================================================
-   TIC TAC TOE
-========================================================= */
-
-.ttt-board{
-    display:grid;
-    gap:5px;
-    width:min(430px,100%);
-    margin:18px auto;
-}
-
-.ttt-cell{
-    aspect-ratio:1;
-    border:1px solid var(--border);
-    border-radius:9px;
-    background:#0e1319;
-    color:white;
-    font-size:clamp(18px,5vw,31px);
-    font-weight:900;
-    transition:.12s;
-}
-
-.ttt-cell:hover:not(:disabled){
-    background:#202630;
-}
-
-.ttt-cell.x{
-    color:#f0f2f5;
-}
-
-.ttt-cell.o{
-    color:#8d98a8;
-}
-
-.turn{
-    margin:10px 0;
-    padding:9px 11px;
-    text-align:center;
-    border-radius:9px;
-    border:1px solid var(--border);
-    background:#11161c;
-    color:#aeb6c1;
-    font-size:12px;
-}
-
-.turn strong{
-    color:white;
-}
-
-/* =========================================================
-   REACTION
-========================================================= */
-
-.reaction-box{
-    width:min(280px,75vw);
-    aspect-ratio:1;
-    margin:20px auto;
-    display:grid;
-    place-items:center;
-    border-radius:20px;
-    border:3px solid #303640;
-    background:#151a21;
-    color:#808995;
-    font-size:23px;
-    font-weight:850;
-    user-select:none;
+    text-align:left;
     transition:.15s;
 }
 
-.reaction-box.ready{
-    background:#183c29;
-    border-color:#3c8c5b;
-    color:#8cffb5;
+.game-choice:hover{
+    background:var(--panel3);
+    transform:translateY(-1px);
 }
 
-.reaction-box.go{
-    background:#472024;
-    border-color:#9a414c;
-    color:#ff8585;
-}
-
-.reaction-box.done{
-    background:#25223a;
-    border-color:#514b78;
-    color:#b9b2ff;
-}
-
-/* =========================================================
-   TYPE GAME
-========================================================= */
-
-.type-sentence{
-    margin:16px auto;
-    width:min(700px,100%);
-    padding:17px;
-    border-radius:11px;
-    background:#10151b;
-    border:1px solid var(--border);
-    text-align:center;
-    font-size:19px;
-    font-weight:750;
-    line-height:1.5;
-}
-
-.type-input{
+.game-choice strong{
     display:block;
-    width:min(600px,100%);
-    margin:auto;
-    padding:12px;
-    border:1px solid var(--border);
-    border-radius:10px;
-    background:#0d1217;
-    color:white;
-    outline:0;
+    margin-bottom:4px;
 }
 
-.type-input:focus{
-    border-color:#515b68;
-}
-
-.stats{
-    display:flex;
-    justify-content:center;
-    flex-wrap:wrap;
-    gap:10px;
-    margin:12px 0;
-}
-
-.stat{
-    padding:7px 10px;
-    border-radius:8px;
-    border:1px solid var(--border);
-    background:#10151b;
-    color:#8f98a5;
+.game-choice span{
+    color:var(--muted);
     font-size:11px;
+    line-height:1.4;
 }
 
-.stat strong{
-    color:white;
+.game-players{
+    display:inline-block;
+    margin-top:6px;
+    padding:3px 7px;
+    border-radius:20px;
+    background:#ffffff07;
+    color:var(--muted2);
+    font-size:10px;
 }
 
-/* =========================================================
-   BOSS
-========================================================= */
+/* =========================
+   EMPTY
+========================= */
 
-.boss-title{
-    text-align:center;
-    font-size:27px;
-    font-weight:950;
-    color:#ff6572;
-    margin:8px 0;
-}
-
-.boss-hp{
-    position:relative;
-    width:100%;
-    height:28px;
-    overflow:hidden;
-    border-radius:14px;
-    border:1px solid #513039;
-    background:#160f12;
-}
-
-.boss-hp-fill{
-    height:100%;
-    width:100%;
-    background:linear-gradient(
-        90deg,
-        #c93a49,
-        #ff6b50
-    );
-    transition:width .25s;
-}
-
-.boss-hp-text{
-    position:absolute;
-    inset:0;
+.empty{
+    min-height:300px;
     display:grid;
     place-items:center;
-    color:white;
-    font-size:11px;
-    font-weight:850;
-}
-
-.boss-damage{
     text-align:center;
-    margin:10px 0;
-    color:#ff8a6b;
-    font-size:24px;
-    font-weight:950;
+    color:var(--muted);
 }
 
-.boss-upgrades{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    gap:7px;
-}
-
-.upgrade{
-    padding:8px 11px;
-    border:1px solid var(--border);
-    border-radius:9px;
-    background:#11161c;
-    color:white;
-    font-size:11px;
-}
-
-.upgrade span{
+.empty strong{
     display:block;
-    color:#e5c66b;
-    margin-top:3px;
+    color:var(--muted2);
+    margin-bottom:5px;
 }
 
-/* =========================================================
-   CONFIRM
-========================================================= */
-
-.confirm-buttons{
-    display:flex;
-    gap:8px;
-    justify-content:flex-end;
-}
-
-/* =========================================================
-   TOAST
-========================================================= */
-
-.toast-container{
-    position:fixed;
-    right:18px;
-    bottom:85px;
-    z-index:500;
-    display:flex;
-    flex-direction:column;
-    gap:7px;
-    pointer-events:none;
-}
-
-.toast{
-    max-width:320px;
-    padding:11px 13px;
-    border:1px solid var(--border);
-    border-radius:10px;
-    background:#171c23;
-    color:#dce1e7;
-    box-shadow:0 10px 30px #0006;
-    font-size:12px;
-    animation:toastIn .2s ease;
-}
-
-@keyframes toastIn{
-    from{
-        opacity:0;
-        transform:translateY(8px);
-    }
-    to{
-        opacity:1;
-        transform:none;
-    }
-}
-
-/* =========================================================
+/* =========================
    MOBILE
-========================================================= */
+========================= */
 
 @media(max-width:650px){
 
     .header{
-        padding:0 11px;
-        height:61px;
-        min-height:61px;
+        height:58px;
+        min-height:58px;
+        padding:0 10px;
     }
 
-    .brand-icon{
-        width:36px;
-        height:36px;
+    .channel{
+        display:none;
     }
 
     .messages{
-        padding:16px 10px;
+        padding:15px 10px;
     }
 
-    .message-body{
-        max-width:calc(100vw - 60px);
+    .message-content{
+        max-width:calc(100vw - 65px);
     }
 
-    .message-card{
-        max-width:100%;
+    .message-avatar{
+        width:32px;
+        height:32px;
+        flex-basis:32px;
     }
 
     .game-grid{
         grid-template-columns:1fr;
     }
 
-    .game-header{
-        padding:13px;
+    .game-body{
+        padding:14px;
     }
 
-    .game-body{
-        padding:13px;
+    .reaction-box{
+        width:150px;
+        height:150px;
+    }
+
+    .type-sentence{
+        font-size:17px;
     }
 
     .composer{
-        padding:8px 9px 10px;
+        padding:8px;
     }
 
-    .send-button{
+    .send-btn{
         padding:0 13px;
-    }
-
-    .modal-body{
-        padding:13px;
-    }
-
-    .modal{
-        border-radius:14px;
     }
 }
 </style>
@@ -1066,33 +954,29 @@ button:disabled{
 
 <header class="header">
 
-    <div class="brand">
+    <div class="logo">
+        <div class="logo-icon">🎮</div>
 
-        <div class="brand-icon">🎮</div>
-
-        <div class="brand-text">
-            <div class="brand-name">
-                Game Chat
-            </div>
-
-            <div class="channel">
-                # general
-            </div>
+        <div class="logo-title">
+            Game Chat
         </div>
 
+        <div class="channel">
+            # general
+        </div>
     </div>
 
     <div class="header-actions">
 
         <button
-            class="icon-button"
-            id="gamesButton"
+            class="icon-btn"
+            id="gamesBtn"
             title="Games"
         >🎮</button>
 
         <button
-            class="icon-button"
-            id="settingsButton"
+            class="icon-btn"
+            id="settingsBtn"
             title="Settings"
         >⚙</button>
 
@@ -1100,28 +984,24 @@ button:disabled{
 
 </header>
 
-
 <main
     class="messages"
     id="messages"
 ></main>
 
-
 <div class="composer">
 
-    <div class="composer-inner">
+    <div class="composer-box">
 
         <textarea
             id="messageInput"
-            class="message-input"
             rows="1"
-            maxlength="2000"
             placeholder="Message #general"
         ></textarea>
 
         <button
-            id="sendButton"
-            class="send-button"
+            class="send-btn"
+            id="sendBtn"
         >
             Send
         </button>
@@ -1133,608 +1013,393 @@ button:disabled{
 </div>
 
 
-<!-- =====================================================
-     GAMES MODAL
-===================================================== -->
+<!-- =========================
+     GAME CREATOR
+========================= -->
 
 <div
     class="overlay"
     id="gamesOverlay"
 >
 
-<div class="modal">
+<div class="panel">
 
-    <div class="modal-header">
+<div class="panel-header">
 
-        <div class="modal-title">
-            Create a game
-        </div>
+<h2>🎮 Create Game</h2>
 
-        <button
-            class="icon-button"
-            id="closeGames"
-        >×</button>
+<button
+    class="icon-btn"
+    id="closeGames"
+>×</button>
 
-    </div>
+</div>
 
-    <div class="modal-body">
+<div class="panel-body">
 
-        <p
-            style="
-            color:var(--muted);
-            font-size:12px;
-            line-height:1.5;
-            margin-top:0;
-            "
-        >
-            Create a multiplayer game. Everyone in the chat
-            will see it automatically.
-        </p>
+<p style="color:var(--muted2);line-height:1.5">
+Create a multiplayer game. Other players will automatically
+see it and can join.
+</p>
 
-        <div class="game-grid">
+<div class="game-grid">
 
-            <button
-                class="game-choice"
-                data-create-game="ttt3"
-            >
-                <strong>⭕ Tic-Tac-Toe 3×3</strong>
-                <span>
-                    Classic three in a row.
-                </span>
-                <div class="game-players">
-                    2 players
-                </div>
-            </button>
+<button class="game-choice" data-game="ttt3">
+<strong>⭕ Tic-Tac-Toe 3×3</strong>
+<span>Classic 3×3. Get three in a row.</span>
+<div class="game-players">2 players</div>
+</button>
 
-            <button
-                class="game-choice"
-                data-create-game="ttt4"
-            >
-                <strong>⭕ Tic-Tac-Toe 4×4</strong>
-                <span>
-                    Four in a row wins.
-                </span>
-                <div class="game-players">
-                    2 players
-                </div>
-            </button>
+<button class="game-choice" data-game="ttt4">
+<strong>⭕ Tic-Tac-Toe 4×4</strong>
+<span>4×4 board. Get four in a row.</span>
+<div class="game-players">2 players</div>
+</button>
 
-            <button
-                class="game-choice"
-                data-create-game="ttt5"
-            >
-                <strong>⭕ Tic-Tac-Toe 5×5</strong>
-                <span>
-                    Five in a row wins.
-                </span>
-                <div class="game-players">
-                    2 players
-                </div>
-            </button>
+<button class="game-choice" data-game="ttt5">
+<strong>⭕ Tic-Tac-Toe 5×5</strong>
+<span>5×5 board. Get five in a row.</span>
+<div class="game-players">2 players</div>
+</button>
 
-            <button
-                class="game-choice"
-                data-create-game="ttt6"
-            >
-                <strong>⭕ Tic-Tac-Toe 6×6</strong>
-                <span>
-                    Six in a row wins.
-                </span>
-                <div class="game-players">
-                    2 players
-                </div>
-            </button>
+<button class="game-choice" data-game="ttt6">
+<strong>⭕ Tic-Tac-Toe 6×6</strong>
+<span>6×6 board. Get six in a row.</span>
+<div class="game-players">2 players</div>
+</button>
 
-            <button
-                class="game-choice"
-                data-create-game="reaction"
-            >
-                <strong>⚡ Reaction Time</strong>
-                <span>
-                    React as fast as possible.
-                </span>
-                <div class="game-players">
-                    2–6 players
-                </div>
-            </button>
+<button class="game-choice" data-game="reaction">
+<strong>⚡ Reaction Time</strong>
+<span>React as quickly as possible.</span>
+<div class="game-players">2–6 players</div>
+</button>
 
-            <button
-                class="game-choice"
-                data-create-game="type"
-            >
-                <strong>⌨ Type Sentence</strong>
-                <span>
-                    Type the sentence faster than everyone.
-                </span>
-                <div class="game-players">
-                    2–6 players
-                </div>
-            </button>
+<button class="game-choice" data-game="type">
+<strong>⌨️ Type Sentence</strong>
+<span>Type the sentence faster than everyone.</span>
+<div class="game-players">2–6 players</div>
+</button>
 
-            <button
-                class="game-choice"
-                data-create-game="boss"
-            >
-                <strong>👹 Boss Battle</strong>
-                <span>
-                    Work together to defeat the boss.
-                </span>
-                <div class="game-players">
-                    2–6 players
-                </div>
-            </button>
-
-        </div>
-
-    </div>
+<button class="game-choice" data-game="boss">
+<strong>👹 Boss Battle</strong>
+<span>Work together to defeat the boss.</span>
+<div class="game-players">2–6 players</div>
+</button>
 
 </div>
 
 </div>
+</div>
+</div>
 
 
-<!-- =====================================================
+<!-- =========================
      SETTINGS
-===================================================== -->
+========================= -->
 
 <div
     class="overlay"
     id="settingsOverlay"
 >
 
-<div class="modal">
+<div class="panel">
 
-    <div class="modal-header">
+<div class="panel-header">
 
-        <div class="modal-title">
-            Settings
-        </div>
+<h2>Settings</h2>
 
-        <button
-            class="icon-button"
-            id="closeSettings"
-        >×</button>
-
-    </div>
-
-    <div class="modal-body">
-
-        <div class="category open">
-
-            <button class="category-title">
-                <span>👤 Profile</span>
-                <span>⌄</span>
-            </button>
-
-            <div class="category-body">
-
-                <div class="setting">
-
-                    <label>Your name</label>
-
-                    <input
-                        id="username"
-                        maxlength="24"
-                        placeholder="Enter your name"
-                    >
-
-                </div>
-
-                <div class="setting">
-
-                    <label>Device ID</label>
-
-                    <input
-                        id="deviceId"
-                        readonly
-                    >
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="category">
-
-            <button class="category-title">
-                <span>📝 Text</span>
-                <span>⌄</span>
-            </button>
-
-            <div class="category-body">
-
-                <div class="setting">
-
-                    <label>Text size</label>
-
-                    <input
-                        id="textSize"
-                        type="range"
-                        min="12"
-                        max="24"
-                        value="16"
-                    >
-
-                    <div
-                        class="setting-value"
-                        id="textSizeValue"
-                    ></div>
-
-                </div>
-
-                <div class="setting">
-
-                    <label>Word spacing</label>
-
-                    <input
-                        id="wordSpacing"
-                        type="range"
-                        min="0"
-                        max="12"
-                        value="0"
-                    >
-
-                    <div
-                        class="setting-value"
-                        id="wordSpacingValue"
-                    ></div>
-
-                </div>
-
-                <div class="setting">
-
-                    <label>Line spacing</label>
-
-                    <input
-                        id="lineSpacing"
-                        type="range"
-                        min="1"
-                        max="2"
-                        step=".05"
-                        value="1.45"
-                    >
-
-                    <div
-                        class="setting-value"
-                        id="lineSpacingValue"
-                    ></div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="category">
-
-            <button class="category-title">
-                <span>💬 Chat</span>
-                <span>⌄</span>
-            </button>
-
-            <div class="category-body">
-
-                <div class="setting">
-
-                    <label>Refresh rate</label>
-
-                    <select id="refreshRate">
-
-                        <option value="10000">
-                            10 seconds
-                        </option>
-
-                        <option value="5000">
-                            5 seconds
-                        </option>
-
-                        <option value="3000">
-                            3 seconds
-                        </option>
-
-                        <option value="2000">
-                            2 seconds
-                        </option>
-
-                        <option value="1000">
-                            1 second
-                        </option>
-
-                        <option
-                            value="500"
-                            selected
-                        >
-                            0.5 seconds
-                        </option>
-
-                        <option value="250">
-                            0.25 seconds
-                        </option>
-
-                    </select>
-
-                </div>
-
-                <div class="setting">
-
-                    <label>Show timestamps</label>
-
-                    <select id="showTimestamps">
-
-                        <option value="true">
-                            On
-                        </option>
-
-                        <option value="false">
-                            Off
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="category">
-
-            <button class="category-title">
-                <span>🎨 Appearance</span>
-                <span>⌄</span>
-            </button>
-
-            <div class="category-body">
-
-                <div class="setting">
-
-                    <label>Theme</label>
-
-                    <select id="theme">
-
-                        <option value="dark">
-                            Dark
-                        </option>
-
-                        <option value="midnight">
-                            Midnight
-                        </option>
-
-                        <option value="slate">
-                            Slate
-                        </option>
-
-                        <option value="black">
-                            Pure Black
-                        </option>
-
-                        <option value="blue">
-                            Dark Blue
-                        </option>
-
-                        <option value="purple">
-                            Dark Purple
-                        </option>
-
-                        <option value="green">
-                            Dark Green
-                        </option>
-
-                        <option value="red">
-                            Dark Red
-                        </option>
-
-                        <option value="gray">
-                            Classic Gray
-                        </option>
-
-                        <option value="light">
-                            Light
-                        </option>
-
-                        <option value="oled">
-                            OLED
-                        </option>
-
-                    </select>
-
-                </div>
-
-                <div class="setting">
-
-                    <label>Corner roundness</label>
-
-                    <input
-                        id="cornerRadius"
-                        type="range"
-                        min="0"
-                        max="25"
-                        value="12"
-                    >
-
-                    <div
-                        class="setting-value"
-                        id="cornerRadiusValue"
-                    ></div>
-
-                </div>
-
-                <div class="setting">
-
-                    <label>UI scale</label>
-
-                    <input
-                        id="uiScale"
-                        type="range"
-                        min=".8"
-                        max="1.2"
-                        step=".05"
-                        value="1"
-                    >
-
-                    <div
-                        class="setting-value"
-                        id="uiScaleValue"
-                    ></div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="category">
-
-            <button class="category-title">
-                <span>⚙ Behavior</span>
-                <span>⌄</span>
-            </button>
-
-            <div class="category-body">
-
-                <div class="setting">
-
-                    <label>Enter to send</label>
-
-                    <select id="enterToSend">
-
-                        <option value="true">
-                            On
-                        </option>
-
-                        <option value="false">
-                            Off
-                        </option>
-
-                    </select>
-
-                </div>
-
-                <div class="setting">
-
-                    <label>Auto-scroll</label>
-
-                    <select id="autoScroll">
-
-                        <option value="true">
-                            On
-                        </option>
-
-                        <option value="false">
-                            Off
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <button
-            class="save-button"
-            id="saveSettings"
-        >
-            Save settings
-        </button>
-
-
-        <div class="danger-zone">
-
-            <div class="danger-title">
-                Danger Zone
-            </div>
-
-            <p class="danger-description">
-                Delete all messages and game states from
-                the chat.
-            </p>
-
-            <button
-                class="danger-button"
-                id="deleteEverything"
-            >
-                Delete everything
-            </button>
-
-        </div>
-
-    </div>
+<button
+    class="icon-btn"
+    id="closeSettings"
+>×</button>
 
 </div>
 
-</div>
+<div class="panel-body">
 
+<div class="category open">
 
-<!-- =====================================================
-     CONFIRM
-===================================================== -->
+<button class="category-title">
+<span>👤 Profile</span>
+<span>⌄</span>
+</button>
 
-<div
-    class="overlay"
-    id="confirmOverlay"
+<div class="category-body">
+
+<div class="setting">
+
+<label>Your name</label>
+
+<input
+    id="usernameInput"
+    maxlength="24"
+    placeholder="Enter your name"
 >
 
-<div class="modal">
+</div>
 
-    <div class="modal-header">
+<div class="setting">
 
-        <div
-            class="modal-title"
-            id="confirmTitle"
-        >
-            Confirm
-        </div>
+<label>Device ID</label>
 
-    </div>
-
-    <div class="modal-body">
-
-        <p
-            id="confirmText"
-            style="
-            color:var(--muted2);
-            line-height:1.5;
-            font-size:13px;
-            "
-        ></p>
-
-        <div class="confirm-buttons">
-
-            <button
-                class="game-button"
-                id="confirmCancel"
-            >
-                Cancel
-            </button>
-
-            <button
-                class="game-button danger"
-                id="confirmYes"
-            >
-                Confirm
-            </button>
-
-        </div>
-
-    </div>
+<input
+    id="deviceIdInput"
+    readonly
+>
 
 </div>
 
 </div>
+</div>
 
 
-<div
-    class="toast-container"
-    id="toastContainer"
-></div>
+<div class="category">
+
+<button class="category-title">
+<span>📝 Text</span>
+<span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+
+<label>Text size</label>
+
+<input
+    id="textSize"
+    type="range"
+    min="12"
+    max="24"
+    value="16"
+>
+
+<div class="setting-value" id="textSizeValue"></div>
+
+</div>
+
+<div class="setting">
+
+<label>Word spacing</label>
+
+<input
+    id="wordSpacing"
+    type="range"
+    min="0"
+    max="12"
+    value="0"
+>
+
+<div class="setting-value" id="wordSpacingValue"></div>
+
+</div>
+
+<div class="setting">
+
+<label>Line spacing</label>
+
+<input
+    id="lineSpacing"
+    type="range"
+    min="1"
+    max="2"
+    step=".05"
+    value="1.45"
+>
+
+<div class="setting-value" id="lineSpacingValue"></div>
+
+</div>
+
+</div>
+</div>
+
+
+<div class="category">
+
+<button class="category-title">
+<span>💬 Chat</span>
+<span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+
+<label>Refresh rate</label>
+
+<select id="refreshRate">
+<option value="10000">10 seconds</option>
+<option value="5000">5 seconds</option>
+<option value="3000">3 seconds</option>
+<option value="2000">2 seconds</option>
+<option value="1000">1 second</option>
+<option value="500" selected>0.5 seconds</option>
+<option value="100">0.1 seconds</option>
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Show timestamps</label>
+
+<select id="showTimestamps">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
+
+</div>
+
+</div>
+</div>
+
+
+<div class="category">
+
+<button class="category-title">
+<span>🎨 Appearance</span>
+<span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+
+<label>Theme</label>
+
+<select id="themeSelect">
+
+<option value="dark">Dark</option>
+<option value="midnight">Midnight</option>
+<option value="slate">Slate</option>
+<option value="black">Pure Black</option>
+<option value="blue">Dark Blue</option>
+<option value="purple">Dark Purple</option>
+<option value="green">Dark Green</option>
+<option value="red">Dark Red</option>
+<option value="gray">Classic Gray</option>
+<option value="light">Light</option>
+
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Corner roundness</label>
+
+<input
+    id="cornerRadius"
+    type="range"
+    min="0"
+    max="25"
+    value="12"
+>
+
+<div class="setting-value" id="cornerRadiusValue"></div>
+
+</div>
+
+<div class="setting">
+
+<label>UI scale</label>
+
+<input
+    id="uiScale"
+    type="range"
+    min=".8"
+    max="1.2"
+    step=".05"
+    value="1"
+>
+
+<div class="setting-value" id="uiScaleValue"></div>
+
+</div>
+
+</div>
+</div>
+
+
+<div class="category">
+
+<button class="category-title">
+<span>⚙️ Behavior</span>
+<span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+
+<label>Enter to send</label>
+
+<select id="enterToSend">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Auto-scroll</label>
+
+<select id="autoScroll">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
+
+</div>
+
+</div>
+</div>
+
+
+<button
+    class="save-btn"
+    id="saveSettings"
+>
+Save settings
+</button>
+
+
+<div style="
+margin-top:22px;
+padding-top:18px;
+border-top:1px solid #402529;
+">
+
+<div style="
+color:var(--red);
+font-weight:800;
+margin-bottom:7px;
+">
+⚠ Danger Zone
+</div>
+
+<p style="
+color:var(--muted);
+line-height:1.5;
+font-size:13px;
+">
+Remove all chat and game messages from the server.
+</p>
+
+<button
+    class="game-btn danger"
+    id="removeEverything"
+    style="width:100%"
+>
+Remove everything
+</button>
+
+</div>
+
+</div>
+</div>
+</div>
 
 
 <script>
@@ -1748,9 +1413,8 @@ const CHANNEL="general";
 
 const GAME_SERVER="__GAME_SERVER__";
 
-const HEARTBEAT_TIMEOUT=6000;
-
-const DONE_REMOVE_DELAY=3000;
+const GAME_TIMEOUT=12000;
+const GAME_REMOVE_DELAY=3000;
 
 
 /* =========================================================
@@ -1762,27 +1426,13 @@ let deviceId=
 
 if(!deviceId){
 
-    if(
+    deviceId=
         window.crypto &&
         crypto.randomUUID
-    ){
-
-        deviceId=crypto.randomUUID();
-
-    }else{
-
-        deviceId=
+            ?crypto.randomUUID()
+            :
             Date.now().toString(36)+
-            "-" +
-            Math.random()
-                .toString(36)
-                .slice(2)+
-            "-" +
-            Math.random()
-                .toString(36)
-                .slice(2);
-
-    }
+            Math.random().toString(36).slice(2);
 
     localStorage.setItem(
         "chat_device_id",
@@ -1795,26 +1445,27 @@ if(!deviceId){
    SETTINGS
 ========================================================= */
 
-const DEFAULTS={
+const defaults={
 
     username:"",
     refreshRate:500,
+
     showTimestamps:true,
 
     textSize:16,
     wordSpacing:0,
     lineSpacing:1.45,
 
-    theme:"dark",
     cornerRadius:12,
     uiScale:1,
+
+    theme:"dark",
 
     enterToSend:true,
     autoScroll:true
 };
 
-
-function loadSetting(key){
+function getSetting(key){
 
     const value=
         localStorage.getItem(
@@ -1822,7 +1473,7 @@ function loadSetting(key){
         );
 
     if(value===null){
-        return DEFAULTS[key];
+        return defaults[key];
     }
 
     if(value==="true"){
@@ -1835,155 +1486,57 @@ function loadSetting(key){
 
     const number=Number(value);
 
-    if(!Number.isNaN(number)){
-        return number;
-    }
-
-    return value;
+    return Number.isNaN(number)
+        ?value
+        :number;
 }
-
 
 let settings={};
 
-for(const key in DEFAULTS){
-
-    settings[key]=
-        loadSetting(key);
-
-}
-
-
-/* =========================================================
-   GAME TYPES
-========================================================= */
-
-const GAME_TYPES={
-
-    ttt3:{
-        name:"Tic-Tac-Toe 3×3",
-        icon:"⭕",
-        min:2,
-        max:2,
-        size:3
-    },
-
-    ttt4:{
-        name:"Tic-Tac-Toe 4×4",
-        icon:"⭕",
-        min:2,
-        max:2,
-        size:4
-    },
-
-    ttt5:{
-        name:"Tic-Tac-Toe 5×5",
-        icon:"⭕",
-        min:2,
-        max:2,
-        size:5
-    },
-
-    ttt6:{
-        name:"Tic-Tac-Toe 6×6",
-        icon:"⭕",
-        min:2,
-        max:2,
-        size:6
-    },
-
-    reaction:{
-        name:"Reaction Time",
-        icon:"⚡",
-        min:2,
-        max:6
-    },
-
-    type:{
-        name:"Type Sentence",
-        icon:"⌨",
-        min:2,
-        max:6
-    },
-
-    boss:{
-        name:"Boss Battle",
-        icon:"👹",
-        min:2,
-        max:6
-    }
-
-};
-
-
-/* =========================================================
-   STATE
-========================================================= */
-
-let allMessages=[];
-
-let normalMessages=[];
-
-let gameMessages=[];
-
-let games=new Map();
-
-let renderedMessages=
-    new Map();
-
-let renderedGames=
-    new Map();
-
-let pollTimer=null;
-
-let polling=false;
-
-let confirmCallback=null;
-
-let localGameInputs={};
-
-let reactionTimers={};
-
-let actionCooldowns={};
-
-let lastServerMessages=[];
+Object.keys(defaults).forEach(key=>{
+    settings[key]=getSetting(key);
+});
 
 
 /* =========================================================
    ELEMENTS
 ========================================================= */
 
-const messages=
+const messagesEl=
     document.getElementById("messages");
 
 const messageInput=
     document.getElementById("messageInput");
 
-const sendButton=
-    document.getElementById("sendButton");
+const sendBtn=
+    document.getElementById("sendBtn");
 
-const gamesButton=
-    document.getElementById("gamesButton");
-
-const settingsButton=
-    document.getElementById("settingsButton");
+const gamesBtn=
+    document.getElementById("gamesBtn");
 
 const gamesOverlay=
     document.getElementById("gamesOverlay");
 
-const settingsOverlay=
-    document.getElementById("settingsOverlay");
-
 const closeGames=
     document.getElementById("closeGames");
+
+const settingsBtn=
+    document.getElementById("settingsBtn");
+
+const settingsOverlay=
+    document.getElementById("settingsOverlay");
 
 const closeSettings=
     document.getElementById("closeSettings");
 
-const username=
-    document.getElementById("username");
+const saveSettings=
+    document.getElementById("saveSettings");
+
+const usernameInput=
+    document.getElementById("usernameInput");
 
 const deviceIdInput=
-    document.getElementById("deviceId");
+    document.getElementById("deviceIdInput");
 
 const refreshRate=
     document.getElementById("refreshRate");
@@ -1991,8 +1544,8 @@ const refreshRate=
 const showTimestamps=
     document.getElementById("showTimestamps");
 
-const theme=
-    document.getElementById("theme");
+const themeSelect=
+    document.getElementById("themeSelect");
 
 const textSize=
     document.getElementById("textSize");
@@ -2030,294 +1583,189 @@ const cornerRadiusValue=
 const uiScaleValue=
     document.getElementById("uiScaleValue");
 
-const saveSettings=
-    document.getElementById("saveSettings");
-
-const deleteEverything=
-    document.getElementById("deleteEverything");
-
-const confirmOverlay=
-    document.getElementById("confirmOverlay");
-
-const confirmTitle=
-    document.getElementById("confirmTitle");
-
-const confirmText=
-    document.getElementById("confirmText");
-
-const confirmCancel=
-    document.getElementById("confirmCancel");
-
-const confirmYes=
-    document.getElementById("confirmYes");
-
-const toastContainer=
-    document.getElementById("toastContainer");
+const removeEverything=
+    document.getElementById("removeEverything");
 
 
 /* =========================================================
-   UTILS
+   STATE
+========================================================= */
+
+let currentMessages=[];
+let games=new Map();
+
+let refreshTimer=null;
+let syncing=false;
+
+let renderedMessages=new Map();
+let renderedGames=new Map();
+
+let gameObjects=new Map();
+
+let gameLoopTimers=new Map();
+
+let pendingGameUpdates=new Map();
+
+
+/* =========================================================
+   GAME TYPES
+========================================================= */
+
+const GAME_TYPES={
+
+    ttt3:{
+        name:"Tic-Tac-Toe 3×3",
+        icon:"⭕",
+        min:2,
+        max:2,
+        size:3,
+        desc:"Get three in a row."
+    },
+
+    ttt4:{
+        name:"Tic-Tac-Toe 4×4",
+        icon:"⭕",
+        min:2,
+        max:2,
+        size:4,
+        desc:"Get four in a row."
+    },
+
+    ttt5:{
+        name:"Tic-Tac-Toe 5×5",
+        icon:"⭕",
+        min:2,
+        max:2,
+        size:5,
+        desc:"Get five in a row."
+    },
+
+    ttt6:{
+        name:"Tic-Tac-Toe 6×6",
+        icon:"⭕",
+        min:2,
+        max:2,
+        size:6,
+        desc:"Get six in a row."
+    },
+
+    reaction:{
+        name:"Reaction Time",
+        icon:"⚡",
+        min:2,
+        max:6,
+        desc:"React faster than everyone."
+    },
+
+    type:{
+        name:"Type Sentence",
+        icon:"⌨️",
+        min:2,
+        max:6,
+        desc:"Type the sentence as quickly as possible."
+    },
+
+    boss:{
+        name:"Boss Battle",
+        icon:"👹",
+        min:2,
+        max:6,
+        desc:"Work together to defeat the boss."
+    }
+};
+
+
+/* =========================================================
+   HELPERS
 ========================================================= */
 
 function escapeHTML(value){
 
-    const div=
-        document.createElement("div");
+    const div=document.createElement("div");
 
-    div.textContent=
-        String(value ?? "");
+    div.textContent=String(value ?? "");
 
     return div.innerHTML;
 }
 
 
-function now(){
+function getInitial(name){
 
-    return Date.now();
+    name=String(name||"?").trim();
 
+    return name
+        ?name.charAt(0).toUpperCase()
+        :"?";
 }
 
 
-function usernameValue(){
+function formatTime(date){
+
+    const d=new Date(date);
+
+    if(Number.isNaN(d.getTime())){
+        return "";
+    }
+
+    return d.toLocaleTimeString(
+        [],
+        {
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
+}
+
+
+function nearBottom(){
 
     return (
-        settings.username ||
-        "Anonymous"
-    ).trim().substring(0,24);
-
+        messagesEl.scrollHeight -
+        messagesEl.scrollTop -
+        messagesEl.clientHeight
+    ) < 120;
 }
 
 
-function gameUsername(){
+function makeId(){
 
-    return usernameValue() ||
-        "Player";
-
-}
-
-
-function toast(text){
-
-    const el=
-        document.createElement("div");
-
-    el.className="toast";
-
-    el.textContent=text;
-
-    toastContainer.appendChild(el);
-
-    setTimeout(()=>{
-
-        el.remove();
-
-    },3000);
-
-}
-
-
-function openOverlay(el){
-
-    el.classList.add("show");
-
-}
-
-
-function closeOverlay(el){
-
-    el.classList.remove("show");
-
-}
-
-
-/* =========================================================
-   API
-========================================================= */
-
-async function apiGet(){
-
-    const response=
-        await fetch(
-            API_URL+
-            "?channel="+
-            encodeURIComponent(CHANNEL),
-            {
-                method:"GET",
-                cache:"no-store"
-            }
-        );
-
-    if(!response.ok){
-
-        throw new Error(
-            "Server returned "+
-            response.status
-        );
-
+    if(window.crypto && crypto.randomUUID){
+        return crypto.randomUUID();
     }
 
-    const data=
-        await response.json();
-
-    return Array.isArray(data.messages)
-        ? data.messages
-        : [];
-
-}
-
-
-async function apiPost(body){
-
-    const response=
-        await fetch(
-            API_URL,
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":
-                        "application/json"
-                },
-                body:
-                    JSON.stringify({
-                        ...body,
-                        channel:CHANNEL
-                    })
-            }
-        );
-
-    const data=
-        await response.json()
-            .catch(()=>({}));
-
-    if(!response.ok){
-
-        throw new Error(
-            data.error ||
-            "Request failed"
-        );
-
-    }
-
-    return data;
-
-}
-
-
-async function apiPatch(body){
-
-    const response=
-        await fetch(
-            API_URL,
-            {
-                method:"PATCH",
-                headers:{
-                    "Content-Type":
-                        "application/json"
-                },
-                body:
-                    JSON.stringify(body)
-            }
-        );
-
-    const data=
-        await response.json()
-            .catch(()=>({}));
-
-    if(!response.ok){
-
-        throw new Error(
-            data.error ||
-            "Request failed"
-        );
-
-    }
-
-    return data;
-
-}
-
-
-async function apiDelete(body){
-
-    const response=
-        await fetch(
-            API_URL,
-            {
-                method:"DELETE",
-                headers:{
-                    "Content-Type":
-                        "application/json"
-                },
-                body:
-                    JSON.stringify(body)
-            }
-        );
-
-    const data=
-        await response.json()
-            .catch(()=>({}));
-
-    if(!response.ok){
-
-        throw new Error(
-            data.error ||
-            "Request failed"
-        );
-
-    }
-
-    return data;
-
-}
-
-
-/* =========================================================
-   SETTINGS
-========================================================= */
-
-function saveSetting(key,value){
-
-    settings[key]=value;
-
-    localStorage.setItem(
-        "chat_"+key,
-        String(value)
+    return (
+        Date.now().toString(36)+
+        Math.random().toString(36).slice(2)
     );
-
 }
 
+
+/* =========================================================
+   SETTINGS UI
+========================================================= */
 
 function loadSettingsUI(){
 
-    username.value=
-        settings.username;
+    usernameInput.value=settings.username;
 
-    deviceIdInput.value=
-        deviceId;
+    deviceIdInput.value=deviceId;
 
-    refreshRate.value=
-        String(settings.refreshRate);
+    refreshRate.value=settings.refreshRate;
 
     showTimestamps.value=
         String(settings.showTimestamps);
 
-    theme.value=
-        settings.theme;
+    themeSelect.value=settings.theme;
 
-    textSize.value=
-        settings.textSize;
+    textSize.value=settings.textSize;
 
-    wordSpacing.value=
-        settings.wordSpacing;
+    wordSpacing.value=settings.wordSpacing;
 
-    lineSpacing.value=
-        settings.lineSpacing;
+    lineSpacing.value=settings.lineSpacing;
 
-    cornerRadius.value=
-        settings.cornerRadius;
+    cornerRadius.value=settings.cornerRadius;
 
-    uiScale.value=
-        settings.uiScale;
+    uiScale.value=settings.uiScale;
 
     enterToSend.value=
         String(settings.enterToSend);
@@ -2326,34 +1774,42 @@ function loadSettingsUI(){
         String(settings.autoScroll);
 
     updateRangeLabels();
-
 }
 
 
 function updateRangeLabels(){
 
     textSizeValue.textContent=
-        textSize.value+
-        "px";
+        textSize.value+"px";
 
     wordSpacingValue.textContent=
-        wordSpacing.value+
-        "px";
+        wordSpacing.value+"px";
 
     lineSpacingValue.textContent=
         lineSpacing.value;
 
     cornerRadiusValue.textContent=
-        cornerRadius.value+
-        "px";
+        cornerRadius.value+"px";
 
     uiScaleValue.textContent=
         Math.round(
             Number(uiScale.value)*100
-        )+
-        "%";
-
+        )+"%";
 }
+
+
+[
+    textSize,
+    wordSpacing,
+    lineSpacing,
+    cornerRadius,
+    uiScale
+].forEach(input=>{
+    input.addEventListener(
+        "input",
+        updateRangeLabels
+    );
+});
 
 
 function applyTheme(name){
@@ -2362,3508 +1818,314 @@ function applyTheme(name){
 
         dark:{
             bg:"#090b0f",
-            surface:"#101319",
-            surface2:"#151a21"
+            panel:"#11151c"
         },
 
         midnight:{
-            bg:"#070a12",
-            surface:"#0e1420",
-            surface2:"#131b29"
+            bg:"#070a13",
+            panel:"#0e1420"
         },
 
         slate:{
-            bg:"#0f1317",
-            surface:"#161c22",
-            surface2:"#1b2229"
+            bg:"#101418",
+            panel:"#171d23"
         },
 
         black:{
-            bg:"#000",
-            surface:"#080808",
-            surface2:"#101010"
+            bg:"#000000",
+            panel:"#080808"
         },
 
         blue:{
             bg:"#081018",
-            surface:"#0d1822",
-            surface2:"#13212d"
+            panel:"#101b28"
         },
 
         purple:{
-            bg:"#100b16",
-            surface:"#18101f",
-            surface2:"#21152a"
+            bg:"#100a17",
+            panel:"#181020"
         },
 
         green:{
-            bg:"#08110c",
-            surface:"#0d1912",
-            surface2:"#14231a"
+            bg:"#08120d",
+            panel:"#101b15"
         },
 
         red:{
-            bg:"#120909",
-            surface:"#1b1010",
-            surface2:"#241515"
+            bg:"#140a0a",
+            panel:"#1e1111"
         },
 
         gray:{
-            bg:"#141414",
-            surface:"#1e1e1e",
-            surface2:"#262626"
+            bg:"#151515",
+            panel:"#202020"
         },
 
         light:{
-            bg:"#e9ebee",
-            surface:"#f5f6f8",
-            surface2:"#ffffff"
-        },
-
-        oled:{
-            bg:"#000",
-            surface:"#000",
-            surface2:"#050505"
+            bg:"#eceef1",
+            panel:"#ffffff"
         }
-
     };
 
     const t=
-        themes[name] ||
+        themes[name]||
         themes.dark;
 
-    document.documentElement
-        .style
-        .setProperty(
-            "--bg",
-            t.bg
-        );
+    document.documentElement.style.setProperty(
+        "--bg",
+        t.bg
+    );
 
-    document.documentElement
-        .style
-        .setProperty(
-            "--surface",
-            t.surface
-        );
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--surface2",
-            t.surface2
-        );
-
-    if(name==="light"){
-
-        document.documentElement
-            .style
-            .setProperty(
-                "--text",
-                "#17191c"
-            );
-
-        document.documentElement
-            .style
-            .setProperty(
-                "--muted",
-                "#66707d"
-            );
-
-        document.documentElement
-            .style
-            .setProperty(
-                "--border",
-                "#d5d8dc"
-            );
-
-    }else{
-
-        document.documentElement
-            .style
-            .setProperty(
-                "--text",
-                "#f2f4f7"
-            );
-
-        document.documentElement
-            .style
-            .setProperty(
-                "--border",
-                "#272e38"
-            );
-
-    }
-
+    document.documentElement.style.setProperty(
+        "--panel",
+        t.panel
+    );
 }
 
 
 function applySettings(){
 
-    document.documentElement
-        .style
-        .setProperty(
-            "--text-size",
-            settings.textSize+
-            "px"
-        );
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--word-spacing",
-            settings.wordSpacing+
-            "px"
-        );
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--line-spacing",
-            settings.lineSpacing
-        );
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--radius",
-            settings.cornerRadius+
-            "px"
-        );
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--ui-scale",
-            settings.uiScale
-        );
-
-    applyTheme(
-        settings.theme
+    document.documentElement.style.setProperty(
+        "--text-size",
+        settings.textSize+"px"
     );
 
+    document.documentElement.style.setProperty(
+        "--word-spacing",
+        settings.wordSpacing+"px"
+    );
+
+    document.documentElement.style.setProperty(
+        "--line-spacing",
+        settings.lineSpacing
+    );
+
+    document.documentElement.style.setProperty(
+        "--radius",
+        settings.cornerRadius+"px"
+    );
+
+    document.documentElement.style.setProperty(
+        "--ui-scale",
+        settings.uiScale
+    );
+
+    applyTheme(settings.theme);
+
+    /*
+     IMPORTANT:
+     We DO NOT clear renderedMessages here.
+     This prevents settings from rebuilding the chat.
+    */
+
+    updateExistingMessageStyles();
+
+    restartRefresh();
 }
 
 
-saveSettings.onclick=()=>{
+function updateExistingMessageStyles(){
 
-    saveSetting(
-        "username",
-        username.value.trim()
-    );
+    renderedMessages.forEach(el=>{
 
-    saveSetting(
-        "refreshRate",
-        Number(refreshRate.value)
-    );
+        const time=el.querySelector(".time");
 
-    saveSetting(
-        "showTimestamps",
-        showTimestamps.value==="true"
-    );
+        if(time){
+            time.style.display=
+                settings.showTimestamps
+                    ?"inline"
+                    :"none";
+        }
+    });
+}
 
-    saveSetting(
-        "theme",
-        theme.value
-    );
 
-    saveSetting(
-        "textSize",
-        Number(textSize.value)
-    );
+function saveAllSettings(){
 
-    saveSetting(
-        "wordSpacing",
-        Number(wordSpacing.value)
-    );
+    settings.username=
+        usernameInput.value.trim();
 
-    saveSetting(
-        "lineSpacing",
-        Number(lineSpacing.value)
-    );
+    settings.refreshRate=
+        Number(refreshRate.value);
 
-    saveSetting(
-        "cornerRadius",
-        Number(cornerRadius.value)
-    );
+    settings.showTimestamps=
+        showTimestamps.value==="true";
 
-    saveSetting(
-        "uiScale",
-        Number(uiScale.value)
-    );
+    settings.theme=
+        themeSelect.value;
 
-    saveSetting(
-        "enterToSend",
-        enterToSend.value==="true"
-    );
+    settings.textSize=
+        Number(textSize.value);
 
-    saveSetting(
-        "autoScroll",
-        autoScroll.value==="true"
+    settings.wordSpacing=
+        Number(wordSpacing.value);
+
+    settings.lineSpacing=
+        Number(lineSpacing.value);
+
+    settings.cornerRadius=
+        Number(cornerRadius.value);
+
+    settings.uiScale=
+        Number(uiScale.value);
+
+    settings.enterToSend=
+        enterToSend.value==="true";
+
+    settings.autoScroll=
+        autoScroll.value==="true";
+
+    Object.entries(settings).forEach(
+        ([key,value])=>{
+            localStorage.setItem(
+                "chat_"+key,
+                String(value)
+            );
+        }
     );
 
     applySettings();
 
-    closeOverlay(settingsOverlay);
+    settingsOverlay.classList.remove(
+        "show"
+    );
+}
 
-    restartPolling();
 
-    toast("Settings saved");
+/* =========================================================
+   SETTINGS EVENTS
+========================================================= */
 
+settingsBtn.onclick=()=>{
+
+    loadSettingsUI();
+
+    settingsOverlay.classList.add("show");
 };
 
 
-[textSize,
- wordSpacing,
- lineSpacing,
- cornerRadius,
- uiScale].forEach(el=>{
+closeSettings.onclick=()=>{
 
-    el.addEventListener(
-        "input",
-        updateRangeLabels
-    );
+    settingsOverlay.classList.remove("show");
+};
 
+
+gamesBtn.onclick=()=>{
+
+    gamesOverlay.classList.add("show");
+};
+
+
+closeGames.onclick=()=>{
+
+    gamesOverlay.classList.remove("show");
+};
+
+
+document.querySelectorAll(
+    ".category-title"
+).forEach(button=>{
+
+    button.onclick=()=>{
+
+        button.parentElement.classList.toggle(
+            "open"
+        );
+    };
 });
 
 
-/* =========================================================
-   CATEGORY ACCORDIONS
-========================================================= */
-
-document
-    .querySelectorAll(".category-title")
-    .forEach(button=>{
-
-        button.addEventListener(
-            "click",
-            ()=>{
-
-                button
-                    .parentElement
-                    .classList
-                    .toggle("open");
-
-            }
-        );
-
-    });
+saveSettings.onclick=
+    saveAllSettings;
 
 
 /* =========================================================
-   CHAT RENDERING
-========================================================= */
-
-function isNearBottom(){
-
-    return (
-        messages.scrollHeight -
-        messages.scrollTop -
-        messages.clientHeight
-    ) < 100;
-
-}
-
-
-function renderNormalMessages(){
-
-    const oldBottom=
-        isNearBottom();
-
-    const activeIds=
-        new Set(
-            normalMessages.map(
-                m=>String(m.id)
-            )
-        );
-
-    /* REMOVE MISSING */
-
-    for(
-        const [id,element]
-        of renderedMessages
-    ){
-
-        if(!activeIds.has(id)){
-
-            element.remove();
-
-            renderedMessages.delete(id);
-
-        }
-
-    }
-
-    /* ADD / UPDATE */
-
-    for(const msg of normalMessages){
-
-        const id=
-            String(msg.id);
-
-        let element=
-            renderedMessages.get(id);
-
-        if(!element){
-
-            element=
-                createMessageElement(msg);
-
-            renderedMessages.set(
-                id,
-                element
-            );
-
-            insertMessageInOrder(
-                element,
-                msg
-            );
-
-        }else{
-
-            updateMessageElement(
-                element,
-                msg
-            );
-
-        }
-
-    }
-
-    if(
-        settings.autoScroll &&
-        oldBottom
-    ){
-
-        messages.scrollTop=
-            messages.scrollHeight;
-
-    }
-
-}
-
-
-function insertMessageInOrder(
-    element,
-    msg
-){
-
-    const targetTime=
-        new Date(
-            msg.created_at
-        ).getTime();
-
-    const children=
-        [...messages.children];
-
-    for(const child of children){
-
-        if(
-            !child.dataset ||
-            !child.dataset.messageId
-        ){
-            continue;
-        }
-
-        const other=
-            normalMessages.find(
-                m=>
-                    String(m.id)===
-                    child.dataset.messageId
-            );
-
-        if(!other){
-            continue;
-        }
-
-        const otherTime=
-            new Date(
-                other.created_at
-            ).getTime();
-
-        if(targetTime<otherTime){
-
-            messages.insertBefore(
-                element,
-                child
-            );
-
-            return;
-
-        }
-
-    }
-
-    messages.appendChild(element);
-
-}
-
-
-function createMessageElement(msg){
-
-    const element=
-        document.createElement("div");
-
-    element.className="message";
-
-    element.dataset.messageId=
-        String(msg.id);
-
-    const avatar=
-        document.createElement("div");
-
-    avatar.className="avatar";
-
-    avatar.textContent=
-        getInitials(
-            msg.username
-        );
-
-    const body=
-        document.createElement("div");
-
-    body.className="message-body";
-
-    const card=
-        document.createElement("div");
-
-    card.className="message-card";
-
-    const top=
-        document.createElement("div");
-
-    top.className="message-top";
-
-    const name=
-        document.createElement("span");
-
-    name.className="username";
-
-    name.textContent=
-        msg.username ||
-        "Anonymous";
-
-    const time=
-        document.createElement("span");
-
-    time.className="time";
-
-    const edited=
-        document.createElement("span");
-
-    edited.className="edited";
-
-    top.appendChild(name);
-    top.appendChild(time);
-    top.appendChild(edited);
-
-    const text=
-        document.createElement("div");
-
-    text.className="message-text";
-
-    card.appendChild(top);
-    card.appendChild(text);
-
-    if(msg.image){
-
-        const image=
-            document.createElement("img");
-
-        image.className=
-            "message-image";
-
-        image.src=
-            msg.image;
-
-        image.alt="";
-
-        card.appendChild(image);
-
-    }
-
-    body.appendChild(card);
-
-    element.appendChild(avatar);
-    element.appendChild(body);
-
-    updateMessageElement(
-        element,
-        msg
-    );
-
-    return element;
-
-}
-
-
-function updateMessageElement(
-    element,
-    msg
-){
-
-    const name=
-        element.querySelector(
-            ".username"
-        );
-
-    const time=
-        element.querySelector(
-            ".time"
-        );
-
-    const edited=
-        element.querySelector(
-            ".edited"
-        );
-
-    const text=
-        element.querySelector(
-            ".message-text"
-        );
-
-    name.textContent=
-        msg.username ||
-        "Anonymous";
-
-    if(settings.showTimestamps){
-
-        const date=
-            new Date(
-                msg.created_at
-            );
-
-        time.textContent=
-            date.toLocaleTimeString(
-                [],
-                {
-                    hour:"2-digit",
-                    minute:"2-digit"
-                }
-            );
-
-    }else{
-
-        time.textContent="";
-
-    }
-
-    edited.textContent=
-        msg.edited
-            ? "edited"
-            : "";
-
-    text.textContent=
-        msg.message || "";
-
-}
-
-
-function getInitials(name){
-
-    const value=
-        String(name || "?")
-            .trim();
-
-    if(!value){
-        return "?";
-    }
-
-    const parts=
-        value.split(/\s+/);
-
-    if(parts.length===1){
-
-        return parts[0]
-            .substring(0,2)
-            .toUpperCase();
-
-    }
-
-    return (
-        parts[0][0]+
-        parts[1][0]
-    ).toUpperCase();
-
-}
-
-
-/* =========================================================
-   GAME STATE PARSING
-========================================================= */
-
-function parseGameMessage(msg){
-
-    if(
-        msg.username!==
-        GAME_SERVER
-    ){
-
-        return null;
-
-    }
-
-    try{
-
-        const data=
-            JSON.parse(
-                msg.message
-            );
-
-        if(
-            data &&
-            data.kind
-        ){
-
-            return {
-                data,
-                message:msg
-            };
-
-        }
-
-    }catch(error){
-
-        /* old/invalid hidden messages */
-
-    }
-
-    return null;
-
-}
-
-
-function collectGames(serverMessages){
-
-    const states=
-        new Map();
-
-    const actions=[];
-
-    for(const msg of serverMessages){
-
-        const parsed=
-            parseGameMessage(msg);
-
-        if(!parsed){
-            continue;
-        }
-
-        const data=
-            parsed.data;
-
-        if(data.kind==="game"){
-
-            if(
-                !data.gameId
-            ){
-                continue;
-            }
-
-            states.set(
-                data.gameId,
-                {
-                    ...data,
-                    _message:msg
-                }
-            );
-
-        }
-
-        if(data.kind==="action"){
-
-            actions.push({
-                ...data,
-                _message:msg
-            });
-
-        }
-
-    }
-
-    return {
-        states,
-        actions
-    };
-
-}
-
-
-/* =========================================================
-   GAME HOST ACTION PROCESSING
-========================================================= */
-
-async function processHostActions(
-    gameStates,
-    actions
-){
-
-    for(
-        const [gameId,game]
-        of gameStates
-    ){
-
-        if(
-            game.hostDeviceId !==
-            deviceId
-        ){
-            continue;
-        }
-
-        const relevant=
-            actions.filter(
-                action=>
-                    action.gameId===
-                    gameId
-            );
-
-        if(!relevant.length){
-            continue;
-        }
-
-        let changed=false;
-
-        for(const action of relevant){
-
-            const result=
-                applyGameAction(
-                    game,
-                    action
-                );
-
-            if(result){
-                changed=true;
-            }
-
-        }
-
-        if(changed){
-
-            game.updatedAt=
-                now();
-
-            try{
-
-                await updateGame(
-                    game
-                );
-
-            }catch(error){
-
-                console.error(
-                    "Game update failed",
-                    error
-                );
-
-            }
-
-        }
-
-    }
-
-}
-
-
-function applyGameAction(
-    game,
-    action
-){
-
-    if(
-        !game ||
-        game.status==="finished"
-    ){
-        return false;
-    }
-
-    if(
-        !action.playerId
-    ){
-        return false;
-    }
-
-    const player=
-        game.players.find(
-            p=>
-                p.id===
-                action.playerId
-        );
-
-    /* JOIN */
-
-    if(
-        action.action==="join"
-    ){
-
-        if(player){
-            return false;
-        }
-
-        if(
-            game.players.length>=
-            game.maxPlayers
-        ){
-            return false;
-        }
-
-        game.players.push({
-            id:action.playerId,
-            name:
-                action.name ||
-                "Player",
-            joinedAt:now()
-        });
-
-        return true;
-
-    }
-
-
-    if(!player){
-        return false;
-    }
-
-
-    /* START REQUEST */
-
-    if(
-        action.action==="start"
-    ){
-
-        if(
-            game.hostDeviceId===
-            action.playerId
-        ){
-
-            return startGameState(
-                game
-            );
-
-        }
-
-        return false;
-
-    }
-
-
-    /* FORCE STOP */
-
-    if(
-        action.action==="forceStop"
-    ){
-
-        if(
-            game.hostDeviceId===
-            action.playerId
-        ){
-
-            game.status=
-                "finished";
-
-            game.result={
-                type:"stopped",
-                message:
-                    "Game stopped by host."
-            };
-
-            game.finishedAt=
-                now();
-
-            return true;
-
-        }
-
-        return false;
-
-    }
-
-
-    /* GAME-SPECIFIC */
-
-    if(
-        game.type.startsWith("ttt")
-    ){
-
-        if(
-            action.action==="tttMove"
-        ){
-
-            return handleTTTMove(
-                game,
-                player,
-                action
-            );
-
-        }
-
-    }
-
-
-    if(
-        game.type==="reaction"
-    ){
-
-        if(
-            action.action==="reactionClick"
-        ){
-
-            return handleReactionClick(
-                game,
-                player,
-                action
-            );
-
-        }
-
-    }
-
-
-    if(
-        game.type==="type"
-    ){
-
-        if(
-            action.action==="typeSubmit"
-        ){
-
-            return handleTypeSubmit(
-                game,
-                player,
-                action
-            );
-
-        }
-
-    }
-
-
-    if(
-        game.type==="boss"
-    ){
-
-        if(
-            action.action==="bossAttack"
-        ){
-
-            return handleBossAttack(
-                game,
-                player
-            );
-
-        }
-
-    }
-
-    return false;
-
-}
-
-
-/* =========================================================
-   TTT
-========================================================= */
-
-function startGameState(game){
-
-    if(
-        game.players.length<
-        game.minPlayers
-    ){
-        return false;
-    }
-
-    game.status="running";
-
-    game.startedAt=
-        now();
-
-    if(
-        game.type.startsWith("ttt")
-    ){
-
-        const size=
-            GAME_TYPES[
-                game.type
-            ].size;
-
-        game.ttt={
-            size,
-            board:
-                Array(
-                    size*size
-                ).fill(""),
-            turn:
-                0,
-            winner:null,
-            moves:0
-        };
-
-    }
-
-
-    if(game.type==="reaction"){
-
-        game.reaction={
-            phase:"waiting",
-            goAt:
-                now()+
-                2000+
-                Math.random()*4000,
-            clicks:{},
-            results:{}
-        };
-
-    }
-
-
-    if(game.type==="type"){
-
-        const sentences=[
-            "The quick fox jumps over the quiet hill.",
-            "Everyone in the game is ready to play.",
-            "The fastest player wins this round.",
-            "Welcome to the multiplayer game chat.",
-            "Sometimes the simplest games are the most fun.",
-            "A good player knows when to wait and when to move."
-        ];
-
-        game.typeGame={
-            sentence:
-                sentences[
-                    Math.floor(
-                        Math.random()*
-                        sentences.length
-                    )
-                ],
-            results:{}
-        };
-
-    }
-
-
-    if(game.type==="boss"){
-
-        game.boss={
-            maxHp:100000000,
-            hp:100000000,
-            damage:100,
-            hits:{}
-        };
-
-    }
-
-    return true;
-
-}
-
-
-function handleTTTMove(
-    game,
-    player,
-    action
-){
-
-    if(
-        game.status!=="running" ||
-        !game.ttt
-    ){
-        return false;
-    }
-
-    const players=
-        game.players;
-
-    const currentPlayer=
-        players[
-            game.ttt.turn %
-            players.length
-        ];
-
-    if(
-        currentPlayer.id!==
-        player.id
-    ){
-        return false;
-    }
-
-    const index=
-        Number(action.index);
-
-    const size=
-        game.ttt.size;
-
-    if(
-        !Number.isInteger(index) ||
-        index<0 ||
-        index>=size*size
-    ){
-        return false;
-    }
-
-    if(
-        game.ttt.board[index]
-    ){
-        return false;
-    }
-
-    const symbol=
-        game.ttt.turn%2===0
-            ? "X"
-            : "O";
-
-    game.ttt.board[index]=
-        symbol;
-
-    game.ttt.moves++;
-
-    if(
-        checkTTTWin(
-            game.ttt.board,
-            size,
-            index,
-            symbol
-        )
-    ){
-
-        game.ttt.winner=
-            player.id;
-
-        game.status=
-            "finished";
-
-        game.result={
-            type:"winner",
-            playerId:
-                player.id,
-            name:
-                player.name
-        };
-
-        game.finishedAt=
-            now();
-
-        return true;
-
-    }
-
-    if(
-        game.ttt.moves>=
-        size*size
-    ){
-
-        game.status=
-            "finished";
-
-        game.result={
-            type:"draw"
-        };
-
-        game.finishedAt=
-            now();
-
-        return true;
-
-    }
-
-    game.ttt.turn++;
-
-    return true;
-
-}
-
-
-function checkTTTWin(
-    board,
-    size,
-    index,
-    symbol
-){
-
-    const row=
-        Math.floor(index/size);
-
-    const col=
-        index%size;
-
-
-    const directions=[
-        [1,0],
-        [0,1],
-        [1,1],
-        [1,-1]
-    ];
-
-
-    for(
-        const [dr,dc]
-        of directions
-    ){
-
-        let count=1;
-
-        for(
-            let direction=1;
-            direction<6;
-            direction++
-        ){
-
-            const r=
-                row+
-                dr*
-                direction;
-
-            const c=
-                col+
-                dc*
-                direction;
-
-            if(
-                r<0 ||
-                r>=size ||
-                c<0 ||
-                c>=size
-            ){
-                break;
-            }
-
-            if(
-                board[
-                    r*size+c
-                ]===
-                symbol
-            ){
-                count++;
-            }else{
-                break;
-            }
-
-        }
-
-        for(
-            let direction=1;
-            direction<6;
-            direction++
-        ){
-
-            const r=
-                row-
-                dr*
-                direction;
-
-            const c=
-                col-
-                dc*
-                direction;
-
-            if(
-                r<0 ||
-                r>=size ||
-                c<0 ||
-                c>=size
-            ){
-                break;
-            }
-
-            if(
-                board[
-                    r*size+c
-                ]===
-                symbol
-            ){
-                count++;
-            }else{
-                break;
-            }
-
-        }
-
-        if(count>=size){
-            return true;
-        }
-
-    }
-
-    return false;
-
-}
-
-
-/* =========================================================
-   REACTION
-========================================================= */
-
-function updateReactionGame(
-    game
-){
-
-    if(
-        game.type!=="reaction" ||
-        game.status!=="running" ||
-        !game.reaction
-    ){
-        return false;
-    }
-
-    if(
-        game.reaction.phase==="waiting" &&
-        now()>=
-        game.reaction.goAt
-    ){
-
-        game.reaction.phase="go";
-
-        game.reaction.goTimestamp=
-            now();
-
-        return true;
-
-    }
-
-    return false;
-
-}
-
-
-function handleReactionClick(
-    game,
-    player,
-    action
-){
-
-    if(
-        !game.reaction ||
-        game.reaction.phase!=="go"
-    ){
-        return false;
-    }
-
-    if(
-        game.reaction.clicks[player.id]
-    ){
-        return false;
-    }
-
-    const reactionTime=
-        Math.max(
-            0,
-            Number(action.timestamp)-
-            Number(
-                game.reaction.goTimestamp
-            )
-        );
-
-    game.reaction.clicks[
-        player.id
-    ]={
-        time:reactionTime,
-        name:player.name
-    };
-
-    game.reaction.results[
-        player.id
-    ]=reactionTime;
-
-    if(
-        Object.keys(
-            game.reaction.clicks
-        ).length>=
-        game.players.length
-    ){
-
-        finishReaction(game);
-
-    }
-
-    return true;
-
-}
-
-
-function finishReaction(game){
-
-    const results=
-        Object.entries(
-            game.reaction.results
-        )
-        .sort(
-            (a,b)=>a[1]-b[1]
-        );
-
-    game.status="finished";
-
-    if(results.length){
-
-        const winner=
-            game.players.find(
-                p=>
-                    p.id===
-                    results[0][0]
-            );
-
-        game.result={
-            type:"winner",
-            playerId:
-                results[0][0],
-            name:
-                winner?.name ||
-                "Winner",
-            time:
-                results[0][1]
-        };
-
-    }
-
-    game.finishedAt=
-        now();
-
-}
-
-
-/* =========================================================
-   TYPE GAME
-========================================================= */
-
-function handleTypeSubmit(
-    game,
-    player,
-    action
-){
-
-    if(
-        game.status!=="running" ||
-        !game.typeGame
-    ){
-        return false;
-    }
-
-    if(
-        game.typeGame.results[
-            player.id
-        ]
-    ){
-        return false;
-    }
-
-    if(
-        String(action.text || "")
-        !==
-        game.typeGame.sentence
-    ){
-        return false;
-    }
-
-    game.typeGame.results[
-        player.id
-    ]={
-        time:
-            Number(action.timestamp)-
-            Number(game.startedAt),
-        name:
-            player.name
-    };
-
-    if(
-        Object.keys(
-            game.typeGame.results
-        ).length>=
-        game.players.length
-    ){
-
-        finishTypeGame(game);
-
-    }
-
-    return true;
-
-}
-
-
-function finishTypeGame(game){
-
-    const results=
-        Object.entries(
-            game.typeGame.results
-        )
-        .sort(
-            (a,b)=>
-                a[1].time-
-                b[1].time
-        );
-
-    if(!results.length){
-        return;
-    }
-
-    const winner=
-        results[0][1];
-
-    game.status=
-        "finished";
-
-    game.result={
-        type:"winner",
-        playerId:
-            results[0][0],
-        name:
-            winner.name,
-        time:
-            winner.time
-    };
-
-    game.finishedAt=
-        now();
-
-}
-
-
-/* =========================================================
-   BOSS
-========================================================= */
-
-function handleBossAttack(
-    game,
-    player
-){
-
-    if(
-        game.status!=="running" ||
-        !game.boss
-    ){
-        return false;
-    }
-
-    const last=
-        game.boss.hits[
-            player.id
-        ] || 0;
-
-    if(
-        now()-last<250
-    ){
-        return false;
-    }
-
-    game.boss.hits[
-        player.id
-    ]=now();
-
-    game.boss.hp=
-        Math.max(
-            0,
-            game.boss.hp-
-            game.boss.damage
-        );
-
-    if(game.boss.hp<=0){
-
-        game.status=
-            "finished";
-
-        game.result={
-            type:"bossDefeated"
-        };
-
-        game.finishedAt=
-            now();
-
-    }
-
-    return true;
-
-}
-
-
-/* =========================================================
-   GAME UPDATE
-========================================================= */
-
-async function updateGame(game){
-
-    const state=
-        JSON.stringify(
-            cleanGameState(game)
-        );
-
-    await apiPatch({
-
-        id:
-            game._message.id,
-
-        device_id:
-            deviceId,
-
-        game_server:true,
-
-        game_state:
-            state
-
-    });
-
-}
-
-
-function cleanGameState(game){
-
-    const copy=
-        JSON.parse(
-            JSON.stringify(game)
-        );
-
-    delete copy._message;
-
-    return copy;
-
-}
-
-
-/* =========================================================
-   GAME CREATION
-========================================================= */
-
-async function createGame(type){
-
-    const config=
-        GAME_TYPES[type];
-
-    if(!config){
-        return;
-    }
-
-    const name=
-        gameUsername();
-
-    const gameId=
-        crypto.randomUUID
-            ? crypto.randomUUID()
-            :
-            Date.now()
-            .toString(36)+
-            Math.random()
-                .toString(36)
-                .slice(2);
-
-    const game={
-
-        kind:"game",
-
-        gameId,
-
-        type,
-
-        name:config.name,
-
-        icon:config.icon,
-
-        minPlayers:
-            config.min,
-
-        maxPlayers:
-            config.max,
-
-        minPlayers:
-            config.min,
-
-        hostDeviceId:
-            deviceId,
-
-        hostName:
-            name,
-
-        players:[
-
-            {
-                id:deviceId,
-                name,
-                joinedAt:now()
-            }
-
-        ],
-
-        status:"lobby",
-
-        createdAt:
-            now(),
-
-        updatedAt:
-            now(),
-
-        heartbeat:
-            now()
-
-    };
-
-    try{
-
-        await apiPost({
-
-            username:
-                GAME_SERVER,
-
-            device_id:
-                deviceId,
-
-            game_server:true,
-
-            message:
-                JSON.stringify(game)
-
-        });
-
-        closeOverlay(gamesOverlay);
-
-        toast(
-            "Game created"
-        );
-
-        await poll();
-
-    }catch(error){
-
-        toast(
-            error.message
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   ACTION MESSAGES
-========================================================= */
-
-async function sendGameAction(
-    game,
-    action
-){
-
-    const key=
-        game.gameId+
-        ":"+
-        action.action;
-
-    if(
-        actionCooldowns[key] &&
-        now()-
-        actionCooldowns[key]<
-        150
-    ){
-        return;
-    }
-
-    actionCooldowns[key]=
-        now();
-
-    try{
-
-        await apiPost({
-
-            username:
-                GAME_SERVER,
-
-            device_id:
-                deviceId,
-
-            game_server:true,
-
-            message:
-                JSON.stringify({
-
-                    kind:"action",
-
-                    gameId:
-                        game.gameId,
-
-                    action:
-                        action.action,
-
-                    playerId:
-                        deviceId,
-
-                    name:
-                        gameUsername(),
-
-                    timestamp:
-                        now(),
-
-                    ...action
-
-                })
-
-        });
-
-    }catch(error){
-
-        toast(
-            error.message
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   JOIN
-========================================================= */
-
-async function joinGame(game){
-
-    if(
-        game.players.some(
-            p=>p.id===deviceId
-        )
-    ){
-
-        toast(
-            "You are already in this game"
-        );
-
-        return;
-
-    }
-
-    if(
-        game.players.length>=
-        game.maxPlayers
-    ){
-
-        toast(
-            "Game is full"
-        );
-
-        return;
-
-    }
-
-    await sendGameAction(
-        game,
-        {
-            action:"join"
-        }
-    );
-
-    toast(
-        "Join request sent"
-    );
-
-}
-
-
-/* =========================================================
-   START / STOP
-========================================================= */
-
-async function requestStart(game){
-
-    if(
-        game.hostDeviceId===
-        deviceId
-    ){
-
-        /* host can immediately process */
-
-        const copy=
-            JSON.parse(
-                JSON.stringify(game)
-            );
-
-        if(
-            copy.players.length<
-            copy.minPlayers
-        ){
-
-            toast(
-                "Need at least "+
-                copy.minPlayers+
-                " players"
-            );
-
-            return;
-
-        }
-
-        if(copy.status!=="lobby"){
-            return;
-        }
-
-        startGameState(copy);
-
-        try{
-
-            await updateGame({
-                ...copy,
-                _message:
-                    game._message
-            });
-
-            await poll();
-
-        }catch(error){
-
-            toast(
-                error.message
-            );
-
-        }
-
-    }else{
-
-        await sendGameAction(
-            game,
-            {
-                action:"start"
-            }
-        );
-
-    }
-
-}
-
-
-async function forceStop(game){
-
-    if(
-        game.hostDeviceId!==
-        deviceId
-    ){
-        return;
-    }
-
-    const copy=
-        JSON.parse(
-            JSON.stringify(game)
-        );
-
-    copy.status=
-        "finished";
-
-    copy.result={
-        type:"stopped",
-        message:
-            "Game stopped by host."
-    };
-
-    copy.finishedAt=
-        now();
-
-    try{
-
-        await updateGame({
-            ...copy,
-            _message:
-                game._message
-        });
-
-        await poll();
-
-    }catch(error){
-
-        toast(
-            error.message
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   GAME CARD RENDER
-========================================================= */
-
-function renderGames(){
-
-    const active=
-        new Set();
-
-    for(
-        const [id,game]
-        of games
-    ){
-
-        active.add(id);
-
-        let element=
-            renderedGames.get(id);
-
-        if(!element){
-
-            element=
-                document.createElement(
-                    "div"
-                );
-
-            element.className=
-                "game-message";
-
-            element.dataset.gameId=
-                id;
-
-            renderedGames.set(
-                id,
-                element
-            );
-
-            messages.appendChild(
-                element
-            );
-
-        }
-
-        updateGameElement(
-            element,
-            game
-        );
-
-    }
-
-
-    for(
-        const [id,element]
-        of renderedGames
-    ){
-
-        if(!active.has(id)){
-
-            element.remove();
-
-            renderedGames.delete(id);
-
-        }
-
-    }
-
-}
-
-
-function updateGameElement(
-    element,
-    game
-){
-
-    const config=
-        GAME_TYPES[game.type];
-
-    element.innerHTML=
-        buildGameHTML(
-            game,
-            config
-        );
-
-    attachGameEvents(
-        element,
-        game
-    );
-
-}
-
-
-function buildGameHTML(
-    game,
-    config
-){
-
-    let statusText=
-        game.status==="lobby"
-            ? "Lobby"
-            : game.status==="running"
-                ? "Running"
-                : "Finished";
-
-    let statusClass=
-        game.status==="running"
-            ? "running"
-            : game.status==="finished"
-                ? "finished"
-                : "";
-
-    const isHost=
-        game.hostDeviceId===
-        deviceId;
-
-    const joined=
-        game.players.some(
-            p=>p.id===deviceId
-        );
-
-    let html=`
-
-<div class="game-card">
-
-    <div class="game-header">
-
-        <div>
-
-            <div class="game-name">
-                ${escapeHTML(config.icon)}
-                ${escapeHTML(config.name)}
-            </div>
-
-            <div class="game-host">
-                Hosted by
-                ${escapeHTML(game.hostName)}
-            </div>
-
-        </div>
-
-        <div class="game-status ${statusClass}">
-            ${statusText}
-        </div>
-
-    </div>
-
-    <div class="game-body">
-
-        <div class="players">
-`;
-
-    for(const player of game.players){
-
-        html+=`
-
-            <div class="player ${
-                player.id===
-                game.hostDeviceId
-                    ? "host"
-                    : ""
-            }">
-
-                ${
-                    player.id===
-                    game.hostDeviceId
-                        ? "👑 "
-                        : ""
-                }
-
-                ${escapeHTML(
-                    player.name
-                )}
-
-            </div>
-
-`;
-
-    }
-
-    html+=`
-
-        </div>
-`;
-
-    if(
-        game.status==="lobby"
-    ){
-
-        html+=`
-
-        <p class="game-description">
-            Waiting for players.
-            ${
-                game.players.length
-            }/
-            ${
-                game.maxPlayers
-            } joined.
-        </p>
-
-`;
-
-    }
-
-
-    if(
-        game.status==="finished"
-    ){
-
-        html+=`
-
-        <div class="turn">
-            ${escapeHTML(
-                getGameResultText(game)
-            )}
-        </div>
-
-`;
-
-    }
-
-
-    if(
-        game.status==="running"
-    ){
-
-        html+=
-            buildRunningGame(
-                game
-            );
-
-    }
-
-
-    html+=`
-
-        <div class="game-actions">
-`;
-
-    if(
-        game.status==="lobby" &&
-        !joined &&
-        game.players.length<
-        game.maxPlayers
-    ){
-
-        html+=`
-
-            <button
-                class="game-button success"
-                data-action="join"
-            >
-                Join game
-            </button>
-
-`;
-
-    }
-
-
-    if(
-        game.status==="lobby" &&
-        isHost
-    ){
-
-        html+=`
-
-            <button
-                class="game-button primary"
-                data-action="start"
-                ${
-                    game.players.length<
-                    game.minPlayers
-                        ? "disabled"
-                        : ""
-                }
-            >
-                Start
-            </button>
-
-`;
-
-    }
-
-
-    if(
-        isHost &&
-        game.status!=="finished"
-    ){
-
-        html+=`
-
-            <button
-                class="game-button danger"
-                data-action="stop"
-            >
-                Force stop
-            </button>
-
-`;
-
-    }
-
-
-    html+=`
-
-        </div>
-
-    </div>
-
-</div>
-`;
-
-    return html;
-
-}
-
-
-/* =========================================================
-   RUNNING GAME HTML
-========================================================= */
-
-function buildRunningGame(game){
-
-    if(
-        game.type.startsWith("ttt")
-    ){
-
-        return buildTTT(
-            game
-        );
-
-    }
-
-    if(game.type==="reaction"){
-
-        return buildReaction(
-            game
-        );
-
-    }
-
-    if(game.type==="type"){
-
-        return buildType(
-            game
-        );
-
-    }
-
-    if(game.type==="boss"){
-
-        return buildBoss(
-            game
-        );
-
-    }
-
-    return "";
-
-}
-
-
-/* =========================================================
-   TTT UI
-========================================================= */
-
-function buildTTT(game){
-
-    const size=
-        game.ttt.size;
-
-    const joined=
-        game.players.some(
-            p=>p.id===deviceId
-        );
-
-    const current=
-        game.players[
-            game.ttt.turn %
-            game.players.length
-        ];
-
-    let html=`
-
-        <div class="turn">
-
-            ${
-                joined &&
-                current.id===deviceId
-                    ? "<strong>Your turn</strong>"
-                    :
-                    "Turn: <strong>"+
-                    escapeHTML(
-                        current.name
-                    )+
-                    "</strong>"
-            }
-
-        </div>
-
-        <div
-            class="ttt-board"
-            style="
-                grid-template-columns:
-                repeat(${size},1fr)
-            "
-        >
-`;
-
-    game.ttt.board.forEach(
-        (value,index)=>{
-
-            html+=`
-
-            <button
-                class="ttt-cell ${
-                    value==="X"
-                        ? "x"
-                        : value==="O"
-                            ? "o"
-                            : ""
-                }"
-                data-ttt-index="${index}"
-                ${
-                    value ||
-                    !joined ||
-                    current.id!==deviceId
-                        ? "disabled"
-                        : ""
-                }
-            >
-                ${value || ""}
-            </button>
-
-`;
-
-        }
-    );
-
-    html+=`
-
-        </div>
-`;
-
-    return html;
-
-}
-
-
-/* =========================================================
-   REACTION UI
-========================================================= */
-
-function buildReaction(game){
-
-    const phase=
-        game.reaction?.phase ||
-        "waiting";
-
-    const clicked=
-        Boolean(
-            game.reaction?.clicks?.[
-                deviceId
-            ]
-        );
-
-    let text="WAIT";
-
-    if(phase==="go"){
-        text=
-            clicked
-                ? "DONE"
-                : "CLICK!";
-    }
-
-    if(
-        phase==="waiting"
-    ){
-        text="WAIT...";
-    }
-
-    return `
-
-        <div class="turn">
-            ${
-                phase==="go"
-                    ? "GO!"
-                    : "Wait for green..."
-            }
-        </div>
-
-        <div
-            class="reaction-box ${
-                phase==="go"
-                    ? "go"
-                    : "waiting"
-            }"
-            data-reaction
-        >
-            ${text}
-        </div>
-
-        <div class="stats">
-
-            ${
-                Object.entries(
-                    game.reaction?.results ||
-                    {}
-                )
-                .map(
-                    ([id,time])=>{
-                        const p=
-                            game.players.find(
-                                x=>x.id===id
-                            );
-
-                        return `
-                        <div class="stat">
-                            ${escapeHTML(
-                                p?.name ||
-                                "Player"
-                            )}
-                            <strong>
-                                ${time} ms
-                            </strong>
-                        </div>
-                        `;
-                    }
-                )
-                .join("")
-            }
-
-        </div>
-`;
-
-}
-
-
-/* =========================================================
-   TYPE UI
-========================================================= */
-
-function buildType(game){
-
-    const joined=
-        game.players.some(
-            p=>p.id===deviceId
-        );
-
-    const completed=
-        Boolean(
-            game.typeGame?.results?.[
-                deviceId
-            ]
-        );
-
-    return `
-
-        <div class="type-sentence">
-            ${escapeHTML(
-                game.typeGame.sentence
-            )}
-        </div>
-
-        ${
-            joined &&
-            !completed
-                ? `
-                    <input
-                        class="type-input"
-                        data-type-input
-                        placeholder="Type the sentence..."
-                        autocomplete="off"
-                    >
-                `
-                : ""
-        }
-
-        ${
-            completed
-                ? `
-                    <div class="turn">
-                        ✓ Your answer has been submitted.
-                    </div>
-                `
-                : ""
-        }
-
-        <div class="stats">
-
-            ${
-                Object.entries(
-                    game.typeGame.results
-                )
-                .map(
-                    ([id,result])=>`
-                        <div class="stat">
-                            ${
-                                escapeHTML(
-                                    result.name
-                                )
-                            }
-                            <strong>
-                                ${result.time} ms
-                            </strong>
-                        </div>
-                    `
-                )
-                .join("")
-            }
-
-        </div>
-`;
-
-}
-
-
-/* =========================================================
-   BOSS UI
-========================================================= */
-
-function buildBoss(game){
-
-    const hp=
-        game.boss.hp;
-
-    const max=
-        game.boss.maxHp;
-
-    const percent=
-        Math.max(
-            0,
-            Math.min(
-                100,
-                hp/max*100
-            )
-        );
-
-    const joined=
-        game.players.some(
-            p=>p.id===deviceId
-        );
-
-    return `
-
-        <div class="boss-title">
-            THE BOSS
-        </div>
-
-        <div class="boss-hp">
-
-            <div
-                class="boss-hp-fill"
-                style="width:${percent}%"
-            ></div>
-
-            <div class="boss-hp-text">
-                ${formatNumber(hp)}
-                /
-                ${formatNumber(max)}
-                HP
-            </div>
-
-        </div>
-
-        <div class="boss-damage">
-            ${formatNumber(
-                game.boss.damage
-            )}
-            damage / hit
-        </div>
-
-        <div class="boss-upgrades">
-
-            <button
-                class="upgrade"
-                data-boss-attack
-                ${
-                    joined
-                        ? ""
-                        : "disabled"
-                }
-            >
-                ⚔ Attack
-                <span>
-                    ${
-                        joined
-                            ? "CLICK"
-                            : "JOIN FIRST"
-                    }
-                </span>
-            </button>
-
-        </div>
-
-`;
-
-}
-
-
-function formatNumber(value){
-
-    return Number(
-        value || 0
-    ).toLocaleString();
-
-}
-
-
-/* =========================================================
-   RESULT
-========================================================= */
-
-function getGameResultText(game){
-
-    if(!game.result){
-
-        return "Game finished.";
-
-    }
-
-    if(
-        game.result.type==="winner"
-    ){
-
-        if(
-            game.type==="reaction"
-        ){
-
-            return (
-                game.result.name+
-                " won with "+
-                game.result.time+
-                " ms!"
-            );
-
-        }
-
-        if(
-            game.type==="type"
-        ){
-
-            return (
-                game.result.name+
-                " typed it first!"
-            );
-
-        }
-
-        return (
-            game.result.name+
-            " won!"
-        );
-
-    }
-
-    if(
-        game.result.type==="draw"
-    ){
-        return "Draw!";
-    }
-
-    if(
-        game.result.type===
-        "bossDefeated"
-    ){
-        return "👹 Boss defeated!";
-    }
-
-    if(
-        game.result.type===
-        "stopped"
-    ){
-        return "Game stopped by host.";
-    }
-
-    return "Game finished.";
-
-}
-
-
-/* =========================================================
-   GAME EVENTS
-========================================================= */
-
-function attachGameEvents(
-    element,
-    game
-){
-
-    const join=
-        element.querySelector(
-            '[data-action="join"]'
-        );
-
-    if(join){
-
-        join.onclick=()=>{
-
-            joinGame(game);
-
-        };
-
-    }
-
-
-    const start=
-        element.querySelector(
-            '[data-action="start"]'
-        );
-
-    if(start){
-
-        start.onclick=()=>{
-
-            requestStart(game);
-
-        };
-
-    }
-
-
-    const stop=
-        element.querySelector(
-            '[data-action="stop"]'
-        );
-
-    if(stop){
-
-        stop.onclick=()=>{
-
-            confirmAction(
-                "Stop game?",
-                "This will immediately stop the game.",
-                ()=>forceStop(game)
-            );
-
-        };
-
-    }
-
-
-    element
-        .querySelectorAll(
-            "[data-ttt-index]"
-        )
-        .forEach(button=>{
-
-            button.onclick=()=>{
-
-                sendGameAction(
-                    game,
-                    {
-                        action:
-                            "tttMove",
-
-                        index:
-                            Number(
-                                button
-                                    .dataset
-                                    .tttIndex
-                            )
-                    }
-                );
-
-            };
-
-        });
-
-
-    const reaction=
-        element.querySelector(
-            "[data-reaction]"
-        );
-
-    if(reaction){
-
-        reaction.onclick=()=>{
-
-            if(
-                game.reaction?.phase!=="go"
-            ){
-                return;
-            }
-
-            if(
-                game.reaction.clicks[
-                    deviceId
-                ]
-            ){
-                return;
-            }
-
-            sendGameAction(
-                game,
-                {
-                    action:
-                        "reactionClick",
-
-                    timestamp:
-                        now()
-                }
-            );
-
-        };
-
-    }
-
-
-    const typeInput=
-        element.querySelector(
-            "[data-type-input]"
-        );
-
-    if(typeInput){
-
-        const key=
-            "type_"+game.gameId;
-
-        if(
-            localGameInputs[key]
-        ){
-
-            typeInput.value=
-                localGameInputs[key];
-
-        }
-
-        typeInput.addEventListener(
-            "input",
-            ()=>{
-                localGameInputs[key]=
-                    typeInput.value;
-            }
-        );
-
-        typeInput.addEventListener(
-            "keydown",
-            event=>{
-
-                if(
-                    event.key==="Enter"
-                ){
-
-                    event.preventDefault();
-
-                    sendGameAction(
-                        game,
-                        {
-                            action:
-                                "typeSubmit",
-
-                            text:
-                                typeInput.value,
-
-                            timestamp:
-                                now()
-                        }
-                    );
-
-                }
-
-            }
-        );
-
-    }
-
-
-    const attack=
-        element.querySelector(
-            "[data-boss-attack]"
-        );
-
-    if(attack){
-
-        attack.onclick=()=>{
-
-            sendGameAction(
-                game,
-                {
-                    action:
-                        "bossAttack"
-                }
-            );
-
-        };
-
-    }
-
-}
-
-
-/* =========================================================
-   HIDDEN GAME MESSAGE CLEANUP
-========================================================= */
-
-function cleanDeadGames(){
-
-    const timestamp=
-        now();
-
-    for(
-        const [id,game]
-        of games
-    ){
-
-        /* Finished games disappear after 3 sec */
-
-        if(
-            game.status==="finished" &&
-            game.finishedAt &&
-            timestamp-
-            game.finishedAt >=
-            DONE_REMOVE_DELAY
-        ){
-
-            games.delete(id);
-
-            continue;
-
-        }
-
-
-        /* Host heartbeat */
-
-        if(
-            game.status!=="finished" &&
-            game.hostDeviceId!==deviceId
-        ){
-
-            const heartbeat=
-                Number(
-                    game.heartbeat ||
-                    game.updatedAt ||
-                    game.createdAt ||
-                    0
-                );
-
-            if(
-                timestamp-
-                heartbeat >
-                HEARTBEAT_TIMEOUT
-            ){
-
-                games.delete(id);
-
-            }
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   HOST HEARTBEAT
-========================================================= */
-
-async function heartbeatGames(){
-
-    const owned=
-        [...games.values()]
-        .filter(
-            game=>
-                game.hostDeviceId===
-                deviceId &&
-                game.status!=="finished"
-        );
-
-    for(const game of owned){
-
-        const copy=
-            JSON.parse(
-                JSON.stringify(game)
-            );
-
-        copy.heartbeat=
-            now();
-
-        copy.updatedAt=
-            now();
-
-        try{
-
-            await updateGame({
-                ...copy,
-                _message:
-                    game._message
-            });
-
-        }catch(error){
-
-            console.error(
-                "Heartbeat error",
-                error
-            );
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   POLL
-========================================================= */
-
-async function poll(){
-
-    if(polling){
-        return;
-    }
-
-    polling=true;
-
-    try{
-
-        const fetched=
-            await apiGet();
-
-        lastServerMessages=
-            fetched;
-
-        const oldNormalIds=
-            new Set(
-                normalMessages.map(
-                    m=>String(m.id)
-                )
-            );
-
-        const oldGames=
-            new Map(games);
-
-        allMessages=
-            fetched;
-
-        normalMessages=
-            fetched.filter(
-                msg=>
-                    msg.username!==
-                    GAME_SERVER
-            );
-
-        gameMessages=
-            fetched.filter(
-                msg=>
-                    msg.username===
-                    GAME_SERVER
-            );
-
-
-        const collected=
-            collectGames(
-                gameMessages
-            );
-
-
-        /*
-         * IMPORTANT:
-         * Process host actions BEFORE displaying
-         * the new game state.
-         */
-
-        await processHostActions(
-            collected.states,
-            collected.actions
-        );
-
-
-        /*
-         * Re-fetch if this client is a host and
-         * just changed a game.
-         */
-
-        if(
-            collected.actions.length
-        ){
-
-            const refreshed=
-                await apiGet();
-
-            allMessages=
-                refreshed;
-
-            normalMessages=
-                refreshed.filter(
-                    msg=>
-                        msg.username!==
-                        GAME_SERVER
-                );
-
-            gameMessages=
-                refreshed.filter(
-                    msg=>
-                        msg.username===
-                        GAME_SERVER
-                );
-
-            const second=
-                collectGames(
-                    gameMessages
-                );
-
-            games=
-                second.states;
-
-        }else{
-
-            games=
-                collected.states;
-
-        }
-
-
-        cleanDeadGames();
-
-        renderNormalMessages();
-
-        renderGames();
-
-
-        /*
-         * Keep chat order correct.
-         */
-
-        sortVisibleMessages();
-
-
-        if(
-            !oldNormalIds.size &&
-            normalMessages.length
-        ){
-
-            messages.scrollTop=
-                messages.scrollHeight;
-
-        }
-
-
-    }catch(error){
-
-        console.error(
-            "Polling error:",
-            error
-        );
-
-    }finally{
-
-        polling=false;
-
-    }
-
-}
-
-
-function sortVisibleMessages(){
-
-    const elements=
-        [...messages.children];
-
-    elements.sort(
-        (a,b)=>{
-
-            const aGame=
-                a.dataset.gameId;
-
-            const bGame=
-                b.dataset.gameId;
-
-            if(aGame && !bGame){
-                return 1;
-            }
-
-            if(!aGame && bGame){
-                return -1;
-            }
-
-            if(aGame && bGame){
-
-                const ga=
-                    games.get(aGame);
-
-                const gb=
-                    games.get(bGame);
-
-                return (
-                    Number(
-                        ga?.createdAt ||
-                        0
-                    )-
-                    Number(
-                        gb?.createdAt ||
-                        0
-                    )
-                );
-
-            }
-
-            const ma=
-                normalMessages.find(
-                    m=>
-                        String(m.id)===
-                        a.dataset.messageId
-                );
-
-            const mb=
-                normalMessages.find(
-                    m=>
-                        String(m.id)===
-                        b.dataset.messageId
-                );
-
-            return (
-                new Date(
-                    ma?.created_at || 0
-                )-
-                new Date(
-                    mb?.created_at || 0
-                )
-            );
-
-        }
-    );
-
-    for(const element of elements){
-
-        messages.appendChild(
-            element
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   HOST GAME TICK
-========================================================= */
-
-async function hostGameTick(){
-
-    const owned=
-        [...games.values()]
-        .filter(
-            game=>
-                game.hostDeviceId===
-                deviceId &&
-                game.status==="running"
-        );
-
-    let changed=false;
-
-    for(const game of owned){
-
-        if(
-            game.type==="reaction"
-        ){
-
-            if(
-                updateReactionGame(game)
-            ){
-
-                changed=true;
-
-            }
-
-        }
-
-    }
-
-    if(changed){
-
-        for(const game of owned){
-
-            try{
-
-                await updateGame({
-                    ...game,
-                    _message:
-                        game._message
-                });
-
-            }catch(error){
-
-                console.error(
-                    error
-                );
-
-            }
-
-        }
-
-        await poll();
-
-    }
-
-}
-
-
-/* =========================================================
-   POLLING LOOP
-========================================================= */
-
-function restartPolling(){
-
-    if(pollTimer){
-
-        clearInterval(
-            pollTimer
-        );
-
-    }
-
-    poll();
-
-    pollTimer=
-        setInterval(
-            poll,
-            Number(
-                settings.refreshRate
-            )
-        );
-
-}
-
-
-setInterval(
-    heartbeatGames,
-    2500
-);
-
-
-setInterval(
-    hostGameTick,
-    250
-);
-
-
-/* =========================================================
-   SEND MESSAGE
+   NORMAL CHAT
 ========================================================= */
 
 async function sendMessage(){
 
-    const text=
+    const message=
         messageInput.value.trim();
 
-    if(!text){
+    if(!message){
         return;
     }
 
-    sendButton.disabled=true;
+    if(!settings.username){
+
+        settingsOverlay.classList.add("show");
+
+        loadSettingsUI();
+
+        usernameInput.focus();
+
+        return;
+    }
+
+    sendBtn.disabled=true;
 
     try{
 
-        await apiPost({
+        const response=
+            await fetch(
+                API_URL,
+                {
+                    method:"POST",
 
-            username:
-                usernameValue(),
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
 
-            device_id:
-                deviceId,
+                    body:JSON.stringify({
 
-            message:text
+                        username:
+                            settings.username,
 
-        });
+                        channel:CHANNEL,
+
+                        message,
+
+                        device_id:deviceId
+                    })
+                }
+            );
+
+        const data=
+            await response.json();
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error||
+                "Could not send message."
+            );
+        }
 
         messageInput.value="";
 
-        autoResize();
+        resizeTextarea();
 
-        await poll();
+        /*
+         Do not manually rebuild chat.
+         The server result is picked up by sync.
+        */
 
-        messages.scrollTop=
-            messages.scrollHeight;
+        await sync();
 
     }catch(error){
 
-        toast(
-            error.message
-        );
+        alert(error.message);
 
     }finally{
 
-        sendButton.disabled=false;
-
-        messageInput.focus();
-
+        sendBtn.disabled=false;
     }
-
 }
 
 
-sendButton.onclick=
-    sendMessage;
+sendBtn.onclick=sendMessage;
 
 
 messageInput.addEventListener(
@@ -5879,290 +2141,2722 @@ messageInput.addEventListener(
             event.preventDefault();
 
             sendMessage();
-
         }
-
     }
 );
+
+
+function resizeTextarea(){
+
+    messageInput.style.height="auto";
+
+    messageInput.style.height=
+        Math.min(
+            messageInput.scrollHeight,
+            150
+        )+"px";
+}
 
 
 messageInput.addEventListener(
     "input",
-    autoResize
+    resizeTextarea
 );
 
 
-function autoResize(){
+/* =========================================================
+   CREATE GAME
+========================================================= */
 
-    messageInput.style.height=
-        "auto";
+document.querySelectorAll(
+    ".game-choice"
+).forEach(button=>{
 
-    messageInput.style.height=
-        Math.min(
-            150,
-            messageInput.scrollHeight
-        )+
-        "px";
+    button.onclick=async()=>{
 
+        const type=
+            button.dataset.game;
+
+        await createGame(type);
+
+        gamesOverlay.classList.remove(
+            "show"
+        );
+    };
+});
+
+
+async function createGame(type){
+
+    if(!settings.username){
+
+        settingsOverlay.classList.add("show");
+
+        loadSettingsUI();
+
+        usernameInput.focus();
+
+        return;
+    }
+
+    const config=GAME_TYPES[type];
+
+    if(!config){
+        return;
+    }
+
+    const gameId=makeId();
+
+    const state={
+
+        version:1,
+
+        id:gameId,
+
+        type,
+
+        status:"lobby",
+
+        host:{
+
+            id:deviceId,
+
+            name:settings.username
+        },
+
+        players:[
+
+            {
+                id:deviceId,
+                name:settings.username
+            }
+
+        ],
+
+        createdAt:Date.now(),
+
+        startedAt:null,
+
+        finishedAt:null,
+
+        winner:null,
+
+        data:createInitialGameData(type)
+    };
+
+    const result=
+        await postGameState(state);
+
+    if(!result){
+        return;
+    }
+
+    await sync();
 }
 
 
 /* =========================================================
-   MODALS
+   GAME INITIAL STATE
 ========================================================= */
 
-gamesButton.onclick=()=>{
+function createInitialGameData(type){
 
-    openOverlay(
-        gamesOverlay
-    );
+    if(type.startsWith("ttt")){
 
-};
+        const size=
+            GAME_TYPES[type].size;
 
+        return {
 
-settingsButton.onclick=()=>{
+            board:
+                Array(size*size).fill(""),
 
-    loadSettingsUI();
+            turn:0,
 
-    openOverlay(
-        settingsOverlay
-    );
-
-};
-
-
-closeGames.onclick=()=>{
-
-    closeOverlay(
-        gamesOverlay
-    );
-
-};
+            moves:0
+        };
+    }
 
 
-closeSettings.onclick=()=>{
+    if(type==="reaction"){
 
-    closeOverlay(
-        settingsOverlay
-    );
+        return {
 
-};
+            phase:"waiting",
+
+            readyAt:null,
+
+            results:{},
+
+            round:0
+        };
+    }
 
 
-document
-    .querySelectorAll(".overlay")
-    .forEach(overlay=>{
+    if(type==="type"){
 
-        overlay.addEventListener(
-            "click",
-            event=>{
+        const sentences=[
 
-                if(
-                    event.target===
-                    overlay
-                ){
+            "The quick brown fox jumps over the lazy dog.",
 
-                    closeOverlay(
-                        overlay
-                    );
+            "Games are better when everyone can play together.",
 
+            "Welcome to the multiplayer game chat.",
+
+            "Sometimes the fastest player wins.",
+
+            "Keep your eyes open and react quickly."
+        ];
+
+        return {
+
+            sentence:
+                sentences[
+                    Math.floor(
+                        Math.random()*
+                        sentences.length
+                    )
+                ],
+
+            results:{},
+
+            round:0
+        };
+    }
+
+
+    if(type==="boss"){
+
+        return {
+
+            hp:100000000,
+
+            maxHp:100000000,
+
+            damage:{},
+
+            upgrades:{}
+        };
+    }
+
+
+    return {};
+}
+
+
+/* =========================================================
+   GAME SERVER POST
+========================================================= */
+
+async function postGameState(state){
+
+    try{
+
+        const response=
+            await fetch(
+                API_URL,
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        game_server:true,
+
+                        device_id:deviceId,
+
+                        channel:CHANNEL,
+
+                        message:
+                            JSON.stringify(state)
+                    })
                 }
+            );
 
+        const data=
+            await response.json();
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error||
+                "Could not create game."
+            );
+        }
+
+        return data.game;
+
+    }catch(error){
+
+        console.error(error);
+
+        alert(error.message);
+
+        return null;
+    }
+}
+
+
+/* =========================================================
+   GAME PATCH
+========================================================= */
+
+async function patchGame(game){
+
+    if(
+        !game ||
+        !game.serverId ||
+        game.host.id!==deviceId
+    ){
+        return null;
+    }
+
+    try{
+
+        const response=
+            await fetch(
+                API_URL,
+                {
+                    method:"PATCH",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        id:game.serverId,
+
+                        device_id:deviceId,
+
+                        game_server:true,
+
+                        game_state:
+                            JSON.stringify(
+                                stripGameForServer(
+                                    game
+                                )
+                            )
+                    })
+                }
+            );
+
+        const data=
+            await response.json();
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error||
+                "Game update failed."
+            );
+        }
+
+        return data.game;
+
+    }catch(error){
+
+        console.error(
+            "GAME PATCH",
+            error
+        );
+
+        return null;
+    }
+}
+
+
+function stripGameForServer(game){
+
+    return {
+
+        version:1,
+
+        id:game.id,
+
+        type:game.type,
+
+        status:game.status,
+
+        host:game.host,
+
+        players:game.players,
+
+        createdAt:game.createdAt,
+
+        startedAt:game.startedAt,
+
+        finishedAt:game.finishedAt,
+
+        winner:game.winner,
+
+        data:game.data
+    };
+}
+
+
+/* =========================================================
+   DELETE GAME
+========================================================= */
+
+async function deleteGame(game){
+
+    if(
+        !game ||
+        !game.serverId ||
+        game.host.id!==deviceId
+    ){
+        return;
+    }
+
+    try{
+
+        await fetch(
+            API_URL,
+            {
+                method:"DELETE",
+
+                headers:{
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body:JSON.stringify({
+
+                    game_server:true,
+
+                    id:game.serverId,
+
+                    device_id:deviceId
+                })
             }
         );
 
-    });
+    }catch(error){
 
-
-/* =========================================================
-   CREATE GAME BUTTONS
-========================================================= */
-
-document
-    .querySelectorAll(
-        "[data-create-game]"
-    )
-    .forEach(button=>{
-
-        button.onclick=()=>{
-
-            createGame(
-                button.dataset.createGame
-            );
-
-        };
-
-    });
-
-
-/* =========================================================
-   CONFIRM
-========================================================= */
-
-function confirmAction(
-    title,
-    text,
-    callback
-){
-
-    confirmTitle.textContent=
-        title;
-
-    confirmText.textContent=
-        text;
-
-    confirmCallback=
-        callback;
-
-    openOverlay(
-        confirmOverlay
-    );
-
+        console.error(
+            "GAME DELETE",
+            error
+        );
+    }
 }
 
 
-confirmCancel.onclick=()=>{
+/* =========================================================
+   GAME JOIN
+========================================================= */
 
-    confirmCallback=null;
+async function joinGame(game){
 
-    closeOverlay(
-        confirmOverlay
-    );
-
-};
-
-
-confirmYes.onclick=async()=>{
-
-    const callback=
-        confirmCallback;
-
-    confirmCallback=null;
-
-    closeOverlay(
-        confirmOverlay
-    );
-
-    if(callback){
-
-        await callback();
-
+    if(!game){
+        return;
     }
 
-};
+    if(game.status!=="lobby"){
+        return;
+    }
+
+    if(
+        game.players.some(
+            p=>p.id===deviceId
+        )
+    ){
+        return;
+    }
+
+    if(
+        game.players.length>=
+        GAME_TYPES[game.type].max
+    ){
+        return;
+    }
+
+    const updated=
+        structuredClone
+            ?structuredClone(game)
+            :JSON.parse(
+                JSON.stringify(game)
+            );
+
+    updated.players.push({
+
+        id:deviceId,
+
+        name:
+            settings.username||
+            "Player"
+    });
+
+    if(updated.host.id===deviceId){
+        return;
+    }
+
+    /*
+     Players cannot PATCH because the API only
+     allows the host to update game state.
+
+     Therefore joining is done through a special
+     game action message.
+    */
+
+    await sendGameAction(
+        game,
+        {
+            action:"join",
+
+            player:{
+                id:deviceId,
+                name:
+                    settings.username||
+                    "Player"
+            }
+        }
+    );
+}
 
 
 /* =========================================================
-   DELETE EVERYTHING
+   GAME ACTIONS
 ========================================================= */
 
-deleteEverything.onclick=()=>{
+async function sendGameAction(game,action){
 
-    confirmAction(
-        "Delete everything?",
-        "This permanently removes all chat messages and hidden game states.",
-        async()=>{
+    /*
+     Game actions are sent as normal hidden game
+     messages.
 
-            try{
+     They do not appear in the visible chat because
+     the renderer filters __GAME_SERVER__.
+    */
 
-                await apiDelete({
-                    delete_all:true
-                });
+    const state={
 
-                renderedMessages.forEach(
-                    element=>
-                        element.remove()
-                );
+        actionMessage:true,
 
-                renderedGames.forEach(
-                    element=>
-                        element.remove()
-                );
+        gameId:game.id,
 
-                renderedMessages.clear();
-                renderedGames.clear();
+        from:{
 
-                normalMessages=[];
-                games.clear();
+            id:deviceId,
 
-                await poll();
+            name:
+                settings.username||
+                "Player"
+        },
 
-                toast(
-                    "Everything deleted"
-                );
+        action,
 
-            }catch(error){
+        timestamp:Date.now()
+    };
 
-                toast(
-                    error.message
-                );
+    try{
 
+        const response=
+            await fetch(
+                API_URL,
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:JSON.stringify({
+
+                        game_server:true,
+
+                        device_id:deviceId,
+
+                        channel:CHANNEL,
+
+                        message:
+                            JSON.stringify(state)
+                    })
+                }
+            );
+
+        if(!response.ok){
+
+            const data=
+                await response.json();
+
+            console.error(
+                data.error
+            );
+        }
+
+    }catch(error){
+
+        console.error(error);
+    }
+}
+
+
+/* =========================================================
+   SYNC
+========================================================= */
+
+async function sync(){
+
+    if(syncing){
+        return;
+    }
+
+    syncing=true;
+
+    try{
+
+        const response=
+            await fetch(
+                API_URL+
+                "?channel="+
+                encodeURIComponent(CHANNEL),
+                {
+                    cache:"no-store"
+                }
+            );
+
+        if(!response.ok){
+            throw new Error(
+                "Server returned "+
+                response.status
+            );
+        }
+
+        const result=
+            await response.json();
+
+        const serverMessages=
+            Array.isArray(result.messages)
+                ?result.messages
+                :[];
+
+        processServerMessages(
+            serverMessages
+        );
+
+    }catch(error){
+
+        console.error(
+            "SYNC ERROR:",
+            error
+        );
+
+    }finally{
+
+        syncing=false;
+    }
+}
+
+
+/* =========================================================
+   PROCESS SERVER DATA
+========================================================= */
+
+function processServerMessages(list){
+
+    const oldBottom=nearBottom();
+
+    const normalMessages=
+        list.filter(
+            m=>
+                m.username!==
+                GAME_SERVER
+        );
+
+    const serverGames=
+        list.filter(
+            m=>
+                m.username===
+                GAME_SERVER
+        );
+
+    currentMessages=
+        normalMessages;
+
+    /*
+     Incremental normal-message renderer.
+    */
+
+    updateNormalMessages(
+        normalMessages
+    );
+
+    /*
+     Rebuild the GAME MAP only.
+     Visible chat is untouched.
+    */
+
+    processGames(
+        serverGames
+    );
+
+    if(
+        oldBottom &&
+        settings.autoScroll
+    ){
+
+        messagesEl.scrollTop=
+            messagesEl.scrollHeight;
+    }
+}
+
+
+/* =========================================================
+   INCREMENTAL MESSAGE RENDERING
+========================================================= */
+
+function updateNormalMessages(list){
+
+    const incomingIds=
+        new Set(
+            list.map(
+                m=>String(m.id)
+            )
+        );
+
+    /*
+     Remove only messages that no longer exist.
+    */
+
+    renderedMessages.forEach(
+        (element,id)=>{
+
+            if(!incomingIds.has(String(id))){
+
+                element.remove();
+
+                renderedMessages.delete(id);
             }
-
         }
     );
 
-};
+    /*
+     Add only messages we have never rendered.
+    */
+
+    list.forEach(message=>{
+
+        const id=String(message.id);
+
+        if(renderedMessages.has(id)){
+
+            updateMessageElement(
+                renderedMessages.get(id),
+                message
+            );
+
+            return;
+        }
+
+        const element=
+            createMessageElement(
+                message
+            );
+
+        renderedMessages.set(
+            id,
+            element
+        );
+
+        insertMessageInOrder(
+            element,
+            message
+        );
+    });
+}
+
+
+/* =========================================================
+   CREATE MESSAGE
+========================================================= */
+
+function createMessageElement(message){
+
+    const wrapper=
+        document.createElement("div");
+
+    wrapper.className="message";
+
+    wrapper.dataset.id=
+        String(message.id);
+
+    const avatar=
+        document.createElement("div");
+
+    avatar.className=
+        "message-avatar";
+
+    avatar.textContent=
+        getInitial(
+            message.username
+        );
+
+    const content=
+        document.createElement("div");
+
+    content.className=
+        "message-content";
+
+    const card=
+        document.createElement("div");
+
+    card.className=
+        "message-card";
+
+    const top=
+        document.createElement("div");
+
+    top.className=
+        "message-top";
+
+    const username=
+        document.createElement("span");
+
+    username.className=
+        "username";
+
+    username.textContent=
+        message.username;
+
+    const time=
+        document.createElement("span");
+
+    time.className="time";
+
+    time.textContent=
+        formatTime(
+            message.created_at
+        );
+
+    const edited=
+        document.createElement("span");
+
+    edited.className="edited";
+
+    edited.textContent=
+        message.edited
+            ?"edited"
+            :"";
+
+    top.append(
+        username,
+        time,
+        edited
+    );
+
+    card.append(top);
+
+    if(message.message){
+
+        const text=
+            document.createElement("div");
+
+        text.className=
+            "message-text";
+
+        text.textContent=
+            message.message;
+
+        card.append(text);
+    }
+
+    if(message.image){
+
+        const image=
+            document.createElement("img");
+
+        image.className=
+            "message-image";
+
+        image.src=
+            message.image;
+
+        image.loading="lazy";
+
+        card.append(image);
+    }
+
+    content.append(card);
+
+    wrapper.append(
+        avatar,
+        content
+    );
+
+    return wrapper;
+}
+
+
+/* =========================================================
+   UPDATE EXISTING MESSAGE
+========================================================= */
+
+function updateMessageElement(
+    element,
+    message
+){
+
+    const username=
+        element.querySelector(
+            ".username"
+        );
+
+    if(username){
+        username.textContent=
+            message.username;
+    }
+
+    const time=
+        element.querySelector(
+            ".time"
+        );
+
+    if(time){
+
+        time.textContent=
+            formatTime(
+                message.created_at
+            );
+
+        time.style.display=
+            settings.showTimestamps
+                ?"inline"
+                :"none";
+    }
+
+    const edited=
+        element.querySelector(
+            ".edited"
+        );
+
+    if(edited){
+
+        edited.textContent=
+            message.edited
+                ?"edited"
+                :"";
+    }
+
+    const text=
+        element.querySelector(
+            ".message-text"
+        );
+
+    if(text){
+
+        text.textContent=
+            message.message||
+            "";
+    }
+}
+
+
+/* =========================================================
+   INSERT IN CORRECT ORDER
+========================================================= */
+
+function insertMessageInOrder(
+    element,
+    message
+){
+
+    const children=
+        [
+            ...messagesEl.children
+        ];
+
+    const targetTime=
+        new Date(
+            message.created_at
+        ).getTime();
+
+    for(const child of children){
+
+        if(
+            child.classList.contains(
+                "game-message"
+            )
+        ){
+            continue;
+        }
+
+        const other=
+            currentMessages.find(
+                m=>
+                    String(m.id)===
+                    child.dataset.id
+            );
+
+        if(!other){
+            continue;
+        }
+
+        const otherTime=
+            new Date(
+                other.created_at
+            ).getTime();
+
+        if(targetTime<otherTime){
+
+            messagesEl.insertBefore(
+                element,
+                child
+            );
+
+            return;
+        }
+    }
+
+    /*
+     Keep game cards after chat messages
+     by inserting before the first game.
+    */
+
+    const firstGame=
+        messagesEl.querySelector(
+            ".game-message"
+        );
+
+    if(firstGame){
+
+        messagesEl.insertBefore(
+            element,
+            firstGame
+        );
+
+    }else{
+
+        messagesEl.appendChild(
+            element
+        );
+    }
+}
+
+
+/* =========================================================
+   GAME PROCESSING
+========================================================= */
+
+function processGames(serverMessages){
+
+    const gameMessages=
+        new Map();
+
+    serverMessages.forEach(message=>{
+
+        let parsed;
+
+        try{
+
+            parsed=
+                JSON.parse(
+                    message.message
+                );
+
+        }catch{
+
+            return;
+        }
+
+        if(
+            parsed &&
+            parsed.actionMessage
+        ){
+
+            /*
+             Action messages are handled by hosts.
+            */
+
+            handleIncomingGameAction(
+                message,
+                parsed
+            );
+
+            return;
+        }
+
+        if(
+            parsed &&
+            parsed.id &&
+            parsed.type
+        ){
+
+            gameMessages.set(
+                parsed.id,
+                {
+                    ...parsed,
+                    serverId:message.id,
+                    serverCreatedAt:
+                        message.created_at
+                }
+            );
+        }
+    });
+
+    /*
+     Remove games that disappeared from server.
+    */
+
+    games.forEach(
+        (game,id)=>{
+
+            if(!gameMessages.has(id)){
+
+                removeGameElement(id);
+
+                games.delete(id);
+            }
+        }
+    );
+
+    /*
+     Add/update games.
+    */
+
+    gameMessages.forEach(
+        (game,id)=>{
+
+            const previous=
+                games.get(id);
+
+            games.set(
+                id,
+                game
+            );
+
+            if(!previous){
+
+                createGameElement(
+                    game
+                );
+
+            }else{
+
+                updateGameElement(
+                    game
+                );
+            }
+
+            runGameLifecycle(
+                game
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   GAME ACTION HANDLER
+========================================================= */
+
+async function handleIncomingGameAction(
+    serverMessage,
+    actionMessage
+){
+
+    const game=
+        games.get(
+            actionMessage.gameId
+        );
+
+    if(!game){
+        return;
+    }
+
+    /*
+     Only host processes state-changing actions.
+    */
+
+    if(
+        game.host.id!==deviceId
+    ){
+        return;
+    }
+
+    const action=
+        actionMessage.action;
+
+    if(action.action==="join"){
+
+        const player=
+            action.player;
+
+        if(
+            !player ||
+            game.players.some(
+                p=>p.id===player.id
+            )
+        ){
+            return;
+        }
+
+        if(
+            game.players.length >=
+            GAME_TYPES[game.type].max
+        ){
+            return;
+        }
+
+        game.players.push({
+            id:player.id,
+            name:player.name
+        });
+
+        await patchGame(game);
+
+        return;
+    }
+
+    if(action.action==="tttMove"){
+
+        if(game.status!=="playing"){
+            return;
+        }
+
+        const playerIndex=
+            game.players.findIndex(
+                p=>
+                    p.id===
+                    action.playerId
+            );
+
+        if(playerIndex<0){
+            return;
+        }
+
+        if(
+            playerIndex!==
+            game.data.turn
+        ){
+            return;
+        }
+
+        const size=
+            GAME_TYPES[
+                game.type
+            ].size;
+
+        const index=
+            Number(action.index);
+
+        if(
+            index<0 ||
+            index>=size*size ||
+            game.data.board[index]
+        ){
+            return;
+        }
+
+        game.data.board[index]=
+            playerIndex===0
+                ?"X"
+                :"O";
+
+        game.data.turn=
+            game.data.turn===0
+                ?1
+                :0;
+
+        game.data.moves++;
+
+        const result=
+            checkTTT(
+                game.data.board,
+                size
+            );
+
+        if(result){
+
+            game.status="finished";
+
+            game.winner=
+                game.players[
+                    playerIndex
+                ];
+
+            game.finishedAt=
+                Date.now();
+        }
+
+        if(
+            game.data.moves>=size*size &&
+            !result
+        ){
+
+            game.status="finished";
+
+            game.winner=null;
+
+            game.finishedAt=
+                Date.now();
+        }
+
+        await patchGame(game);
+
+        return;
+    }
+
+    if(action.action==="reactionClick"){
+
+        if(game.status!=="playing"){
+            return;
+        }
+
+        if(
+            game.data.phase!=="go"
+        ){
+            return;
+        }
+
+        if(
+            game.data.results[
+                action.playerId
+            ]
+        ){
+            return;
+        }
+
+        game.data.results[
+            action.playerId
+        ]=
+            Date.now()-
+            game.data.readyAt;
+
+        const count=
+            Object.keys(
+                game.data.results
+            ).length;
+
+        if(
+            count>=game.players.length
+        ){
+
+            const sorted=
+                Object.entries(
+                    game.data.results
+                )
+                .sort(
+                    (a,b)=>a[1]-b[1]
+                );
+
+            game.winner=
+                game.players.find(
+                    p=>
+                        p.id===
+                        sorted[0][0]
+                );
+
+            game.status="finished";
+
+            game.finishedAt=
+                Date.now();
+        }
+
+        await patchGame(game);
+
+        return;
+    }
+
+    if(action.action==="typeFinish"){
+
+        if(game.status!=="playing"){
+            return;
+        }
+
+        if(
+            game.data.results[
+                action.playerId
+            ]
+        ){
+            return;
+        }
+
+        if(
+            action.text===
+            game.data.sentence
+        ){
+
+            game.data.results[
+                action.playerId
+            ]=
+                Date.now();
+
+            game.winner=
+                game.players.find(
+                    p=>
+                        p.id===
+                        action.playerId
+                );
+
+            game.status="finished";
+
+            game.finishedAt=
+                Date.now();
+
+            await patchGame(game);
+        }
+
+        return;
+    }
+
+    if(action.action==="bossDamage"){
+
+        if(game.status!=="playing"){
+            return;
+        }
+
+        const damage=
+            Math.max(
+                1,
+                Math.min(
+                    1000000,
+                    Number(action.damage)||1
+                )
+            );
+
+        game.data.hp=
+            Math.max(
+                0,
+                game.data.hp-damage
+            );
+
+        game.data.damage[
+            action.playerId
+        ]=
+            (
+                game.data.damage[
+                    action.playerId
+                ]||0
+            )+damage;
+
+        if(game.data.hp<=0){
+
+            game.status="finished";
+
+            game.winner=null;
+
+            game.finishedAt=
+                Date.now();
+        }
+
+        await patchGame(game);
+    }
+}
+
+
+/* =========================================================
+   GAME LIFECYCLE
+========================================================= */
+
+function runGameLifecycle(game){
+
+    if(
+        game.status==="finished" &&
+        game.finishedAt
+    ){
+
+        const age=
+            Date.now()-
+            game.finishedAt;
+
+        if(
+            age>=GAME_REMOVE_DELAY &&
+            game.host.id===deviceId
+        ){
+
+            deleteGame(game);
+
+            return;
+        }
+    }
+
+    /*
+     Host heartbeat.
+     If a host closes/disconnects, other clients
+     remove the stale game locally. The host's game
+     message disappears from the server on explicit
+     removal. This also prevents stale lobbies.
+    */
+
+    if(
+        game.status!=="finished" &&
+        game.serverCreatedAt
+    ){
+
+        const age=
+            Date.now()-
+            new Date(
+                game.serverCreatedAt
+            ).getTime();
+
+        if(
+            age>GAME_TIMEOUT*3
+        ){
+
+            /*
+             Only host can actually delete through API.
+             Non-host hides the stale game locally.
+            */
+
+            if(
+                game.host.id===deviceId
+            ){
+
+                deleteGame(game);
+
+            }else{
+
+                removeGameElement(
+                    game.id
+                );
+
+                games.delete(
+                    game.id
+                );
+            }
+        }
+    }
+
+    /*
+     Host heartbeat.
+    */
+
+    if(
+        game.host.id===deviceId &&
+        game.status!=="finished"
+    ){
+
+        startHostHeartbeat(game);
+    }
+}
+
+
+function startHostHeartbeat(game){
+
+    if(
+        gameLoopTimers.has(
+            "heartbeat_"+game.id
+        )
+    ){
+        return;
+    }
+
+    const timer=
+        setInterval(
+            async()=>{
+
+                /*
+                 The host re-publishes the same
+                 state so other clients know it is alive.
+                */
+
+                const current=
+                    games.get(game.id);
+
+                if(
+                    !current ||
+                    current.host.id!==deviceId
+                ){
+
+                    clearInterval(timer);
+
+                    gameLoopTimers.delete(
+                        "heartbeat_"+game.id
+                    );
+
+                    return;
+                }
+
+                await patchGame(current);
+
+            },
+            5000
+        );
+
+    gameLoopTimers.set(
+        "heartbeat_"+game.id,
+        timer
+    );
+}
+
+
+/* =========================================================
+   GAME ELEMENT
+========================================================= */
+
+function createGameElement(game){
+
+    const wrapper=
+        document.createElement("div");
+
+    wrapper.className=
+        "game-message";
+
+    wrapper.dataset.gameId=
+        game.id;
+
+    wrapper.innerHTML=
+        buildGameHTML(game);
+
+    messagesEl.appendChild(
+        wrapper
+    );
+
+    renderedGames.set(
+        game.id,
+        wrapper
+    );
+
+    attachGameEvents(
+        wrapper,
+        game
+    );
+
+    updateGameElement(
+        game
+    );
+}
+
+
+function updateGameElement(game){
+
+    const wrapper=
+        renderedGames.get(
+            game.id
+        );
+
+    if(!wrapper){
+        createGameElement(game);
+        return;
+    }
+
+    const oldScroll=
+        messagesEl.scrollTop;
+
+    wrapper.innerHTML=
+        buildGameHTML(game);
+
+    attachGameEvents(
+        wrapper,
+        game
+    );
+
+    messagesEl.scrollTop=
+        oldScroll;
+}
+
+
+function removeGameElement(id){
+
+    const element=
+        renderedGames.get(id);
+
+    if(element){
+        element.remove();
+
+        renderedGames.delete(id);
+    }
+
+    const timer=
+        gameLoopTimers.get(
+            "heartbeat_"+id
+        );
+
+    if(timer){
+
+        clearInterval(timer);
+
+        gameLoopTimers.delete(
+            "heartbeat_"+id
+        );
+    }
+}
+
+
+/* =========================================================
+   GAME HTML
+========================================================= */
+
+function buildGameHTML(game){
+
+    const config=
+        GAME_TYPES[game.type];
+
+    if(!config){
+        return "";
+    }
+
+    let statusText=
+        "Lobby";
+
+    if(game.status==="playing"){
+        statusText="Playing";
+    }
+
+    if(game.status==="finished"){
+        statusText="Finished";
+    }
+
+    const isHost=
+        game.host.id===deviceId;
+
+    const joined=
+        game.players.some(
+            p=>p.id===deviceId
+        );
+
+    const full=
+        game.players.length>=
+        config.max;
+
+    let body="";
+
+    if(game.type.startsWith("ttt")){
+
+        body=
+            buildTTT(
+                game,
+                isHost,
+                joined
+            );
+
+    }else if(game.type==="reaction"){
+
+        body=
+            buildReaction(
+                game,
+                isHost,
+                joined
+            );
+
+    }else if(game.type==="type"){
+
+        body=
+            buildTypeGame(
+                game,
+                isHost,
+                joined
+            );
+
+    }else if(game.type==="boss"){
+
+        body=
+            buildBoss(
+                game,
+                isHost,
+                joined
+            );
+    }
+
+    return `
+
+<div class="game-card">
+
+<div class="game-header">
+
+<div class="game-title">
+
+<div class="game-title-icon">
+${config.icon}
+</div>
+
+<div class="game-name">
+${escapeHTML(config.name)}
+</div>
+
+</div>
+
+<div class="game-status">
+${statusText}
+</div>
+
+</div>
+
+<div class="game-body">
+
+<div class="game-info">
+
+<div class="game-pill">
+Host:
+<strong>
+${escapeHTML(game.host.name)}
+</strong>
+</div>
+
+<div class="game-pill">
+Players:
+<strong>
+${game.players.length}/${config.max}
+</strong>
+</div>
+
+</div>
+
+<div class="game-description">
+${escapeHTML(config.desc)}
+</div>
+
+<div class="players-list">
+
+${game.players.map(
+    (player,index)=>`
+
+<div class="player-chip ${
+    index===0
+        ?"host"
+        :""
+}">
+
+${index===0
+    ?"👑 "
+    :""
+}${escapeHTML(player.name)}
+
+</div>
+
+`).join("")}
+
+</div>
+
+${body}
+
+${
+    game.status==="lobby"
+    ?`
+
+<div class="game-actions">
+
+${
+    !joined && !full
+    ?`
+<button
+    class="game-btn primary"
+    data-action="join"
+>
+Join Game
+</button>
+`
+    :""
+}
+
+${
+    isHost
+    ?`
+<button
+    class="game-btn primary"
+    data-action="start"
+    ${
+        game.players.length<
+        config.min
+        ?"disabled"
+        :""
+    }
+>
+Start
+</button>
+
+<button
+    class="game-btn danger"
+    data-action="forceStop"
+>
+Force Stop
+</button>
+`
+    :""
+}
+
+${
+    joined && !isHost
+    ?`
+<div class="turn-banner">
+Waiting for host to start the game.
+</div>
+`
+    :""
+}
+
+</div>
+`
+    :""
+}
+
+${
+    game.status==="finished"
+    ?`
+<div class="turn-banner">
+Game finished. Removing automatically...
+</div>
+`
+    :""
+}
+
+</div>
+
+</div>
+`;
+}
+
+
+/* =========================================================
+   GAME EVENTS
+========================================================= */
+
+function attachGameEvents(
+    wrapper,
+    game
+){
+
+    wrapper
+        .querySelector(
+            '[data-action="join"]'
+        )
+        ?.addEventListener(
+            "click",
+            ()=>joinGame(game)
+        );
+
+
+    wrapper
+        .querySelector(
+            '[data-action="start"]'
+        )
+        ?.addEventListener(
+            "click",
+            ()=>startGame(game)
+        );
+
+
+    wrapper
+        .querySelector(
+            '[data-action="forceStop"]'
+        )
+        ?.addEventListener(
+            "click",
+            ()=>deleteGame(game)
+        );
+
+
+    wrapper
+        .querySelectorAll(
+            "[data-ttt-index]"
+        )
+        .forEach(button=>{
+
+            button.addEventListener(
+                "click",
+                ()=>{
+
+                    const index=
+                        Number(
+                            button.dataset.tttIndex
+                        );
+
+                    sendGameAction(
+                        game,
+                        {
+                            action:"tttMove",
+
+                            playerId:
+                                deviceId,
+
+                            index
+                        }
+                    );
+                }
+            );
+        });
+
+
+    const reaction=
+        wrapper.querySelector(
+            "[data-reaction]"
+        );
+
+    if(reaction){
+
+        reaction.addEventListener(
+            "click",
+            ()=>{
+
+                sendGameAction(
+                    game,
+                    {
+                        action:
+                            "reactionClick",
+
+                        playerId:
+                            deviceId
+                    }
+                );
+            }
+        );
+    }
+
+
+    const typeInput=
+        wrapper.querySelector(
+            "[data-type-input]"
+        );
+
+    if(typeInput){
+
+        typeInput.addEventListener(
+            "keydown",
+            event=>{
+
+                if(
+                    event.key!=="Enter"
+                ){
+                    return;
+                }
+
+                sendGameAction(
+                    game,
+                    {
+                        action:
+                            "typeFinish",
+
+                        playerId:
+                            deviceId,
+
+                        text:
+                            typeInput.value
+                    }
+                );
+            }
+        );
+    }
+
+
+    const damage=
+        wrapper.querySelector(
+            "[data-boss-damage]"
+        );
+
+    if(damage){
+
+        damage.addEventListener(
+            "click",
+            ()=>{
+
+                sendGameAction(
+                    game,
+                    {
+                        action:
+                            "bossDamage",
+
+                        playerId:
+                            deviceId,
+
+                        damage:100000
+                    }
+                );
+            }
+        );
+    }
+}
+
+
+/* =========================================================
+   START GAME
+========================================================= */
+
+async function startGame(game){
+
+    if(
+        game.host.id!==deviceId ||
+        game.status!=="lobby"
+    ){
+        return;
+    }
+
+    if(
+        game.players.length<
+        GAME_TYPES[game.type].min
+    ){
+        return;
+    }
+
+    game.status="playing";
+
+    game.startedAt=
+        Date.now();
+
+    if(game.type==="reaction"){
+
+        game.data.phase="waiting";
+
+        game.data.readyAt=null;
+
+        game.data.results={};
+
+        game.data.round++;
+
+    }
+
+    if(game.type==="type"){
+
+        game.data.results={};
+
+        game.data.round++;
+
+    }
+
+    await patchGame(game);
+
+    if(game.type==="reaction"){
+
+        setTimeout(
+            async()=>{
+
+                const current=
+                    games.get(game.id);
+
+                if(
+                    !current ||
+                    current.status!=="playing" ||
+                    current.host.id!==deviceId
+                ){
+                    return;
+                }
+
+                current.data.phase="go";
+
+                current.data.readyAt=
+                    Date.now();
+
+                await patchGame(current);
+
+            },
+            1500+
+            Math.random()*2500
+        );
+    }
+}
+
+
+/* =========================================================
+   TTT
+========================================================= */
+
+function buildTTT(
+    game,
+    isHost,
+    joined
+){
+
+    const size=
+        GAME_TYPES[
+            game.type
+        ].size;
+
+    const board=
+        game.data.board||[];
+
+    if(game.status==="lobby"){
+
+        return `
+<div class="turn-banner">
+Join the game, then wait for the host to start.
+</div>
+`;
+    }
+
+    if(game.status==="finished"){
+
+        return `
+<div class="turn-banner">
+${
+    game.winner
+        ?`🏆 ${escapeHTML(game.winner.name)} wins!`
+        :"Draw!"
+}
+</div>
+`;
+    }
+
+    const current=
+        game.players[
+            game.data.turn||0
+        ];
+
+    return `
+
+<div class="turn-banner">
+
+Turn:
+<strong>
+${escapeHTML(
+    current
+        ?current.name
+        :"Player"
+)}
+</strong>
+
+</div>
+
+<div
+    class="ttt"
+    style="
+        grid-template-columns:
+        repeat(${size},42px)
+    "
+>
+
+${board.map(
+    (cell,index)=>`
+
+<button
+    data-ttt-index="${index}"
+    style="
+        width:42px;
+        height:42px;
+        font-size:18px;
+    "
+    ${
+        cell ||
+        !joined ||
+        game.players[
+            game.data.turn||0
+        ]?.id!==deviceId
+        ?"disabled"
+        :""
+    }
+>
+${cell}
+</button>
+
+`).join("")}
+
+</div>
+`;
+}
+
+
+/* =========================================================
+   TTT CHECK
+========================================================= */
+
+function checkTTT(board,size){
+
+    for(let row=0;row<size;row++){
+
+        const first=
+            board[row*size];
+
+        if(!first){
+            continue;
+        }
+
+        let good=true;
+
+        for(
+            let col=1;
+            col<size;
+            col++
+        ){
+
+            if(
+                board[
+                    row*size+col
+                ]!==first
+            ){
+
+                good=false;
+                break;
+            }
+        }
+
+        if(good){
+            return true;
+        }
+    }
+
+
+    for(let col=0;col<size;col++){
+
+        const first=
+            board[col];
+
+        if(!first){
+            continue;
+        }
+
+        let good=true;
+
+        for(
+            let row=1;
+            row<size;
+            row++
+        ){
+
+            if(
+                board[
+                    row*size+col
+                ]!==first
+            ){
+
+                good=false;
+                break;
+            }
+        }
+
+        if(good){
+            return true;
+        }
+    }
+
+
+    let first=
+        board[0];
+
+    if(first){
+
+        let good=true;
+
+        for(let i=1;i<size;i++){
+
+            if(
+                board[
+                    i*size+i
+                ]!==first
+            ){
+
+                good=false;
+                break;
+            }
+        }
+
+        if(good){
+            return true;
+        }
+    }
+
+
+    first=
+        board[size-1];
+
+    if(first){
+
+        let good=true;
+
+        for(let i=1;i<size;i++){
+
+            if(
+                board[
+                    i*size+
+                    (size-1-i)
+                ]!==first
+            ){
+
+                good=false;
+                break;
+            }
+        }
+
+        if(good){
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+/* =========================================================
+   REACTION
+========================================================= */
+
+function buildReaction(
+    game,
+    isHost,
+    joined
+){
+
+    if(game.status==="lobby"){
+
+        return `
+<div class="turn-banner">
+Everyone joins first. The host starts the round.
+</div>
+`;
+    }
+
+    if(game.status==="finished"){
+
+        return `
+<div class="reaction-area">
+
+<div class="turn-banner">
+🏆 ${
+    game.winner
+        ?escapeHTML(
+            game.winner.name
+        )
+        :"Winner"
+} won!
+</div>
+
+</div>
+`;
+    }
+
+    let text=
+        "Wait...";
+
+    let cls="";
+
+    if(game.data.phase==="go"){
+
+        text="CLICK!";
+
+        cls="go";
+
+    }
+
+    return `
+
+<div class="reaction-area">
+
+<div
+    class="reaction-box ${cls}"
+    data-reaction
+>
+${text}
+</div>
+
+${
+    game.data.phase==="waiting"
+    ?`
+<div class="turn-banner">
+Wait for green.
+</div>
+`
+    :""
+}
+
+</div>
+`;
+}
+
+
+/* =========================================================
+   TYPE GAME
+========================================================= */
+
+function buildTypeGame(
+    game,
+    isHost,
+    joined
+){
+
+    if(game.status==="lobby"){
+
+        return `
+<div class="turn-banner">
+Wait for the host to start.
+</div>
+`;
+    }
+
+    if(game.status==="finished"){
+
+        return `
+<div class="turn-banner">
+🏆 ${
+    game.winner
+        ?escapeHTML(
+            game.winner.name
+        )
+        :"Game finished"
+}
+</div>
+`;
+    }
+
+    return `
+
+<div class="type-area">
+
+<div class="type-sentence">
+${escapeHTML(
+    game.data.sentence
+)}
+</div>
+
+${
+    joined
+    ?`
+<input
+    class="type-input"
+    data-type-input
+    placeholder="Type it and press Enter..."
+    autocomplete="off"
+>
+`
+    :""
+}
+
+</div>
+`;
+}
+
+
+/* =========================================================
+   BOSS
+========================================================= */
+
+function buildBoss(
+    game,
+    isHost,
+    joined
+){
+
+    if(game.status==="lobby"){
+
+        return `
+<div class="turn-banner">
+Wait for the host to start the boss fight.
+</div>
+`;
+    }
+
+    const hp=
+        Math.max(
+            0,
+            Number(
+                game.data.hp
+            )||0
+        );
+
+    const maxHp=
+        Number(
+            game.data.maxHp
+        )||100000000;
+
+    const percent=
+        Math.max(
+            0,
+            Math.min(
+                100,
+                hp/maxHp*100
+            )
+        );
+
+    if(game.status==="finished"){
+
+        return `
+<div class="boss-area">
+
+<div class="boss-monster-name">
+👹 BOSS DEFEATED
+</div>
+
+<div class="turn-banner">
+Everyone wins together!
+</div>
+
+</div>
+`;
+    }
+
+    return `
+
+<div class="boss-area">
+
+<div class="boss-monster-name">
+THE BOSS
+</div>
+
+<div class="boss-health-bar">
+
+<div
+    class="boss-health-fill"
+    style="width:${percent}%"
+></div>
+
+<div class="boss-health-text">
+${Math.floor(hp).toLocaleString()}
+/
+${Math.floor(maxHp).toLocaleString()}
+</div>
+
+</div>
+
+<div class="boss-stats">
+
+<div>
+Your damage:
+<strong>
+${(
+    game.data.damage?.[deviceId]||0
+).toLocaleString()}
+</strong>
+</div>
+
+</div>
+
+${
+    joined
+    ?`
+<button
+    class="game-btn danger"
+    data-boss-damage
+>
+⚔ Deal 100,000 Damage
+</button>
+`
+    :""
+}
+
+</div>
+`;
+}
+
+
+/* =========================================================
+   DELETE ALL
+========================================================= */
+
+removeEverything.onclick=
+    async()=>{
+
+        if(
+            !confirm(
+                "Delete every message and game?"
+            )
+        ){
+            return;
+        }
+
+        try{
+
+            const response=
+                await fetch(
+                    API_URL,
+                    {
+                        method:"DELETE",
+
+                        headers:{
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:JSON.stringify({
+                            delete_all:true
+                        })
+                    }
+                );
+
+            if(!response.ok){
+
+                const data=
+                    await response.json();
+
+                throw new Error(
+                    data.error||
+                    "Delete failed."
+                );
+            }
+
+            /*
+             Clear UI only after server deletion.
+            */
+
+            renderedMessages.forEach(
+                element=>element.remove()
+            );
+
+            renderedMessages.clear();
+
+            renderedGames.forEach(
+                element=>element.remove()
+            );
+
+            renderedGames.clear();
+
+            games.clear();
+
+        }catch(error){
+
+            alert(error.message);
+        }
+    };
+
+
+/* =========================================================
+   REFRESH
+========================================================= */
+
+function restartRefresh(){
+
+    if(refreshTimer){
+
+        clearInterval(
+            refreshTimer
+        );
+    }
+
+    refreshTimer=
+        setInterval(
+            sync,
+            Math.max(
+                100,
+                Number(
+                    settings.refreshRate
+                )||500
+            )
+        );
+}
+
+
+document.addEventListener(
+    "visibilitychange",
+    ()=>{
+        if(
+            document.visibilityState===
+            "visible"
+        ){
+            sync();
+        }
+    }
+);
 
 
 /* =========================================================
    INITIALIZE
 ========================================================= */
 
-applySettings();
-
 loadSettingsUI();
 
-restartPolling();
+applySettings();
 
-messageInput.focus();
+sync();
 
-
-/* =========================================================
-   PAGE VISIBILITY
-========================================================= */
-
-document.addEventListener(
-    "visibilitychange",
-    ()=>{
-
-        if(
-            !document.hidden
-        ){
-
-            poll();
-
-        }
-
-    }
-);
+restartRefresh();
 
 
 /* =========================================================
-   BEFORE UNLOAD
-========================================================= */
-
-/*
- * Do NOT delete the game here.
- *
- * Browsers do not reliably allow async DELETE requests
- * during page unload.
- *
- * Other clients detect a missing host through heartbeat
- * timeout instead.
- */
-
-
-/* =========================================================
-   LIGHTWEIGHT HOST KEEPALIVE
+   BEFORE LEAVING
 ========================================================= */
 
 window.addEventListener(
-    "focus",
+    "beforeunload",
     ()=>{
+        /*
+         We intentionally don't use fetch here because
+         browsers can terminate normal requests during
+         unload.
 
-        poll();
-
+         The host heartbeat + timeout handles stale games.
+        */
     }
 );
 
