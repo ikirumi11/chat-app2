@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
 <title>Chat</title>
 
@@ -14,37 +14,48 @@
 html,
 body {
     margin: 0;
-    padding: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #111;
+
+    background: #101010;
     color: #eee;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 }
 
-body {
-    display: flex;
+button,
+input {
+    font-family: inherit;
 }
 
-/* ================================
+button {
+    cursor: pointer;
+}
+
+/* =========================================
    APP
-================================ */
+========================================= */
 
 #app {
     width: 100%;
     height: 100%;
+
     display: flex;
     flex-direction: column;
-    background: #111;
+
+    background: #101010;
 }
 
-/* ================================
+/* =========================================
    HEADER
-================================ */
+========================================= */
 
 .header {
-    height: 64px;
+    height: 62px;
     flex-shrink: 0;
 
     display: flex;
@@ -59,34 +70,41 @@ body {
 .logo {
     font-size: 20px;
     font-weight: 700;
-    letter-spacing: .5px;
 }
 
 .channel {
-    margin-left: 20px;
+    margin-left: 18px;
 
-    padding: 7px 12px;
+    padding: 7px 11px;
 
     border-radius: 7px;
 
-    background: #222;
+    background: #242424;
+
     color: #aaa;
 
-    font-size: 14px;
+    font-size: 13px;
 }
 
-.status {
+.header-right {
     margin-left: auto;
 
     display: flex;
     align-items: center;
-    gap: 7px;
-
-    font-size: 12px;
-    color: #777;
+    gap: 12px;
 }
 
-.status-dot {
+.connection {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    color: #666;
+
+    font-size: 11px;
+}
+
+.connection-dot {
     width: 8px;
     height: 8px;
 
@@ -95,13 +113,31 @@ body {
     background: #555;
 }
 
-.status-dot.online {
+.connection-dot.online {
     background: #55c878;
 }
 
-/* ================================
+#settingsButton {
+    width: 36px;
+    height: 36px;
+
+    border: 1px solid #303030;
+    border-radius: 8px;
+
+    background: #222;
+    color: #bbb;
+
+    font-size: 18px;
+}
+
+#settingsButton:hover {
+    background: #2d2d2d;
+    color: white;
+}
+
+/* =========================================
    MESSAGES
-================================ */
+========================================= */
 
 #messages {
     flex: 1;
@@ -109,7 +145,7 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
 
-    padding: 18px;
+    padding: 16px;
 
     scroll-behavior: auto;
 }
@@ -118,29 +154,29 @@ body {
     width: 8px;
 }
 
-#messages::-webkit-scrollbar-track {
-    background: transparent;
-}
-
 #messages::-webkit-scrollbar-thumb {
     background: #303030;
     border-radius: 10px;
 }
 
+#messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
 .message {
+    display: flex;
+
     width: 100%;
 
-    display: flex;
-    gap: 12px;
-
-    padding: 10px 8px;
+    padding: 9px 7px;
 
     border-radius: 8px;
 
-    /* IMPORTANT:
-       No animation.
-       No opacity transition.
-       No fade effect.
+    /*
+       IMPORTANT:
+       No animations.
+       No fading.
+       No transitions.
     */
 }
 
@@ -154,18 +190,19 @@ body {
 
     flex-shrink: 0;
 
-    border-radius: 50%;
+    margin-right: 11px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    background: #292929;
+    border-radius: 50%;
 
+    background: #292929;
     color: #bbb;
 
-    font-weight: bold;
     font-size: 14px;
+    font-weight: bold;
 }
 
 .message-content {
@@ -176,35 +213,39 @@ body {
 .message-top {
     display: flex;
     align-items: baseline;
-    gap: 9px;
+    gap: 8px;
 
     margin-bottom: 3px;
 }
 
 .username {
+    color: #ddd;
+
     font-size: 14px;
     font-weight: 700;
-    color: #ddd;
 }
 
 .time {
-    font-size: 11px;
     color: #555;
+
+    font-size: 10px;
+}
+
+.edited {
+    color: #666;
+
+    font-size: 10px;
 }
 
 .message-text {
-    white-space: pre-wrap;
-    word-break: break-word;
+    color: #ccc;
 
     font-size: 14px;
     line-height: 1.45;
 
-    color: #ccc;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
-
-/* ================================
-   IMAGES
-================================ */
 
 .chat-image {
     display: block;
@@ -216,23 +257,20 @@ body {
 
     border-radius: 8px;
 
-    cursor: pointer;
+    background: #080808;
 
     object-fit: contain;
 
-    background: #080808;
-
-    /* NO TRANSITION */
-    transition: none;
+    cursor: pointer;
 }
 
 .chat-image:hover {
     opacity: .9;
 }
 
-/* ================================
+/* =========================================
    EMPTY
-================================ */
+========================================= */
 
 #empty {
     width: 100%;
@@ -247,31 +285,63 @@ body {
     font-size: 14px;
 }
 
-/* ================================
-   INPUT AREA
-================================ */
+/* =========================================
+   INPUT
+========================================= */
 
 .input-area {
     flex-shrink: 0;
 
-    padding: 12px 16px 16px;
+    padding: 9px 14px 14px;
 
     background: #151515;
-
     border-top: 1px solid #292929;
 }
 
-.input-row {
-    display: flex;
-    gap: 8px;
-
+.username-row {
     max-width: 1100px;
-    margin: auto;
+
+    margin: 0 auto 7px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-/* ================================
-   INPUT
-================================ */
+.username-label {
+    color: #555;
+    font-size: 10px;
+}
+
+#usernameInput {
+    width: 180px;
+    height: 29px;
+
+    padding: 0 9px;
+
+    outline: none;
+
+    border: 1px solid #2c2c2c;
+    border-radius: 6px;
+
+    background: #1d1d1d;
+    color: #ddd;
+
+    font-size: 12px;
+}
+
+#usernameInput:focus {
+    border-color: #444;
+}
+
+.input-row {
+    max-width: 1100px;
+
+    margin: auto;
+
+    display: flex;
+    gap: 8px;
+}
 
 #messageInput {
     flex: 1;
@@ -282,10 +352,10 @@ body {
 
     padding: 0 14px;
 
+    outline: none;
+
     border: 1px solid #303030;
     border-radius: 9px;
-
-    outline: none;
 
     background: #202020;
     color: #eee;
@@ -294,36 +364,29 @@ body {
 }
 
 #messageInput:focus {
-    border-color: #4b4b4b;
+    border-color: #444;
 }
 
 #messageInput::placeholder {
     color: #666;
 }
 
-/* ================================
-   BUTTONS
-================================ */
+#imageButton,
+#sendButton {
+    height: 46px;
 
-button {
-    border: none;
-    outline: none;
-
-    cursor: pointer;
-
-    font-family: inherit;
+    border-radius: 9px;
 }
 
 #imageButton {
     width: 46px;
-    height: 46px;
 
-    border-radius: 9px;
+    border: 0;
 
     background: #252525;
     color: #ccc;
 
-    font-size: 20px;
+    font-size: 19px;
 }
 
 #imageButton:hover {
@@ -331,20 +394,18 @@ button {
 }
 
 #sendButton {
-    height: 46px;
+    padding: 0 18px;
 
-    padding: 0 19px;
-
-    border-radius: 9px;
+    border: 0;
 
     background: #eee;
     color: #111;
 
-    font-weight: 700;
+    font-weight: bold;
 }
 
 #sendButton:hover {
-    background: #fff;
+    background: white;
 }
 
 #sendButton:disabled {
@@ -352,36 +413,37 @@ button {
     cursor: default;
 }
 
-/* ================================
+/* =========================================
    SELECTED IMAGE
-================================ */
+========================================= */
 
 #selectedImage {
     display: none;
 
     max-width: 1100px;
 
-    margin: 0 auto 8px;
+    margin: 0 auto 7px;
 
-    padding: 8px 10px;
+    padding: 7px 10px;
 
-    border-radius: 8px;
+    border-radius: 7px;
 
     background: #202020;
 
     color: #aaa;
 
-    font-size: 12px;
+    font-size: 11px;
 }
 
 #selectedImage.visible {
     display: flex;
     align-items: center;
-    gap: 8px;
 }
 
 #removeImage {
     margin-left: auto;
+
+    border: 0;
 
     background: transparent;
     color: #888;
@@ -390,68 +452,322 @@ button {
 }
 
 #removeImage:hover {
-    color: #fff;
+    color: white;
 }
 
-/* ================================
-   USERNAME
-================================ */
+/* =========================================
+   CONTEXT MENU
+========================================= */
 
-#usernameBox {
-    max-width: 1100px;
-    margin: 0 auto 8px;
+#contextMenu {
+    position: fixed;
 
+    z-index: 10000;
+
+    display: none;
+
+    min-width: 150px;
+
+    padding: 5px;
+
+    background: #202020;
+
+    border: 1px solid #363636;
+    border-radius: 8px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.45);
+}
+
+#contextMenu button {
+    display: block;
+
+    width: 100%;
+
+    padding: 9px 11px;
+
+    border: 0;
+    border-radius: 5px;
+
+    background: transparent;
+
+    color: #ccc;
+
+    text-align: left;
+
+    font-size: 13px;
+}
+
+#contextMenu button:hover {
+    background: #303030;
+    color: white;
+}
+
+#contextDelete {
+    color: #e58b8b !important;
+}
+
+/* =========================================
+   SETTINGS
+========================================= */
+
+#settingsOverlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 8000;
+
+    display: none;
+
+    background: rgba(0,0,0,.72);
+}
+
+#settingsOverlay.open {
     display: flex;
+
     align-items: center;
-    gap: 8px;
+    justify-content: center;
 }
 
-#usernameInput {
-    width: 180px;
-    height: 30px;
+.settings {
+    width: min(430px, calc(100vw - 30px));
 
-    padding: 0 9px;
+    max-height: 85vh;
 
-    border: 1px solid #2c2c2c;
-    border-radius: 6px;
+    overflow-y: auto;
 
-    outline: none;
+    padding: 20px;
 
-    background: #1d1d1d;
-    color: #ddd;
+    background: #191919;
+
+    border: 1px solid #333;
+    border-radius: 12px;
+
+    box-shadow:
+        0 20px 70px rgba(0,0,0,.6);
+}
+
+.settings-title {
+    margin-bottom: 4px;
+
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.settings-subtitle {
+    margin-bottom: 20px;
+
+    color: #666;
 
     font-size: 12px;
 }
 
-#usernameInput::placeholder {
-    color: #555;
+.settings-section {
+    margin-top: 18px;
+
+    padding-top: 16px;
+
+    border-top: 1px solid #292929;
 }
 
-.username-label {
+.settings-label {
+    margin-bottom: 8px;
+
+    color: #aaa;
+
     font-size: 11px;
-    color: #555;
+    font-weight: bold;
 }
 
-/* ================================
+.settings-close {
+    width: 100%;
+    height: 40px;
+
+    margin-top: 18px;
+
+    border: 1px solid #333;
+    border-radius: 7px;
+
+    background: #242424;
+    color: #ddd;
+}
+
+.settings-close:hover {
+    background: #303030;
+}
+
+/* =========================================
+   DANGER AREA
+========================================= */
+
+.danger-box {
+    padding: 13px;
+
+    border: 1px solid #4b2929;
+    border-radius: 8px;
+
+    background: #211717;
+}
+
+.danger-title {
+    margin-bottom: 5px;
+
+    color: #e58b8b;
+
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.danger-description {
+    margin-bottom: 12px;
+
+    color: #888;
+
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+#removeEverythingButton {
+    width: 100%;
+    height: 38px;
+
+    border: 1px solid #613232;
+    border-radius: 7px;
+
+    background: #321c1c;
+    color: #ed9999;
+
+    font-size: 12px;
+    font-weight: bold;
+}
+
+#removeEverythingButton:hover {
+    background: #472222;
+}
+
+/* =========================================
+   CONFIRMATION MODAL
+========================================= */
+
+#confirmOverlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 11000;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0,0,0,.82);
+}
+
+#confirmOverlay.open {
+    display: flex;
+}
+
+.confirm-box {
+    width: min(440px, 100%);
+
+    padding: 22px;
+
+    background: #1b1b1b;
+
+    border: 1px solid #3b3b3b;
+    border-radius: 12px;
+
+    box-shadow:
+        0 20px 80px rgba(0,0,0,.7);
+}
+
+.confirm-title {
+    margin-bottom: 12px;
+
+    color: #eee;
+
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.confirm-text {
+    color: #aaa;
+
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.confirm-warning {
+    margin-top: 13px;
+
+    padding: 10px;
+
+    border-radius: 7px;
+
+    background: #281818;
+
+    color: #e59898;
+
+    font-size: 12px;
+}
+
+.confirm-buttons {
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 18px;
+}
+
+.confirm-buttons button {
+    flex: 1;
+
+    height: 40px;
+
+    border-radius: 7px;
+
+    font-weight: bold;
+}
+
+#confirmCancel {
+    border: 1px solid #333;
+
+    background: #252525;
+    color: #ccc;
+}
+
+#confirmAction {
+    border: 1px solid #673535;
+
+    background: #3a2020;
+    color: #ed9999;
+}
+
+/* =========================================
    FULLSCREEN IMAGE
-================================ */
+========================================= */
 
 #imageViewer {
     position: fixed;
 
     inset: 0;
 
-    z-index: 9999;
+    z-index: 12000;
 
     display: none;
 
-    background: rgba(0, 0, 0, .96);
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0,0,0,.97);
 }
 
 #imageViewer.open {
     display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 #fullscreenImage {
@@ -459,8 +775,6 @@ button {
     max-height: calc(100vh - 100px);
 
     object-fit: contain;
-
-    user-select: none;
 }
 
 #backButton {
@@ -469,20 +783,15 @@ button {
     top: 18px;
     left: 18px;
 
-    z-index: 10000;
-
     height: 42px;
 
     padding: 0 16px;
 
+    border: 1px solid #333;
     border-radius: 8px;
 
     background: #222;
     color: #eee;
-
-    border: 1px solid #333;
-
-    font-size: 14px;
 }
 
 #backButton:hover {
@@ -492,21 +801,113 @@ button {
 #imageName {
     position: fixed;
 
-    bottom: 18px;
     left: 50%;
+    bottom: 17px;
 
     transform: translateX(-50%);
 
-    max-width: 80vw;
-
     color: #777;
 
-    font-size: 12px;
+    font-size: 11px;
 }
 
-/* ================================
+/* =========================================
+   EDIT MODAL
+========================================= */
+
+#editOverlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 10500;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0,0,0,.75);
+}
+
+#editOverlay.open {
+    display: flex;
+}
+
+.edit-box {
+    width: min(500px, 100%);
+
+    padding: 20px;
+
+    border: 1px solid #333;
+    border-radius: 11px;
+
+    background: #1b1b1b;
+}
+
+.edit-title {
+    margin-bottom: 12px;
+
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#editInput {
+    width: 100%;
+    min-height: 110px;
+
+    resize: vertical;
+
+    padding: 11px;
+
+    outline: none;
+
+    border: 1px solid #333;
+    border-radius: 7px;
+
+    background: #111;
+    color: #eee;
+
+    font-size: 14px;
+}
+
+.edit-buttons {
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 10px;
+}
+
+.edit-buttons button {
+    flex: 1;
+
+    height: 40px;
+
+    border-radius: 7px;
+}
+
+#editCancel {
+    border: 1px solid #333;
+
+    background: #252525;
+    color: #ccc;
+}
+
+#editSave {
+    border: 0;
+
+    background: #eee;
+    color: #111;
+
+    font-weight: bold;
+}
+
+/* =========================================
    ERROR
-================================ */
+========================================= */
 
 #errorBox {
     position: fixed;
@@ -514,22 +915,23 @@ button {
     left: 50%;
     bottom: 90px;
 
-    transform: translateX(-50%);
-
-    z-index: 5000;
+    z-index: 20000;
 
     display: none;
 
     max-width: 90vw;
 
+    transform: translateX(-50%);
+
     padding: 11px 15px;
 
+    border: 1px solid #4b2727;
     border-radius: 8px;
 
     background: #291818;
-    border: 1px solid #4b2727;
-
     color: #e88;
+
+    white-space: pre-wrap;
 
     font-size: 12px;
 }
@@ -538,11 +940,11 @@ button {
     display: block;
 }
 
-/* ================================
+/* =========================================
    MOBILE
-================================ */
+========================================= */
 
-@media (max-width: 600px) {
+@media(max-width:600px) {
 
     .header {
         height: 56px;
@@ -558,25 +960,23 @@ button {
         font-size: 12px;
     }
 
-    .status {
+    .connection {
         display: none;
     }
 
     #messages {
-        padding: 10px;
-    }
-
-    .message {
-        padding: 8px 3px;
+        padding: 9px;
     }
 
     .avatar {
         width: 32px;
         height: 32px;
+
+        margin-right: 8px;
     }
 
     .chat-image {
-        max-width: 85vw;
+        max-width: 86vw;
         max-height: 400px;
     }
 
@@ -589,7 +989,7 @@ button {
     }
 
     #sendButton {
-        padding: 0 14px;
+        padding: 0 13px;
     }
 }
 </style>
@@ -611,16 +1011,27 @@ button {
             # general
         </div>
 
-        <div class="status">
+        <div class="header-right">
 
-            <div
-                id="statusDot"
-                class="status-dot">
+            <div class="connection">
+
+                <div
+                    id="connectionDot"
+                    class="connection-dot">
+                </div>
+
+                <span id="connectionText">
+                    Connecting...
+                </span>
+
             </div>
 
-            <span id="statusText">
-                Connecting...
-            </span>
+            <button
+                id="settingsButton"
+                type="button"
+                title="Settings">
+                ⚙
+            </button>
 
         </div>
 
@@ -642,7 +1053,7 @@ button {
 
     <section class="input-area">
 
-        <div id="usernameBox">
+        <div class="username-row">
 
             <span class="username-label">
                 NAME
@@ -652,8 +1063,7 @@ button {
                 id="usernameInput"
                 maxlength="24"
                 placeholder="Username"
-                autocomplete="off"
-            >
+                autocomplete="off">
 
         </div>
 
@@ -687,16 +1097,13 @@ button {
                 id="fileInput"
                 type="file"
                 accept="image/*"
-                hidden
-            >
+                hidden>
 
             <input
                 id="messageInput"
-                type="text"
                 maxlength="2000"
                 placeholder="Message #general"
-                autocomplete="off"
-            >
+                autocomplete="off">
 
             <button
                 id="sendButton"
@@ -711,7 +1118,183 @@ button {
 </div>
 
 
-<!-- FULLSCREEN IMAGE VIEWER -->
+<!-- =========================================
+     CONTEXT MENU
+========================================= -->
+
+<div id="contextMenu">
+
+    <button
+        id="contextEdit"
+        type="button">
+        Edit
+    </button>
+
+    <button
+        id="contextDelete"
+        type="button">
+        Delete
+    </button>
+
+</div>
+
+
+<!-- =========================================
+     SETTINGS
+========================================= -->
+
+<div id="settingsOverlay">
+
+    <div class="settings">
+
+        <div class="settings-title">
+            Settings
+        </div>
+
+        <div class="settings-subtitle">
+            Chat settings
+        </div>
+
+
+        <div class="settings-section">
+
+            <div class="settings-label">
+                CHANNEL
+            </div>
+
+            <div class="channel">
+                # general
+            </div>
+
+        </div>
+
+
+        <div class="settings-section">
+
+            <div class="settings-label">
+                DANGER ZONE
+            </div>
+
+            <div class="danger-box">
+
+                <div class="danger-title">
+                    Remove everything
+                </div>
+
+                <div class="danger-description">
+                    This permanently requests deletion of
+                    every message in the chat.
+                    This action cannot be undone.
+                </div>
+
+                <button
+                    id="removeEverythingButton"
+                    type="button">
+                    Remove everything
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <button
+            id="settingsClose"
+            class="settings-close"
+            type="button">
+            Close
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     CONFIRMATION
+========================================= -->
+
+<div id="confirmOverlay">
+
+    <div class="confirm-box">
+
+        <div
+            id="confirmTitle"
+            class="confirm-title">
+            Are you sure?
+        </div>
+
+        <div
+            id="confirmText"
+            class="confirm-text">
+        </div>
+
+        <div
+            id="confirmWarning"
+            class="confirm-warning">
+        </div>
+
+        <div class="confirm-buttons">
+
+            <button
+                id="confirmCancel"
+                type="button">
+                Cancel
+            </button>
+
+            <button
+                id="confirmAction"
+                type="button">
+                Continue
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     EDIT
+========================================= -->
+
+<div id="editOverlay">
+
+    <div class="edit-box">
+
+        <div class="edit-title">
+            Edit message
+        </div>
+
+        <textarea
+            id="editInput"
+            maxlength="2000"></textarea>
+
+        <div class="edit-buttons">
+
+            <button
+                id="editCancel"
+                type="button">
+                Cancel
+            </button>
+
+            <button
+                id="editSave"
+                type="button">
+                Save
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     IMAGE VIEWER
+========================================= -->
 
 <div id="imageViewer">
 
@@ -723,15 +1306,12 @@ button {
 
     <img
         id="fullscreenImage"
-        alt="Full size image"
-    >
+        alt="Full size image">
 
     <div id="imageName"></div>
 
 </div>
 
-
-<!-- ERROR -->
 
 <div id="errorBox"></div>
 
@@ -739,7 +1319,7 @@ button {
 <script>
 
 /* =========================================================
-   SETTINGS
+   CONFIGURATION
 ========================================================= */
 
 const API_URL =
@@ -755,89 +1335,124 @@ const REFRESH_TIME =
     3000;
 
 
+/*
+ * Put the username that should be allowed
+ * to perform administrator actions here.
+ *
+ * IMPORTANT:
+ * This is only a UI check.
+ *
+ * Real admin protection MUST also be
+ * implemented by your server/API.
+ */
+const ADMIN_USERNAME =
+    "admin";
+
+
 /* =========================================================
    ELEMENTS
 ========================================================= */
 
 const messagesElement =
-    document.getElementById(
-        "messages"
-    );
-
-const messageInput =
-    document.getElementById(
-        "messageInput"
-    );
+    document.getElementById("messages");
 
 const usernameInput =
-    document.getElementById(
-        "usernameInput"
-    );
+    document.getElementById("usernameInput");
+
+const messageInput =
+    document.getElementById("messageInput");
 
 const sendButton =
-    document.getElementById(
-        "sendButton"
-    );
+    document.getElementById("sendButton");
 
 const imageButton =
-    document.getElementById(
-        "imageButton"
-    );
+    document.getElementById("imageButton");
 
 const fileInput =
-    document.getElementById(
-        "fileInput"
-    );
+    document.getElementById("fileInput");
 
 const selectedImage =
-    document.getElementById(
-        "selectedImage"
-    );
+    document.getElementById("selectedImage");
 
 const selectedImageName =
-    document.getElementById(
-        "selectedImageName"
-    );
+    document.getElementById("selectedImageName");
 
 const removeImage =
-    document.getElementById(
-        "removeImage"
-    );
+    document.getElementById("removeImage");
 
-const statusText =
-    document.getElementById(
-        "statusText"
-    );
+const connectionDot =
+    document.getElementById("connectionDot");
 
-const statusDot =
-    document.getElementById(
-        "statusDot"
-    );
+const connectionText =
+    document.getElementById("connectionText");
 
 const errorBox =
+    document.getElementById("errorBox");
+
+const contextMenu =
+    document.getElementById("contextMenu");
+
+const contextEdit =
+    document.getElementById("contextEdit");
+
+const contextDelete =
+    document.getElementById("contextDelete");
+
+const settingsButton =
+    document.getElementById("settingsButton");
+
+const settingsOverlay =
+    document.getElementById("settingsOverlay");
+
+const settingsClose =
+    document.getElementById("settingsClose");
+
+const removeEverythingButton =
     document.getElementById(
-        "errorBox"
+        "removeEverythingButton"
     );
+
+const confirmOverlay =
+    document.getElementById("confirmOverlay");
+
+const confirmTitle =
+    document.getElementById("confirmTitle");
+
+const confirmText =
+    document.getElementById("confirmText");
+
+const confirmWarning =
+    document.getElementById("confirmWarning");
+
+const confirmCancel =
+    document.getElementById("confirmCancel");
+
+const confirmAction =
+    document.getElementById("confirmAction");
+
+const editOverlay =
+    document.getElementById("editOverlay");
+
+const editInput =
+    document.getElementById("editInput");
+
+const editCancel =
+    document.getElementById("editCancel");
+
+const editSave =
+    document.getElementById("editSave");
 
 const imageViewer =
-    document.getElementById(
-        "imageViewer"
-    );
+    document.getElementById("imageViewer");
 
 const fullscreenImage =
-    document.getElementById(
-        "fullscreenImage"
-    );
+    document.getElementById("fullscreenImage");
 
 const backButton =
-    document.getElementById(
-        "backButton"
-    );
+    document.getElementById("backButton");
 
 const imageName =
-    document.getElementById(
-        "imageName"
-    );
+    document.getElementById("imageName");
 
 
 /* =========================================================
@@ -847,11 +1462,17 @@ const imageName =
 let selectedImageBase64 =
     null;
 
-let selectedImageFileName =
-    "";
-
 let messagesCache =
     new Map();
+
+let selectedMessage =
+    null;
+
+let editMessage =
+    null;
+
+let confirmationStep =
+    0;
 
 let loading =
     false;
@@ -867,12 +1488,9 @@ const savedUsername =
     );
 
 if (savedUsername) {
-
     usernameInput.value =
         savedUsername;
-
 }
-
 
 usernameInput.addEventListener(
     "input",
@@ -888,13 +1506,15 @@ usernameInput.addEventListener(
 
 
 /* =========================================================
-   ERROR
+   ERRORS
 ========================================================= */
 
-function showError(message) {
+function showError(
+    text
+) {
 
     errorBox.textContent =
-        message;
+        text;
 
     errorBox.classList.add(
         "show"
@@ -913,42 +1533,41 @@ function showError(message) {
                 );
 
             },
-            6000
+            7000
         );
 
 }
 
 
 /* =========================================================
-   STATUS
+   CONNECTION
 ========================================================= */
 
 function setOnline() {
 
-    statusDot.classList.add(
+    connectionDot.classList.add(
         "online"
     );
 
-    statusText.textContent =
+    connectionText.textContent =
         "Connected";
 
 }
 
-
 function setOffline() {
 
-    statusDot.classList.remove(
+    connectionDot.classList.remove(
         "online"
     );
 
-    statusText.textContent =
+    connectionText.textContent =
         "Connection error";
 
 }
 
 
 /* =========================================================
-   IMAGE SELECT
+   IMAGE UPLOAD
 ========================================================= */
 
 imageButton.addEventListener(
@@ -979,10 +1598,11 @@ fileInput.addEventListener(
         ) {
 
             showError(
-                "Please choose an image file."
+                "Please choose an image."
             );
 
             return;
+
         }
 
         try {
@@ -993,9 +1613,6 @@ fileInput.addEventListener(
                     MAX_IMAGE_SIZE
                 );
 
-            selectedImageFileName =
-                file.name;
-
             selectedImageName.textContent =
                 file.name +
                 " selected";
@@ -1004,12 +1621,10 @@ fileInput.addEventListener(
                 "visible"
             );
 
-        } catch (error) {
-
-            console.error(error);
+        } catch {
 
             showError(
-                "Could not process the image."
+                "Could not process image."
             );
 
         }
@@ -1018,17 +1633,9 @@ fileInput.addEventListener(
 );
 
 
-/* =========================================================
-   REMOVE IMAGE
-========================================================= */
-
 removeImage.addEventListener(
     "click",
-    () => {
-
-        clearSelectedImage();
-
-    }
+    clearSelectedImage
 );
 
 
@@ -1036,9 +1643,6 @@ function clearSelectedImage() {
 
     selectedImageBase64 =
         null;
-
-    selectedImageFileName =
-        "";
 
     fileInput.value =
         "";
@@ -1051,7 +1655,7 @@ function clearSelectedImage() {
 
 
 /* =========================================================
-   RESIZE IMAGE
+   IMAGE RESIZE
 ========================================================= */
 
 function resizeImage(
@@ -1079,12 +1683,6 @@ function resizeImage(
 
                             let height =
                                 img.naturalHeight;
-
-
-                            /*
-                             * Keep the original
-                             * aspect ratio.
-                             */
 
                             if (
                                 width >
@@ -1115,7 +1713,6 @@ function resizeImage(
 
                             }
 
-
                             const canvas =
                                 document.createElement(
                                     "canvas"
@@ -1127,14 +1724,12 @@ function resizeImage(
                             canvas.height =
                                 height;
 
-
-                            const context =
+                            const ctx =
                                 canvas.getContext(
                                     "2d"
                                 );
 
-
-                            context.drawImage(
+                            ctx.drawImage(
                                 img,
                                 0,
                                 0,
@@ -1142,53 +1737,25 @@ function resizeImage(
                                 height
                             );
 
-
-                            /*
-                             * JPEG keeps Base64
-                             * much smaller.
-                             */
-
-                            const result =
+                            resolve(
                                 canvas.toDataURL(
                                     "image/jpeg",
-                                    0.82
-                                );
-
-
-                            resolve(result);
-
-                        };
-
-
-                    img.onerror =
-                        () => {
-
-                            reject(
-                                new Error(
-                                    "Image could not be loaded."
+                                    .82
                                 )
                             );
 
                         };
 
+                    img.onerror =
+                        reject;
 
                     img.src =
                         reader.result;
 
                 };
 
-
             reader.onerror =
-                () => {
-
-                    reject(
-                        new Error(
-                            "Could not read image."
-                        )
-                    );
-
-                };
-
+                reject;
 
             reader.readAsDataURL(
                 file
@@ -1201,7 +1768,7 @@ function resizeImage(
 
 
 /* =========================================================
-   CREATE MESSAGE ELEMENT
+   CREATE MESSAGE
 ========================================================= */
 
 function createMessageElement(
@@ -1216,16 +1783,46 @@ function createMessageElement(
     wrapper.className =
         "message";
 
-    /*
-     * Stable ID.
-     * This lets us update only messages
-     * that actually changed.
-     */
-
     wrapper.dataset.id =
-        String(
-            msg.id
-        );
+        String(msg.id);
+
+
+    /* RIGHT CLICK */
+
+    wrapper.addEventListener(
+        "contextmenu",
+        event => {
+
+            event.preventDefault();
+
+            const currentUsername =
+                usernameInput.value
+                    .trim();
+
+            /*
+             * Only allow context menu
+             * for the user's own messages.
+             */
+
+            if (
+                msg.username !==
+                currentUsername
+            ) {
+
+                return;
+
+            }
+
+            selectedMessage =
+                msg;
+
+            openContextMenu(
+                event.clientX,
+                event.clientY
+            );
+
+        }
+    );
 
 
     /* AVATAR */
@@ -1239,9 +1836,13 @@ function createMessageElement(
         "avatar";
 
     avatar.textContent =
-        getInitial(
-            msg.username
-        );
+        String(
+            msg.username ||
+            "?"
+        )
+        .trim()
+        .charAt(0)
+        .toUpperCase();
 
 
     /* CONTENT */
@@ -1302,12 +1903,32 @@ function createMessageElement(
     );
 
 
+    if (msg.edited === true) {
+
+        const edited =
+            document.createElement(
+                "span"
+            );
+
+        edited.className =
+            "edited";
+
+        edited.textContent =
+            "(edited)";
+
+        top.appendChild(
+            edited
+        );
+
+    }
+
+
     content.appendChild(
         top
     );
 
 
-    /* TEXT */
+    /* MESSAGE */
 
     if (
         msg.message &&
@@ -1357,10 +1978,6 @@ function createMessageElement(
         image.loading =
             "lazy";
 
-        image.decoding =
-            "async";
-
-
         image.addEventListener(
             "click",
             () => {
@@ -1372,7 +1989,6 @@ function createMessageElement(
 
             }
         );
-
 
         content.appendChild(
             image
@@ -1389,31 +2005,7 @@ function createMessageElement(
         content
     );
 
-
     return wrapper;
-
-}
-
-
-/* =========================================================
-   INITIAL
-========================================================= */
-
-function getInitial(
-    name
-) {
-
-    const value =
-        String(
-            name ||
-            "?"
-        ).trim();
-
-    return value
-        ? value
-            .charAt(0)
-            .toUpperCase()
-        : "?";
 
 }
 
@@ -1431,18 +2023,14 @@ function formatTime(
     }
 
     const date =
-        new Date(
-            value
-        );
+        new Date(value);
 
     if (
         Number.isNaN(
             date.getTime()
         )
     ) {
-
         return "";
-
     }
 
     return date.toLocaleTimeString(
@@ -1457,7 +2045,7 @@ function formatTime(
 
 
 /* =========================================================
-   RENDER MESSAGES
+   RENDER
 ========================================================= */
 
 function renderMessages(
@@ -1469,18 +2057,11 @@ function renderMessages(
             incoming
         )
     ) {
-
         return;
-
     }
 
 
-    /*
-     * Remember whether the user was
-     * already near the bottom.
-     */
-
-    const wasNearBottom =
+    const nearBottom =
         messagesElement.scrollHeight -
         messagesElement.scrollTop -
         messagesElement.clientHeight <
@@ -1493,23 +2074,25 @@ function renderMessages(
         );
 
 
-    if (incoming.length === 0) {
+    if (
+        incoming.length === 0
+    ) {
 
         if (!empty) {
 
-            const emptyElement =
+            const element =
                 document.createElement(
                     "div"
                 );
 
-            emptyElement.id =
+            element.id =
                 "empty";
 
-            emptyElement.textContent =
+            element.textContent =
                 "No messages yet.";
 
             messagesElement.appendChild(
-                emptyElement
+                element
             );
 
         }
@@ -1520,24 +2103,8 @@ function renderMessages(
 
 
     if (empty) {
-
         empty.remove();
-
     }
-
-
-    /*
-     * IMPORTANT:
-     *
-     * We do NOT clear innerHTML.
-     *
-     * We do NOT fade messages.
-     *
-     * We do NOT rebuild the entire list.
-     *
-     * We only add/update/remove what
-     * actually changed.
-     */
 
 
     const incomingIds =
@@ -1549,45 +2116,61 @@ function renderMessages(
     ) {
 
         const id =
-            String(
-                msg.id
-            );
+            String(msg.id);
 
-        incomingIds.add(
-            id
-        );
+        incomingIds.add(id);
 
 
         const old =
-            messagesCache.get(
-                id
-            );
+            messagesCache.get(id);
 
 
         /*
-         * Existing message:
-         * leave its DOM alone.
+         * If nothing changed,
+         * leave the existing DOM alone.
          */
 
-        if (old) {
+        if (
+            old &&
+            JSON.stringify(old) ===
+                JSON.stringify(msg)
+        ) {
 
             continue;
 
         }
 
 
-        /*
-         * New message.
-         */
+        const oldElement =
+            messagesElement.querySelector(
+                `[data-id="${CSS.escape(id)}"]`
+            );
 
-        const element =
+
+        const newElement =
             createMessageElement(
                 msg
             );
 
-        messagesElement.appendChild(
-            element
-        );
+
+        if (oldElement) {
+
+            /*
+             * Replace only this one message.
+             */
+
+            oldElement.replaceWith(
+                newElement
+            );
+
+        } else {
+
+            messagesElement.appendChild(
+                newElement
+            );
+
+        }
+
 
         messagesCache.set(
             id,
@@ -1598,8 +2181,8 @@ function renderMessages(
 
 
     /*
-     * Remove messages that no longer
-     * exist on the server.
+     * Remove messages no longer
+     * returned by the server.
      */
 
     for (
@@ -1609,9 +2192,7 @@ function renderMessages(
     ) {
 
         if (
-            !incomingIds.has(
-                id
-            )
+            !incomingIds.has(id)
         ) {
 
             const element =
@@ -1623,21 +2204,14 @@ function renderMessages(
                 element.remove();
             }
 
-            messagesCache.delete(
-                id
-            );
+            messagesCache.delete(id);
 
         }
 
     }
 
 
-    /*
-     * Only scroll automatically if
-     * already near the bottom.
-     */
-
-    if (wasNearBottom) {
+    if (nearBottom) {
 
         messagesElement.scrollTop =
             messagesElement.scrollHeight;
@@ -1648,7 +2222,7 @@ function renderMessages(
 
 
 /* =========================================================
-   LOAD MESSAGES
+   LOAD
 ========================================================= */
 
 async function loadMessages() {
@@ -1660,7 +2234,6 @@ async function loadMessages() {
     loading =
         true;
 
-
     try {
 
         const response =
@@ -1671,16 +2244,8 @@ async function loadMessages() {
                     CHANNEL
                 ),
                 {
-                    method:
-                        "GET",
-
                     cache:
-                        "no-store",
-
-                    headers: {
-                        "Accept":
-                            "application/json"
-                    }
+                        "no-store"
                 }
             );
 
@@ -1690,7 +2255,6 @@ async function loadMessages() {
 
 
         let data;
-
 
         try {
 
@@ -1713,23 +2277,11 @@ async function loadMessages() {
             throw new Error(
                 "HTTP " +
                 response.status +
-                ": " +
+                "\n" +
                 (
                     data.error ||
-                    "Server error"
+                    "Request failed."
                 )
-            );
-
-        }
-
-
-        if (
-            data.success !== true
-        ) {
-
-            throw new Error(
-                data.error ||
-                "API request failed."
             );
 
         }
@@ -1738,23 +2290,15 @@ async function loadMessages() {
         setOnline();
 
         renderMessages(
-            data.messages
+            data.messages || []
         );
 
 
     } catch (error) {
 
-        console.error(
-            "LOAD ERROR:",
-            error
-        );
+        console.error(error);
 
         setOffline();
-
-        /*
-         * Don't erase existing messages
-         * when a refresh fails.
-         */
 
         if (
             messagesCache.size === 0
@@ -1777,19 +2321,10 @@ async function loadMessages() {
 
 
 /* =========================================================
-   SEND MESSAGE
+   SEND
 ========================================================= */
 
 async function sendMessage() {
-
-    if (
-        sendButton.disabled
-    ) {
-
-        return;
-
-    }
-
 
     const username =
         usernameInput.value
@@ -1813,8 +2348,6 @@ async function sendMessage() {
         showError(
             "Enter a username first."
         );
-
-        usernameInput.focus();
 
         return;
 
@@ -1844,23 +2377,6 @@ async function sendMessage() {
 
     try {
 
-        const payload = {
-
-            username:
-                username,
-
-            channel:
-                CHANNEL,
-
-            message:
-                message,
-
-            image:
-                selectedImageBase64
-
-        };
-
-
         const response =
             await fetch(
                 API_URL,
@@ -1870,19 +2386,26 @@ async function sendMessage() {
                         "POST",
 
                     headers: {
-
                         "Content-Type":
-                            "application/json",
-
-                        "Accept":
                             "application/json"
-
                     },
 
                     body:
-                        JSON.stringify(
-                            payload
-                        )
+                        JSON.stringify({
+
+                            username:
+                                username,
+
+                            channel:
+                                CHANNEL,
+
+                            message:
+                                message,
+
+                            image:
+                                selectedImageBase64
+
+                        })
 
                 }
             );
@@ -1894,13 +2417,10 @@ async function sendMessage() {
 
         let data;
 
-
         try {
 
             data =
-                JSON.parse(
-                    text
-                );
+                JSON.parse(text);
 
         } catch {
 
@@ -1913,67 +2433,29 @@ async function sendMessage() {
 
         if (!response.ok) {
 
-            let errorMessage =
-                data.error ||
-                "Failed to send message.";
-
-
-            if (data.fix) {
-
-                errorMessage +=
-                    "\n\n" +
-                    data.fix;
-
-            }
-
-
             throw new Error(
-                errorMessage
+                data.error ||
+                "Message could not be sent." +
+                (
+                    data.fix
+                        ? "\n\n" +
+                          data.fix
+                        : ""
+                )
             );
 
         }
 
-
-        if (
-            data.success !== true
-        ) {
-
-            throw new Error(
-                data.error ||
-                "Message was not accepted."
-            );
-
-        }
-
-
-        /*
-         * Clear input only after
-         * successful sending.
-         */
 
         messageInput.value =
             "";
 
         clearSelectedImage();
 
-
-        setOnline();
-
-
-        /*
-         * Fetch immediately so the new
-         * message appears.
-         */
-
         await loadMessages();
 
 
     } catch (error) {
-
-        console.error(
-            "SEND ERROR:",
-            error
-        );
 
         showError(
             error.message
@@ -1992,27 +2474,18 @@ async function sendMessage() {
 }
 
 
-/* =========================================================
-   SEND BUTTON
-========================================================= */
-
 sendButton.addEventListener(
     "click",
     sendMessage
 );
 
 
-/* =========================================================
-   ENTER TO SEND
-========================================================= */
-
 messageInput.addEventListener(
     "keydown",
     event => {
 
         if (
-            event.key ===
-                "Enter" &&
+            event.key === "Enter" &&
             !event.shiftKey
         ) {
 
@@ -2027,35 +2500,632 @@ messageInput.addEventListener(
 
 
 /* =========================================================
+   CONTEXT MENU
+========================================================= */
+
+function openContextMenu(
+    x,
+    y
+) {
+
+    contextMenu.style.display =
+        "block";
+
+    const width =
+        contextMenu.offsetWidth;
+
+    const height =
+        contextMenu.offsetHeight;
+
+
+    contextMenu.style.left =
+        Math.min(
+            x,
+            window.innerWidth -
+                width -
+                8
+        ) + "px";
+
+
+    contextMenu.style.top =
+        Math.min(
+            y,
+            window.innerHeight -
+                height -
+                8
+        ) + "px";
+
+}
+
+
+function closeContextMenu() {
+
+    contextMenu.style.display =
+        "none";
+
+    selectedMessage =
+        null;
+
+}
+
+
+document.addEventListener(
+    "click",
+    event => {
+
+        if (
+            !contextMenu.contains(
+                event.target
+            )
+        ) {
+
+            closeContextMenu();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   EDIT
+========================================================= */
+
+contextEdit.addEventListener(
+    "click",
+    () => {
+
+        if (!selectedMessage) {
+            return;
+        }
+
+        editMessage =
+            selectedMessage;
+
+        editInput.value =
+            editMessage.message ||
+            "";
+
+        editOverlay.classList.add(
+            "open"
+        );
+
+        editInput.focus();
+
+        closeContextMenu();
+
+    }
+);
+
+
+editCancel.addEventListener(
+    "click",
+    () => {
+
+        editOverlay.classList.remove(
+            "open"
+        );
+
+        editMessage =
+            null;
+
+    }
+);
+
+
+editSave.addEventListener(
+    "click",
+    async () => {
+
+        if (!editMessage) {
+            return;
+        }
+
+
+        const newMessage =
+            editInput.value
+                .trim()
+                .substring(
+                    0,
+                    2000
+                );
+
+
+        if (!newMessage) {
+
+            showError(
+                "Message cannot be empty."
+            );
+
+            return;
+
+        }
+
+
+        editSave.disabled =
+            true;
+
+
+        try {
+
+            const response =
+                await fetch(
+                    API_URL,
+                    {
+
+                        method:
+                            "PATCH",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                id:
+                                    editMessage.id,
+
+                                username:
+                                    usernameInput.value
+                                        .trim(),
+
+                                message:
+                                    newMessage,
+
+                                channel:
+                                    CHANNEL
+
+                            })
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Could not edit message."
+                );
+
+            }
+
+
+            editOverlay.classList.remove(
+                "open"
+            );
+
+            editMessage =
+                null;
+
+
+            await loadMessages();
+
+
+        } catch (error) {
+
+            showError(
+                error.message
+            );
+
+        } finally {
+
+            editSave.disabled =
+                false;
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   DELETE MESSAGE
+========================================================= */
+
+contextDelete.addEventListener(
+    "click",
+    async () => {
+
+        if (!selectedMessage) {
+            return;
+        }
+
+
+        const message =
+            selectedMessage;
+
+
+        closeContextMenu();
+
+
+        const sure =
+            confirm(
+                "Delete this message?\n\nThis cannot be undone."
+            );
+
+
+        if (!sure) {
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    API_URL,
+                    {
+
+                        method:
+                            "DELETE",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                id:
+                                    message.id,
+
+                                username:
+                                    usernameInput.value
+                                        .trim(),
+
+                                channel:
+                                    CHANNEL
+
+                            })
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Could not delete message."
+                );
+
+            }
+
+
+            await loadMessages();
+
+
+        } catch (error) {
+
+            showError(
+                error.message
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+settingsButton.addEventListener(
+    "click",
+    () => {
+
+        settingsOverlay.classList.add(
+            "open"
+        );
+
+    }
+);
+
+
+settingsClose.addEventListener(
+    "click",
+    () => {
+
+        settingsOverlay.classList.remove(
+            "open"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   REMOVE EVERYTHING
+========================================================= */
+
+removeEverythingButton.addEventListener(
+    "click",
+    () => {
+
+        /*
+         * Optional client-side admin check.
+         *
+         * Real security must be done
+         * server-side.
+         */
+
+        const username =
+            usernameInput.value
+                .trim();
+
+
+        if (
+            username !==
+            ADMIN_USERNAME
+        ) {
+
+            showError(
+                "You do not have permission to remove everything."
+            );
+
+            return;
+
+        }
+
+
+        confirmationStep =
+            1;
+
+        showConfirmation();
+
+    }
+);
+
+
+/* =========================================================
+   CONFIRMATION SYSTEM
+========================================================= */
+
+function showConfirmation() {
+
+    confirmOverlay.classList.add(
+        "open"
+    );
+
+
+    if (
+        confirmationStep === 1
+    ) {
+
+        confirmTitle.textContent =
+            "Remove every message?";
+
+        confirmText.textContent =
+            "This will request permanent deletion of every message in the general channel.";
+
+        confirmWarning.textContent =
+            "Messages, images, edits and other stored message data may be permanently removed.";
+
+        confirmAction.textContent =
+            "I know";
+
+    }
+
+
+    else if (
+        confirmationStep === 2
+    ) {
+
+        confirmTitle.textContent =
+            "Are you sure?";
+
+        confirmText.textContent =
+            "You are about to remove every message. There will be no normal undo option.";
+
+        confirmWarning.textContent =
+            "Please make sure you really want to continue.";
+
+        confirmAction.textContent =
+            "Yes";
+
+    }
+
+
+    else if (
+        confirmationStep === 3
+    ) {
+
+        confirmTitle.textContent =
+            "Last time.";
+
+        confirmText.textContent =
+            "Are you ultra sure every memory is being removed and has no evidence of existing?";
+
+        confirmWarning.textContent =
+            "This is the final confirmation before the server is asked to delete the messages.";
+
+        confirmAction.textContent =
+            "Yes, delete everything";
+
+    }
+
+}
+
+
+confirmCancel.addEventListener(
+    "click",
+    cancelConfirmation
+);
+
+
+function cancelConfirmation() {
+
+    confirmationStep =
+        0;
+
+    confirmOverlay.classList.remove(
+        "open"
+    );
+
+}
+
+
+confirmAction.addEventListener(
+    "click",
+    async () => {
+
+        if (
+            confirmationStep < 3
+        ) {
+
+            confirmationStep++;
+
+            showConfirmation();
+
+            return;
+
+        }
+
+
+        await deleteEverything();
+
+    }
+);
+
+
+/* =========================================================
+   DELETE EVERYTHING REQUEST
+========================================================= */
+
+async function deleteEverything() {
+
+    confirmAction.disabled =
+        true;
+
+    confirmAction.textContent =
+        "Deleting...";
+
+
+    try {
+
+        const username =
+            usernameInput.value
+                .trim();
+
+
+        const response =
+            await fetch(
+                API_URL,
+                {
+
+                    method:
+                        "DELETE",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                "delete_all",
+
+                            username:
+                                username,
+
+                            channel:
+                                CHANNEL
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "The server rejected the deletion request."
+            );
+
+        }
+
+
+        messagesCache.clear();
+
+        messagesElement.innerHTML =
+            '<div id="empty">No messages yet.</div>';
+
+
+        confirmationStep =
+            0;
+
+        confirmOverlay.classList.remove(
+            "open"
+        );
+
+        settingsOverlay.classList.remove(
+            "open"
+        );
+
+
+    } catch (error) {
+
+        showError(
+            error.message
+        );
+
+    } finally {
+
+        confirmAction.disabled =
+            false;
+
+        confirmAction.textContent =
+            "Continue";
+
+    }
+
+}
+
+
+/* =========================================================
    FULLSCREEN IMAGE
 ========================================================= */
 
 function openImage(
     src,
-    name
+    username
 ) {
 
     fullscreenImage.src =
         src;
 
     imageName.textContent =
-        name
-            ? "Sent by " + name
+        username
+            ? "Sent by " + username
             : "";
 
     imageViewer.classList.add(
         "open"
     );
 
-    document.body.style.overflow =
-        "hidden";
-
 }
 
-
-/* =========================================================
-   CLOSE FULLSCREEN
-========================================================= */
 
 function closeImage() {
 
@@ -2066,9 +3136,6 @@ function closeImage() {
     fullscreenImage.src =
         "";
 
-    document.body.style.overflow =
-        "hidden";
-
 }
 
 
@@ -2077,11 +3144,6 @@ backButton.addEventListener(
     closeImage
 );
 
-
-/*
- * Clicking the dark background also
- * closes the image.
- */
 
 imageViewer.addEventListener(
     "click",
@@ -2100,23 +3162,90 @@ imageViewer.addEventListener(
 );
 
 
-/*
- * ESC closes fullscreen.
- */
-
 document.addEventListener(
     "keydown",
     event => {
 
         if (
-            event.key ===
-                "Escape" &&
-            imageViewer.classList.contains(
-                "open"
-            )
+            event.key === "Escape"
         ) {
 
-            closeImage();
+            if (
+                imageViewer.classList.contains(
+                    "open"
+                )
+            ) {
+
+                closeImage();
+
+            }
+
+            if (
+                editOverlay.classList.contains(
+                    "open"
+                )
+            ) {
+
+                editOverlay.classList.remove(
+                    "open"
+                );
+
+            }
+
+            if (
+                confirmOverlay.classList.contains(
+                    "open"
+                )
+            ) {
+
+                cancelConfirmation();
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   CLOSE MODALS BY BACKGROUND
+========================================================= */
+
+settingsOverlay.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            settingsOverlay
+        ) {
+
+            settingsOverlay.classList.remove(
+                "open"
+            );
+
+        }
+
+    }
+);
+
+
+editOverlay.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            editOverlay
+        ) {
+
+            editOverlay.classList.remove(
+                "open"
+            );
+
+            editMessage =
+                null;
 
         }
 
@@ -2132,11 +3261,8 @@ loadMessages();
 
 
 /*
- * Refresh messages without rebuilding
- * the existing DOM.
- *
- * Existing messages therefore stay
- * completely instant and visible.
+ * Existing messages are NOT cleared
+ * during refresh.
  */
 
 setInterval(
