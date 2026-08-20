@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-
     res.setHeader("Content-Type", "application/json");
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader(
@@ -15,24 +14,31 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
+    const SUPABASE_URL =
+        process.env.SUPABASE_URL ||
+        "https://wlvbkdzcueqkknysisfw.supabase.co";
+
+    /*
+     * Keep this as your PUBLIC/publishable key.
+     *
+     * For production, preferably put it in an environment variable:
+     * SUPABASE_PUBLISHABLE_KEY
+     */
+    const SUPABASE_KEY =
+        process.env.SUPABASE_PUBLISHABLE_KEY ||
+        "prj_IMlCG1QDEBoeaSRuGvuEMS0t3Ifv";
+
+    const cleanUrl =
+        SUPABASE_URL.replace(/\/+$/, "");
+
+    const headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    };
+
     try {
-
-        const supabaseUrl =
-            "https://wlvbkdzcueqkknysisfw.supabase.co";
-
-        const supabaseKey =
-            "sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL";
-
-        const cleanUrl =
-            supabaseUrl.replace(/\/+$/, "");
-
-        const headers = {
-            "apikey": supabaseKey,
-            "Authorization": "Bearer " + supabaseKey,
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        };
-
 
         /* =====================================================
            GET
@@ -47,6 +53,73 @@ export default async function handler(req, res) {
                 .trim()
                 .substring(0, 32);
 
+            const games =
+                req.query.games === "true";
+
+            if (games) {
+
+                const url =
+                    cleanUrl +
+                    "/rest/v1/messages" +
+                    "?select=id,username,channel,message,device_id,created_at" +
+                    "&channel=eq." +
+                    encodeURIComponent(channel) +
+                    "&message=like." +
+                    encodeURIComponent("__GAME_STATE__%") +
+                    "&order=created_at.asc";
+
+                const response =
+                    await fetch(url, {
+                        method: "GET",
+                        headers
+                    });
+
+                const data =
+                    await readJson(response);
+
+                if (!response.ok) {
+                    return supabaseError(
+                        res,
+                        response,
+                        data
+                    );
+                }
+
+                const gamesList = [];
+
+                if (Array.isArray(data)) {
+
+                    for (const row of data) {
+
+                        try {
+
+                            const raw =
+                                String(row.message || "")
+                                    .substring(
+                                        "__GAME_STATE__".length
+                                    );
+
+                            const state =
+                                JSON.parse(raw);
+
+                            state._messageId = row.id;
+
+                            gamesList.push(state);
+
+                        } catch {
+                            /*
+                             * Ignore broken temporary game rows.
+                             */
+                        }
+                    }
+                }
+
+                return res.status(200).json({
+                    success: true,
+                    games: gamesList
+                });
+            }
+
             const url =
                 cleanUrl +
                 "/rest/v1/messages" +
@@ -55,15 +128,14 @@ export default async function handler(req, res) {
                 encodeURIComponent(channel) +
                 "&order=created_at.asc";
 
-            const response = await fetch(
-                url,
-                {
+            const response =
+                await fetch(url, {
                     method: "GET",
                     headers
-                }
-            );
+                });
 
-            const data = await readJson(response);
+            const data =
+                await readJson(response);
 
             if (!response.ok) {
                 return supabaseError(
@@ -73,24 +145,126 @@ export default async function handler(req, res) {
                 );
             }
 
+            const messages =
+                Array.isArray(data)
+                    ? data.filter(
+                        m =>
+                            !String(m.message || "")
+                                .startsWith("__GAME_STATE__")
+                    )
+                    : [];
+
             return res.status(200).json({
                 success: true,
-                messages:
-                    Array.isArray(data)
-                        ? data
-                        : []
+                messages
             });
         }
 
 
         /* =====================================================
            POST
-           Normal chat OR hidden game-server message
         ===================================================== */
 
         if (req.method === "POST") {
 
             const body = req.body || {};
+
+            /*
+             * GAME CREATE
+             */
+
+            if (body.game_action === "create") {
+
+                const game =
+                    cleanGameState(body.game);
+
+                if (!game) {
+                    return res.status(400).json({
+                        error: "Invalid game state."
+                    });
+                }
+
+                if (!game.gameId ||
+                    !game.hostDeviceId ||
+                    !game.hostName) {
+
+                    return res.status(400).json({
+                        error: "Missing game host information."
+                    });
+                }
+
+                /*
+                 * One host may only have one active game.
+                 */
+
+                const existing =
+                    await findHostGames(
+                        cleanUrl,
+                        headers,
+                        game.hostDeviceId,
+                        game.channel
+                    );
+
+                if (existing.length > 0) {
+
+                    return res.status(409).json({
+                        error:
+                            "You are already hosting a game."
+                    });
+                }
+
+                const row = {
+                    username: game.hostName,
+                    channel: game.channel,
+                    message:
+                        "__GAME_STATE__" +
+                        JSON.stringify(game),
+                    image: null,
+                    device_id: game.hostDeviceId,
+                    edited: false
+                };
+
+                const response =
+                    await fetch(
+                        cleanUrl +
+                        "/rest/v1/messages",
+                        {
+                            method: "POST",
+                            headers: {
+                                ...headers,
+                                "Prefer":
+                                    "return=representation"
+                            },
+                            body:
+                                JSON.stringify(row)
+                        }
+                    );
+
+                const data =
+                    await readJson(response);
+
+                if (!response.ok) {
+                    return supabaseError(
+                        res,
+                        response,
+                        data
+                    );
+                }
+
+                return res.status(200).json({
+                    success: true,
+                    game: game,
+                    messageId:
+                        Array.isArray(data)
+                            ? data[0]?.id
+                            : data?.id
+                });
+            }
+
+
+            /*
+             * NORMAL MESSAGE
+             */
 
             const username =
                 String(body.username || "")
@@ -107,15 +281,12 @@ export default async function handler(req, res) {
             const message =
                 String(body.message || "")
                     .trim()
-                    .substring(0, 20000);
+                    .substring(0, 2000);
 
             const deviceId =
                 String(body.device_id || "")
                     .trim()
                     .substring(0, 100);
-
-            const gameServer =
-                body.game_server === true;
 
             let image = null;
 
@@ -126,81 +297,9 @@ export default async function handler(req, res) {
                 image = body.image;
             }
 
-
-            /* GAME SERVER */
-
-            if (gameServer) {
-
-                if (!deviceId) {
-                    return res.status(400).json({
-                        error:
-                            "Device ID is required for a game server."
-                    });
-                }
-
-                if (!message) {
-                    return res.status(400).json({
-                        error:
-                            "Game state is required."
-                    });
-                }
-
-                /*
-                 * Hidden game messages are marked with
-                 * this special username.
-                 */
-
-                const gameData = {
-                    username: "__GAME_SERVER__",
-                    channel,
-                    message,
-                    image: null,
-                    device_id: deviceId,
-                    edited: false
-                };
-
-                const response = await fetch(
-                    cleanUrl +
-                    "/rest/v1/messages",
-                    {
-                        method: "POST",
-                        headers: {
-                            ...headers,
-                            "Prefer":
-                                "return=representation"
-                        },
-                        body:
-                            JSON.stringify(gameData)
-                    }
-                );
-
-                const data =
-                    await readJson(response);
-
-                if (!response.ok) {
-                    return supabaseError(
-                        res,
-                        response,
-                        data
-                    );
-                }
-
-                return res.status(200).json({
-                    success: true,
-                    game:
-                        Array.isArray(data)
-                            ? data[0]
-                            : data
-                });
-            }
-
-
-            /* NORMAL MESSAGE */
-
             if (!username) {
                 return res.status(400).json({
-                    error:
-                        "Username is required."
+                    error: "Username is required."
                 });
             }
 
@@ -216,8 +315,7 @@ export default async function handler(req, res) {
                 image.length > 5000000
             ) {
                 return res.status(413).json({
-                    error:
-                        "Image is too large."
+                    error: "Image is too large."
                 });
             }
 
@@ -226,8 +324,7 @@ export default async function handler(req, res) {
                 !image.startsWith("data:image/")
             ) {
                 return res.status(400).json({
-                    error:
-                        "Invalid image data."
+                    error: "Invalid image data."
                 });
             }
 
@@ -240,20 +337,21 @@ export default async function handler(req, res) {
                 edited: false
             };
 
-            const response = await fetch(
-                cleanUrl +
-                "/rest/v1/messages",
-                {
-                    method: "POST",
-                    headers: {
-                        ...headers,
-                        "Prefer":
-                            "return=representation"
-                    },
-                    body:
-                        JSON.stringify(messageData)
-                }
-            );
+            const response =
+                await fetch(
+                    cleanUrl +
+                    "/rest/v1/messages",
+                    {
+                        method: "POST",
+                        headers: {
+                            ...headers,
+                            "Prefer":
+                                "return=representation"
+                        },
+                        body:
+                            JSON.stringify(messageData)
+                    }
+                );
 
             const data =
                 await readJson(response);
@@ -278,42 +376,51 @@ export default async function handler(req, res) {
 
         /* =====================================================
            PATCH
-           Normal message editing OR game-state update
         ===================================================== */
 
         if (req.method === "PATCH") {
 
             const body = req.body || {};
 
-            const id =
-                String(body.id || "")
-                    .trim();
+            /*
+             * GAME UPDATE
+             */
 
-            const deviceId =
-                String(body.device_id || "")
-                    .trim();
+            if (body.game_action === "update") {
 
-            if (!id || !deviceId) {
-                return res.status(400).json({
-                    error:
-                        "Message ID and device ID are required."
-                });
-            }
+                const game =
+                    cleanGameState(body.game);
 
+                if (!game) {
+                    return res.status(400).json({
+                        error: "Invalid game."
+                    });
+                }
 
-            /* GAME STATE UPDATE */
+                const id =
+                    String(
+                        body.message_id || ""
+                    ).trim();
 
-            if (body.game_server === true) {
+                const deviceId =
+                    String(
+                        body.device_id || ""
+                    ).trim();
 
-                const gameState =
-                    String(body.game_state || "")
-                        .trim()
-                        .substring(0, 20000);
-
-                if (!gameState) {
+                if (!id || !deviceId) {
                     return res.status(400).json({
                         error:
-                            "Game state is required."
+                            "Game message ID and device ID are required."
+                    });
+                }
+
+                if (
+                    game.hostDeviceId !==
+                    deviceId
+                ) {
+                    return res.status(403).json({
+                        error:
+                            "Only the host can update the game."
                     });
                 }
 
@@ -322,26 +429,32 @@ export default async function handler(req, res) {
                     "/rest/v1/messages" +
                     "?id=eq." +
                     encodeURIComponent(id) +
-                    "&username=eq.__GAME_SERVER__" +
                     "&device_id=eq." +
                     encodeURIComponent(deviceId);
 
-                const response = await fetch(
-                    url,
-                    {
-                        method: "PATCH",
-                        headers: {
-                            ...headers,
-                            "Prefer":
-                                "return=representation"
-                        },
-                        body:
-                            JSON.stringify({
-                                message: gameState,
-                                edited: true
-                            })
-                    }
-                );
+                const response =
+                    await fetch(
+                        url,
+                        {
+                            method: "PATCH",
+                            headers: {
+                                ...headers,
+                                "Prefer":
+                                    "return=representation"
+                            },
+                            body:
+                                JSON.stringify({
+                                    username:
+                                        game.hostName,
+                                    channel:
+                                        game.channel,
+                                    message:
+                                        "__GAME_STATE__" +
+                                        JSON.stringify(game),
+                                    edited: true
+                                })
+                        }
+                    );
 
                 const data =
                     await readJson(response);
@@ -360,23 +473,40 @@ export default async function handler(req, res) {
                 ) {
                     return res.status(403).json({
                         error:
-                            "You are not the game host."
+                            "Game no longer exists or you are not the host."
                     });
                 }
 
                 return res.status(200).json({
                     success: true,
-                    game: data[0]
+                    game
                 });
             }
 
 
-            /* NORMAL EDIT */
+            /*
+             * NORMAL EDIT
+             */
+
+            const id =
+                String(body.id || "")
+                    .trim();
+
+            const deviceId =
+                String(body.device_id || "")
+                    .trim();
 
             const message =
                 String(body.message || "")
                     .trim()
                     .substring(0, 2000);
+
+            if (!id || !deviceId) {
+                return res.status(400).json({
+                    error:
+                        "Message ID and device ID are required."
+                });
+            }
 
             const url =
                 cleanUrl +
@@ -384,25 +514,25 @@ export default async function handler(req, res) {
                 "?id=eq." +
                 encodeURIComponent(id) +
                 "&device_id=eq." +
-                encodeURIComponent(deviceId) +
-                "&username=neq.__GAME_SERVER__";
+                encodeURIComponent(deviceId);
 
-            const response = await fetch(
-                url,
-                {
-                    method: "PATCH",
-                    headers: {
-                        ...headers,
-                        "Prefer":
-                            "return=representation"
-                    },
-                    body:
-                        JSON.stringify({
-                            message,
-                            edited: true
-                        })
-                }
-            );
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: "PATCH",
+                        headers: {
+                            ...headers,
+                            "Prefer":
+                                "return=representation"
+                        },
+                        body:
+                            JSON.stringify({
+                                message,
+                                edited: true
+                            })
+                    }
+                );
 
             const data =
                 await readJson(response);
@@ -441,53 +571,23 @@ export default async function handler(req, res) {
             const body = req.body || {};
 
 
-            /* FULL CHAT WIPE */
+            /*
+             * GAME DELETE
+             */
 
-            if (body.delete_all === true) {
-
-                const response = await fetch(
-                    cleanUrl +
-                    "/rest/v1/messages?id=not.is.null",
-                    {
-                        method: "DELETE",
-                        headers: {
-                            ...headers,
-                            "Prefer":
-                                "return=minimal"
-                        }
-                    }
-                );
-
-                const data =
-                    await readJson(response);
-
-                if (!response.ok) {
-                    return supabaseError(
-                        res,
-                        response,
-                        data
-                    );
-                }
-
-                return res.status(200).json({
-                    success: true,
-                    message:
-                        "Everything was deleted."
-                });
-            }
-
-
-            /* DELETE GAME SERVER */
-
-            if (body.game_server === true) {
+            if (
+                body.game_action === "delete"
+            ) {
 
                 const id =
-                    String(body.id || "")
-                        .trim();
+                    String(
+                        body.message_id || ""
+                    ).trim();
 
                 const deviceId =
-                    String(body.device_id || "")
-                        .trim();
+                    String(
+                        body.device_id || ""
+                    ).trim();
 
                 if (!id || !deviceId) {
                     return res.status(400).json({
@@ -496,26 +596,116 @@ export default async function handler(req, res) {
                     });
                 }
 
-                const url =
+                /*
+                 * First verify that this device
+                 * is actually the host.
+                 */
+
+                const verifyUrl =
                     cleanUrl +
                     "/rest/v1/messages" +
-                    "?id=eq." +
+                    "?select=id,device_id,message" +
+                    "&id=eq." +
                     encodeURIComponent(id) +
-                    "&username=eq.__GAME_SERVER__" +
                     "&device_id=eq." +
                     encodeURIComponent(deviceId);
 
-                const response = await fetch(
-                    url,
-                    {
-                        method: "DELETE",
-                        headers: {
-                            ...headers,
-                            "Prefer":
-                                "return=representation"
+                const verifyResponse =
+                    await fetch(
+                        verifyUrl,
+                        {
+                            method: "GET",
+                            headers
                         }
-                    }
-                );
+                    );
+
+                const verifyData =
+                    await readJson(
+                        verifyResponse
+                    );
+
+                if (
+                    !verifyResponse.ok ||
+                    !Array.isArray(verifyData) ||
+                    !verifyData.length
+                ) {
+                    return res.status(403).json({
+                        error:
+                            "Only the game host can remove this game."
+                    });
+                }
+
+                const raw =
+                    String(
+                        verifyData[0].message || ""
+                    );
+
+                if (
+                    !raw.startsWith(
+                        "__GAME_STATE__"
+                    )
+                ) {
+                    return res.status(400).json({
+                        error:
+                            "This is not a game state."
+                    });
+                }
+
+                const deleteUrl =
+                    cleanUrl +
+                    "/rest/v1/messages" +
+                    "?id=eq." +
+                    encodeURIComponent(id);
+
+                const response =
+                    await fetch(
+                        deleteUrl,
+                        {
+                            method: "DELETE",
+                            headers: {
+                                ...headers,
+                                "Prefer":
+                                    "return=minimal"
+                            }
+                        }
+                    );
+
+                const data =
+                    await readJson(response);
+
+                if (!response.ok) {
+                    return supabaseError(
+                        res,
+                        response,
+                        data
+                    );
+                }
+
+                return res.status(200).json({
+                    success: true
+                });
+            }
+
+
+            /*
+             * FULL CHAT WIPE
+             */
+
+            if (body.delete_all === true) {
+
+                const response =
+                    await fetch(
+                        cleanUrl +
+                        "/rest/v1/messages?id=not.is.null",
+                        {
+                            method: "DELETE",
+                            headers: {
+                                ...headers,
+                                "Prefer":
+                                    "return=minimal"
+                            }
+                        }
+                    );
 
                 const data =
                     await readJson(response);
@@ -531,12 +721,14 @@ export default async function handler(req, res) {
                 return res.status(200).json({
                     success: true,
                     message:
-                        "Game server removed."
+                        "All messages were deleted."
                 });
             }
 
 
-            /* NORMAL MESSAGE DELETE */
+            /*
+             * NORMAL MESSAGE DELETE
+             */
 
             const id =
                 String(body.id || "")
@@ -559,20 +751,20 @@ export default async function handler(req, res) {
                 "?id=eq." +
                 encodeURIComponent(id) +
                 "&device_id=eq." +
-                encodeURIComponent(deviceId) +
-                "&username=neq.__GAME_SERVER__";
+                encodeURIComponent(deviceId);
 
-            const response = await fetch(
-                url,
-                {
-                    method: "DELETE",
-                    headers: {
-                        ...headers,
-                        "Prefer":
-                            "return=representation"
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            ...headers,
+                            "Prefer":
+                                "return=representation"
+                        }
                     }
-                }
-            );
+                );
 
             const data =
                 await readJson(response);
@@ -596,22 +788,19 @@ export default async function handler(req, res) {
             }
 
             return res.status(200).json({
-                success: true,
-                message:
-                    "Message deleted."
+                success: true
             });
         }
 
 
         return res.status(405).json({
-            error:
-                "Method not allowed."
+            error: "Method not allowed."
         });
 
     } catch (error) {
 
         console.error(
-            "MESSAGE/GAME API ERROR:",
+            "MESSAGE API ERROR:",
             error
         );
 
@@ -625,8 +814,160 @@ export default async function handler(req, res) {
 
 
 /* =========================================================
-   HELPERS
+   GAME HELPERS
 ========================================================= */
+
+function cleanGameState(game) {
+
+    if (
+        !game ||
+        typeof game !== "object"
+    ) {
+        return null;
+    }
+
+    const result = {
+        gameId:
+            String(game.gameId || "")
+                .substring(0, 80),
+
+        gameType:
+            String(game.gameType || "")
+                .substring(0, 30),
+
+        title:
+            String(game.title || "")
+                .substring(0, 80),
+
+        channel:
+            String(
+                game.channel || "general"
+            )
+            .substring(0, 32),
+
+        hostDeviceId:
+            String(
+                game.hostDeviceId || ""
+            )
+            .substring(0, 100),
+
+        hostName:
+            String(
+                game.hostName || "Host"
+            )
+            .substring(0, 24),
+
+        status:
+            game.status === "playing"
+                ? "playing"
+                : "lobby",
+
+        maxPlayers:
+            Math.max(
+                2,
+                Math.min(
+                    12,
+                    Number(game.maxPlayers) || 2
+                )
+            ),
+
+        players:
+            Array.isArray(game.players)
+                ? game.players
+                    .slice(0, 12)
+                    .map(p => ({
+                        deviceId:
+                            String(
+                                p.deviceId || ""
+                            ).substring(0, 100),
+
+                        name:
+                            String(
+                                p.name || "Player"
+                            ).substring(0, 24)
+                    }))
+                    .filter(p => p.deviceId)
+                : [],
+
+        turnIndex:
+            Math.max(
+                0,
+                Number(game.turnIndex) || 0
+            ),
+
+        state:
+            game.state &&
+            typeof game.state === "object"
+                ? game.state
+                : {},
+
+        version:
+            Number(game.version) || 1,
+
+        updatedAt:
+            Date.now()
+    };
+
+    if (!result.gameId ||
+        !result.hostDeviceId) {
+        return null;
+    }
+
+    /*
+     * Prevent enormous arbitrary game payloads.
+     */
+
+    const encoded =
+        JSON.stringify(result);
+
+    if (encoded.length > 500000) {
+        return null;
+    }
+
+    return result;
+}
+
+
+async function findHostGames(
+    cleanUrl,
+    headers,
+    deviceId,
+    channel
+) {
+
+    const url =
+        cleanUrl +
+        "/rest/v1/messages" +
+        "?select=id,message" +
+        "&channel=eq." +
+        encodeURIComponent(channel || "general") +
+        "&device_id=eq." +
+        encodeURIComponent(deviceId) +
+        "&message=like." +
+        encodeURIComponent("__GAME_STATE__%");
+
+    const response =
+        await fetch(
+            url,
+            {
+                method: "GET",
+                headers
+            }
+        );
+
+    const data =
+        await readJson(response);
+
+    if (
+        !response.ok ||
+        !Array.isArray(data)
+    ) {
+        return [];
+    }
+
+    return data;
+}
+
 
 async function readJson(response) {
 
@@ -654,14 +995,12 @@ function supabaseError(
 ) {
 
     return res.status(
-        response.status
+        response.status || 500
     ).json({
-
         error:
             data.message ||
             data.error ||
             "Supabase request failed.",
-
         details: data
     });
 }

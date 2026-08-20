@@ -1,39 +1,40 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1.0"
+>
 <title>Chat</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+    box-sizing:border-box;
+}
 
 :root{
     --bg:#0b0d10;
     --panel:#111419;
     --panel2:#181c22;
-    --panel3:#20252d;
+    --panel3:#20252c;
     --border:#292f38;
     --text:#edf0f4;
     --muted:#7e8793;
     --accent:#e8eaed;
     --danger:#ff7070;
-    --green:#65d68b;
-    --blue:#6ea8ff;
-    --yellow:#ffd166;
+    --good:#65d991;
     --radius:12px;
-
-    --ui-scale:1;
     --text-size:16px;
     --word-spacing:0px;
     --line-spacing:1.45;
 }
 
-html,body{
-    margin:0;
+html,
+body{
     width:100%;
     height:100%;
+    margin:0;
     background:var(--bg);
     color:var(--text);
     font-family:Inter,Arial,sans-serif;
@@ -41,10 +42,12 @@ html,body{
 
 body{
     overflow:hidden;
-    font-size:calc(16px * var(--ui-scale));
 }
 
-button,input,textarea,select{
+button,
+input,
+textarea,
+select{
     font:inherit;
 }
 
@@ -80,13 +83,13 @@ button{
 }
 
 .logo-icon{
-    width:35px;
-    height:35px;
+    width:36px;
+    height:36px;
     display:grid;
     place-items:center;
-    border-radius:10px;
     background:var(--panel2);
     border:1px solid var(--border);
+    border-radius:10px;
 }
 
 .channel{
@@ -94,11 +97,16 @@ button{
     font-weight:400;
 }
 
+.header-actions{
+    display:flex;
+    gap:7px;
+}
+
 .icon-btn{
     width:39px;
     height:39px;
-    border-radius:10px;
     border:1px solid var(--border);
+    border-radius:10px;
     background:var(--panel2);
     color:var(--text);
 }
@@ -122,8 +130,8 @@ button{
 }
 
 .avatar{
-    flex:0 0 40px;
     width:40px;
+    min-width:40px;
     height:40px;
     display:grid;
     place-items:center;
@@ -149,7 +157,8 @@ button{
     font-weight:700;
 }
 
-.time,.edited{
+.time,
+.edited{
     color:var(--muted);
     font-size:11px;
 }
@@ -161,6 +170,11 @@ button{
     font-size:var(--text-size);
     word-spacing:var(--word-spacing);
     line-height:var(--line-spacing);
+}
+
+.message-link{
+    color:#8fbaff;
+    text-decoration:underline;
 }
 
 .message-image{
@@ -175,108 +189,129 @@ button{
     cursor:pointer;
 }
 
-/* GAME INVITES */
-
-.game-message{
-    width:min(760px,100%);
-    margin-top:8px;
-}
+/* GAME CARD */
 
 .game-card{
-    position:relative;
-    overflow:hidden;
-    border:1px solid #303742;
+    margin:0 0 20px 0;
+    border:1px solid #303743;
     border-radius:16px;
+    overflow:hidden;
     background:
         linear-gradient(
             145deg,
-            #171b22,
+            #171b21,
             #101318
         );
     box-shadow:
-        0 12px 40px rgba(0,0,0,.22);
+        0 12px 35px rgba(0,0,0,.2);
 }
 
-.game-card-header{
-    padding:18px 18px 14px;
+.game-head{
+    padding:17px 18px;
     display:flex;
-    align-items:center;
     justify-content:space-between;
-    gap:15px;
+    align-items:center;
+    gap:12px;
     border-bottom:1px solid var(--border);
 }
 
 .game-title{
     display:flex;
     align-items:center;
-    gap:12px;
+    gap:10px;
+    font-size:18px;
+    font-weight:800;
 }
 
 .game-icon{
-    width:46px;
-    height:46px;
+    width:42px;
+    height:42px;
     display:grid;
     place-items:center;
-    border-radius:13px;
-    background:#222832;
-    border:1px solid #353c47;
-    font-size:23px;
-}
-
-.game-name{
-    font-size:17px;
-    font-weight:800;
-}
-
-.game-host{
-    margin-top:3px;
-    color:var(--muted);
-    font-size:12px;
+    border-radius:12px;
+    background:#222831;
+    border:1px solid #363e49;
+    font-size:21px;
 }
 
 .game-status{
-    padding:6px 10px;
-    border-radius:999px;
-    font-size:11px;
-    font-weight:800;
-    background:#20262e;
-    color:#aeb7c4;
+    color:var(--good);
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
 }
 
-.game-status.waiting{
-    color:var(--yellow);
-}
-
-.game-status.running{
-    color:var(--green);
-}
-
-.game-status.finished{
-    color:#aaa;
+.game-body{
+    padding:18px;
 }
 
 .game-info{
-    padding:14px 18px;
     display:flex;
     flex-wrap:wrap;
-    gap:8px;
+    gap:7px;
+    margin-bottom:15px;
 }
 
 .game-pill{
     padding:7px 10px;
     border-radius:8px;
-    background:#1c2129;
-    border:1px solid #2c333d;
-    color:#adb6c2;
+    background:#20252c;
+    border:1px solid #303640;
+    color:#bbc2cc;
     font-size:12px;
 }
 
-.game-pill strong{
-    color:white;
+.game-players{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin-bottom:15px;
 }
 
-.game-body{
-    padding:0 18px 18px;
+.player-pill{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:7px 10px;
+    border-radius:9px;
+    background:#171b20;
+    border:1px solid #2b313a;
+    font-size:12px;
+}
+
+.player-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:#68717d;
+}
+
+.player-dot.host{
+    background:#f1c75b;
+}
+
+.turn-box{
+    padding:13px;
+    margin-bottom:15px;
+    border:1px solid #343b46;
+    border-radius:11px;
+    background:#15191e;
+    text-align:center;
+}
+
+.turn-box strong{
+    display:block;
+    margin-bottom:4px;
+}
+
+.turn-box span{
+    color:#8e98a6;
+    font-size:12px;
+}
+
+.game-board{
+    margin:15px auto;
+    width:min(420px,100%);
 }
 
 .game-actions{
@@ -286,250 +321,159 @@ button{
 }
 
 .game-btn{
-    border:1px solid #353c47;
-    background:#222832;
-    color:white;
     padding:10px 14px;
     border-radius:9px;
+    border:1px solid var(--border);
+    background:#20252c;
+    color:white;
     font-weight:700;
 }
 
 .game-btn:hover{
-    background:#2b323d;
+    background:#292f37;
 }
 
 .game-btn.primary{
     background:#e8eaed;
     color:#111;
-    border-color:#e8eaed;
 }
 
 .game-btn.danger{
-    color:#ff8c8c;
-    border-color:#633232;
-    background:#261719;
+    color:#ff8585;
+    border-color:#633438;
+    background:#28191b;
 }
 
-.game-btn.green{
-    color:#82e6a0;
-    border-color:#31583e;
-    background:#17241b;
-}
-
-.game-players{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    margin-bottom:12px;
-}
-
-.player-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:8px 10px;
-    border-radius:8px;
-    background:#171b21;
-    border:1px solid #252b34;
-    font-size:13px;
-}
-
-.player-name{
-    display:flex;
-    align-items:center;
-    gap:7px;
-}
-
-.player-dot{
-    width:8px;
-    height:8px;
-    border-radius:50%;
-    background:#687280;
-}
-
-.player-dot.host{
-    background:#ffd166;
-}
-
-.player-dot.turn{
-    background:#65d68b;
-    box-shadow:0 0 8px #65d68b;
-}
-
-/* GAME BOARD */
-
-.game-board-wrap{
-    margin-top:14px;
-    padding:14px;
-    border-radius:13px;
-    background:#0d1014;
-    border:1px solid #252b33;
-}
-
-.turn-banner{
-    text-align:center;
-    margin-bottom:12px;
-    padding:9px;
-    border-radius:9px;
-    background:#171c23;
-    color:#b9c2ce;
-    font-size:13px;
-    font-weight:700;
-}
-
-.turn-banner.my-turn{
-    color:#7de89a;
-    background:#132219;
-    border:1px solid #274833;
+.game-btn:disabled{
+    opacity:.45;
+    cursor:not-allowed;
 }
 
 /* TIC TAC TOE */
 
-.ttt-board{
-    width:min(330px,100%);
-    margin:auto;
+.ttt{
     display:grid;
     grid-template-columns:repeat(3,1fr);
+    gap:6px;
+}
+
+.ttt button{
+    aspect-ratio:1;
+    border:1px solid #343b46;
+    border-radius:10px;
+    background:#1a1f25;
+    color:white;
+    font-size:clamp(25px,7vw,45px);
+    font-weight:900;
+}
+
+.ttt button:hover{
+    background:#252b33;
+}
+
+/* CONNECT 4 */
+
+.connect4{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:5px;
+    padding:8px;
+    border-radius:12px;
+    background:#151a20;
+}
+
+.c4-cell{
+    aspect-ratio:1;
+    border-radius:50%;
+    background:#080a0c;
+    border:1px solid #303640;
+    cursor:pointer;
+}
+
+.c4-cell.p1{
+    background:#e5e7eb;
+}
+
+.c4-cell.p2{
+    background:#777f8b;
+}
+
+/* REACTION */
+
+.reaction-box{
+    min-height:180px;
+    display:grid;
+    place-items:center;
+    border-radius:14px;
+    border:1px solid #343b46;
+    background:#15191e;
+    font-size:20px;
+    font-weight:800;
+    text-align:center;
+    padding:20px;
+}
+
+.reaction-box.ready{
+    cursor:pointer;
+}
+
+.reaction-box.waiting{
+    background:#191d23;
+}
+
+.reaction-box.go{
+    background:#26352b;
+}
+
+/* MEMORY */
+
+.memory-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
     gap:7px;
 }
 
-.ttt-cell{
+.memory-card{
     aspect-ratio:1;
-    border:1px solid #343b46;
-    border-radius:11px;
-    background:#171c23;
+    border:1px solid #363e48;
+    border-radius:9px;
+    background:#171b20;
+    color:transparent;
+    font-size:25px;
+    cursor:pointer;
+}
+
+.memory-card.flipped,
+.memory-card.matched{
     color:white;
-    font-size:40px;
-    font-weight:900;
+    background:#252b33;
 }
 
-.ttt-cell:hover{
-    background:#202630;
+.memory-card.matched{
+    border-color:#4a805d;
 }
 
-/* CONNECT FOUR */
+/* NUMBER */
 
-.connect-board{
-    width:min(430px,100%);
-    margin:auto;
-    padding:9px;
+.number-board{
     display:grid;
-    grid-template-columns:repeat(7,1fr);
-    gap:6px;
-    background:#151a21;
-    border-radius:12px;
-}
-
-.connect-cell{
-    aspect-ratio:1;
-    border-radius:50%;
-    background:#090b0e;
-    border:2px solid #292f38;
-}
-
-.connect-cell.red{
-    background:#ef6262;
-    border-color:#ff8585;
-}
-
-.connect-cell.yellow{
-    background:#ffd166;
-    border-color:#ffe19a;
-}
-
-/* REVERSI */
-
-.reversi-board{
-    width:min(430px,100%);
-    margin:auto;
-    padding:7px;
-    display:grid;
-    grid-template-columns:repeat(8,1fr);
-    gap:3px;
-    background:#142619;
-    border-radius:10px;
-}
-
-.reversi-cell{
-    aspect-ratio:1;
-    display:grid;
-    place-items:center;
-    background:#1d6332;
-    border:1px solid #287540;
-    border-radius:4px;
-}
-
-.reversi-piece{
-    width:78%;
-    height:78%;
-    border-radius:50%;
-    background:#111;
-    box-shadow:inset 0 2px 4px #ffffff20;
-}
-
-.reversi-piece.white{
-    background:#eee;
-}
-
-/* DICE */
-
-.dice-area{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
     gap:12px;
-    padding:15px;
 }
 
-.dice{
-    width:100px;
-    height:100px;
-    display:grid;
-    place-items:center;
-    border-radius:18px;
-    background:#ececec;
-    color:#111;
-    font-size:48px;
-    font-weight:900;
-    box-shadow:0 12px 30px #0006;
-}
-
-.dice-result{
-    color:#aab3bf;
+.number-value{
     text-align:center;
+    font-size:32px;
+    font-weight:900;
 }
 
-/* GRID RACE */
-
-.race-board{
-    width:min(500px,100%);
-    margin:auto;
-    display:grid;
-    grid-template-columns:repeat(10,1fr);
-    gap:3px;
-}
-
-.race-cell{
-    aspect-ratio:1;
-    display:grid;
-    place-items:center;
-    border-radius:4px;
-    background:#171c23;
-    border:1px solid #242a33;
-    font-size:11px;
-    font-weight:800;
-}
-
-.race-cell.finish{
-    background:#28231a;
-}
-
-.race-piece{
-    width:65%;
-    height:65%;
-    border-radius:50%;
-    background:#65d68b;
-    box-shadow:0 0 8px #65d68b77;
+.number-input{
+    width:100%;
+    padding:12px;
+    border-radius:9px;
+    border:1px solid var(--border);
+    background:#11151a;
+    color:white;
+    outline:none;
 }
 
 /* COMPOSER */
@@ -578,6 +522,10 @@ textarea{
     font-size:20px;
 }
 
+.attach-btn:hover{
+    background:#242932;
+}
+
 .send-btn{
     padding:0 18px;
     background:var(--accent);
@@ -585,7 +533,11 @@ textarea{
     font-weight:700;
 }
 
-/* OVERLAYS */
+.send-btn:disabled{
+    opacity:.5;
+}
+
+/* OVERLAY */
 
 .overlay{
     position:fixed;
@@ -602,7 +554,7 @@ textarea{
 }
 
 .panel{
-    width:min(560px,calc(100vw - 25px));
+    width:min(540px,calc(100vw - 25px));
     max-height:calc(100vh - 25px);
     overflow-y:auto;
     background:var(--panel);
@@ -626,6 +578,51 @@ textarea{
 .panel-body{
     padding:18px;
 }
+
+/* GAME CREATOR */
+
+.game-list{
+    display:grid;
+    gap:9px;
+}
+
+.game-choice{
+    width:100%;
+    padding:14px;
+    text-align:left;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    border:1px solid var(--border);
+    border-radius:11px;
+    background:var(--panel2);
+    color:white;
+}
+
+.game-choice:hover{
+    background:#232830;
+}
+
+.game-choice-icon{
+    width:40px;
+    height:40px;
+    display:grid;
+    place-items:center;
+    border-radius:10px;
+    background:#252b33;
+}
+
+.game-choice strong{
+    display:block;
+}
+
+.game-choice small{
+    display:block;
+    margin-top:3px;
+    color:var(--muted);
+}
+
+/* SETTINGS */
 
 .category{
     margin-bottom:12px;
@@ -678,8 +675,14 @@ textarea{
     color:white;
 }
 
-.setting input[type=range]{
+.setting input[type="range"]{
     padding:0;
+}
+
+.setting-value{
+    color:var(--muted);
+    font-size:12px;
+    margin-top:5px;
 }
 
 .save-btn{
@@ -702,7 +705,11 @@ textarea{
 .danger-title{
     color:var(--danger);
     font-weight:700;
-    margin-bottom:7px;
+}
+
+.danger-zone p{
+    color:var(--muted);
+    line-height:1.45;
 }
 
 .danger-btn{
@@ -714,34 +721,7 @@ textarea{
     color:#ff8585;
 }
 
-.context-menu{
-    position:fixed;
-    display:none;
-    width:160px;
-    padding:5px;
-    z-index:200;
-    background:var(--panel2);
-    border:1px solid var(--border);
-    border-radius:9px;
-}
-
-.context-menu.show{
-    display:block;
-}
-
-.context-menu button{
-    width:100%;
-    padding:9px 10px;
-    text-align:left;
-    border:0;
-    border-radius:6px;
-    background:transparent;
-    color:var(--text);
-}
-
-.delete-option{
-    color:#ff7777!important;
-}
+/* EMPTY */
 
 .empty{
     height:100%;
@@ -755,42 +735,6 @@ textarea{
     display:block;
     color:#aab2bd;
     margin-bottom:5px;
-}
-
-/* GAME CREATOR */
-
-.game-picker{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:9px;
-}
-
-.game-option{
-    padding:14px;
-    border:1px solid var(--border);
-    border-radius:11px;
-    background:#171b21;
-    color:white;
-    text-align:left;
-}
-
-.game-option:hover{
-    background:#20252d;
-}
-
-.game-option-icon{
-    font-size:25px;
-    margin-bottom:6px;
-}
-
-.game-option-name{
-    font-weight:800;
-}
-
-.game-option-desc{
-    color:var(--muted);
-    font-size:11px;
-    margin-top:4px;
 }
 
 @media(max-width:600px){
@@ -811,12 +755,17 @@ textarea{
         max-width:calc(100vw - 70px);
     }
 
-    .game-picker{
-        grid-template-columns:1fr;
+    .game-head{
+        align-items:flex-start;
     }
 
-    .game-card-header{
-        align-items:flex-start;
+    .game-actions{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+    }
+
+    .game-btn{
+        width:100%;
     }
 }
 </style>
@@ -834,7 +783,7 @@ textarea{
         <span class="channel"># general</span>
     </div>
 
-    <div style="display:flex;gap:7px">
+    <div class="header-actions">
 
         <button
             class="icon-btn"
@@ -852,7 +801,10 @@ textarea{
 
 </header>
 
-<main class="messages" id="messages"></main>
+<main
+    class="messages"
+    id="messages"
+></main>
 
 <div class="composer">
 
@@ -890,13 +842,16 @@ textarea{
 
 <!-- GAME CREATOR -->
 
-<div class="overlay" id="gamesOverlay">
+<div
+    class="overlay"
+    id="gamesOverlay"
+>
 
 <div class="panel">
 
 <div class="panel-header">
 
-    <h2>🎮 Games</h2>
+    <h2>🎮 Activities</h2>
 
     <button
         class="icon-btn"
@@ -907,33 +862,92 @@ textarea{
 
 <div class="panel-body">
 
-<p style="color:var(--muted);margin-top:0">
-Choose a game to host. You can only host one game at a time.
+<p style="color:var(--muted);line-height:1.5">
+Start a game in chat. Everyone can spectate, but only people who
+press <b>Join</b> before the host starts become players.
 </p>
 
-<div class="game-picker" id="gamePicker"></div>
+<div class="game-list">
+
+<button
+    class="game-choice"
+    data-game="ttt"
+>
+    <div class="game-choice-icon">⭕</div>
+    <div>
+        <strong>Tic-Tac-Toe</strong>
+        <small>Classic 3 × 3 battle</small>
+    </div>
+</button>
+
+<button
+    class="game-choice"
+    data-game="connect4"
+>
+    <div class="game-choice-icon">🔴</div>
+    <div>
+        <strong>Connect Four</strong>
+        <small>Get four in a row</small>
+    </div>
+</button>
+
+<button
+    class="game-choice"
+    data-game="reaction"
+>
+    <div class="game-choice-icon">⚡</div>
+    <div>
+        <strong>Reaction Race</strong>
+        <small>Be the fastest player</small>
+    </div>
+</button>
+
+<button
+    class="game-choice"
+    data-game="memory"
+>
+    <div class="game-choice-icon">🧠</div>
+    <div>
+        <strong>Memory Match</strong>
+        <small>Find matching pairs</small>
+    </div>
+</button>
+
+<button
+    class="game-choice"
+    data-game="number"
+>
+    <div class="game-choice-icon">🔢</div>
+    <div>
+        <strong>Number Guess</strong>
+        <small>Guess the secret number</small>
+    </div>
+</button>
 
 </div>
 
 </div>
-
+</div>
 </div>
 
 
 <!-- SETTINGS -->
 
-<div class="overlay" id="settingsOverlay">
+<div
+    class="overlay"
+    id="settingsOverlay"
+>
 
 <div class="panel">
 
 <div class="panel-header">
 
-<h2>Settings</h2>
+    <h2>Settings</h2>
 
-<button
-    class="icon-btn"
-    id="closeSettings"
->×</button>
+    <button
+        class="icon-btn"
+        id="closeSettings"
+    >×</button>
 
 </div>
 
@@ -942,8 +956,8 @@ Choose a game to host. You can only host one game at a time.
 <div class="category open">
 
 <button class="category-title">
-<span>👤 Profile</span>
-<span>⌄</span>
+    <span>👤 Profile</span>
+    <span>⌄</span>
 </button>
 
 <div class="category-body">
@@ -978,25 +992,53 @@ Choose a game to host. You can only host one game at a time.
 <div class="category">
 
 <button class="category-title">
-<span>📝 Text</span>
-<span>⌄</span>
+    <span>📝 Text</span>
+    <span>⌄</span>
 </button>
 
 <div class="category-body">
 
 <div class="setting">
 <label>Text size</label>
-<input id="textSize" type="range" min="12" max="24">
+<input
+    id="textSize"
+    type="range"
+    min="12"
+    max="24"
+>
+<div
+    class="setting-value"
+    id="textSizeValue"
+></div>
 </div>
 
 <div class="setting">
 <label>Word spacing</label>
-<input id="wordSpacing" type="range" min="0" max="12">
+<input
+    id="wordSpacing"
+    type="range"
+    min="0"
+    max="12"
+>
+<div
+    class="setting-value"
+    id="wordSpacingValue"
+></div>
 </div>
 
 <div class="setting">
 <label>Line spacing</label>
-<input id="lineSpacing" type="range" min="1" max="2" step=".05">
+<input
+    id="lineSpacing"
+    type="range"
+    min="1"
+    max="2"
+    step=".05"
+>
+<div
+    class="setting-value"
+    id="lineSpacingValue"
+></div>
 </div>
 
 </div>
@@ -1006,15 +1048,15 @@ Choose a game to host. You can only host one game at a time.
 <div class="category">
 
 <button class="category-title">
-<span>💬 Chat</span>
-<span>⌄</span>
+    <span>💬 Chat</span>
+    <span>⌄</span>
 </button>
 
 <div class="category-body">
 
 <div class="setting">
 
-<label>Refresh rate</label>
+<label>Chat refresh</label>
 
 <select id="refreshRate">
 <option value="10000">10 seconds</option>
@@ -1057,8 +1099,56 @@ Choose a game to host. You can only host one game at a time.
 <div class="category">
 
 <button class="category-title">
-<span>🎨 Appearance</span>
-<span>⌄</span>
+    <span>🎮 Games</span>
+    <span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+
+<label>Game sync speed</label>
+
+<select id="gameSyncMode">
+<option value="adaptive">Adaptive 0.1–1 sec</option>
+<option value="fast">Fast 0.1 sec</option>
+<option value="normal">Normal 0.5 sec</option>
+<option value="slow">Slow 1 sec</option>
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Show game invitations</label>
+
+<select id="showGameInvites">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Auto-open active games</label>
+
+<select id="autoOpenGames">
+<option value="true">On</option>
+<option value="false">Off</option>
+</select>
+
+</div>
+
+</div>
+</div>
+
+
+<div class="category">
+
+<button class="category-title">
+    <span>🎨 Appearance</span>
+    <span>⌄</span>
 </button>
 
 <div class="category-body">
@@ -1096,6 +1186,11 @@ Choose a game to host. You can only host one game at a time.
     max="25"
 >
 
+<div
+    class="setting-value"
+    id="cornerRadiusValue"
+></div>
+
 </div>
 
 <div class="setting">
@@ -1110,6 +1205,11 @@ Choose a game to host. You can only host one game at a time.
     step=".05"
 >
 
+<div
+    class="setting-value"
+    id="uiScaleValue"
+></div>
+
 </div>
 
 </div>
@@ -1119,8 +1219,8 @@ Choose a game to host. You can only host one game at a time.
 <div class="category">
 
 <button class="category-title">
-<span>⚙️ Behavior</span>
-<span>⌄</span>
+    <span>⚙️ Behavior</span>
+    <span>⌄</span>
 </button>
 
 <div class="category-body">
@@ -1169,26 +1269,77 @@ Choose a game to host. You can only host one game at a time.
 Save settings
 </button>
 
+
+<div class="danger-zone">
+
+<div class="danger-title">
+⚠ Danger Zone
+</div>
+
+<p>
+Remove every normal chat message and temporary game state.
+This affects everyone.
+</p>
+
+<button
+    class="danger-btn"
+    id="removeEverything"
+>
+Remove everything
+</button>
+
+</div>
+
 </div>
 </div>
 </div>
 
 
-<!-- CONTEXT MENU -->
+<!-- CONFIRM -->
 
-<div class="context-menu" id="contextMenu">
+<div
+    class="overlay"
+    id="dialogOverlay"
+>
 
-<button id="editMessage">
-Edit
+<div
+    class="panel"
+    style="width:min(450px,calc(100vw - 30px));"
+>
+
+<div class="panel-body">
+
+<h2 id="dialogTitle">
+Confirm
+</h2>
+
+<p
+    id="dialogText"
+    style="color:var(--muted);line-height:1.5"
+></p>
+
+<div
+    style="display:flex;justify-content:flex-end;gap:8px"
+>
+
+<button
+    class="game-btn"
+    id="dialogCancel"
+>
+Cancel
 </button>
 
 <button
-    id="deleteMessage"
-    class="delete-option"
+    class="game-btn danger"
+    id="dialogConfirm"
 >
-Delete
+Confirm
 </button>
 
+</div>
+
+</div>
+</div>
 </div>
 
 
@@ -1198,28 +1349,22 @@ Delete
    BASIC CONFIG
 ========================================================= */
 
-const API_URL="/api/messages";
-const CHANNEL="general";
-
-/*
-    Normal chat uses the user's chosen refresh rate.
-
-    Games deliberately use 10ms polling while an active game
-    exists so game actions feel much faster.
-*/
-
-const GAME_REFRESH_MS=10;
+const API_URL = "/api/messages";
+const CHANNEL = "general";
 
 
 /* =========================================================
    DEVICE
 ========================================================= */
 
-let deviceId=localStorage.getItem("chat_device_id");
+let deviceId =
+    localStorage.getItem(
+        "chat_device_id"
+    );
 
-if(!deviceId){
+if (!deviceId) {
 
-    deviceId=
+    deviceId =
         crypto.randomUUID();
 
     localStorage.setItem(
@@ -1233,2509 +1378,379 @@ if(!deviceId){
    SETTINGS
 ========================================================= */
 
-const defaults={
+const defaults = {
 
-    username:"",
-    theme:"dark",
+    username: "",
 
-    refreshRate:500,
+    refreshRate: 500,
 
-    showTimestamps:true,
-    compactMessages:false,
+    textSize: 16,
 
-    textSize:16,
-    wordSpacing:0,
-    lineSpacing:1.45,
+    wordSpacing: 0,
 
-    cornerRadius:12,
-    uiScale:1,
+    lineSpacing: 1.45,
 
-    enterToSend:true,
-    autoScroll:true,
-    confirmDelete:true
+    cornerRadius: 12,
+
+    uiScale: 1,
+
+    theme: "dark",
+
+    showTimestamps: true,
+
+    compactMessages: false,
+
+    gameSyncMode: "adaptive",
+
+    showGameInvites: true,
+
+    autoOpenGames: true,
+
+    enterToSend: true,
+
+    autoScroll: true,
+
+    confirmDelete: true
 };
 
-const settings={};
 
-Object.keys(defaults).forEach(key=>{
+function getSetting(key) {
 
-    const saved=
+    const value =
         localStorage.getItem(
-            "chat_"+key
+            "chat_" + key
         );
 
-    if(saved===null){
-
-        settings[key]=
-            defaults[key];
-
-    }else if(
-        saved==="true"||
-        saved==="false"
-    ){
-
-        settings[key]=
-            saved==="true";
-
-    }else{
-
-        const n=Number(saved);
-
-        settings[key]=
-            Number.isNaN(n)
-            ?saved
-            :n;
+    if (value === null) {
+        return defaults[key];
     }
-});
 
-
-/* =========================================================
-   ELEMENTS
-========================================================= */
-
-const messagesEl=
-    document.getElementById("messages");
-
-const messageInput=
-    document.getElementById("messageInput");
-
-const sendBtn=
-    document.getElementById("sendBtn");
-
-const imageInput=
-    document.getElementById("imageInput");
-
-const attachBtn=
-    document.getElementById("attachBtn");
-
-const gamesBtn=
-    document.getElementById("gamesBtn");
-
-const gamesOverlay=
-    document.getElementById("gamesOverlay");
-
-const closeGames=
-    document.getElementById("closeGames");
-
-const gamePicker=
-    document.getElementById("gamePicker");
-
-const settingsBtn=
-    document.getElementById("settingsBtn");
-
-const settingsOverlay=
-    document.getElementById("settingsOverlay");
-
-const closeSettings=
-    document.getElementById("closeSettings");
-
-const saveSettings=
-    document.getElementById("saveSettings");
-
-const usernameInput=
-    document.getElementById("usernameInput");
-
-const deviceIdInput=
-    document.getElementById("deviceIdInput");
-
-const themeSelect=
-    document.getElementById("themeSelect");
-
-const refreshRate=
-    document.getElementById("refreshRate");
-
-const showTimestamps=
-    document.getElementById("showTimestamps");
-
-const compactMessages=
-    document.getElementById("compactMessages");
-
-const textSize=
-    document.getElementById("textSize");
-
-const wordSpacing=
-    document.getElementById("wordSpacing");
-
-const lineSpacing=
-    document.getElementById("lineSpacing");
-
-const cornerRadius=
-    document.getElementById("cornerRadius");
-
-const uiScale=
-    document.getElementById("uiScale");
-
-const enterToSend=
-    document.getElementById("enterToSend");
-
-const autoScroll=
-    document.getElementById("autoScroll");
-
-const confirmDelete=
-    document.getElementById("confirmDelete");
-
-const contextMenu=
-    document.getElementById("contextMenu");
-
-const editMessageBtn=
-    document.getElementById("editMessage");
-
-const deleteMessageBtn=
-    document.getElementById("deleteMessage");
-
-
-/* =========================================================
-   STATE
-========================================================= */
-
-let selectedFile=null;
-let selectedMessage=null;
-
-let currentMessages=[];
-
-let refreshTimer=null;
-let gameTimer=null;
-
-let games={};
-
-let activeGameIds=new Set();
-
-
-/* =========================================================
-   GAME DEFINITIONS
-========================================================= */
-
-const GAME_TYPES={
-
-    ttt:{
-        name:"Tic-Tac-Toe",
-        icon:"❌",
-        max:2,
-        description:"Classic 3 × 3 turn-based game."
-    },
-
-    connect4:{
-        name:"Connect Four",
-        icon:"🔴",
-        max:2,
-        description:"Drop pieces and connect four."
-    },
-
-    reversi:{
-        name:"Reversi",
-        icon:"⚫",
-        max:2,
-        description:"Surround and capture your opponent."
-    },
-
-    dice:{
-        name:"Dice Duel",
-        icon:"🎲",
-        max:4,
-        description:"Roll against everyone on your turn."
-    },
-
-    race:{
-        name:"Grid Race",
-        icon:"🏁",
-        max:4,
-        description:"Roll and race to the finish."
+    if (
+        value === "true" ||
+        value === "false"
+    ) {
+        return value === "true";
     }
-};
 
+    const number = Number(value);
 
-/* =========================================================
-   GAME CREATOR
-========================================================= */
-
-function renderGamePicker(){
-
-    gamePicker.innerHTML="";
-
-    Object.entries(GAME_TYPES)
-    .forEach(([type,info])=>{
-
-        const button=
-            document.createElement("button");
-
-        button.className="game-option";
-
-        button.innerHTML=`
-            <div class="game-option-icon">
-                ${info.icon}
-            </div>
-
-            <div class="game-option-name">
-                ${escapeHtml(info.name)}
-            </div>
-
-            <div class="game-option-desc">
-                ${escapeHtml(info.description)}
-                · ${info.max} max
-            </div>
-        `;
-
-        button.onclick=()=>{
-            createGame(type);
-        };
-
-        gamePicker.appendChild(button);
-    });
+    return Number.isNaN(number)
+        ? value
+        : number;
 }
 
 
-gamesBtn.onclick=()=>{
+let settings = {};
 
-    renderGamePicker();
+Object.keys(defaults)
+    .forEach(key => {
 
-    gamesOverlay.classList.add("show");
-};
-
-closeGames.onclick=()=>{
-
-    gamesOverlay.classList.remove("show");
-};
-
-
-/* =========================================================
-   UNIQUE GAME ID
-========================================================= */
-
-function newGameId(){
-
-    return (
-        "game_"+
-
-        Date.now().toString(36)+
-
-        "_"+
-
-        crypto.randomUUID()
-        .replaceAll("-","")
-        .slice(0,8)
-    );
-}
-
-
-/* =========================================================
-   HIDDEN GAME MESSAGE FORMAT
-========================================================= */
-
-const GAME_PREFIX="__CHAT_GAME_STATE_v4__";
-
-
-function encodeGame(game){
-
-    return GAME_PREFIX+
-        JSON.stringify(game);
-}
-
-
-function decodeGame(message){
-
-    if(
-        typeof message!=="string"||
-        !message.startsWith(GAME_PREFIX)
-    ){
-
-        return null;
-    }
-
-    try{
-
-        return JSON.parse(
-            message.slice(
-                GAME_PREFIX.length
-            )
-        );
-
-    }catch{
-
-        return null;
-    }
-}
-
-
-/* =========================================================
-   CREATE GAME
-========================================================= */
-
-async function createGame(type){
-
-    if(!settings.username){
-
-        settingsOverlay.classList.add("show");
-
-        usernameInput.focus();
-
-        alert(
-            "Set your name in Settings first."
-        );
-
-        return;
-    }
-
-    /*
-       One host can only host one game.
-    */
-
-    const alreadyHosting=
-        Object.values(games).some(game=>
-            game.hostDeviceId===deviceId &&
-            game.status!=="finished"
-        );
-
-    if(alreadyHosting){
-
-        alert(
-            "You are already hosting a game."
-        );
-
-        return;
-    }
-
-    const info=GAME_TYPES[type];
-
-    const game={
-
-        kind:"game",
-
-        gameId:newGameId(),
-
-        type,
-
-        name:info.name,
-
-        icon:info.icon,
-
-        maxPlayers:info.max,
-
-        hostDeviceId:deviceId,
-
-        hostName:settings.username,
-
-        status:"waiting",
-
-        turnIndex:0,
-
-        winner:null,
-
-        createdAt:Date.now(),
-
-        players:[{
-
-            deviceId,
-
-            username:settings.username,
-
-            index:0
-
-        }],
-
-        state:createInitialState(type)
-
-    };
-
-    games[game.gameId]=game;
-
-    activeGameIds.add(game.gameId);
-
-    gamesOverlay.classList.remove("show");
-
-    await saveGame(game);
-
-    await loadMessages();
-}
-
-
-/* =========================================================
-   INITIAL GAME STATES
-========================================================= */
-
-function createInitialState(type){
-
-    if(type==="ttt"){
-
-        return {
-            board:Array(9).fill(null)
-        };
-    }
-
-    if(type==="connect4"){
-
-        return {
-            board:Array(42).fill(null),
-            columns:7,
-            rows:6
-        };
-    }
-
-    if(type==="reversi"){
-
-        const board=
-            Array(64).fill(null);
-
-        board[27]="white";
-        board[28]="black";
-        board[35]="black";
-        board[36]="white";
-
-        return {
-            board
-        };
-    }
-
-    if(type==="dice"){
-
-        return {
-            scores:{},
-            lastRoll:null,
-            lastRoller:null
-        };
-    }
-
-    if(type==="race"){
-
-        return {
-            positions:{}
-        };
-    }
-
-    return {};
-}
-
-
-/* =========================================================
-   SAVE GAME
-========================================================= */
-
-async function saveGame(game){
-
-    try{
-
-        await fetch(API_URL,{
-
-            method:"POST",
-
-            headers:{
-                "Content-Type":
-                    "application/json"
-            },
-
-            body:JSON.stringify({
-
-                username:
-                    game.hostName,
-
-                channel:CHANNEL,
-
-                message:
-                    encodeGame(game),
-
-                image:null,
-
-                device_id:
-                    game.hostDeviceId
-
-            })
-        });
-
-    }catch(error){
-
-        console.error(
-            "Game save failed:",
-            error
-        );
-    }
-}
-
-
-/* =========================================================
-   LOAD GAME STATES
-========================================================= */
-
-function processGameMessages(){
-
-    const latest={};
-
-    currentMessages.forEach(message=>{
-
-        const game=
-            decodeGame(message.message);
-
-        if(!game)return;
-
-        if(
-            !game.gameId||
-            !game.createdAt
-        )return;
-
-        const old=
-            latest[game.gameId];
-
-        if(
-            !old||
-            game.updatedAt>=
-            old.updatedAt
-        ){
-
-            latest[game.gameId]=game;
-        }
-    });
-
-    games=latest;
-
-    activeGameIds=
-        new Set(
-            Object.keys(games)
-            .filter(id=>
-                games[id].status!=="finished"
-            )
-        );
-}
-
-
-/* =========================================================
-   JOIN GAME
-========================================================= */
-
-async function joinGame(gameId){
-
-    const game=games[gameId];
-
-    if(!game)return;
-
-    if(game.status!=="waiting"){
-
-        alert(
-            "This game has already started."
-        );
-
-        return;
-    }
-
-    if(
-        game.players.some(
-            p=>p.deviceId===deviceId
-        )
-    ){
-
-        return;
-    }
-
-    if(
-        game.players.length>=
-        game.maxPlayers
-    ){
-
-        alert("This game is full.");
-
-        return;
-    }
-
-    game.players.push({
-
-        deviceId,
-
-        username:
-            settings.username,
-
-        index:
-            game.players.length
+        settings[key] =
+            getSetting(key);
 
     });
 
-    game.updatedAt=Date.now();
-
-    await saveGame(game);
-
-    await loadMessages();
-}
-
 
 /* =========================================================
-   START GAME
+   DOM
 ========================================================= */
 
-async function startGame(gameId){
-
-    const game=games[gameId];
-
-    if(!game)return;
-
-    if(
-        game.hostDeviceId!==deviceId
-    ){
-
-        return;
-    }
-
-    if(game.status!=="waiting"){
-
-        return;
-    }
-
-    /*
-       The player list becomes locked here.
-    */
-
-    game.status="running";
-
-    game.turnIndex=0;
-
-    game.updatedAt=Date.now();
-
-    await saveGame(game);
-
-    await loadMessages();
-}
-
-
-/* =========================================================
-   LEAVE GAME
-========================================================= */
-
-async function leaveGame(gameId){
-
-    const game=games[gameId];
-
-    if(!game)return;
-
-    if(game.status==="finished"){
-
-        return;
-    }
-
-    const me=
-        game.players.findIndex(
-            p=>p.deviceId===deviceId
-        );
-
-    if(me===-1)return;
-
-    /*
-       Host cannot simply leave.
-
-       Host must force quit the game.
-    */
-
-    if(
-        game.hostDeviceId===deviceId
-    ){
-
-        alert(
-            "The host must use Force Quit."
-        );
-
-        return;
-    }
-
-    game.players.splice(me,1);
-
-    game.players.forEach(
-        (p,index)=>{
-            p.index=index;
-        }
+const messagesEl =
+    document.getElementById(
+        "messages"
     );
 
-    if(
-        game.turnIndex>=
-        game.players.length
-    ){
-
-        game.turnIndex=0;
-    }
-
-    game.updatedAt=Date.now();
-
-    await saveGame(game);
-
-    await loadMessages();
-}
-
-
-/* =========================================================
-   FORCE QUIT
-========================================================= */
-
-async function forceQuitGame(gameId){
-
-    const game=games[gameId];
-
-    if(!game)return;
-
-    if(
-        game.hostDeviceId!==deviceId
-    ){
-
-        return;
-    }
-
-    game.status="finished";
-
-    game.winner=null;
-
-    game.forceStopped=true;
-
-    game.updatedAt=Date.now();
-
-    await saveGame(game);
-
-    await loadMessages();
-}
-
-
-/* =========================================================
-   GET MY PLAYER
-========================================================= */
-
-function getMyPlayer(game){
-
-    return game.players.find(
-        p=>p.deviceId===deviceId
-    );
-}
-
-
-function isMyTurn(game){
-
-    const me=getMyPlayer(game);
-
-    if(!me)return false;
-
-    return me.index===game.turnIndex;
-}
-
-
-/* =========================================================
-   NEXT TURN
-========================================================= */
-
-function nextTurn(game){
-
-    if(!game.players.length){
-
-        game.status="finished";
-
-        return;
-    }
-
-    game.turnIndex=
-        (
-            game.turnIndex+1
-        )%
-        game.players.length;
-}
-
-
-/* =========================================================
-   TIC TAC TOE
-========================================================= */
-
-async function tttMove(game,index){
-
-    if(
-        game.status!=="running"||
-        !isMyTurn(game)
-    )return;
-
-    if(game.state.board[index])return;
-
-    const me=getMyPlayer(game);
-
-    game.state.board[index]=
-        me.index===0
-        ?"X"
-        :"O";
-
-    const result=
-        checkTTT(game.state.board);
-
-    if(result){
-
-        game.status="finished";
-
-        game.winner=
-            result==="draw"
-            ?"draw"
-            :me.username;
-
-    }else{
-
-        nextTurn(game);
-    }
-
-    game.updatedAt=Date.now();
-
-    await saveGame(game);
-    await loadMessages();
-}
-
-
-function checkTTT(board){
-
-    const wins=[
-
-        [0,1,2],
-        [3,4,5],
-        [6,7,8],
-
-        [0,3,6],
-        [1,4,7],
-        [2,5,8],
-
-        [0,4,8],
-        [2,4,6]
-    ];
-
-    for(const w of wins){
-
-        if(
-            board[w[0]] &&
-            board[w[0]]===
-            board[w[1]] &&
-            board[w[1]]===
-            board[w[2]]
-        ){
-
-            return board[w[0]];
-        }
-    }
-
-    if(board.every(Boolean)){
-
-        return "draw";
-    }
-
-    return null;
-}
-
-
-/* =========================================================
-   CONNECT FOUR
-========================================================= */
-
-async function connectMove(game,column){
-
-    if(
-        game.status!=="running"||
-        !isMyTurn(game)
-    )return;
-
-    const rows=6;
-
-    const me=getMyPlayer(game);
-
-    const piece=
-        me.index===0
-        ?"red"
-        :"yellow";
-
-    let placed=-1;
-
-    for(
-        let row=rows-1;
-        row>=0;
-        row--
-    ){
-
-        const index=
-            row*7+column;
-
-        if(
-            !game.state.board[index]
-        ){
-
-            game.state.board[index]=
-                piece;
-
-            placed=index;
-
-            break;
-        }
-    }
-
-    if(placed===-1)return;
-
-    if(
-        checkConnectFour(
-            game.state.board,
-            placed
-        )
-    ){
-
-        game.status="finished";
-
-        game.winner=
-            me.username;
-
-    }else if(
-        game.state.board.every(Boolean)
-    ){
-
-        game.status="finished";
-
-        game.winner="draw";
-
-    }else{
-
-        nextTurn(game);
-    }
-
-    game.updatedAt=Date.now();
-
-    await saveGame(game);
-    await loadMessages();
-}
-
-
-function checkConnectFour(board,index){
-
-    const r=Math.floor(index/7);
-    const c=index%7;
-    const value=board[index];
-
-    const dirs=[
-        [1,0],
-        [0,1],
-        [1,1],
-        [1,-1]
-    ];
-
-    for(const [dr,dc] of dirs){
-
-        let count=1;
-
-        for(
-            let sign of [-1,1]
-        ){
-
-            let rr=r+dr*sign;
-            let cc=c+dc*sign;
-
-            while(
-                rr>=0&&
-                rr<6&&
-                cc>=0&&
-                cc<7&&
-                board[rr*7+cc]===value
-            ){
-
-                count++;
-
-                rr+=dr*sign;
-                cc+=dc*sign;
-            }
-        }
-
-        if(count>=4)return true;
-    }
-
-    return false;
-}
-
-
-/* =========================================================
-   REVERSI
-========================================================= */
-
-async function reversiMove(game,index){
-
-    if(
-        game.status!=="running"||
-        !isMyTurn(game)
-    )return;
-
-    if(
-        game.state.board[index]
-    )return;
-
-    const me=getMyPlayer(game);
-
-    const color=
-        me.index===0
-        ?"black"
-        :"white";
-
-    const opponent=
-        color==="black"
-        ?"white"
-        :"black";
-
-    const flips=
-        getReversiFlips(
-            game.state.board,
-            index,
-            color,
-            opponent
-        );
-
-    if(!flips.length)return;
-
-    game.state.board[index]=color;
-
-    flips.forEach(
-        i=>{
-            game.state.board[i]=color;
-        }
+const messageInput =
+    document.getElementById(
+        "messageInput"
     );
 
-    nextTurn(game);
-
-    game.updatedAt=Date.now();
-
-    await saveGame(game);
-    await loadMessages();
-}
-
-
-function getReversiFlips(
-    board,
-    index,
-    color,
-    opponent
-){
-
-    const r=
-        Math.floor(index/8);
-
-    const c=
-        index%8;
-
-    const dirs=[
-
-        [-1,-1],
-        [-1,0],
-        [-1,1],
-
-        [0,-1],
-        [0,1],
-
-        [1,-1],
-        [1,0],
-        [1,1]
-    ];
-
-    const result=[];
-
-    for(const [dr,dc] of dirs){
-
-        const line=[];
-
-        let rr=r+dr;
-        let cc=c+dc;
-
-        while(
-            rr>=0&&
-            rr<8&&
-            cc>=0&&
-            cc<8
-        ){
-
-            const value=
-                board[rr*8+cc];
-
-            if(value===opponent){
-
-                line.push(
-                    rr*8+cc
-                );
-
-            }else if(
-                value===color
-            ){
-
-                if(line.length){
-
-                    result.push(...line);
-                }
-
-                break;
-
-            }else{
-
-                break;
-            }
-
-            rr+=dr;
-            cc+=dc;
-        }
-    }
-
-    return result;
-}
-
-
-/* =========================================================
-   DICE DUEL
-========================================================= */
-
-async function diceMove(game){
-
-    if(
-        game.status!=="running"||
-        !isMyTurn(game)
-    )return;
-
-    const me=getMyPlayer(game);
-
-    const roll=
-        Math.floor(
-            Math.random()*6
-        )+1;
-
-    game.state.lastRoll=roll;
-
-    game.state.lastRoller=
-        me.username;
-
-    if(
-        !game.state.scores[
-            me.deviceId
-        ]
-    ){
-
-        game.state.scores[
-            me.deviceId
-        ]=0;
-    }
-
-    game.state.scores[
-        me.deviceId
-    ]+=roll;
-
-    nextTurn(game);
-
-    game.updatedAt=Date.now();
-
-    await saveGame(game);
-    await loadMessages();
-}
-
-
-/* =========================================================
-   GRID RACE
-========================================================= */
-
-async function raceMove(game){
-
-    if(
-        game.status!=="running"||
-        !isMyTurn(game)
-    )return;
-
-    const me=getMyPlayer(game);
-
-    if(
-        game.state.positions[
-            me.deviceId
-        ]===undefined
-    ){
-
-        game.state.positions[
-            me.deviceId
-        ]=0;
-    }
-
-    const roll=
-        Math.floor(
-            Math.random()*6
-        )+1;
-
-    game.state.positions[
-        me.deviceId
-    ]+=roll;
-
-    if(
-        game.state.positions[
-            me.deviceId
-        ]>=99
-    ){
-
-        game.state.positions[
-            me.deviceId
-        ]=99;
-
-        game.status="finished";
-
-        game.winner=
-            me.username;
-
-    }else{
-
-        nextTurn(game);
-    }
-
-    game.updatedAt=Date.now();
-
-    await saveGame(game);
-    await loadMessages();
-}
-
-
-/* =========================================================
-   GAME BUTTON HANDLER
-========================================================= */
-
-function handleGameAction(
-    game,
-    action,
-    value
-){
-
-    if(action==="join"){
-
-        joinGame(game.gameId);
-
-        return;
-    }
-
-    if(action==="start"){
-
-        startGame(game.gameId);
-
-        return;
-    }
-
-    if(action==="leave"){
-
-        leaveGame(game.gameId);
-
-        return;
-    }
-
-    if(action==="force"){
-
-        forceQuitGame(game.gameId);
-
-        return;
-    }
-
-    if(action==="ttt"){
-
-        tttMove(
-            game,
-            Number(value)
-        );
-
-        return;
-    }
-
-    if(action==="connect"){
-
-        connectMove(
-            game,
-            Number(value)
-        );
-
-        return;
-    }
-
-    if(action==="reversi"){
-
-        reversiMove(
-            game,
-            Number(value)
-        );
-
-        return;
-    }
-
-    if(action==="dice"){
-
-        diceMove(game);
-
-        return;
-    }
-
-    if(action==="race"){
-
-        raceMove(game);
-
-        return;
-    }
-}
-
-
-/* =========================================================
-   GAME CARD
-========================================================= */
-
-function createGameCard(game){
-
-    const wrapper=
-        document.createElement("div");
-
-    wrapper.className=
-        "game-message";
-
-    const card=
-        document.createElement("div");
-
-    card.className=
-        "game-card";
-
-    let statusClass="waiting";
-
-    if(game.status==="running"){
-        statusClass="running";
-    }
-
-    if(game.status==="finished"){
-        statusClass="finished";
-    }
-
-    const statusText=
-        game.status==="waiting"
-        ?"WAITING"
-        :game.status==="running"
-        ?"LIVE"
-        :"ENDED";
-
-    card.innerHTML=`
-
-        <div class="game-card-header">
-
-            <div class="game-title">
-
-                <div class="game-icon">
-                    ${game.icon}
-                </div>
-
-                <div>
-
-                    <div class="game-name">
-                        ${escapeHtml(game.name)}
-                    </div>
-
-                    <div class="game-host">
-                        Hosted by
-                        <strong>
-                            ${escapeHtml(game.hostName)}
-                        </strong>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="game-status ${statusClass}">
-                ${statusText}
-            </div>
-
-        </div>
-
-        <div class="game-info">
-
-            <div class="game-pill">
-                Players:
-                <strong>
-                    ${game.players.length}/${game.maxPlayers}
-                </strong>
-            </div>
-
-            ${
-                game.status==="running"
-                ?
-                `
-                <div class="game-pill">
-                    Turn:
-                    <strong>
-                        ${escapeHtml(
-                            game.players[
-                                game.turnIndex
-                            ]?.username||"?"
-                        )}
-                    </strong>
-                </div>
-                `
-                :
-                ""
-            }
-
-            ${
-                game.status==="finished"
-                ?
-                `
-                <div class="game-pill">
-                    ${
-                        game.forceStopped
-                        ?"Game force stopped"
-                        :
-                        game.winner==="draw"
-                        ?"Draw"
-                        :
-                        game.winner
-                        ?"Winner: "+escapeHtml(game.winner)
-                        :"Game ended"
-                    }
-                </div>
-                `
-                :
-                ""
-            }
-
-        </div>
-
-        <div class="game-body">
-
-            <div class="game-players"></div>
-
-            <div class="game-actions"></div>
-
-            <div class="game-board-wrap"></div>
-
-        </div>
-    `;
-
-    const playersEl=
-        card.querySelector(
-            ".game-players"
-        );
-
-    game.players.forEach(player=>{
-
-        const row=
-            document.createElement("div");
-
-        row.className="player-row";
-
-        const turn=
-            game.status==="running"&&
-            game.players[
-                game.turnIndex
-            ]?.deviceId===
-            player.deviceId;
-
-        row.innerHTML=`
-
-            <div class="player-name">
-
-                <span class="
-                    player-dot
-                    ${player.index===0?"host":""}
-                    ${turn?"turn":""}
-                "></span>
-
-                <span>
-                    ${escapeHtml(
-                        player.username
-                    )}
-                </span>
-
-                ${
-                    player.deviceId===
-                    game.hostDeviceId
-                    ?
-                    `<small style="color:#ffd166">
-                        HOST
-                    </small>`
-                    :
-                    ""
-                }
-
-            </div>
-
-            ${
-                turn
-                ?
-                `<span style="color:#65d68b">
-                    TURN
-                </span>`
-                :
-                ""
-            }
-
-        `;
-
-        playersEl.appendChild(row);
-    });
-
-
-    const actions=
-        card.querySelector(
-            ".game-actions"
-        );
-
-    const board=
-        card.querySelector(
-            ".game-board-wrap"
-        );
-
-
-    const me=
-        getMyPlayer(game);
-
-    const isHost=
-        game.hostDeviceId===
-        deviceId;
-
-    const playing=
-        !!me;
-
-    if(game.status==="waiting"){
-
-        if(!playing){
-
-            addGameButton(
-                actions,
-                "Join",
-                "primary",
-                "join",
-                game.gameId
-            );
-
-        }else{
-
-            addGameButton(
-                actions,
-                "Joined",
-                "green",
-                null,
-                null
-            );
-
-        }
-
-        if(isHost){
-
-            addGameButton(
-                actions,
-                "Start Game",
-                "primary",
-                "start",
-                game.gameId
-            );
-
-            addGameButton(
-                actions,
-                "Force Quit",
-                "danger",
-                "force",
-                game.gameId
-            );
-
-        }else if(playing){
-
-            addGameButton(
-                actions,
-                "Leave",
-                "",
-                "leave",
-                game.gameId
-            );
-        }
-
-    }else if(game.status==="running"){
-
-        if(playing){
-
-            addGameButton(
-                actions,
-                "Leave",
-                "",
-                "leave",
-                game.gameId
-            );
-        }
-
-        if(isHost){
-
-            addGameButton(
-                actions,
-                "Force Quit",
-                "danger",
-                "force",
-                game.gameId
-            );
-        }
-
-    }
-
-
-    if(game.status==="running"){
-
-        const turnPlayer=
-            game.players[
-                game.turnIndex
-            ];
-
-        const banner=
-            document.createElement("div");
-
-        banner.className=
-            "turn-banner";
-
-        const myTurn=
-            turnPlayer?.deviceId===
-            deviceId;
-
-        if(myTurn){
-
-            banner.classList.add(
-                "my-turn"
-            );
-
-            banner.textContent=
-                "🟢 Your turn";
-
-        }else{
-
-            banner.textContent=
-                "⏳ "+(
-                    turnPlayer?.username||
-                    "Unknown"
-                )+
-                "'s turn";
-        }
-
-        board.appendChild(banner);
-    }
-
-
-    renderGameBoard(
-        game,
-        board
+const sendBtn =
+    document.getElementById(
+        "sendBtn"
+    );
+
+const imageInput =
+    document.getElementById(
+        "imageInput"
+    );
+
+const attachBtn =
+    document.getElementById(
+        "attachBtn"
+    );
+
+const gamesBtn =
+    document.getElementById(
+        "gamesBtn"
+    );
+
+const gamesOverlay =
+    document.getElementById(
+        "gamesOverlay"
+    );
+
+const closeGames =
+    document.getElementById(
+        "closeGames"
+    );
+
+const settingsBtn =
+    document.getElementById(
+        "settingsBtn"
+    );
+
+const settingsOverlay =
+    document.getElementById(
+        "settingsOverlay"
+    );
+
+const closeSettings =
+    document.getElementById(
+        "closeSettings"
+    );
+
+const saveSettings =
+    document.getElementById(
+        "saveSettings"
+    );
+
+const usernameInput =
+    document.getElementById(
+        "usernameInput"
+    );
+
+const deviceIdInput =
+    document.getElementById(
+        "deviceIdInput"
+    );
+
+const refreshRate =
+    document.getElementById(
+        "refreshRate"
+    );
+
+const textSize =
+    document.getElementById(
+        "textSize"
+    );
+
+const wordSpacing =
+    document.getElementById(
+        "wordSpacing"
+    );
+
+const lineSpacing =
+    document.getElementById(
+        "lineSpacing"
+    );
+
+const textSizeValue =
+    document.getElementById(
+        "textSizeValue"
+    );
+
+const wordSpacingValue =
+    document.getElementById(
+        "wordSpacingValue"
+    );
+
+const lineSpacingValue =
+    document.getElementById(
+        "lineSpacingValue"
+    );
+
+const cornerRadius =
+    document.getElementById(
+        "cornerRadius"
+    );
+
+const cornerRadiusValue =
+    document.getElementById(
+        "cornerRadiusValue"
+    );
+
+const uiScale =
+    document.getElementById(
+        "uiScale"
+    );
+
+const uiScaleValue =
+    document.getElementById(
+        "uiScaleValue"
+    );
+
+const themeSelect =
+    document.getElementById(
+        "themeSelect"
+    );
+
+const showTimestamps =
+    document.getElementById(
+        "showTimestamps"
+    );
+
+const compactMessages =
+    document.getElementById(
+        "compactMessages"
+    );
+
+const gameSyncMode =
+    document.getElementById(
+        "gameSyncMode"
+    );
+
+const showGameInvites =
+    document.getElementById(
+        "showGameInvites"
+    );
+
+const autoOpenGames =
+    document.getElementById(
+        "autoOpenGames"
+    );
+
+const enterToSend =
+    document.getElementById(
+        "enterToSend"
+    );
+
+const autoScroll =
+    document.getElementById(
+        "autoScroll"
+    );
+
+const confirmDelete =
+    document.getElementById(
+        "confirmDelete"
+    );
+
+const removeEverything =
+    document.getElementById(
+        "removeEverything"
+    );
+
+const dialogOverlay =
+    document.getElementById(
+        "dialogOverlay"
+    );
+
+const dialogTitle =
+    document.getElementById(
+        "dialogTitle"
+    );
+
+const dialogText =
+    document.getElementById(
+        "dialogText"
+    );
+
+const dialogCancel =
+    document.getElementById(
+        "dialogCancel"
+    );
+
+const dialogConfirm =
+    document.getElementById(
+        "dialogConfirm"
     );
 
 
-    wrapper.appendChild(card);
-
-    return wrapper;
-}
-
-
-/* =========================================================
-   GAME BUTTON
-========================================================= */
-
-function addGameButton(
-    parent,
-    text,
-    className,
-    action,
-    value
-){
-
-    const button=
-        document.createElement("button");
-
-    button.className=
-        "game-btn "+className;
-
-    button.textContent=text;
-
-    if(action){
-
-        button.onclick=event=>{
-
-            event.stopPropagation();
-
-            handleGameAction(
-                games[value],
-                action,
-                null
-            );
-        };
-    }
-
-    parent.appendChild(button);
-}
-
-
-/* =========================================================
-   RENDER GAME BOARD
-========================================================= */
-
-function renderGameBoard(
-    game,
-    container
-){
-
-    if(game.status!=="running"){
-
-        return;
-    }
-
-    if(game.type==="ttt"){
-
-        renderTTT(
-            game,
-            container
-        );
-
-    }else if(game.type==="connect4"){
-
-        renderConnect4(
-            game,
-            container
-        );
-
-    }else if(game.type==="reversi"){
-
-        renderReversi(
-            game,
-            container
-        );
-
-    }else if(game.type==="dice"){
-
-        renderDice(
-            game,
-            container
-        );
-
-    }else if(game.type==="race"){
-
-        renderRace(
-            game,
-            container
-        );
-    }
-}
-
-
-/* =========================================================
-   TTT UI
-========================================================= */
-
-function renderTTT(game,container){
-
-    const board=
-        document.createElement("div");
-
-    board.className="ttt-board";
-
-    game.state.board.forEach(
-        (value,index)=>{
-
-            const button=
-                document.createElement("button");
-
-            button.className=
-                "ttt-cell";
-
-            button.textContent=
-                value||"";
-
-            button.onclick=()=>{
-
-                handleGameAction(
-                    game,
-                    "ttt",
-                    index
-                );
-            };
-
-            board.appendChild(button);
-        }
-    );
-
-    container.appendChild(board);
-}
-
-
-/* =========================================================
-   CONNECT UI
-========================================================= */
-
-function renderConnect4(
-    game,
-    container
-){
-
-    const board=
-        document.createElement("div");
-
-    board.className=
-        "connect-board";
-
-    game.state.board.forEach(
-        (value,index)=>{
-
-            const button=
-                document.createElement("button");
-
-            button.className=
-                "connect-cell "+
-                (value||"");
-
-            button.onclick=()=>{
-
-                handleGameAction(
-                    game,
-                    "connect",
-                    index%7
-                );
-            };
-
-            board.appendChild(button);
-        }
-    );
-
-    container.appendChild(board);
-}
-
-
-/* =========================================================
-   REVERSI UI
-========================================================= */
-
-function renderReversi(
-    game,
-    container
-){
-
-    const board=
-        document.createElement("div");
-
-    board.className=
-        "reversi-board";
-
-    game.state.board.forEach(
-        (value,index)=>{
-
-            const cell=
-                document.createElement("button");
-
-            cell.className=
-                "reversi-cell";
-
-            cell.onclick=()=>{
-
-                handleGameAction(
-                    game,
-                    "reversi",
-                    index
-                );
-            };
-
-            if(value){
-
-                const piece=
-                    document.createElement("div");
-
-                piece.className=
-                    "reversi-piece "+
-                    value;
-
-                cell.appendChild(piece);
-            }
-
-            board.appendChild(cell);
-        }
-    );
-
-    container.appendChild(board);
-}
-
-
-/* =========================================================
-   DICE UI
-========================================================= */
-
-function renderDice(
-    game,
-    container
-){
-
-    const area=
-        document.createElement("div");
-
-    area.className=
-        "dice-area";
-
-    const dice=
-        document.createElement("div");
-
-    dice.className="dice";
-
-    dice.textContent=
-        game.state.lastRoll||
-        "🎲";
-
-    area.appendChild(dice);
-
-    if(game.state.lastRoll){
-
-        const result=
-            document.createElement("div");
-
-        result.className=
-            "dice-result";
-
-        result.textContent=
-            game.state.lastRoller+
-            " rolled "+
-            game.state.lastRoll;
-
-        area.appendChild(result);
-    }
-
-    if(isMyTurn(game)){
-
-        const button=
-            document.createElement("button");
-
-        button.className=
-            "game-btn primary";
-
-        button.textContent=
-            "Roll Dice";
-
-        button.onclick=()=>{
-
-            handleGameAction(
-                game,
-                "dice"
-            );
-        };
-
-        area.appendChild(button);
-    }
-
-    const scores=
-        document.createElement("div");
-
-    scores.style.width="100%";
-
-    Object.entries(
-        game.state.scores
-    ).forEach(([id,score])=>{
-
-        const player=
-            game.players.find(
-                p=>p.deviceId===id
-            );
-
-        if(!player)return;
-
-        const row=
-            document.createElement("div");
-
-        row.className="player-row";
-
-        row.innerHTML=`
-            <span>
-                ${escapeHtml(
-                    player.username
-                )}
-            </span>
-            <strong>
-                ${score}
-            </strong>
-        `;
-
-        scores.appendChild(row);
-    });
-
-    area.appendChild(scores);
-
-    container.appendChild(area);
-}
-
-
-/* =========================================================
-   RACE UI
-========================================================= */
-
-function renderRace(
-    game,
-    container
-){
-
-    const board=
-        document.createElement("div");
-
-    board.className=
-        "race-board";
-
-    for(let i=0;i<100;i++){
-
-        const cell=
-            document.createElement("div");
-
-        cell.className=
-            "race-cell";
-
-        if(i===99){
-
-            cell.classList.add(
-                "finish"
-            );
-
-            cell.textContent="🏁";
-        }
-
-        game.players.forEach(
-            player=>{
-
-                const position=
-                    game.state.positions[
-                        player.deviceId
-                    ]??0;
-
-                if(position===i){
-
-                    const piece=
-                        document.createElement(
-                            "div"
-                        );
-
-                    piece.className=
-                        "race-piece";
-
-                    piece.title=
-                        player.username;
-
-                    cell.appendChild(piece);
-                }
-            }
-        );
-
-        board.appendChild(cell);
-    }
-
-    container.appendChild(board);
-
-    if(isMyTurn(game)){
-
-        const button=
-            document.createElement("button");
-
-        button.className=
-            "game-btn primary";
-
-        button.style.display="block";
-        button.style.margin="12px auto 0";
-
-        button.textContent=
-            "🎲 Roll & Move";
-
-        button.onclick=()=>{
-
-            handleGameAction(
-                game,
-                "race"
-            );
-        };
-
-        container.appendChild(button);
-    }
-}
-
-
-/* =========================================================
-   RENDER CHAT
-========================================================= */
-
-function renderMessages(){
-
-    const wasBottom=
-        messagesEl.scrollHeight-
-        messagesEl.scrollTop-
-        messagesEl.clientHeight<100;
-
-    processGameMessages();
-
-    const normalMessages=
-        currentMessages.filter(
-            message=>
-                !decodeGame(
-                    message.message
-                )
-        );
-
-    const fragment=
-        document.createDocumentFragment();
-
-
-    /*
-       Normal messages.
-    */
-
-    normalMessages.forEach(message=>{
-
-        const item=
-            document.createElement("div");
-
-        item.className="message";
-
-        item.dataset.id=
-            message.id;
-
-        const avatar=
-            document.createElement("div");
-
-        avatar.className="avatar";
-
-        avatar.textContent=
-            (
-                message.username||
-                "?"
-            )
-            .charAt(0)
-            .toUpperCase();
-
-        const content=
-            document.createElement(
-                "div"
-            );
-
-        content.className=
-            "message-content";
-
-        const top=
-            document.createElement("div");
-
-        top.className=
-            "message-top";
-
-        const name=
-            document.createElement("span");
-
-        name.className="username";
-
-        name.textContent=
-            message.username||
-            "User";
-
-        top.appendChild(name);
-
-        if(settings.showTimestamps){
-
-            const time=
-                document.createElement("span");
-
-            time.className="time";
-
-            time.textContent=
-                formatTime(
-                    message.created_at
-                );
-
-            top.appendChild(time);
-        }
-
-        if(message.edited){
-
-            const edited=
-                document.createElement(
-                    "span"
-                );
-
-            edited.className="edited";
-
-            edited.textContent=
-                "(edited)";
-
-            top.appendChild(edited);
-        }
-
-        content.appendChild(top);
-
-        if(message.message){
-
-            const text=
-                document.createElement(
-                    "div"
-                );
-
-            text.className=
-                "message-text";
-
-            text.textContent=
-                message.message;
-
-            content.appendChild(text);
-        }
-
-        if(message.image){
-
-            const img=
-                document.createElement("img");
-
-            img.className=
-                "message-image";
-
-            img.src=
-                message.image;
-
-            content.appendChild(img);
-        }
-
-        item.appendChild(avatar);
-        item.appendChild(content);
-
-        if(
-            message.device_id===
-            deviceId
-        ){
-
-            item.addEventListener(
-                "contextmenu",
-                event=>{
-
-                    event.preventDefault();
-
-                    selectedMessage=
-                        message;
-
-                    contextMenu.style.left=
-                        event.clientX+
-                        "px";
-
-                    contextMenu.style.top=
-                        event.clientY+
-                        "px";
-
-                    contextMenu.classList.add(
-                        "show"
-                    );
-                }
-            );
-        }
-
-        fragment.appendChild(item);
-    });
-
-
-    /*
-       Game messages.
-
-       They are still stored in messages,
-       but are rendered as interactive game
-       cards instead of visible raw JSON.
-    */
-
-    Object.values(games)
-    .sort(
-        (a,b)=>
-            a.createdAt-b.createdAt
-    )
-    .forEach(game=>{
-
-        fragment.appendChild(
-            createGameCard(game)
-        );
-    });
-
-
-    if(
-        !fragment.childNodes.length
-    ){
-
-        const empty=
-            document.createElement("div");
-
-        empty.className="empty";
-
-        empty.innerHTML=`
-            <div>
-                <strong>
-                    No messages yet
-                </strong>
-                Be the first to send something.
-            </div>
-        `;
-
-        fragment.appendChild(empty);
-    }
-
-    messagesEl.replaceChildren(
-        fragment
-    );
-
-    if(
-        wasBottom&&
-        settings.autoScroll
-    ){
-
-        messagesEl.scrollTop=
-            messagesEl.scrollHeight;
-    }
-}
-
-
-/* =========================================================
-   LOAD MESSAGES
-========================================================= */
-
-let loadingMessages=false;
-
-async function loadMessages(){
-
-    if(loadingMessages)return;
-
-    loadingMessages=true;
-
-    try{
-
-        const response=
-            await fetch(
-                API_URL+
-                "?channel="+
-                encodeURIComponent(
-                    CHANNEL
-                ),
-                {
-                    cache:"no-store"
-                }
-            );
-
-        const data=
-            await response.json();
-
-        if(!response.ok){
-
-            throw new Error(
-                data.error||
-                "Failed to load messages."
-            );
-        }
-
-        currentMessages=
-            Array.isArray(data.messages)
-            ?data.messages
-            :[];
-
-        renderMessages();
-
-    }catch(error){
-
-        console.error(error);
-
-    }finally{
-
-        loadingMessages=false;
-    }
-}
-
-
-/* =========================================================
-   FAST GAME REFRESH
-========================================================= */
-
-function startGameRefresh(){
-
-    if(gameTimer){
-
-        clearInterval(
-            gameTimer
-        );
-    }
-
-    /*
-       Only poll this fast while at least
-       one game is active.
-    */
-
-    gameTimer=
-        setInterval(
-            async()=>{
-
-                if(
-                    activeGameIds.size
-                ){
-
-                    await loadMessages();
-                }
-
-            },
-            GAME_REFRESH_MS
-        );
-}
-
-
-/* =========================================================
-   NORMAL REFRESH
-========================================================= */
-
-function startNormalRefresh(){
-
-    if(refreshTimer){
-
-        clearInterval(
-            refreshTimer
-        );
-    }
-
-    refreshTimer=
-        setInterval(
-            loadMessages,
-            Number(
-                settings.refreshRate
-            )
-        );
-}
+let selectedFile = null;
+let currentMessages = [];
+let activeGames = [];
+let refreshTimer = null;
+let gameTimer = null;
+let gameBusy = false;
+let confirmCallback = null;
 
 
 /* =========================================================
    SETTINGS
 ========================================================= */
 
-function applyTheme(name){
+function applySettings() {
 
-    const themes={
+    document.documentElement
+        .style
+        .setProperty(
+            "--text-size",
+            settings.textSize + "px"
+        );
 
-        dark:[
-            "#0b0d10",
-            "#111419"
-        ],
+    document.documentElement
+        .style
+        .setProperty(
+            "--word-spacing",
+            settings.wordSpacing + "px"
+        );
 
-        midnight:[
-            "#080b14",
-            "#101522"
-        ],
+    document.documentElement
+        .style
+        .setProperty(
+            "--line-spacing",
+            settings.lineSpacing
+        );
 
-        slate:[
-            "#101418",
-            "#171d22"
-        ],
+    document.documentElement
+        .style
+        .setProperty(
+            "--radius",
+            settings.cornerRadius + "px"
+        );
 
-        black:[
-            "#000",
-            "#090909"
-        ],
+    applyTheme(
+        settings.theme
+    );
 
-        blue:[
-            "#091018",
-            "#101c29"
-        ],
+    renderMessages();
 
-        purple:[
-            "#100b17",
-            "#191021"
-        ],
+    startChatRefresh();
 
-        green:[
-            "#09120d",
-            "#101b15"
-        ],
+    startGameRefresh();
+}
 
-        red:[
-            "#140b0b",
-            "#1e1111"
-        ],
 
-        gray:[
-            "#151515",
-            "#202020"
-        ],
+function applyTheme(name) {
 
-        light:[
-            "#eeeeee",
-            "#fff"
-        ],
+    const themes = {
 
-        oled:[
-            "#000",
-            "#000"
-        ]
+        dark:
+            ["#0b0d10","#111419"],
+
+        midnight:
+            ["#080b14","#101522"],
+
+        slate:
+            ["#101418","#171d22"],
+
+        black:
+            ["#000","#090909"],
+
+        blue:
+            ["#091018","#101c29"],
+
+        purple:
+            ["#100b17","#191021"],
+
+        green:
+            ["#09120d","#101b15"],
+
+        red:
+            ["#140b0b","#1e1111"],
+
+        gray:
+            ["#151515","#202020"],
+
+        light:
+            ["#eeeeee","#fff"],
+
+        oled:
+            ["#000","#000"]
     };
 
-    const t=
-        themes[name]||
+    const t =
+        themes[name] ||
         themes.dark;
 
     document.documentElement
@@ -3751,197 +1766,223 @@ function applyTheme(name){
             "--panel",
             t[1]
         );
+
+    document.body.style.background =
+        t[0];
 }
 
 
-function applySettings(){
+function loadSettingsUI() {
 
-    document.documentElement
-        .style
-        .setProperty(
-            "--text-size",
-            settings.textSize+
-            "px"
-        );
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--word-spacing",
-            settings.wordSpacing+
-            "px"
-        );
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--line-spacing",
-            settings.lineSpacing
-        );
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--radius",
-            settings.cornerRadius+
-            "px"
-        );
-
-    document.documentElement
-        .style
-        .setProperty(
-            "--ui-scale",
-            settings.uiScale
-        );
-
-    applyTheme(
-        settings.theme
-    );
-
-    startNormalRefresh();
-}
-
-
-function loadSettingsUI(){
-
-    usernameInput.value=
+    usernameInput.value =
         settings.username;
 
-    deviceIdInput.value=
+    deviceIdInput.value =
         deviceId;
 
-    themeSelect.value=
-        settings.theme;
-
-    refreshRate.value=
+    refreshRate.value =
         settings.refreshRate;
 
-    showTimestamps.value=
+    textSize.value =
+        settings.textSize;
+
+    wordSpacing.value =
+        settings.wordSpacing;
+
+    lineSpacing.value =
+        settings.lineSpacing;
+
+    cornerRadius.value =
+        settings.cornerRadius;
+
+    uiScale.value =
+        settings.uiScale;
+
+    themeSelect.value =
+        settings.theme;
+
+    showTimestamps.value =
         String(
             settings.showTimestamps
         );
 
-    compactMessages.value=
+    compactMessages.value =
         String(
             settings.compactMessages
         );
 
-    textSize.value=
-        settings.textSize;
+    gameSyncMode.value =
+        settings.gameSyncMode;
 
-    wordSpacing.value=
-        settings.wordSpacing;
+    showGameInvites.value =
+        String(
+            settings.showGameInvites
+        );
 
-    lineSpacing.value=
-        settings.lineSpacing;
+    autoOpenGames.value =
+        String(
+            settings.autoOpenGames
+        );
 
-    cornerRadius.value=
-        settings.cornerRadius;
-
-    uiScale.value=
-        settings.uiScale;
-
-    enterToSend.value=
+    enterToSend.value =
         String(
             settings.enterToSend
         );
 
-    autoScroll.value=
+    autoScroll.value =
         String(
             settings.autoScroll
         );
 
-    confirmDelete.value=
+    confirmDelete.value =
         String(
             settings.confirmDelete
         );
+
+    updateRangeLabels();
 }
 
 
-settingsBtn.onclick=()=>{
+function updateRangeLabels() {
+
+    textSizeValue.textContent =
+        textSize.value + "px";
+
+    wordSpacingValue.textContent =
+        wordSpacing.value + "px";
+
+    lineSpacingValue.textContent =
+        lineSpacing.value;
+
+    cornerRadiusValue.textContent =
+        cornerRadius.value + "px";
+
+    uiScaleValue.textContent =
+        Math.round(
+            Number(uiScale.value) * 100
+        ) + "%";
+}
+
+
+[
+    textSize,
+    wordSpacing,
+    lineSpacing,
+    cornerRadius,
+    uiScale
+].forEach(input => {
+
+    input.oninput =
+        updateRangeLabels;
+
+});
+
+
+settingsBtn.onclick = () => {
 
     loadSettingsUI();
 
-    settingsOverlay.classList.add(
-        "show"
-    );
+    settingsOverlay
+        .classList
+        .add("show");
 };
 
 
-closeSettings.onclick=()=>{
+closeSettings.onclick = () => {
 
-    settingsOverlay.classList.remove(
-        "show"
-    );
+    settingsOverlay
+        .classList
+        .remove("show");
 };
 
 
-saveSettings.onclick=()=>{
+gamesBtn.onclick = () => {
 
-    settings.username=
+    gamesOverlay
+        .classList
+        .add("show");
+
+};
+
+
+closeGames.onclick = () => {
+
+    gamesOverlay
+        .classList
+        .remove("show");
+
+};
+
+
+saveSettings.onclick = () => {
+
+    settings.username =
         usernameInput.value
-        .trim()
-        .substring(0,24);
+            .trim()
+            .substring(0,24);
 
-    settings.theme=
-        themeSelect.value;
-
-    settings.refreshRate=
+    settings.refreshRate =
         Number(
             refreshRate.value
         );
 
-    settings.showTimestamps=
-        showTimestamps.value===
-        "true";
-
-    settings.compactMessages=
-        compactMessages.value===
-        "true";
-
-    settings.textSize=
+    settings.textSize =
         Number(textSize.value);
 
-    settings.wordSpacing=
+    settings.wordSpacing =
         Number(wordSpacing.value);
 
-    settings.lineSpacing=
+    settings.lineSpacing =
         Number(lineSpacing.value);
 
-    settings.cornerRadius=
+    settings.cornerRadius =
         Number(cornerRadius.value);
 
-    settings.uiScale=
+    settings.uiScale =
         Number(uiScale.value);
 
-    settings.enterToSend=
-        enterToSend.value===
-        "true";
+    settings.theme =
+        themeSelect.value;
 
-    settings.autoScroll=
-        autoScroll.value===
-        "true";
+    settings.showTimestamps =
+        showTimestamps.value === "true";
 
-    settings.confirmDelete=
-        confirmDelete.value===
-        "true";
+    settings.compactMessages =
+        compactMessages.value === "true";
+
+    settings.gameSyncMode =
+        gameSyncMode.value;
+
+    settings.showGameInvites =
+        showGameInvites.value === "true";
+
+    settings.autoOpenGames =
+        autoOpenGames.value === "true";
+
+    settings.enterToSend =
+        enterToSend.value === "true";
+
+    settings.autoScroll =
+        autoScroll.value === "true";
+
+    settings.confirmDelete =
+        confirmDelete.value === "true";
 
     Object.keys(settings)
-    .forEach(key=>{
+        .forEach(key => {
 
-        localStorage.setItem(
-            "chat_"+key,
-            settings[key]
-        );
-    });
+            localStorage.setItem(
+                "chat_" + key,
+                settings[key]
+            );
+
+        });
 
     applySettings();
 
-    settingsOverlay.classList.remove(
-        "show"
-    );
-
-    renderMessages();
+    settingsOverlay
+        .classList
+        .remove("show");
 };
 
 
@@ -3950,76 +1991,199 @@ saveSettings.onclick=()=>{
 ========================================================= */
 
 document
-.querySelectorAll(
-    ".category-title"
-)
-.forEach(button=>{
+    .querySelectorAll(
+        ".category-title"
+    )
+    .forEach(button => {
 
-    button.onclick=()=>{
+        button.onclick = () => {
 
-        button.parentElement
-            .classList
-            .toggle("open");
-    };
-});
+            button
+                .parentElement
+                .classList
+                .toggle("open");
 
+        };
 
-/* =========================================================
-   TEXTAREA
-========================================================= */
-
-messageInput.addEventListener(
-    "input",
-    ()=>{
-
-        messageInput.style.height=
-            "auto";
-
-        messageInput.style.height=
-            Math.min(
-                messageInput.scrollHeight,
-                150
-            )+"px";
-    }
-);
+    });
 
 
 /* =========================================================
-   SEND MESSAGE
+   IMAGE
 ========================================================= */
 
-sendBtn.onclick=
+attachBtn.onclick = () => {
+
+    imageInput.click();
+
+};
+
+
+imageInput.onchange = () => {
+
+    selectedFile =
+        imageInput.files[0] || null;
+
+    attachBtn.textContent =
+        selectedFile
+            ? "✓"
+            : "＋";
+};
+
+
+function resizeImage(file) {
+
+    return new Promise(
+        (resolve,reject) => {
+
+            const reader =
+                new FileReader();
+
+            reader.onload = () => {
+
+                const img =
+                    new Image();
+
+                img.onload = () => {
+
+                    let width =
+                        img.width;
+
+                    let height =
+                        img.height;
+
+                    const max =
+                        1500;
+
+                    if (
+                        width > max ||
+                        height > max
+                    ) {
+
+                        const scale =
+                            Math.min(
+                                max / width,
+                                max / height
+                            );
+
+                        width =
+                            Math.round(
+                                width * scale
+                            );
+
+                        height =
+                            Math.round(
+                                height * scale
+                            );
+                    }
+
+                    const canvas =
+                        document
+                            .createElement(
+                                "canvas"
+                            );
+
+                    canvas.width =
+                        width;
+
+                    canvas.height =
+                        height;
+
+                    const ctx =
+                        canvas
+                            .getContext(
+                                "2d"
+                            );
+
+                    ctx.drawImage(
+                        img,
+                        0,
+                        0,
+                        width,
+                        height
+                    );
+
+                    resolve(
+                        canvas.toDataURL(
+                            "image/jpeg",
+                            .78
+                        )
+                    );
+
+                };
+
+                img.onerror =
+                    reject;
+
+                img.src =
+                    reader.result;
+            };
+
+            reader.onerror =
+                reject;
+
+            reader.readAsDataURL(file);
+        }
+    );
+}
+
+
+/* =========================================================
+   SEND
+========================================================= */
+
+sendBtn.onclick =
     sendMessage;
 
 
 messageInput.addEventListener(
     "keydown",
-    event=>{
+    event => {
 
-        if(
-            event.key==="Enter"&&
-            !event.shiftKey&&
+        if (
+            event.key === "Enter" &&
+            !event.shiftKey &&
             settings.enterToSend
-        ){
+        ) {
 
             event.preventDefault();
 
             sendMessage();
+
         }
+
     }
 );
 
 
-async function sendMessage(){
+messageInput.addEventListener(
+    "input",
+    () => {
 
-    const text=
-        messageInput.value.trim();
+        messageInput.style.height =
+            "auto";
 
-    if(!settings.username){
+        messageInput.style.height =
+            Math.min(
+                messageInput.scrollHeight,
+                150
+            ) + "px";
 
-        settingsOverlay.classList.add(
-            "show"
-        );
+    }
+);
+
+
+async function sendMessage() {
+
+    const text =
+        messageInput.value
+            .trim();
+
+    if (!settings.username) {
+
+        settingsOverlay
+            .classList
+            .add("show");
 
         usernameInput.focus();
 
@@ -4030,36 +2194,40 @@ async function sendMessage(){
         return;
     }
 
-    if(!text&&!selectedFile)return;
+    if (
+        !text &&
+        !selectedFile
+    ) {
+        return;
+    }
 
-    sendBtn.disabled=true;
+    sendBtn.disabled =
+        true;
 
-    try{
+    try {
 
-        let image=null;
+        let image = null;
 
-        if(selectedFile){
-
-            image=
+        if (selectedFile) {
+            image =
                 await resizeImage(
                     selectedFile
                 );
         }
 
-        const response=
+        const response =
             await fetch(
                 API_URL,
                 {
-                    method:"POST",
+                    method: "POST",
 
-                    headers:{
+                    headers: {
                         "Content-Type":
                             "application/json"
                     },
 
                     body:
                         JSON.stringify({
-
                             username:
                                 settings.username,
 
@@ -4077,278 +2245,2599 @@ async function sendMessage(){
                 }
             );
 
-        const data=
+        const data =
             await response.json();
 
-        if(!response.ok){
-
+        if (!response.ok) {
             throw new Error(
-                data.error||
-                "Failed to send."
+                data.error ||
+                "Failed to send message."
             );
         }
 
-        messageInput.value="";
-        messageInput.style.height=
+        messageInput.value = "";
+
+        messageInput.style.height =
             "auto";
 
-        selectedFile=null;
+        selectedFile = null;
 
-        imageInput.value="";
+        imageInput.value = "";
 
-        attachBtn.textContent="＋";
+        attachBtn.textContent =
+            "＋";
 
         await loadMessages();
 
-    }catch(error){
+    } catch (error) {
 
         alert(
-            "Failed to send:\n\n"+
+            "Failed to send:\n\n" +
             error.message
         );
 
-    }finally{
+    } finally {
 
-        sendBtn.disabled=false;
+        sendBtn.disabled =
+            false;
+
     }
 }
 
 
 /* =========================================================
-   IMAGE
+   CHAT LOADING
 ========================================================= */
 
-attachBtn.onclick=()=>{
-    imageInput.click();
-};
+async function loadMessages() {
 
-imageInput.onchange=()=>{
+    try {
 
-    selectedFile=
-        imageInput.files[0]||
-        null;
-
-    attachBtn.textContent=
-        selectedFile
-        ?"✓"
-        :"＋";
-};
-
-
-function resizeImage(file){
-
-    return new Promise(
-        (resolve,reject)=>{
-
-            const reader=
-                new FileReader();
-
-            reader.onload=()=>{
-
-                const img=
-                    new Image();
-
-                img.onload=()=>{
-
-                    let width=
-                        img.width;
-
-                    let height=
-                        img.height;
-
-                    const max=1500;
-
-                    if(
-                        width>max||
-                        height>max
-                    ){
-
-                        const scale=
-                            Math.min(
-                                max/width,
-                                max/height
-                            );
-
-                        width=
-                            Math.round(
-                                width*scale
-                            );
-
-                        height=
-                            Math.round(
-                                height*scale
-                            );
-                    }
-
-                    const canvas=
-                        document.createElement(
-                            "canvas"
-                        );
-
-                    canvas.width=width;
-                    canvas.height=height;
-
-                    const ctx=
-                        canvas.getContext(
-                            "2d"
-                        );
-
-                    ctx.drawImage(
-                        img,
-                        0,
-                        0,
-                        width,
-                        height
-                    );
-
-                    resolve(
-                        canvas.toDataURL(
-                            "image/jpeg",
-                            .78
-                        )
-                    );
-                };
-
-                img.onerror=reject;
-
-                img.src=
-                    reader.result;
-            };
-
-            reader.onerror=reject;
-
-            reader.readAsDataURL(
-                file
-            );
-        }
-    );
-}
-
-
-/* =========================================================
-   EDIT / DELETE
-========================================================= */
-
-document.addEventListener(
-    "click",
-    ()=>{
-        contextMenu.classList.remove(
-            "show"
-        );
-    }
-);
-
-
-editMessageBtn.onclick=
-async event=>{
-
-    event.stopPropagation();
-
-    contextMenu.classList.remove(
-        "show"
-    );
-
-    if(!selectedMessage)return;
-
-    const text=
-        prompt(
-            "Edit message:",
-            selectedMessage.message||
-            ""
-        );
-
-    if(text===null)return;
-
-    try{
-
-        const response=
+        const response =
             await fetch(
-                API_URL,
+                API_URL +
+                "?channel=" +
+                encodeURIComponent(
+                    CHANNEL
+                ),
                 {
-                    method:"PATCH",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            id:
-                                selectedMessage.id,
-
-                            device_id:
-                                deviceId,
-
-                            message:
-                                text.trim()
-                        })
+                    cache: "no-store"
                 }
             );
 
-        if(!response.ok){
+        const data =
+            await response.json();
 
-            const data=
-                await response.json();
-
+        if (!response.ok) {
             throw new Error(
-                data.error||
-                "Failed to edit."
+                data.error ||
+                "Failed to load messages."
             );
         }
 
-        await loadMessages();
+        currentMessages =
+            Array.isArray(
+                data.messages
+            )
+                ? data.messages
+                : [];
 
-    }catch(error){
+        renderMessages();
 
-        alert(
-            "Failed to edit:\n\n"+
-            error.message
+    } catch (error) {
+
+        messagesEl.innerHTML = "";
+
+        const empty =
+            document.createElement(
+                "div"
+            );
+
+        empty.className =
+            "empty";
+
+        empty.innerHTML =
+            "<div><strong>Unable to load messages</strong>" +
+            escapeHtml(
+                error.message
+            ) +
+            "</div>";
+
+        messagesEl.appendChild(
+            empty
         );
+    }
+}
+
+
+/* =========================================================
+   CHAT RENDER
+========================================================= */
+
+function renderMessages() {
+
+    const wasBottom =
+        messagesEl.scrollHeight -
+        messagesEl.scrollTop -
+        messagesEl.clientHeight
+        < 100;
+
+    const fragment =
+        document
+            .createDocumentFragment();
+
+
+    /*
+     * Active game cards are inserted
+     * before normal messages.
+     */
+
+    if (
+        settings.showGameInvites &&
+        activeGames.length
+    ) {
+
+        activeGames.forEach(
+            game => {
+
+                fragment.appendChild(
+                    createGameCard(
+                        game
+                    )
+                );
+
+            }
+        );
+    }
+
+
+    if (!currentMessages.length) {
+
+        if (!activeGames.length) {
+
+            const empty =
+                document.createElement(
+                    "div"
+                );
+
+            empty.className =
+                "empty";
+
+            empty.innerHTML =
+                "<div>" +
+                "<strong>No messages yet</strong>" +
+                "Be the first to send something." +
+                "</div>";
+
+            fragment.appendChild(
+                empty
+            );
+        }
+
+    } else {
+
+        currentMessages.forEach(
+            message => {
+
+                fragment.appendChild(
+                    createMessage(
+                        message
+                    )
+                );
+
+            }
+        );
+    }
+
+    messagesEl.replaceChildren(
+        fragment
+    );
+
+
+    if (
+        wasBottom &&
+        settings.autoScroll
+    ) {
+
+        messagesEl.scrollTop =
+            messagesEl.scrollHeight;
+    }
+}
+
+
+function createMessage(message) {
+
+    const item =
+        document.createElement(
+            "div"
+        );
+
+    item.className =
+        "message";
+
+    const avatar =
+        document.createElement(
+            "div"
+        );
+
+    avatar.className =
+        "avatar";
+
+    avatar.textContent =
+        (
+            message.username ||
+            "?"
+        )
+        .charAt(0)
+        .toUpperCase();
+
+
+    const content =
+        document.createElement(
+            "div"
+        );
+
+    content.className =
+        "message-content";
+
+
+    const top =
+        document.createElement(
+            "div"
+        );
+
+    top.className =
+        "message-top";
+
+
+    const name =
+        document.createElement(
+            "span"
+        );
+
+    name.className =
+        "username";
+
+    name.textContent =
+        message.username ||
+        "User";
+
+    top.appendChild(
+        name
+    );
+
+
+    if (settings.showTimestamps) {
+
+        const time =
+            document.createElement(
+                "span"
+            );
+
+        time.className =
+            "time";
+
+        time.textContent =
+            formatTime(
+                message.created_at
+            );
+
+        top.appendChild(
+            time
+        );
+    }
+
+
+    if (message.edited) {
+
+        const edited =
+            document.createElement(
+                "span"
+            );
+
+        edited.className =
+            "edited";
+
+        edited.textContent =
+            "(edited)";
+
+        top.appendChild(
+            edited
+        );
+    }
+
+
+    content.appendChild(
+        top
+    );
+
+
+    if (message.message) {
+
+        const text =
+            document.createElement(
+                "div"
+            );
+
+        text.className =
+            "message-text";
+
+        appendLinkedText(
+            text,
+            message.message
+        );
+
+        content.appendChild(
+            text
+        );
+    }
+
+
+    if (message.image) {
+
+        const img =
+            document.createElement(
+                "img"
+            );
+
+        img.className =
+            "message-image";
+
+        img.src =
+            message.image;
+
+        img.alt =
+            "Image";
+
+        content.appendChild(
+            img
+        );
+    }
+
+
+    item.appendChild(
+        avatar
+    );
+
+    item.appendChild(
+        content
+    );
+
+    return item;
+}
+
+
+/* =========================================================
+   LINK SUPPORT
+========================================================= */
+
+function appendLinkedText(
+    element,
+    text
+) {
+
+    const urlRegex =
+        /(https?:\/\/[^\s]+)/g;
+
+    let last = 0;
+
+    String(text)
+        .split(urlRegex)
+        .forEach(part => {
+
+            if (
+                /^https?:\/\//i
+                    .test(part)
+            ) {
+
+                const link =
+                    document.createElement(
+                        "a"
+                    );
+
+                link.className =
+                    "message-link";
+
+                link.href =
+                    part;
+
+                link.target =
+                    "_blank";
+
+                link.rel =
+                    "noopener noreferrer";
+
+                link.textContent =
+                    part;
+
+                element.appendChild(
+                    link
+                );
+
+            } else {
+
+                element.appendChild(
+                    document.createTextNode(
+                        part
+                    )
+                );
+            }
+
+            last +=
+                part.length;
+        });
+}
+
+
+/* =========================================================
+   GAME DEFINITIONS
+========================================================= */
+
+const GAME_DEFS = {
+
+    ttt: {
+        title:
+            "Tic-Tac-Toe",
+        icon:
+            "⭕",
+        maxPlayers:
+            2
+    },
+
+    connect4: {
+        title:
+            "Connect Four",
+        icon:
+            "🔴",
+        maxPlayers:
+            2
+    },
+
+    reaction: {
+        title:
+            "Reaction Race",
+        icon:
+            "⚡",
+        maxPlayers:
+            8
+    },
+
+    memory: {
+        title:
+            "Memory Match",
+        icon:
+            "🧠",
+        maxPlayers:
+            4
+    },
+
+    number: {
+        title:
+            "Number Guess",
+        icon:
+            "🔢",
+        maxPlayers:
+            6
     }
 };
 
 
-deleteMessageBtn.onclick=
-async event=>{
+/* =========================================================
+   GAME CREATION
+========================================================= */
 
-    event.stopPropagation();
+document
+    .querySelectorAll(
+        ".game-choice"
+    )
+    .forEach(button => {
 
-    contextMenu.classList.remove(
-        "show"
-    );
+        button.onclick = () => {
 
-    if(!selectedMessage)return;
+            createGame(
+                button.dataset.game
+            );
 
-    if(
-        settings.confirmDelete&&
-        !confirm(
-            "Delete this message?"
-        )
-    ){
+        };
+
+    });
+
+
+async function createGame(type) {
+
+    if (!settings.username) {
+
+        gamesOverlay
+            .classList
+            .remove("show");
+
+        settingsOverlay
+            .classList
+            .add("show");
+
+        usernameInput.focus();
+
+        alert(
+            "Set your name before hosting a game."
+        );
 
         return;
     }
 
-    try{
 
-        const response=
+    const alreadyHosting =
+        activeGames.some(
+            game =>
+                game.hostDeviceId ===
+                deviceId
+        );
+
+    if (alreadyHosting) {
+
+        alert(
+            "You can only host one game at a time."
+        );
+
+        return;
+    }
+
+
+    const def =
+        GAME_DEFS[type];
+
+    if (!def) {
+        return;
+    }
+
+
+    const gameId =
+        crypto.randomUUID();
+
+
+    const game = {
+
+        gameId,
+
+        gameType:
+            type,
+
+        title:
+            def.title,
+
+        channel:
+            CHANNEL,
+
+        hostDeviceId:
+            deviceId,
+
+        hostName:
+            settings.username,
+
+        status:
+            "lobby",
+
+        maxPlayers:
+            def.maxPlayers,
+
+        players: [
+            {
+                deviceId,
+                name:
+                    settings.username
+            }
+        ],
+
+        turnIndex:
+            0,
+
+        state:
+            createInitialGameState(
+                type
+            ),
+
+        version:
+            1,
+
+        updatedAt:
+            Date.now()
+    };
+
+
+    try {
+
+        const response =
             await fetch(
                 API_URL,
                 {
-                    method:"DELETE",
+                    method:
+                        "POST",
 
-                    headers:{
+                    headers: {
                         "Content-Type":
                             "application/json"
                     },
 
                     body:
                         JSON.stringify({
+                            game_action:
+                                "create",
 
-                            id:
-                                selectedMessage.id,
+                            game
+                        })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                "Could not create game."
+            );
+        }
+
+        gamesOverlay
+            .classList
+            .remove("show");
+
+        await loadGames();
+
+    } catch (error) {
+
+        alert(
+            "Could not start game:\n\n" +
+            error.message
+        );
+    }
+}
+
+
+/* =========================================================
+   INITIAL GAME STATES
+========================================================= */
+
+function createInitialGameState(
+    type
+) {
+
+    if (type === "ttt") {
+
+        return {
+            board:
+                Array(9).fill(""),
+            winner:
+                null
+        };
+    }
+
+
+    if (type === "connect4") {
+
+        return {
+            board:
+                Array(42).fill(0),
+            winner:
+                null
+        };
+    }
+
+
+    if (type === "reaction") {
+
+        return {
+            phase:
+                "waiting",
+            winner:
+                null,
+            round:
+                0
+        };
+    }
+
+
+    if (type === "memory") {
+
+        const cards =
+            [
+                "🍎","🍎",
+                "🚗","🚗",
+                "⭐","⭐",
+                "🌙","🌙",
+                "🔥","🔥",
+                "🎵","🎵",
+                "🐱","🐱",
+                "🌈","🌈"
+            ];
+
+        shuffle(cards);
+
+        return {
+            cards,
+            flipped: [],
+            matched: [],
+            scores: {},
+            winner: null
+        };
+    }
+
+
+    if (type === "number") {
+
+        return {
+            target:
+                Math.floor(
+                    Math.random() * 50
+                ) + 1,
+
+            winner:
+                null,
+
+            lastGuess:
+                null
+        };
+    }
+
+
+    return {};
+}
+
+
+/* =========================================================
+   GAME LOADING
+========================================================= */
+
+async function loadGames() {
+
+    try {
+
+        const response =
+            await fetch(
+                API_URL +
+                "?channel=" +
+                encodeURIComponent(
+                    CHANNEL
+                ) +
+                "&games=true",
+                {
+                    cache:
+                        "no-store"
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                "Failed to load games."
+            );
+        }
+
+        const previous =
+            activeGames;
+
+        activeGames =
+            Array.isArray(data.games)
+                ? data.games
+                : [];
+
+
+        /*
+         * Automatically remove games that
+         * have somehow become invalid.
+         */
+
+        for (
+            const game of activeGames
+        ) {
+
+            if (
+                game.status ===
+                    "finished" ||
+                !game.players ||
+                game.players.length === 0
+            ) {
+
+                if (
+                    game.hostDeviceId ===
+                    deviceId
+                ) {
+
+                    await deleteGame(
+                        game,
+                        false
+                    );
+                }
+            }
+        }
+
+
+        /*
+         * Re-render when game state changes.
+         */
+
+        if (
+            JSON.stringify(previous) !==
+            JSON.stringify(activeGames)
+        ) {
+
+            renderMessages();
+        }
+
+    } catch {
+        /*
+         * Keep the existing UI if
+         * a temporary poll fails.
+         */
+    }
+}
+
+
+/* =========================================================
+   ADAPTIVE GAME POLLING
+========================================================= */
+
+function getGameInterval() {
+
+    if (
+        !activeGames.length
+    ) {
+
+        return 1000;
+    }
+
+    if (
+        settings.gameSyncMode ===
+        "fast"
+    ) {
+
+        return 100;
+    }
+
+    if (
+        settings.gameSyncMode ===
+        "normal"
+    ) {
+
+        return 500;
+    }
+
+    if (
+        settings.gameSyncMode ===
+        "slow"
+    ) {
+
+        return 1000;
+    }
+
+
+    /*
+     * Adaptive:
+     * browser connection estimate +
+     * measured network speed.
+     */
+
+    const connection =
+        navigator.connection ||
+        navigator.mozConnection ||
+        navigator.webkitConnection;
+
+
+    if (connection) {
+
+        if (
+            connection.saveData
+        ) {
+            return 1000;
+        }
+
+        const effective =
+            connection.effectiveType;
+
+        if (
+            effective === "slow-2g" ||
+            effective === "2g"
+        ) {
+            return 1000;
+        }
+
+        if (
+            effective === "3g"
+        ) {
+            return 500;
+        }
+
+        if (
+            effective === "4g"
+        ) {
+            return 100;
+        }
+    }
+
+    return 250;
+}
+
+
+function startGameRefresh() {
+
+    if (gameTimer) {
+
+        clearTimeout(
+            gameTimer
+        );
+    }
+
+
+    async function tick() {
+
+        await loadGames();
+
+        gameTimer =
+            setTimeout(
+                tick,
+                Math.max(
+                    100,
+                    Math.min(
+                        1000,
+                        getGameInterval()
+                    )
+                )
+            );
+    }
+
+
+    tick();
+}
+
+
+/* =========================================================
+   NORMAL CHAT REFRESH
+========================================================= */
+
+function startChatRefresh() {
+
+    if (refreshTimer) {
+
+        clearInterval(
+            refreshTimer
+        );
+    }
+
+    refreshTimer =
+        setInterval(
+            loadMessages,
+            Math.max(
+                100,
+                Number(
+                    settings.refreshRate
+                )
+            )
+        );
+}
+
+
+/* =========================================================
+   GAME CARD
+========================================================= */
+
+function createGameCard(game) {
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+    card.className =
+        "game-card";
+
+
+    const def =
+        GAME_DEFS[
+            game.gameType
+        ] ||
+        {
+            title:
+                game.title ||
+                "Game",
+            icon:
+                "🎮"
+        };
+
+
+    const head =
+        document.createElement(
+            "div"
+        );
+
+    head.className =
+        "game-head";
+
+
+    const title =
+        document.createElement(
+            "div"
+        );
+
+    title.className =
+        "game-title";
+
+
+    const icon =
+        document.createElement(
+            "div"
+        );
+
+    icon.className =
+        "game-icon";
+
+    icon.textContent =
+        def.icon;
+
+
+    const titleText =
+        document.createElement(
+            "div"
+        );
+
+    titleText.textContent =
+        def.title;
+
+
+    title.appendChild(
+        icon
+    );
+
+    title.appendChild(
+        titleText
+    );
+
+
+    const status =
+        document.createElement(
+            "div"
+        );
+
+    status.className =
+        "game-status";
+
+    status.textContent =
+        game.status ===
+        "playing"
+            ? "Playing"
+            : "Lobby";
+
+
+    head.appendChild(
+        title
+    );
+
+    head.appendChild(
+        status
+    );
+
+
+    const body =
+        document.createElement(
+            "div"
+        );
+
+    body.className =
+        "game-body";
+
+
+    const info =
+        document.createElement(
+            "div"
+        );
+
+    info.className =
+        "game-info";
+
+
+    addPill(
+        info,
+        "👑 Host: " +
+        game.hostName
+    );
+
+    addPill(
+        info,
+        "👥 " +
+        game.players.length +
+        "/" +
+        game.maxPlayers +
+        " players"
+    );
+
+
+    body.appendChild(
+        info
+    );
+
+
+    const players =
+        document.createElement(
+            "div"
+        );
+
+    players.className =
+        "game-players";
+
+
+    game.players.forEach(
+        player => {
+
+            const pill =
+                document.createElement(
+                    "div"
+                );
+
+            pill.className =
+                "player-pill";
+
+
+            const dot =
+                document.createElement(
+                    "span"
+                );
+
+            dot.className =
+                "player-dot";
+
+            if (
+                player.deviceId ===
+                game.hostDeviceId
+            ) {
+
+                dot.classList.add(
+                    "host"
+                );
+            }
+
+
+            const name =
+                document.createElement(
+                    "span"
+                );
+
+            name.textContent =
+                player.name;
+
+
+            pill.appendChild(
+                dot
+            );
+
+            pill.appendChild(
+                name
+            );
+
+            players.appendChild(
+                pill
+            );
+        }
+    );
+
+
+    body.appendChild(
+        players
+    );
+
+
+    const turn =
+        document.createElement(
+            "div"
+        );
+
+    turn.className =
+        "turn-box";
+
+
+    if (
+        game.status ===
+        "playing"
+    ) {
+
+        const current =
+            game.players[
+                game.turnIndex %
+                Math.max(
+                    1,
+                    game.players.length
+                )
+            ];
+
+        turn.innerHTML =
+            "<strong>Current turn: " +
+            escapeHtml(
+                current
+                    ? current.name
+                    : "Unknown"
+            ) +
+            "</strong>" +
+            "<span>" +
+            (
+                current &&
+                current.deviceId ===
+                deviceId
+                    ? "It's your turn!"
+                    : "Watch the game or wait for your turn."
+            ) +
+            "</span>";
+
+    } else {
+
+        turn.innerHTML =
+            "<strong>Waiting for host</strong>" +
+            "<span>Players must join before the host starts.</span>";
+    }
+
+
+    body.appendChild(
+        turn
+    );
+
+
+    const board =
+        document.createElement(
+            "div"
+        );
+
+    board.className =
+        "game-board";
+
+
+    board.appendChild(
+        createGameBoard(
+            game
+        )
+    );
+
+
+    body.appendChild(
+        board
+    );
+
+
+    const actions =
+        document.createElement(
+            "div"
+        );
+
+    actions.className =
+        "game-actions";
+
+
+    const isPlayer =
+        game.players.some(
+            p =>
+                p.deviceId ===
+                deviceId
+        );
+
+    const isHost =
+        game.hostDeviceId ===
+        deviceId;
+
+
+    if (
+        game.status ===
+        "lobby"
+    ) {
+
+        if (!isPlayer) {
+
+            const join =
+                createButton(
+                    "Join",
+                    "primary"
+                );
+
+            join.onclick =
+                () =>
+                    joinGame(
+                        game
+                    );
+
+            actions.appendChild(
+                join
+            );
+
+        } else {
+
+            const leave =
+                createButton(
+                    "Leave"
+                );
+
+            leave.onclick =
+                () =>
+                    leaveGame(
+                        game
+                    );
+
+            actions.appendChild(
+                leave
+            );
+        }
+
+
+        if (isHost) {
+
+            const start =
+                createButton(
+                    "Start game",
+                    "primary"
+                );
+
+            start.disabled =
+                game.players.length <
+                2;
+
+            start.onclick =
+                () =>
+                    startGame(
+                        game
+                    );
+
+            actions.appendChild(
+                start
+            );
+        }
+    }
+
+
+    if (
+        game.status ===
+        "playing" &&
+        isPlayer
+    ) {
+
+        const leave =
+            createButton(
+                "Leave"
+            );
+
+        leave.onclick =
+            () =>
+                leaveGame(
+                    game
+                );
+
+        actions.appendChild(
+            leave
+        );
+    }
+
+
+    if (isHost) {
+
+        const force =
+            createButton(
+                "Force quit",
+                "danger"
+            );
+
+        force.onclick =
+            () =>
+                forceQuitGame(
+                    game
+                );
+
+        actions.appendChild(
+            force
+        );
+    }
+
+
+    body.appendChild(
+        actions
+    );
+
+
+    card.appendChild(
+        head
+    );
+
+    card.appendChild(
+        body
+    );
+
+
+    return card;
+}
+
+
+function addPill(
+    parent,
+    text
+) {
+
+    const pill =
+        document.createElement(
+            "div"
+        );
+
+    pill.className =
+        "game-pill";
+
+    pill.textContent =
+        text;
+
+    parent.appendChild(
+        pill
+    );
+}
+
+
+function createButton(
+    text,
+    type = ""
+) {
+
+    const button =
+        document.createElement(
+            "button"
+        );
+
+    button.className =
+        "game-btn";
+
+    if (type) {
+        button.classList.add(
+            type
+        );
+    }
+
+    button.textContent =
+        text;
+
+    return button;
+}
+
+
+/* =========================================================
+   GAME BOARD
+========================================================= */
+
+function createGameBoard(
+    game
+) {
+
+    if (
+        game.gameType ===
+        "ttt"
+    ) {
+
+        return createTTT(
+            game
+        );
+    }
+
+
+    if (
+        game.gameType ===
+        "connect4"
+    ) {
+
+        return createConnect4(
+            game
+        );
+    }
+
+
+    if (
+        game.gameType ===
+        "reaction"
+    ) {
+
+        return createReaction(
+            game
+        );
+    }
+
+
+    if (
+        game.gameType ===
+        "memory"
+    ) {
+
+        return createMemory(
+            game
+        );
+    }
+
+
+    if (
+        game.gameType ===
+        "number"
+    ) {
+
+        return createNumberGame(
+            game
+        );
+    }
+
+
+    return document.createTextNode(
+        "Unknown game"
+    );
+}
+
+
+/* =========================================================
+   TTT
+========================================================= */
+
+function createTTT(game) {
+
+    const wrap =
+        document.createElement(
+            "div"
+        );
+
+    wrap.className =
+        "ttt";
+
+
+    const board =
+        game.state.board ||
+        Array(9).fill("");
+
+
+    board.forEach(
+        (value,index) => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.textContent =
+                value;
+
+            button.disabled =
+                !canMakeMove(game) ||
+                Boolean(value) ||
+                game.state.winner;
+
+            button.onclick =
+                () =>
+                    tttMove(
+                        game,
+                        index
+                    );
+
+            wrap.appendChild(
+                button
+            );
+        }
+    );
+
+
+    if (game.state.winner) {
+
+        const result =
+            document.createElement(
+                "div"
+            );
+
+        result.style.gridColumn =
+            "1/-1";
+
+        result.style.textAlign =
+            "center";
+
+        result.style.padding =
+            "8px";
+
+        result.style.color =
+            "var(--good)";
+
+        result.textContent =
+            game.state.winner ===
+            "draw"
+                ? "Draw!"
+                : game.state.winner +
+                  " wins!";
+
+        wrap.appendChild(
+            result
+        );
+    }
+
+
+    return wrap;
+}
+
+
+async function tttMove(
+    game,
+    index
+) {
+
+    if (!canMakeMove(game)) {
+        return;
+    }
+
+    const next =
+        cloneGame(game);
+
+    const symbol =
+        next.turnIndex === 0
+            ? "X"
+            : "O";
+
+    if (
+        next.state.board[index]
+    ) {
+        return;
+    }
+
+    next.state.board[index] =
+        symbol;
+
+    const winner =
+        checkTTT(
+            next.state.board
+        );
+
+    if (winner) {
+
+        next.state.winner =
+            winner;
+
+        next.status =
+            "finished";
+
+    } else if (
+        next.state.board
+            .every(Boolean)
+    ) {
+
+        next.state.winner =
+            "draw";
+
+        next.status =
+            "finished";
+
+    } else {
+
+        next.turnIndex =
+            (
+                next.turnIndex + 1
+            ) %
+            next.players.length;
+    }
+
+    await hostUpdateGame(
+        next
+    );
+}
+
+
+function checkTTT(
+    board
+) {
+
+    const wins = [
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+        [0,3,6],
+        [1,4,7],
+        [2,5,8],
+        [0,4,8],
+        [2,4,6]
+    ];
+
+    for (
+        const line of wins
+    ) {
+
+        const [
+            a,b,c
+        ] = line;
+
+        if (
+            board[a] &&
+            board[a] ===
+            board[b] &&
+            board[a] ===
+            board[c]
+        ) {
+
+            return board[a];
+        }
+    }
+
+    return null;
+}
+
+
+/* =========================================================
+   CONNECT 4
+========================================================= */
+
+function createConnect4(
+    game
+) {
+
+    const wrap =
+        document.createElement(
+            "div"
+        );
+
+    wrap.className =
+        "connect4";
+
+
+    const board =
+        game.state.board ||
+        Array(42).fill(0);
+
+
+    board.forEach(
+        (value,index) => {
+
+            const cell =
+                document.createElement(
+                    "button"
+                );
+
+            cell.className =
+                "c4-cell";
+
+            if (value === 1) {
+                cell.classList.add(
+                    "p1"
+                );
+            }
+
+            if (value === 2) {
+                cell.classList.add(
+                    "p2"
+                );
+            }
+
+            cell.disabled =
+                !canMakeMove(game) ||
+                Boolean(
+                    game.state.winner
+                );
+
+            cell.onclick =
+                () =>
+                    connect4Move(
+                        game,
+                        index % 7
+                    );
+
+            wrap.appendChild(
+                cell
+            );
+        }
+    );
+
+
+    return wrap;
+}
+
+
+async function connect4Move(
+    game,
+    column
+) {
+
+    if (!canMakeMove(game)) {
+        return;
+    }
+
+    const next =
+        cloneGame(game);
+
+    const board =
+        next.state.board;
+
+    let row = -1;
+
+    for (
+        let r = 5;
+        r >= 0;
+        r--
+    ) {
+
+        const index =
+            r * 7 + column;
+
+        if (!board[index]) {
+
+            row = r;
+
+            board[index] =
+                next.turnIndex === 0
+                    ? 1
+                    : 2;
+
+            break;
+        }
+    }
+
+    if (row < 0) {
+        return;
+    }
+
+
+    if (
+        checkConnect4(
+            board,
+            row,
+            column,
+            board[
+                row * 7 + column
+            ]
+        )
+    ) {
+
+        next.state.winner =
+            next.turnIndex === 0
+                ? "Player 1"
+                : "Player 2";
+
+        next.status =
+            "finished";
+
+    } else if (
+        board.every(Boolean)
+    ) {
+
+        next.state.winner =
+            "draw";
+
+        next.status =
+            "finished";
+
+    } else {
+
+        next.turnIndex =
+            (
+                next.turnIndex + 1
+            ) %
+            next.players.length;
+    }
+
+    await hostUpdateGame(
+        next
+    );
+}
+
+
+function checkConnect4(
+    board,
+    row,
+    col,
+    player
+) {
+
+    const dirs = [
+        [1,0],
+        [0,1],
+        [1,1],
+        [1,-1]
+    ];
+
+    for (
+        const [
+            dr,dc
+        ] of dirs
+    ) {
+
+        let count = 1;
+
+        for (
+            const sign of [-1,1]
+        ) {
+
+            let r =
+                row +
+                dr * sign;
+
+            let c =
+                col +
+                dc * sign;
+
+            while (
+                r >= 0 &&
+                r < 6 &&
+                c >= 0 &&
+                c < 7 &&
+                board[
+                    r * 7 + c
+                ] === player
+            ) {
+
+                count++;
+
+                r +=
+                    dr * sign;
+
+                c +=
+                    dc * sign;
+            }
+        }
+
+        if (count >= 4) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+/* =========================================================
+   REACTION
+========================================================= */
+
+function createReaction(
+    game
+) {
+
+    const box =
+        document.createElement(
+            "div"
+        );
+
+    box.className =
+        "reaction-box";
+
+
+    const phase =
+        game.state.phase;
+
+
+    if (
+        game.state.winner
+    ) {
+
+        box.textContent =
+            game.state.winner +
+            " won!";
+
+        return box;
+    }
+
+
+    if (
+        phase ===
+        "go"
+    ) {
+
+        box.classList.add(
+            "go"
+        );
+
+        box.textContent =
+            "CLICK NOW!";
+
+        box.onclick =
+            () =>
+                reactionClick(
+                    game
+                );
+
+        return box;
+    }
+
+
+    box.classList.add(
+        "waiting"
+    );
+
+    box.textContent =
+        game.status ===
+        "playing"
+            ? "Wait for GO..."
+            : "Waiting for game to start";
+
+    return box;
+}
+
+
+async function reactionClick(
+    game
+) {
+
+    if (!canMakeMove(game)) {
+        return;
+    }
+
+    const next =
+        cloneGame(game);
+
+    const player =
+        next.players[
+            next.turnIndex %
+            next.players.length
+        ];
+
+    next.state.winner =
+        player.name;
+
+    next.state.phase =
+        "finished";
+
+    next.status =
+        "finished";
+
+    await hostUpdateGame(
+        next
+    );
+}
+
+
+/* =========================================================
+   MEMORY
+========================================================= */
+
+function createMemory(
+    game
+) {
+
+    const wrap =
+        document.createElement(
+            "div"
+        );
+
+    wrap.className =
+        "memory-grid";
+
+
+    const cards =
+        game.state.cards || [];
+
+
+    cards.forEach(
+        (value,index) => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "memory-card";
+
+            const visible =
+                game.state.flipped
+                    ?.includes(index) ||
+                game.state.matched
+                    ?.includes(index);
+
+            if (visible) {
+
+                button.classList.add(
+                    "flipped"
+                );
+
+                if (
+                    game.state.matched
+                        ?.includes(index)
+                ) {
+
+                    button.classList.add(
+                        "matched"
+                    );
+                }
+            }
+
+            button.textContent =
+                value;
+
+            button.disabled =
+                !canMakeMove(game) ||
+                visible;
+
+            button.onclick =
+                () =>
+                    memoryMove(
+                        game,
+                        index
+                    );
+
+            wrap.appendChild(
+                button
+            );
+        }
+    );
+
+
+    return wrap;
+}
+
+
+async function memoryMove(
+    game,
+    index
+) {
+
+    if (!canMakeMove(game)) {
+        return;
+    }
+
+    const next =
+        cloneGame(game);
+
+    if (
+        next.state.flipped
+            .includes(index)
+    ) {
+        return;
+    }
+
+    next.state.flipped.push(
+        index
+    );
+
+
+    if (
+        next.state.flipped.length >= 2
+    ) {
+
+        const [
+            a,b
+        ] =
+            next.state.flipped
+                .slice(-2);
+
+        if (
+            next.state.cards[a] ===
+            next.state.cards[b]
+        ) {
+
+            next.state.matched.push(
+                a,
+                b
+            );
+
+            const player =
+                next.players[
+                    next.turnIndex
+                ];
+
+            next.state.scores[
+                player.deviceId
+            ] =
+                (
+                    next.state.scores[
+                        player.deviceId
+                    ] || 0
+                ) + 1;
+
+            next.state.flipped = [];
+
+            if (
+                next.state.matched
+                    .length ===
+                next.state.cards.length
+            ) {
+
+                let winner =
+                    next.players[0];
+
+                for (
+                    const p of
+                    next.players
+                ) {
+
+                    if (
+                        (
+                            next.state
+                                .scores[
+                                    p.deviceId
+                                ] || 0
+                        ) >
+                        (
+                            next.state
+                                .scores[
+                                    winner.deviceId
+                                ] || 0
+                        )
+                    ) {
+
+                        winner = p;
+                    }
+                }
+
+                next.state.winner =
+                    winner.name;
+
+                next.status =
+                    "finished";
+            }
+
+        } else {
+
+            /*
+             * Give the player a short
+             * visible reveal, then hide.
+             */
+
+            await hostUpdateGame(
+                next
+            );
+
+            await sleep(
+                700
+            );
+
+            next.state.flipped = [];
+
+            next.turnIndex =
+                (
+                    next.turnIndex + 1
+                ) %
+                next.players.length;
+        }
+    }
+
+    await hostUpdateGame(
+        next
+    );
+}
+
+
+/* =========================================================
+   NUMBER GUESS
+========================================================= */
+
+function createNumberGame(
+    game
+) {
+
+    const wrap =
+        document.createElement(
+            "div"
+        );
+
+    wrap.className =
+        "number-board";
+
+
+    const number =
+        document.createElement(
+            "div"
+        );
+
+    number.className =
+        "number-value";
+
+    number.textContent =
+        game.state.winner
+            ? game.state.winner +
+              " won!"
+            : "1–50";
+
+
+    const input =
+        document.createElement(
+            "input"
+        );
+
+    input.className =
+        "number-input";
+
+    input.type =
+        "number";
+
+    input.min =
+        "1";
+
+    input.max =
+        "50";
+
+    input.placeholder =
+        "Your guess";
+
+
+    const button =
+        createButton(
+            "Guess",
+            "primary"
+        );
+
+    button.disabled =
+        !canMakeMove(game) ||
+        Boolean(
+            game.state.winner
+        );
+
+    button.onclick =
+        () =>
+            numberGuess(
+                game,
+                input
+            );
+
+
+    wrap.appendChild(
+        number
+    );
+
+    wrap.appendChild(
+        input
+    );
+
+    wrap.appendChild(
+        button
+    );
+
+
+    if (
+        game.state.lastGuess
+    ) {
+
+        const hint =
+            document.createElement(
+                "div"
+            );
+
+        hint.style.textAlign =
+            "center";
+
+        hint.style.color =
+            "var(--muted)";
+
+        hint.textContent =
+            game.state.lastGuess;
+
+        wrap.appendChild(
+            hint
+        );
+    }
+
+
+    return wrap;
+}
+
+
+async function numberGuess(
+    game,
+    input
+) {
+
+    if (!canMakeMove(game)) {
+        return;
+    }
+
+    const value =
+        Number(input.value);
+
+    if (
+        !Number.isInteger(value) ||
+        value < 1 ||
+        value > 50
+    ) {
+
+        return;
+    }
+
+
+    const next =
+        cloneGame(game);
+
+    const player =
+        next.players[
+            next.turnIndex %
+            next.players.length
+        ];
+
+
+    if (
+        value ===
+        next.state.target
+    ) {
+
+        next.state.winner =
+            player.name;
+
+        next.status =
+            "finished";
+
+    } else {
+
+        next.state.lastGuess =
+            player.name +
+            " guessed " +
+            value +
+            (
+                value <
+                next.state.target
+                    ? " — higher!"
+                    : " — lower!"
+            );
+
+        next.turnIndex =
+            (
+                next.turnIndex + 1
+            ) %
+            next.players.length;
+    }
+
+
+    await hostUpdateGame(
+        next
+    );
+}
+
+
+/* =========================================================
+   PLAYER ACTIONS
+========================================================= */
+
+async function joinGame(
+    game
+) {
+
+    if (
+        game.status !==
+        "lobby"
+    ) {
+        return;
+    }
+
+    if (
+        game.players.some(
+            p =>
+                p.deviceId ===
+                deviceId
+        )
+    ) {
+        return;
+    }
+
+    if (
+        game.players.length >=
+        game.maxPlayers
+    ) {
+
+        alert(
+            "This game is full."
+        );
+
+        return;
+    }
+
+
+    /*
+     * Only host can update the
+     * actual game-state row.
+     *
+     * For this reason we send a
+     * request through a special
+     * join operation below.
+     */
+
+    try {
+
+        const response =
+            await fetch(
+                API_URL,
+                {
+                    method:
+                        "PATCH",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            game_action:
+                                "join",
+
+                            game_id:
+                                game.gameId,
+
+                            message_id:
+                                game._messageId,
+
+                            device_id:
+                                deviceId,
+
+                            player_name:
+                                settings.username
+                        })
+                }
+            );
+
+        /*
+         * The API above intentionally
+         * rejects arbitrary non-host
+         * state updates unless the
+         * join operation is implemented.
+         */
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            /*
+             * Fallback:
+             * Tell the user if the backend
+             * needs the join handler.
+             */
+
+            throw new Error(
+                data.error ||
+                "Could not join game."
+            );
+        }
+
+        await loadGames();
+
+    } catch (error) {
+
+        alert(
+            "Could not join:\n\n" +
+            error.message
+        );
+    }
+}
+
+
+async function leaveGame(
+    game
+) {
+
+    /*
+     * Host leaving ends the game.
+     * Non-host leaving uses the same
+     * game participant operation.
+     */
+
+    if (
+        game.hostDeviceId ===
+        deviceId
+    ) {
+
+        await deleteGame(
+            game,
+            true
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                API_URL,
+                {
+                    method:
+                        "PATCH",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            game_action:
+                                "leave",
+
+                            game_id:
+                                game.gameId,
+
+                            message_id:
+                                game._messageId,
 
                             device_id:
                                 deviceId
@@ -4356,52 +4845,511 @@ async event=>{
                 }
             );
 
-        if(!response.ok){
+        const data =
+            await response.json();
 
-            const data=
-                await response.json();
+        if (!response.ok) {
 
             throw new Error(
-                data.error||
-                "Failed to delete."
+                data.error ||
+                "Could not leave."
             );
         }
 
-        selectedMessage=null;
+        await loadGames();
 
-        await loadMessages();
-
-    }catch(error){
+    } catch (error) {
 
         alert(
-            "Failed to delete:\n\n"+
+            "Could not leave:\n\n" +
             error.message
         );
     }
+}
+
+
+async function startGame(
+    game
+) {
+
+    if (
+        game.hostDeviceId !==
+        deviceId
+    ) {
+        return;
+    }
+
+    if (
+        game.players.length < 2
+    ) {
+
+        alert(
+            "At least two players are required."
+        );
+
+        return;
+    }
+
+
+    const next =
+        cloneGame(game);
+
+    next.status =
+        "playing";
+
+    next.turnIndex =
+        0;
+
+    next.version++;
+
+
+    if (
+        next.gameType ===
+        "reaction"
+    ) {
+
+        next.state.phase =
+            "go";
+    }
+
+
+    await hostUpdateGame(
+        next
+    );
+}
+
+
+async function forceQuitGame(
+    game
+) {
+
+    if (
+        game.hostDeviceId !==
+        deviceId
+    ) {
+        return;
+    }
+
+    if (
+        !confirm(
+            "Force quit this game for everyone?"
+        )
+    ) {
+        return;
+    }
+
+    await deleteGame(
+        game,
+        true
+    );
+}
+
+
+async function deleteGame(
+    game,
+    refresh = true
+) {
+
+    if (
+        game.hostDeviceId !==
+        deviceId
+    ) {
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                API_URL,
+                {
+                    method:
+                        "DELETE",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            game_action:
+                                "delete",
+
+                            message_id:
+                                game._messageId,
+
+                            device_id:
+                                deviceId
+                        })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                "Could not remove game."
+            );
+        }
+
+        activeGames =
+            activeGames.filter(
+                g =>
+                    g.gameId !==
+                    game.gameId
+            );
+
+        renderMessages();
+
+        if (refresh) {
+            await loadGames();
+        }
+
+    } catch (error) {
+
+        alert(
+            "Could not remove game:\n\n" +
+            error.message
+        );
+    }
+}
+
+
+/* =========================================================
+   HOST UPDATE
+========================================================= */
+
+async function hostUpdateGame(
+    game
+) {
+
+    if (
+        game.hostDeviceId !==
+        deviceId
+    ) {
+        return;
+    }
+
+    game.version =
+        Number(game.version || 0) + 1;
+
+    game.updatedAt =
+        Date.now();
+
+
+    /*
+     * Finished games are removed
+     * instead of being kept in the DB.
+     */
+
+    if (
+        game.status ===
+        "finished"
+    ) {
+
+        await deleteGame(
+            game,
+            true
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                API_URL,
+                {
+                    method:
+                        "PATCH",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            game_action:
+                                "update",
+
+                            message_id:
+                                game._messageId,
+
+                            device_id:
+                                deviceId,
+
+                            game
+                        })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                "Game update failed."
+            );
+        }
+
+        activeGames =
+            activeGames.map(
+                g =>
+                    g.gameId ===
+                    game.gameId
+                        ? game
+                        : g
+            );
+
+        renderMessages();
+
+    } catch (error) {
+
+        console.error(
+            "Game update:",
+            error
+        );
+    }
+}
+
+
+/* =========================================================
+   GAME MOVE CHECK
+========================================================= */
+
+function canMakeMove(
+    game
+) {
+
+    if (
+        game.status !==
+        "playing"
+    ) {
+        return false;
+    }
+
+    if (!game.players.length) {
+        return false;
+    }
+
+    const player =
+        game.players[
+            game.turnIndex %
+            game.players.length
+        ];
+
+    return Boolean(
+        player &&
+        player.deviceId ===
+        deviceId
+    );
+}
+
+
+function cloneGame(game) {
+
+    return JSON.parse(
+        JSON.stringify(
+            game
+        )
+    );
+}
+
+
+/* =========================================================
+   CONFIRM / WIPE
+========================================================= */
+
+function openConfirm(
+    title,
+    text,
+    callback
+) {
+
+    dialogTitle.textContent =
+        title;
+
+    dialogText.textContent =
+        text;
+
+    confirmCallback =
+        callback;
+
+    dialogOverlay
+        .classList
+        .add("show");
+}
+
+
+dialogCancel.onclick = () => {
+
+    dialogOverlay
+        .classList
+        .remove("show");
+
+    confirmCallback =
+        null;
 };
+
+
+dialogConfirm.onclick =
+    async () => {
+
+        const callback =
+            confirmCallback;
+
+        dialogOverlay
+            .classList
+            .remove("show");
+
+        confirmCallback =
+            null;
+
+        if (callback) {
+            await callback();
+        }
+    };
+
+
+removeEverything.onclick =
+    () => {
+
+        openConfirm(
+            "Remove everything?",
+            "This deletes the entire chat and every temporary game.",
+            permanentlyWipe
+        );
+    };
+
+
+async function permanentlyWipe() {
+
+    try {
+
+        const response =
+            await fetch(
+                API_URL,
+                {
+                    method:
+                        "DELETE",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            delete_all:
+                                true
+                        })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                "Failed to wipe."
+            );
+        }
+
+        currentMessages = [];
+
+        activeGames = [];
+
+        renderMessages();
+
+        alert(
+            "Chat and games were wiped."
+        );
+
+    } catch (error) {
+
+        alert(
+            "Wipe failed:\n\n" +
+            error.message
+        );
+    }
+}
 
 
 /* =========================================================
    HELPERS
 ========================================================= */
 
-function formatTime(date){
+function shuffle(array) {
 
-    if(!date)return "";
+    for (
+        let i =
+            array.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random() *
+                (i + 1)
+            );
+
+        [
+            array[i],
+            array[j]
+        ] =
+        [
+            array[j],
+            array[i]
+        ];
+    }
+
+    return array;
+}
+
+
+function sleep(ms) {
+
+    return new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                ms
+            )
+    );
+}
+
+
+function formatTime(date) {
+
+    if (!date) {
+        return "";
+    }
 
     return new Date(
         date
     ).toLocaleTimeString(
         [],
         {
-            hour:"2-digit",
-            minute:"2-digit"
+            hour:
+                "2-digit",
+
+            minute:
+                "2-digit"
         }
     );
 }
 
 
-function escapeHtml(value){
+function escapeHtml(value) {
 
     return String(value)
         .replaceAll(
@@ -4435,14 +5383,11 @@ loadSettingsUI();
 
 applySettings();
 
-renderGamePicker();
-
-startGameRefresh();
-
 loadMessages();
+
+loadGames();
 
 </script>
 
 </body>
 </html>
-```
