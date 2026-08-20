@@ -1,3 +1,4 @@
+```javascript
 export default async function handler(req, res) {
 
     res.setHeader(
@@ -24,29 +25,37 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
+    const supabaseUrl =
+        "https://wlvbkdzcueqkknysisfw.supabase.co";
+
+    const supabaseKey =
+        "YOUR_SB_PUBLISHABLE_KEY_HERE";
+
+    const cleanUrl =
+        supabaseUrl.replace(/\/+$/,"");
+
+    const headers = {
+
+        "apikey":
+            supabaseKey,
+
+        "Authorization":
+            "Bearer " + supabaseKey,
+
+        "Content-Type":
+            "application/json",
+
+        "Accept":
+            "application/json"
+
+    };
+
+
     try {
 
-        /*
-         * SUPABASE
-         *
-         * Only the publishable key is used.
-         *
-         * Do NOT put your sb_secret key here.
-         */
-
-        const supabaseUrl =
-            "https://wlvbkdzcueqkknysisfw.supabase.co";
-
-        const supabaseKey =
-            "sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL";
-
-        const cleanUrl =
-            supabaseUrl.replace(/\/+$/, "");
-
-
-        /*
-         * GET
-         */
+        /* =========================
+           GET
+        ========================= */
 
         if(req.method === "GET"){
 
@@ -58,31 +67,20 @@ export default async function handler(req, res) {
                 .trim()
                 .substring(0,32);
 
-            const query =
+            const url =
                 cleanUrl +
                 "/rest/v1/messages" +
-                "?select=id,username,channel,message,image,device_id,edited,created_at" +
+                "?select=id,username,channel,message,image,created_at,device_id,edited" +
                 "&channel=eq." +
                 encodeURIComponent(channel) +
                 "&order=created_at.asc";
 
             const response =
                 await fetch(
-                    query,
+                    url,
                     {
                         method:"GET",
-
-                        headers:{
-                            "apikey":
-                                supabaseKey,
-
-                            "Authorization":
-                                "Bearer " +
-                                supabaseKey,
-
-                            "Accept":
-                                "application/json"
-                        }
+                        headers
                     }
                 );
 
@@ -92,34 +90,21 @@ export default async function handler(req, res) {
             let data;
 
             try{
-
-                data =
-                    JSON.parse(text);
-
-            }
-            catch{
-
+                data=JSON.parse(text);
+            }catch{
                 return res.status(500).json({
-                    error:
-                        "Supabase returned invalid JSON.",
-
-                    response:
-                        text.substring(0,2000)
+                    error:"Supabase returned invalid JSON.",
+                    response:text.substring(0,2000)
                 });
-
             }
 
             if(!response.ok){
 
-                return res.status(
-                    response.status
-                ).json({
+                return res.status(response.status).json({
                     error:
                         data.message ||
                         data.error ||
-                        data.hint ||
                         "Supabase GET failed.",
-
                     details:data
                 });
 
@@ -131,72 +116,66 @@ export default async function handler(req, res) {
 
                 messages:
                     Array.isArray(data)
-                        ? data
-                        : []
+                    ?data
+                    :[]
 
             });
 
         }
 
 
-        /*
-         * POST
-         */
+        /* =========================
+           POST
+        ========================= */
 
         if(req.method === "POST"){
 
-            const body =
-                req.body || {};
+            const body=req.body||{};
 
-            const username =
-                String(
-                    body.username ||
-                    "User"
-                )
+            const username=
+                String(body.username||"")
                 .trim()
                 .substring(0,24);
 
-            const channel =
-                String(
-                    body.channel ||
-                    "general"
-                )
+            const channel=
+                String(body.channel||"general")
                 .trim()
                 .substring(0,32);
 
-            const message =
-                String(
-                    body.message ||
-                    ""
-                )
+            const message=
+                String(body.message||"")
                 .trim()
                 .substring(0,2000);
 
-            const device_id =
-                String(
-                    body.device_id ||
-                    ""
-                )
+            const device_id=
+                String(body.device_id||"")
                 .trim()
                 .substring(0,100);
 
-            let image = null;
+            let image=null;
 
             if(
                 body.image &&
-                typeof body.image === "string"
+                typeof body.image==="string"
             ){
 
-                image =
-                    body.image;
+                image=body.image;
+
+            }
+
+
+            if(!username){
+
+                return res.status(400).json({
+                    error:"Username is required."
+                });
 
             }
 
             if(!device_id){
 
                 return res.status(400).json({
-                    error:
-                        "Device ID is required."
+                    error:"Device ID is required."
                 });
 
             }
@@ -204,8 +183,7 @@ export default async function handler(req, res) {
             if(!message && !image){
 
                 return res.status(400).json({
-                    error:
-                        "Message or image is required."
+                    error:"Message or image is required."
                 });
 
             }
@@ -216,8 +194,7 @@ export default async function handler(req, res) {
             ){
 
                 return res.status(413).json({
-                    error:
-                        "Image is too large."
+                    error:"Image is too large."
                 });
 
             }
@@ -228,35 +205,25 @@ export default async function handler(req, res) {
             ){
 
                 return res.status(400).json({
-                    error:
-                        "Invalid image data."
+                    error:"Invalid image data."
                 });
 
             }
 
-            const messageData = {
 
-                username:
-                    username,
+            const messageData={
 
-                channel:
-                    channel,
-
-                message:
-                    message,
-
-                image:
-                    image,
-
-                device_id:
-                    device_id,
-
-                edited:
-                    false
+                username,
+                channel,
+                message,
+                image,
+                device_id,
+                edited:false
 
             };
 
-            const response =
+
+            const response=
                 await fetch(
                     cleanUrl +
                     "/rest/v1/messages",
@@ -265,21 +232,11 @@ export default async function handler(req, res) {
                         method:"POST",
 
                         headers:{
-                            "apikey":
-                                supabaseKey,
-
-                            "Authorization":
-                                "Bearer " +
-                                supabaseKey,
-
-                            "Content-Type":
-                                "application/json",
-
-                            "Accept":
-                                "application/json",
+                            ...headers,
 
                             "Prefer":
                                 "return=representation"
+
                         },
 
                         body:
@@ -290,39 +247,33 @@ export default async function handler(req, res) {
                     }
                 );
 
-            const text =
+
+            const text=
                 await response.text();
 
             let data;
 
             try{
-
-                data =
-                    JSON.parse(text);
-
-            }
-            catch{
+                data=JSON.parse(text);
+            }catch{
 
                 return res.status(500).json({
                     error:
                         "Supabase returned invalid JSON.",
-
                     response:
                         text.substring(0,2000)
                 });
 
             }
 
+
             if(!response.ok){
 
-                return res.status(
-                    response.status
-                ).json({
+                return res.status(response.status).json({
 
                     error:
                         data.message ||
                         data.error ||
-                        data.hint ||
                         "Supabase rejected the message.",
 
                     details:data
@@ -331,75 +282,52 @@ export default async function handler(req, res) {
 
             }
 
+
             return res.status(200).json({
 
                 success:true,
 
                 message:
                     Array.isArray(data)
-                        ? data[0]
-                        : data
+                    ?data[0]
+                    :data
 
             });
 
         }
 
 
-        /*
-         * PATCH
-         *
-         * Edit is protected by BOTH:
-         *
-         * id
-         * device_id
-         *
-         * Username is NOT used.
-         */
+        /* =========================
+           PATCH / EDIT
+        ========================= */
 
         if(req.method === "PATCH"){
 
-            const body =
-                req.body || {};
+            const body=req.body||{};
 
-            const id =
-                String(
-                    body.id ||
-                    ""
-                ).trim();
+            const id=
+                String(body.id||"").trim();
 
-            const device_id =
-                String(
-                    body.device_id ||
-                    ""
-                ).trim();
+            const device_id=
+                String(body.device_id||"").trim();
 
-            const message =
-                String(
-                    body.message ||
-                    ""
-                )
+            const message=
+                String(body.message||"")
                 .trim()
                 .substring(0,2000);
 
-            if(!id){
+
+            if(!id || !device_id){
 
                 return res.status(400).json({
                     error:
-                        "Message ID is required."
+                        "Message ID and device ID are required."
                 });
 
             }
 
-            if(!device_id){
 
-                return res.status(400).json({
-                    error:
-                        "Device ID is required."
-                });
-
-            }
-
-            const query =
+            const url=
                 cleanUrl +
                 "/rest/v1/messages" +
                 "?id=eq." +
@@ -407,71 +335,55 @@ export default async function handler(req, res) {
                 "&device_id=eq." +
                 encodeURIComponent(device_id);
 
-            const response =
+
+            const response=
                 await fetch(
-                    query,
+                    url,
                     {
 
                         method:"PATCH",
 
                         headers:{
-                            "apikey":
-                                supabaseKey,
-
-                            "Authorization":
-                                "Bearer " +
-                                supabaseKey,
-
-                            "Content-Type":
-                                "application/json",
+                            ...headers,
 
                             "Prefer":
                                 "return=representation"
+
                         },
 
                         body:
                             JSON.stringify({
 
-                                message:
-                                    message,
-
-                                edited:
-                                    true
+                                message,
+                                edited:true
 
                             })
 
                     }
                 );
 
-            const text =
+
+            const text=
                 await response.text();
 
             let data;
 
             try{
+                data=JSON.parse(text);
+            }catch{
 
-                data =
-                    text
-                        ? JSON.parse(text)
-                        : [];
-
-            }
-            catch{
-
-                data = [];
+                data=[];
 
             }
+
 
             if(!response.ok){
 
-                return res.status(
-                    response.status
-                ).json({
+                return res.status(response.status).json({
 
                     error:
                         data.message ||
                         data.error ||
-                        data.hint ||
                         "Failed to edit message.",
 
                     details:data
@@ -480,17 +392,6 @@ export default async function handler(req, res) {
 
             }
 
-            if(
-                Array.isArray(data) &&
-                data.length === 0
-            ){
-
-                return res.status(404).json({
-                    error:
-                        "Message not found or it does not belong to this device."
-                });
-
-            }
 
             return res.status(200).json({
 
@@ -498,73 +399,141 @@ export default async function handler(req, res) {
 
                 message:
                     Array.isArray(data)
-                        ? data[0]
-                        : data
+                    ?data[0]||null
+                    :data
 
             });
 
         }
 
 
-        /*
-         * DELETE ONE MESSAGE
-         *
-         * Protected by:
-         *
-         * id
-         * device_id
-         */
+        /* =========================
+           DELETE
+        ========================= */
 
         if(req.method === "DELETE"){
 
-            const body =
-                req.body || {};
+            const body=req.body||{};
 
-            if(body.delete_all){
 
-                return res.status(403).json({
+            /* =========================
+               GLOBAL WIPE
+            ========================= */
 
-                    error:
-                        "Deleting every message is disabled when using a public API key.",
+            if(body.delete_all === true){
 
-                    fix:
-                        "Use secure server-side authentication for global deletion."
+                /*
+                   IMPORTANT:
+
+                   This URL deliberately matches
+                   every row.
+
+                   The filter:
+                       id=not.is.null
+
+                   means every message with an id
+                   is selected.
+
+                   The Supabase DELETE policy must
+                   allow the public role to delete.
+                */
+
+                const url=
+                    cleanUrl +
+                    "/rest/v1/messages" +
+                    "?id=not.is.null";
+
+
+                const response=
+                    await fetch(
+                        url,
+                        {
+
+                            method:"DELETE",
+
+                            headers:{
+                                ...headers,
+
+                                "Prefer":
+                                    "return=representation"
+
+                            }
+
+                        }
+                    );
+
+
+                const text=
+                    await response.text();
+
+                let data;
+
+                try{
+                    data=JSON.parse(text);
+                }catch{
+
+                    data=[];
+
+                }
+
+
+                if(!response.ok){
+
+                    return res.status(response.status).json({
+
+                        error:
+                            data.message ||
+                            data.error ||
+                            "Global wipe was rejected by Supabase.",
+
+                        details:data,
+
+                        fix:
+                            "Your Supabase DELETE RLS policy must allow public deletes."
+
+                    });
+
+                }
+
+
+                return res.status(200).json({
+
+                    success:true,
+
+                    deleted:
+                        Array.isArray(data)
+                        ?data.length
+                        :0
 
                 });
 
             }
 
-            const id =
-                String(
-                    body.id ||
-                    ""
-                ).trim();
 
-            const device_id =
-                String(
-                    body.device_id ||
-                    ""
-                ).trim();
+            /* =========================
+               DELETE ONE OWN MESSAGE
+            ========================= */
 
-            if(!id){
+            const id=
+                String(body.id||"").trim();
+
+            const device_id=
+                String(body.device_id||"").trim();
+
+
+            if(!id || !device_id){
 
                 return res.status(400).json({
+
                     error:
-                        "Message ID is required."
+                        "Message ID and device ID are required."
+
                 });
 
             }
 
-            if(!device_id){
 
-                return res.status(400).json({
-                    error:
-                        "Device ID is required."
-                });
-
-            }
-
-            const query =
+            const url=
                 cleanUrl +
                 "/rest/v1/messages" +
                 "?id=eq." +
@@ -572,60 +541,47 @@ export default async function handler(req, res) {
                 "&device_id=eq." +
                 encodeURIComponent(device_id);
 
-            const response =
+
+            const response=
                 await fetch(
-                    query,
+                    url,
                     {
 
                         method:"DELETE",
 
                         headers:{
-                            "apikey":
-                                supabaseKey,
-
-                            "Authorization":
-                                "Bearer " +
-                                supabaseKey,
-
-                            "Accept":
-                                "application/json",
+                            ...headers,
 
                             "Prefer":
                                 "return=representation"
+
                         }
 
                     }
                 );
 
-            const text =
+
+            const text=
                 await response.text();
 
             let data;
 
             try{
+                data=JSON.parse(text);
+            }catch{
 
-                data =
-                    text
-                        ? JSON.parse(text)
-                        : [];
-
-            }
-            catch{
-
-                data = [];
+                data=[];
 
             }
+
 
             if(!response.ok){
 
-                return res.status(
-                    response.status
-                ).json({
+                return res.status(response.status).json({
 
                     error:
                         data.message ||
                         data.error ||
-                        data.hint ||
                         "Failed to delete message.",
 
                     details:data
@@ -634,17 +590,6 @@ export default async function handler(req, res) {
 
             }
 
-            if(
-                Array.isArray(data) &&
-                data.length === 0
-            ){
-
-                return res.status(404).json({
-                    error:
-                        "Message not found or it does not belong to this device."
-                });
-
-            }
 
             return res.status(200).json({
 
@@ -652,8 +597,8 @@ export default async function handler(req, res) {
 
                 deleted:
                     Array.isArray(data)
-                        ? data[0]
-                        : data
+                    ?data.length
+                    :0
 
             });
 
@@ -662,16 +607,15 @@ export default async function handler(req, res) {
 
         return res.status(405).json({
 
-            error:
-                "Method not allowed."
+            error:"Method not allowed."
 
         });
 
-    }
-    catch(error){
+
+    }catch(error){
 
         console.error(
-            "SERVER ERROR:",
+            "MESSAGE API ERROR:",
             error
         );
 
@@ -679,14 +623,11 @@ export default async function handler(req, res) {
 
             error:
                 error.message ||
-                "Unknown server error.",
-
-            type:
-                error.name ||
-                "Error"
+                "Server error."
 
         });
 
     }
 
 }
+```
