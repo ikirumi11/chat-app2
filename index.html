@@ -1,221 +1,291 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MyChat</title>
 
 <style>
+*{box-sizing:border-box}
 
-* {
-    box-sizing: border-box;
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    font-family:Arial,sans-serif;
+    background:#111214;
+    color:#fff;
 }
 
-html,
-body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    font-family: Arial, sans-serif;
-    background: #111214;
-    color: white;
+body{overflow:hidden}
+
+.app{
+    display:flex;
+    height:100vh;
 }
 
-.app {
-    display: flex;
-    height: 100vh;
+.sidebar{
+    width:230px;
+    background:#18191c;
+    padding:15px;
 }
 
-/* SIDEBAR */
-
-.sidebar {
-    width: 230px;
-    background: #18191c;
-    padding: 15px;
+.logo{
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:25px;
 }
 
-.logo {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 25px;
-}
-
-.channel {
-    padding: 11px;
-    margin-bottom: 5px;
-    border-radius: 5px;
-    color: #aaa;
-    cursor: pointer;
+.channel{
+    padding:11px;
+    margin-bottom:5px;
+    border-radius:5px;
+    color:#aaa;
+    cursor:pointer;
 }
 
 .channel:hover,
-.channel.active {
-    background: #404249;
-    color: white;
+.channel.active{
+    background:#404249;
+    color:#fff;
 }
 
-/* CHAT */
-
-.chat {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
+.chat{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
 }
 
-.header {
-    height: 60px;
-    background: #2b2d31;
-    border-bottom: 1px solid #202225;
-    display: flex;
-    align-items: center;
-    padding: 0 20px;
-    font-weight: bold;
+.header{
+    height:60px;
+    background:#2b2d31;
+    border-bottom:1px solid #202225;
+    display:flex;
+    align-items:center;
+    padding:0 20px;
+    font-weight:bold;
 }
 
-.messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
+.messages{
+    flex:1;
+    overflow-y:auto;
+    padding:20px;
 }
 
-.message {
-    margin-bottom: 18px;
+.message{
+    margin-bottom:18px;
 }
 
-.name {
-    font-weight: bold;
+.name{
+    font-weight:bold;
 }
 
-.time {
-    color: #777;
-    font-size: 11px;
-    margin-left: 8px;
+.time{
+    color:#777;
+    font-size:11px;
+    margin-left:8px;
 }
 
-.text {
-    margin-top: 4px;
-    color: #ddd;
-    white-space: pre-wrap;
+.text{
+    margin-top:4px;
+    color:#ddd;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
 }
 
-.input-area {
-    padding: 15px;
-    background: #2b2d31;
+.input-area{
+    padding:15px;
+    background:#2b2d31;
 }
 
-.input-box {
-    display: flex;
-    background: #383a40;
-    border-radius: 7px;
-    padding: 5px;
+.input-box{
+    display:flex;
+    background:#383a40;
+    border-radius:7px;
+    padding:5px;
 }
 
-textarea {
-    flex: 1;
-    resize: none;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    color: white;
-    padding: 12px;
-    font-size: 15px;
+textarea{
+    flex:1;
+    resize:none;
+    border:0;
+    outline:0;
+    background:transparent;
+    color:#fff;
+    padding:12px;
+    font-size:15px;
 }
 
-.send {
-    width: 75px;
-    border: 0;
-    border-radius: 5px;
-    background: #5865f2;
-    color: white;
-    cursor: pointer;
+.send{
+    width:75px;
+    border:0;
+    border-radius:5px;
+    background:#5865f2;
+    color:#fff;
+    cursor:pointer;
 }
 
-.send:hover {
-    background: #4752c4;
+.send:hover{
+    background:#4752c4;
 }
 
-/* LOGIN */
-
-.login {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.92);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
+.send:disabled{
+    opacity:.5;
+    cursor:not-allowed;
 }
 
-.login-box {
-    width: 350px;
-    max-width: calc(100% - 30px);
-    background: #313338;
-    padding: 30px;
-    border-radius: 8px;
+.login{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.92);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:10;
 }
 
-.login-box h1 {
-    margin-top: 0;
+.login-box{
+    width:370px;
+    max-width:calc(100% - 30px);
+    background:#313338;
+    padding:30px;
+    border-radius:8px;
 }
 
-.login-box input {
-    width: 100%;
-    height: 45px;
-    background: #1e1f22;
-    border: 0;
-    border-radius: 5px;
-    color: white;
-    padding: 10px;
-    margin: 15px 0;
+.login-box h1{
+    margin-top:0;
 }
 
-.login-box button {
-    width: 100%;
-    height: 45px;
-    background: #5865f2;
-    border: 0;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
+.login-box input{
+    width:100%;
+    height:45px;
+    background:#1e1f22;
+    border:0;
+    border-radius:5px;
+    color:#fff;
+    padding:10px;
+    margin:15px 0;
 }
 
-.status {
-    position: fixed;
-    right: 10px;
-    top: 10px;
-    padding: 7px;
-    background: #18191c;
-    border-radius: 5px;
-    font-size: 12px;
-    z-index: 20;
+.login-box button{
+    width:100%;
+    height:45px;
+    background:#5865f2;
+    border:0;
+    border-radius:5px;
+    color:#fff;
+    cursor:pointer;
 }
 
-.error {
-    color: #ed4245;
-    margin-top: 10px;
-    font-size: 13px;
+.status{
+    position:fixed;
+    right:10px;
+    top:10px;
+    padding:7px 10px;
+    background:#18191c;
+    border-radius:5px;
+    font-size:12px;
+    z-index:20;
 }
 
+.status.ok{
+    color:#57f287;
+}
+
+.status.bad{
+    color:#ed4245;
+}
+
+.error-screen{
+    position:fixed;
+    inset:0;
+    background:#111214;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    z-index:100;
+    overflow:auto;
+}
+
+.error-box{
+    width:700px;
+    max-width:100%;
+    background:#2b2d31;
+    border:1px solid #ed4245;
+    border-radius:8px;
+    padding:25px;
+}
+
+.error-title{
+    color:#ed4245;
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:15px;
+}
+
+.error-code{
+    background:#18191c;
+    border-radius:5px;
+    padding:15px;
+    color:#ff7777;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    font-family:monospace;
+    max-height:250px;
+    overflow:auto;
+}
+
+.error-fix{
+    margin-top:20px;
+    color:#ddd;
+    white-space:pre-wrap;
+    line-height:1.6;
+}
+
+.error-buttons{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+.error-buttons button{
+    padding:10px 15px;
+    border:0;
+    border-radius:5px;
+    background:#5865f2;
+    color:#fff;
+    cursor:pointer;
+}
+
+.copy-success{
+    color:#57f287;
+    margin-top:10px;
+    display:none;
+}
+
+@media(max-width:700px){
+    .sidebar{
+        width:170px;
+    }
+
+    .messages{
+        padding:12px;
+    }
+
+    .input-area{
+        padding:10px;
+    }
+}
 </style>
-
 </head>
 
 <body>
 
-<div
-    id="status"
-    class="status">
-    Connecting...
+<div id="status" class="status">
+Connecting...
 </div>
-
 
 <div class="app">
 
@@ -227,41 +297,34 @@ textarea {
 
         <div
             class="channel active"
-            onclick="changeChannel('general', this)">
+            onclick="changeChannel('general',this)">
             # general
         </div>
 
         <div
             class="channel"
-            onclick="changeChannel('gaming', this)">
+            onclick="changeChannel('gaming',this)">
             # gaming
         </div>
 
         <div
             class="channel"
-            onclick="changeChannel('movies', this)">
+            onclick="changeChannel('movies',this)">
             # movies
         </div>
 
     </div>
 
-
     <div class="chat">
 
         <div class="header">
-
-            # <span id="channelName">
-                general
-            </span>
-
+            # <span id="channelName">general</span>
         </div>
-
 
         <div
             id="messages"
             class="messages">
         </div>
-
 
         <div class="input-area">
 
@@ -269,9 +332,9 @@ textarea {
 
                 <textarea
                     id="messageInput"
-                    placeholder="Message #general"
                     rows="1"
-                    maxlength="2000">
+                    maxlength="2000"
+                    placeholder="Message #general">
                 </textarea>
 
                 <button
@@ -290,35 +353,67 @@ textarea {
 </div>
 
 
-<!-- LOGIN -->
-
-<div
-    id="login"
-    class="login">
+<div id="login" class="login">
 
     <div class="login-box">
 
-        <h1>
-            Welcome to MyChat
-        </h1>
+        <h1>Welcome to MyChat</h1>
 
-        <p>
-            Choose a username
-        </p>
+        <p>Choose a username</p>
 
         <input
             id="username"
             maxlength="24"
             placeholder="Username">
 
-        <button
-            onclick="login()">
+        <button onclick="login()">
             Enter Chat
         </button>
 
         <div
             id="loginError"
-            class="error">
+            style="color:#ed4245;margin-top:12px">
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="errorScreen" class="error-screen">
+
+    <div class="error-box">
+
+        <div class="error-title">
+            ⚠ CHAT SERVER ERROR
+        </div>
+
+        <div
+            id="errorCode"
+            class="error-code">
+        </div>
+
+        <div
+            id="errorFix"
+            class="error-fix">
+        </div>
+
+        <div class="error-buttons">
+
+            <button onclick="testServer()">
+                🔄 Test Again
+            </button>
+
+            <button onclick="copyError()">
+                📋 Copy Error
+            </button>
+
+        </div>
+
+        <div
+            id="copySuccess"
+            class="copy-success">
+            Error copied!
         </div>
 
     </div>
@@ -328,227 +423,510 @@ textarea {
 
 <script>
 
-const API =
-    "/api/messages";
+const API="/api/messages";
 
-let username = "";
+let username="";
+let currentChannel="general";
 
-let currentChannel =
-    "general";
+let lastFullError="";
 
 
-/* LOGIN */
+function setStatus(text,good){
 
-function login() {
+    const status=
+        document.getElementById("status");
 
-    const input =
-        document.getElementById(
-            "username"
-        );
+    status.textContent=text;
 
-    const name =
+    status.className=
+        "status "+
+        (good ? "ok" : "bad");
+}
+
+
+function login(){
+
+    const input=
+        document.getElementById("username");
+
+    const error=
+        document.getElementById("loginError");
+
+    const name=
         input.value.trim();
 
-    if (!name) {
+    if(!name){
 
-        document.getElementById(
-            "loginError"
-        ).textContent =
+        error.textContent=
             "Enter a username.";
 
         return;
     }
 
-    username = name;
+    if(name.length<2){
+
+        error.textContent=
+            "Username must be at least 2 characters.";
+
+        return;
+    }
+
+    username=name;
 
     localStorage.setItem(
-        "username",
+        "chat_username",
         username
     );
 
     document.getElementById(
         "login"
-    ).style.display =
-        "none";
+    ).style.display="none";
 
     loadMessages();
 }
 
 
-/* LOAD */
+function getFix(error){
 
-async function loadMessages() {
+    const e=
+        error.toLowerCase();
 
-    try {
 
-        const response =
+    if(e.includes("supabase_url")){
+
+        return `WHAT IT MEANS:
+
+Vercel cannot find your SUPABASE_URL.
+
+HOW TO FIX:
+
+1. Open Vercel.
+2. Open your chat project.
+3. Go to Settings.
+4. Go to Environment Variables.
+5. Add:
+
+SUPABASE_URL
+
+6. Put your Supabase Project URL as the value.
+7. Save it.
+8. Redeploy your Vercel project.`;
+    }
+
+
+    if(
+        e.includes("service_role") ||
+        e.includes("supabase_service_role_key")
+    ){
+
+        return `WHAT IT MEANS:
+
+Vercel cannot find your Supabase secret key.
+
+HOW TO FIX:
+
+1. Open Vercel.
+2. Open your chat project.
+3. Settings.
+4. Environment Variables.
+5. Add:
+
+SUPABASE_SERVICE_ROLE_KEY
+
+6. Put your Supabase service_role key as the value.
+7. Save it.
+8. Redeploy Vercel.
+
+DO NOT put this key inside index.html.`;
+    }
+
+
+    if(
+        e.includes("messages") &&
+        (
+            e.includes("relation") ||
+            e.includes("table")
+        )
+    ){
+
+        return `WHAT IT MEANS:
+
+Supabase cannot find the messages table.
+
+HOW TO FIX:
+
+Open Supabase → Table Editor.
+
+You need a table called:
+
+messages
+
+It should contain:
+
+id
+username
+channel
+message
+created_at`;
+    }
+
+
+    if(e.includes("404")){
+
+        return `WHAT IT MEANS:
+
+Vercel cannot find the API.
+
+HOW TO FIX:
+
+Your GitHub structure must be exactly:
+
+index.html
+api/
+    messages.js
+
+Make sure messages.js is INSIDE the api folder.
+
+Then commit the files and redeploy Vercel.`;
+    }
+
+
+    if(e.includes("401")){
+
+        return `WHAT IT MEANS:
+
+Supabase rejected the API key.
+
+HOW TO FIX:
+
+Go to Supabase → Project Settings → API.
+
+Copy the service_role key again.
+
+Then go to Vercel → Settings → Environment Variables.
+
+Replace:
+
+SUPABASE_SERVICE_ROLE_KEY
+
+Then redeploy Vercel.`;
+    }
+
+
+    if(e.includes("403")){
+
+        return `WHAT IT MEANS:
+
+The request was forbidden.
+
+HOW TO FIX:
+
+Check your Supabase API key.
+
+Make sure you are using the service_role key in Vercel.
+
+Do NOT put it in index.html.`;
+    }
+
+
+    if(e.includes("500")){
+
+        return `WHAT IT MEANS:
+
+The server returned an internal error.
+
+HOW TO FIX:
+
+The exact server response is shown above.
+
+Copy the error and send it to me.
+
+I can identify the problem from that error.`;
+    }
+
+
+    if(e.includes("failed to fetch")){
+
+        return `WHAT IT MEANS:
+
+Your browser could not reach the API.
+
+HOW TO FIX:
+
+Test this URL:
+
+/api/messages?channel=general
+
+If it shows 404, the api/messages.js file is in the wrong place.
+
+If it shows another error, send me that error.`;
+    }
+
+
+    if(e.includes("did not return json")){
+
+        return `WHAT IT MEANS:
+
+Vercel returned something other than JSON.
+
+HOW TO FIX:
+
+Open:
+
+/api/messages?channel=general
+
+in your browser.
+
+Copy everything you see and send it to me.`;
+    }
+
+
+    return `I don't recognize this error yet.
+
+Send me the exact error shown above.
+
+DO NOT send your Supabase service_role key.
+
+I can use the error message to tell you exactly what needs fixing.`;
+}
+
+
+function showError(error){
+
+    lastFullError=error;
+
+    document.getElementById(
+        "errorCode"
+    ).textContent=error;
+
+    document.getElementById(
+        "errorFix"
+    ).textContent=getFix(error);
+
+    document.getElementById(
+        "errorScreen"
+    ).style.display="flex";
+
+    setStatus(
+        "● Error",
+        false
+    );
+}
+
+
+function hideError(){
+
+    document.getElementById(
+        "errorScreen"
+    ).style.display="none";
+}
+
+
+async function testServer(){
+
+    hideError();
+
+    await loadMessages();
+}
+
+
+async function loadMessages(){
+
+    try{
+
+        const response=
             await fetch(
-                API +
-                "?channel=" +
+                API+
+                "?channel="+
                 encodeURIComponent(
                     currentChannel
-                )
+                ),
+                {
+                    method:"GET",
+                    headers:{
+                        "Accept":
+                            "application/json"
+                    }
+                }
             );
 
-        const text =
+
+        const text=
             await response.text();
+
 
         let data;
 
-        try {
 
-            data =
+        try{
+
+            data=
                 JSON.parse(text);
 
-        } catch {
+        }catch{
 
             throw new Error(
-                "Server did not return JSON:\n" +
-                text.substring(0,300)
+                "Server did not return JSON.\n\n"+
+                "HTTP STATUS: "+
+                response.status+
+                "\n\n"+
+                "SERVER RESPONSE:\n"+
+                text.substring(0,1500)
             );
         }
 
-        if (!response.ok) {
+
+        if(!response.ok){
 
             throw new Error(
-                data.error ||
-                "Server error"
+                "HTTP "+
+                response.status+
+                "\n\n"+
+                (
+                    data.error ||
+                    "Unknown server error"
+                )
             );
         }
+
 
         displayMessages(
-            data.messages || []
+            data.messages||[]
         );
+
 
         setStatus(
             "● Connected",
             true
         );
 
-    } catch(error) {
+
+    }catch(error){
 
         console.error(error);
 
-        setStatus(
-            "● Error",
-            false
-        );
-
-        console.error(
+        showError(
             error.message
         );
     }
 }
 
 
-/* DISPLAY */
+function displayMessages(messages){
 
-function displayMessages(
-    messages
-) {
-
-    const container =
+    const container=
         document.getElementById(
             "messages"
         );
 
-    container.innerHTML = "";
+    container.innerHTML="";
 
-    messages.forEach(
-        message => {
 
-            const div =
-                document.createElement(
-                    "div"
-                );
+    messages.forEach(message=>{
 
-            div.className =
-                "message";
+        const div=
+            document.createElement("div");
 
-            const name =
-                document.createElement(
-                    "span"
-                );
+        div.className="message";
 
-            name.className =
-                "name";
 
-            name.textContent =
-                message.username;
+        const name=
+            document.createElement("span");
 
-            const time =
-                document.createElement(
-                    "span"
-                );
+        name.className="name";
 
-            time.className =
-                "time";
+        name.textContent=
+            message.username;
 
-            time.textContent =
+
+        const time=
+            document.createElement("span");
+
+        time.className="time";
+
+        if(message.created_at){
+
+            time.textContent=
                 new Date(
                     message.created_at
                 ).toLocaleString();
-
-            const text =
-                document.createElement(
-                    "div"
-                );
-
-            text.className =
-                "text";
-
-            text.textContent =
-                message.message;
-
-            div.appendChild(name);
-
-            div.appendChild(time);
-
-            div.appendChild(text);
-
-            container.appendChild(div);
-
         }
-    );
 
-    container.scrollTop =
+
+        const text=
+            document.createElement("div");
+
+        text.className="text";
+
+        text.textContent=
+            message.message;
+
+
+        div.appendChild(name);
+
+        div.appendChild(time);
+
+        div.appendChild(text);
+
+        container.appendChild(div);
+
+    });
+
+
+    container.scrollTop=
         container.scrollHeight;
 }
 
 
-/* SEND */
+async function sendMessage(){
 
-async function sendMessage() {
-
-    const input =
+    const input=
         document.getElementById(
             "messageInput"
         );
 
-    const button =
+    const button=
         document.getElementById(
             "sendButton"
         );
 
-    const message =
+
+    const message=
         input.value.trim();
 
-    if (!message)
+
+    if(!username){
+
+        alert(
+            "Choose a username first."
+        );
+
         return;
+    }
 
-    button.disabled =
-        true;
 
-    try {
+    if(!message){
 
-        const response =
+        return;
+    }
+
+
+    button.disabled=true;
+
+
+    try{
+
+        const response=
             await fetch(
                 API,
                 {
-                    method: "POST",
+                    method:"POST",
 
-                    headers: {
+                    headers:{
                         "Content-Type":
+                            "application/json",
+
+                        "Accept":
                             "application/json"
                     },
 
@@ -568,113 +946,139 @@ async function sendMessage() {
                 }
             );
 
-        const text =
+
+        const text=
             await response.text();
+
 
         let data;
 
-        try {
 
-            data =
+        try{
+
+            data=
                 JSON.parse(text);
 
-        } catch {
+        }catch{
 
             throw new Error(
-                "Server did not return JSON:\n" +
-                text.substring(0,300)
+                "Server did not return JSON.\n\n"+
+                "HTTP STATUS: "+
+                response.status+
+                "\n\n"+
+                "SERVER RESPONSE:\n"+
+                text.substring(0,1500)
             );
         }
 
-        if (!response.ok) {
+
+        if(!response.ok){
 
             throw new Error(
-                data.error ||
-                "Could not send message"
+                "HTTP "+
+                response.status+
+                "\n\n"+
+                (
+                    data.error ||
+                    "Unknown server error"
+                )
             );
         }
 
-        input.value = "";
+
+        input.value="";
 
         await loadMessages();
 
-    } catch(error) {
 
-        alert(
-            error.message
-        );
+    }catch(error){
 
         console.error(error);
+
+        showError(
+            error.message
+        );
     }
 
-    button.disabled =
-        false;
+
+    button.disabled=false;
 }
 
-
-/* CHANNEL */
 
 function changeChannel(
     channel,
     element
-) {
+){
 
-    currentChannel =
+    currentChannel=
         channel;
+
 
     document
         .querySelectorAll(
             ".channel"
         )
-        .forEach(
-            item =>
-                item.classList.remove(
-                    "active"
-                )
-        );
+        .forEach(item=>{
+
+            item.classList.remove(
+                "active"
+            );
+
+        });
+
 
     element.classList.add(
         "active"
     );
 
+
     document.getElementById(
         "channelName"
-    ).textContent =
+    ).textContent=
         channel;
+
 
     document.getElementById(
         "messageInput"
-    ).placeholder =
-        "Message #" +
+    ).placeholder=
+        "Message #"+
         channel;
+
 
     loadMessages();
 }
 
 
-/* STATUS */
+async function copyError(){
 
-function setStatus(
-    text,
-    good
-) {
+    try{
 
-    const status =
-        document.getElementById(
-            "status"
+        await navigator.clipboard.writeText(
+            lastFullError
         );
 
-    status.textContent =
-        text;
+        document.getElementById(
+            "copySuccess"
+        ).style.display=
+            "block";
 
-    status.style.color =
-        good
-            ? "#57f287"
-            : "#ed4245";
+        setTimeout(()=>{
+
+            document.getElementById(
+                "copySuccess"
+            ).style.display=
+                "none";
+
+        },2000);
+
+    }catch{
+
+        alert(
+            lastFullError
+        );
+    }
 }
 
-
-/* ENTER */
 
 document
     .getElementById(
@@ -682,12 +1086,12 @@ document
     )
     .addEventListener(
         "keydown",
-        function(event) {
+        event=>{
 
-            if (
-                event.key === "Enter" &&
+            if(
+                event.key==="Enter" &&
                 !event.shiftKey
-            ) {
+            ){
 
                 event.preventDefault();
 
@@ -698,21 +1102,20 @@ document
     );
 
 
-/* START */
-
-const saved =
+const savedUsername=
     localStorage.getItem(
-        "username"
+        "chat_username"
     );
 
-if (saved) {
 
-    username =
-        saved;
+if(savedUsername){
+
+    username=
+        savedUsername;
 
     document.getElementById(
         "login"
-    ).style.display =
+    ).style.display=
         "none";
 
     loadMessages();
@@ -720,12 +1123,19 @@ if (saved) {
 
 
 setInterval(
-    loadMessages,
-    3000
+    ()=>{
+
+        if(username){
+
+            loadMessages();
+
+        }
+
+    },
+    5000
 );
 
 </script>
 
 </body>
-
 </html>
