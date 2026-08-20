@@ -1,1127 +1,1074 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            margin: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: Arial, Helvetica, sans-serif;
-            background: #0b0b0d;
-            color: #fff;
-        }
-
-        button,
-        input,
-        select {
-            font: inherit;
-        }
-
-        button {
-            cursor: pointer;
-        }
-
-        /* =========================
-           APP
-        ========================= */
-
-        .app {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            background:
-                radial-gradient(circle at top right, #1b1b20 0, transparent 35%),
-                #0b0b0d;
-        }
-
-        /* =========================
-           TOP BAR
-        ========================= */
-
-        .topbar {
-            height: 60px;
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            padding: 0 18px;
-            gap: 12px;
-            border-bottom: 1px solid #25252b;
-            background: #111114;
-        }
-
-        .logo {
-            font-size: 19px;
-            font-weight: 800;
-            letter-spacing: .3px;
-            margin-right: 12px;
-        }
-
-        .nav-button {
-            border: 1px solid #292930;
-            background: #18181c;
-            color: #ccc;
-            border-radius: 8px;
-            padding: 9px 14px;
-            transition: .15s;
-        }
-
-        .nav-button:hover {
-            background: #222228;
-            color: #fff;
-        }
-
-        .nav-button.active {
-            background: #fff;
-            color: #111;
-            border-color: #fff;
-        }
-
-        .top-spacer {
-            flex: 1;
-        }
-
-        .username-display {
-            color: #aaa;
-            font-size: 14px;
-        }
-
-        /* =========================
-           MAIN
-        ========================= */
-
-        .main {
-            flex: 1;
-            min-height: 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .window {
-            position: absolute;
-            inset: 14px;
-            display: none;
-            flex-direction: column;
-            border: 1px solid #29292f;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #101013;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, .4);
-        }
-
-        .window.active {
-            display: flex;
-        }
-
-        .window-header {
-            height: 52px;
-            min-height: 52px;
-            display: flex;
-            align-items: center;
-            padding: 0 16px;
-            gap: 10px;
-            border-bottom: 1px solid #29292f;
-            background: #151518;
-        }
-
-        .window-title {
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-        .window-subtitle {
-            color: #777;
-            font-size: 12px;
-        }
-
-        /* =========================
-           CHAT
-        ========================= */
-
-        .chat-layout {
-            display: flex;
-            flex: 1;
-            min-height: 0;
-        }
-
-        .chat-sidebar {
-            width: 210px;
-            min-width: 210px;
-            border-right: 1px solid #29292f;
-            background: #0d0d10;
-            padding: 12px;
-            overflow-y: auto;
-        }
-
-        .sidebar-title {
-            color: #777;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin: 4px 8px 8px;
-        }
-
-        .channel-button {
-            width: 100%;
-            text-align: left;
-            border: 0;
-            background: transparent;
-            color: #999;
-            border-radius: 7px;
-            padding: 9px 10px;
-            margin-bottom: 3px;
-        }
-
-        .channel-button:hover {
-            background: #18181c;
-            color: #fff;
-        }
-
-        .channel-button.active {
-            background: #232328;
-            color: #fff;
-        }
-
-        .chat-content {
-            flex: 1;
-            min-width: 0;
-            min-height: 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .messages {
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
-            padding: 18px;
-        }
-
-        .message {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 17px;
-            max-width: 900px;
-        }
-
-        .avatar {
-            width: 34px;
-            height: 34px;
-            min-width: 34px;
-            border-radius: 50%;
-            background: #29292f;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: #aaa;
-        }
-
-        .message-body {
-            min-width: 0;
-        }
-
-        .message-top {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 3px;
-        }
-
-        .message-user {
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .message-time {
-            color: #555;
-            font-size: 11px;
-        }
-
-        .message-text {
-            color: #d0d0d4;
-            font-size: 14px;
-            line-height: 1.5;
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
-        }
-
-        .message-image {
-            display: block;
-            max-width: min(500px, 100%);
-            max-height: 400px;
-            margin-top: 8px;
-            border-radius: 8px;
-            border: 1px solid #29292f;
-        }
-
-        .edited {
-            color: #555;
-            font-size: 10px;
-            margin-left: 4px;
-        }
-
-        .empty-chat {
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #555;
-            font-size: 14px;
-        }
-
-        .chat-input-area {
-            border-top: 1px solid #29292f;
-            padding: 12px;
-            background: #111114;
-        }
-
-        .chat-input-row {
-            display: flex;
-            gap: 8px;
-        }
-
-        .chat-input {
-            flex: 1;
-            min-width: 0;
-            border: 1px solid #292930;
-            background: #18181c;
-            color: #fff;
-            outline: none;
-            border-radius: 8px;
-            padding: 11px 13px;
-        }
-
-        .chat-input:focus {
-            border-color: #55555d;
-        }
-
-        .send-button {
-            border: 0;
-            background: #fff;
-            color: #111;
-            border-radius: 8px;
-            padding: 0 18px;
-            font-weight: 700;
-        }
-
-        .send-button:hover {
-            background: #ddd;
-        }
-
-        /* =========================
-           GAMES
-        ========================= */
-
-        .games-content {
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-            gap: 14px;
-        }
-
-        .game-card {
-            border: 1px solid #29292f;
-            border-radius: 10px;
-            background: #151518;
-            padding: 15px;
-            transition: .15s;
-        }
-
-        .game-card:hover {
-            border-color: #44444c;
-            transform: translateY(-1px);
-        }
-
-        .game-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 10px;
-            background: #25252b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            margin-bottom: 12px;
-        }
-
-        .game-name {
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .game-description {
-            color: #777;
-            font-size: 12px;
-            line-height: 1.4;
-            min-height: 34px;
-            margin-bottom: 13px;
-        }
-
-        .game-actions {
-            display: flex;
-            gap: 7px;
-        }
-
-        .game-button {
-            flex: 1;
-            border: 1px solid #303037;
-            border-radius: 7px;
-            padding: 9px;
-            background: #1b1b20;
-            color: #ddd;
-        }
-
-        .game-button:hover {
-            background: #25252b;
-        }
-
-        .game-button.primary {
-            background: #fff;
-            color: #111;
-            border-color: #fff;
-        }
-
-        /* =========================
-           HOST WINDOW
-        ========================= */
-
-        .host-panel {
-            width: min(500px, calc(100% - 30px));
-            margin: auto;
-            border: 1px solid #29292f;
-            border-radius: 12px;
-            background: #151518;
-            padding: 22px;
-        }
-
-        .host-title {
-            font-size: 20px;
-            font-weight: 800;
-            margin-bottom: 5px;
-        }
-
-        .host-description {
-            color: #777;
-            font-size: 13px;
-            margin-bottom: 20px;
-        }
-
-        .field {
-            margin-bottom: 15px;
-        }
-
-        .field label {
-            display: block;
-            color: #aaa;
-            font-size: 12px;
-            margin-bottom: 6px;
-        }
-
-        .field input,
-        .field select {
-            width: 100%;
-            border: 1px solid #303037;
-            border-radius: 8px;
-            background: #0e0e11;
-            color: #fff;
-            padding: 11px;
-            outline: none;
-        }
-
-        .field input:focus,
-        .field select:focus {
-            border-color: #55555d;
-        }
-
-        .host-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .host-actions button {
-            flex: 1;
-            padding: 11px;
-            border-radius: 8px;
-            border: 1px solid #303037;
-            background: #1d1d22;
-            color: #fff;
-        }
-
-        .host-actions .primary {
-            background: #fff;
-            color: #111;
-            border-color: #fff;
-        }
-
-        /* =========================
-           ACTIVE GAMES
-        ========================= */
-
-        .active-games {
-            margin-top: 25px;
-        }
-
-        .section-title {
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .server-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .server {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border: 1px solid #29292f;
-            border-radius: 8px;
-            background: #151518;
-            padding: 11px;
-        }
-
-        .server-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .server-name {
-            font-weight: 700;
-        }
-
-        .server-details {
-            color: #777;
-            font-size: 11px;
-            margin-top: 3px;
-        }
-
-        .server button {
-            border: 1px solid #303037;
-            border-radius: 7px;
-            background: #1c1c21;
-            color: #ddd;
-            padding: 8px 13px;
-        }
-
-        .server button:hover {
-            background: #29292f;
-        }
-
-        /* =========================
-           MODAL
-        ========================= */
-
-        .modal {
-            position: fixed;
-            inset: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, .7);
-            z-index: 100;
-            padding: 20px;
-        }
-
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-box {
-            width: min(450px, 100%);
-            border: 1px solid #33333a;
-            border-radius: 12px;
-            background: #151518;
-            padding: 20px;
-            box-shadow: 0 25px 80px rgba(0,0,0,.6);
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
-
-        .modal-text {
-            color: #999;
-            font-size: 13px;
-            line-height: 1.5;
-            margin-bottom: 18px;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .modal-actions button {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #303037;
-            background: #1d1d22;
-            color: #fff;
-        }
-
-        .modal-actions .primary {
-            background: #fff;
-            color: #111;
-        }
-
-        /* =========================
-           STATUS
-        ========================= */
-
-        .status {
-            position: fixed;
-            right: 16px;
-            bottom: 16px;
-            padding: 10px 13px;
-            border-radius: 8px;
-            background: #18181c;
-            border: 1px solid #303037;
-            color: #aaa;
-            font-size: 12px;
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(8px);
-            transition: .2s;
-            z-index: 200;
-        }
-
-        .status.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* =========================
-           MOBILE
-        ========================= */
-
-        @media (max-width: 700px) {
-            .topbar {
-                padding: 0 10px;
-            }
-
-            .logo {
-                display: none;
-            }
-
-            .nav-button {
-                padding: 8px 10px;
-            }
-
-            .username-display {
-                display: none;
-            }
-
-            .window {
-                inset: 7px;
-                border-radius: 9px;
-            }
-
-            .chat-sidebar {
-                width: 145px;
-                min-width: 145px;
-            }
-
-            .games-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .chat-input-row {
-                gap: 5px;
-            }
-
-            .send-button {
-                padding: 0 13px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Chat</title>
+
+<style>
+*{box-sizing:border-box}
+
+:root{
+    --bg:#0b0d10;
+    --panel:#111419;
+    --panel2:#181c22;
+    --panel3:#20252d;
+    --border:#292f38;
+    --text:#edf0f4;
+    --muted:#7e8793;
+    --accent:#e8eaed;
+    --danger:#ff7070;
+    --success:#70d890;
+    --radius:12px;
+    --ui-scale:1;
+    --text-size:16px;
+    --word-spacing:0px;
+    --line-spacing:1.45;
+}
+
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    background:var(--bg);
+    color:var(--text);
+    font-family:Inter,Arial,sans-serif;
+}
+
+body{
+    overflow:hidden;
+    font-size:calc(16px * var(--ui-scale));
+}
+
+button,input,textarea,select{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+button:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+}
+
+.app{
+    width:100%;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+/* HEADER */
+
+.header{
+    height:64px;
+    min-height:64px;
+    padding:0 18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:700;
+}
+
+.logo-icon{
+    width:35px;
+    height:35px;
+    display:grid;
+    place-items:center;
+    border-radius:10px;
+    background:var(--panel2);
+    border:1px solid var(--border);
+}
+
+.channel{
+    color:var(--muted);
+    font-weight:400;
+}
+
+/* TABS */
+
+.tabs{
+    height:48px;
+    min-height:48px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    padding:5px 12px;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+}
+
+.tab{
+    height:38px;
+    padding:0 16px;
+    border:1px solid transparent;
+    border-radius:9px;
+    background:transparent;
+    color:var(--muted);
+    font-weight:700;
+}
+
+.tab:hover{
+    background:var(--panel2);
+    color:var(--text);
+}
+
+.tab.active{
+    background:var(--panel2);
+    border-color:var(--border);
+    color:var(--text);
+}
+
+.icon-btn{
+    width:39px;
+    height:39px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--panel2);
+    color:var(--text);
+}
+
+.icon-btn:hover{
+    filter:brightness(1.15);
+}
+
+/* VIEWS */
+
+.view{
+    flex:1;
+    min-height:0;
+    display:none;
+}
+
+.view.active{
+    display:flex;
+}
+
+/* CHAT */
+
+.chat-view{
+    flex-direction:column;
+}
+
+.messages{
+    flex:1;
+    overflow-y:auto;
+    padding:20px;
+}
+
+.message{
+    display:flex;
+    gap:11px;
+    margin-bottom:17px;
+}
+
+.avatar{
+    flex:0 0 40px;
+    width:40px;
+    height:40px;
+    display:grid;
+    place-items:center;
+    border-radius:var(--radius);
+    background:var(--panel2);
+    border:1px solid var(--border);
+    font-weight:700;
+}
+
+.message-content{
+    min-width:0;
+    max-width:min(850px,calc(100vw - 90px));
+}
+
+.message-top{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    margin-bottom:3px;
+}
+
+.username{
+    font-weight:700;
+}
+
+.time,.edited{
+    color:var(--muted);
+    font-size:11px;
+}
+
+.message-text{
+    color:#d8dde4;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    font-size:var(--text-size);
+    word-spacing:var(--word-spacing);
+    line-height:var(--line-spacing);
+}
+
+.message-image{
+    display:block;
+    max-width:min(500px,80vw);
+    max-height:500px;
+    margin-top:8px;
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    background:#000;
+    object-fit:contain;
+    cursor:pointer;
+}
+
+.composer{
+    padding:12px 16px 16px;
+    background:var(--panel);
+    border-top:1px solid var(--border);
+}
+
+.composer-box{
+    max-width:1100px;
+    margin:auto;
+    display:flex;
+    align-items:flex-end;
+    gap:7px;
+    padding:8px;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    border-radius:14px;
+}
+
+textarea{
+    flex:1;
+    min-height:42px;
+    max-height:150px;
+    resize:none;
+    border:0;
+    outline:none;
+    background:transparent;
+    color:white;
+    padding:10px;
+}
+
+.attach-btn,
+.send-btn{
+    height:42px;
+    border:0;
+    border-radius:9px;
+}
+
+.attach-btn{
+    width:42px;
+    background:transparent;
+    color:#adb5c0;
+    font-size:20px;
+}
+
+.attach-btn:hover{
+    background:#242932;
+}
+
+.send-btn{
+    padding:0 18px;
+    background:var(--accent);
+    color:#111;
+    font-weight:700;
+}
+
+/* GAMES */
+
+.games-view{
+    overflow-y:auto;
+    flex-direction:column;
+    padding:20px;
+}
+
+.games-container{
+    width:min(1200px,100%);
+    margin:auto;
+}
+
+.games-heading{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.games-heading h1{
+    margin:0 0 5px;
+    font-size:25px;
+}
+
+.games-heading p{
+    margin:0;
+    color:var(--muted);
+}
+
+.game-actions{
+    display:flex;
+    gap:8px;
+}
+
+.primary-btn,
+.secondary-btn,
+.danger-btn,
+.success-btn{
+    border-radius:9px;
+    padding:10px 15px;
+    border:1px solid var(--border);
+    font-weight:700;
+}
+
+.primary-btn{
+    background:var(--accent);
+    color:#111;
+}
+
+.secondary-btn{
+    background:var(--panel2);
+    color:var(--text);
+}
+
+.success-btn{
+    background:#183a27;
+    border-color:#28653e;
+    color:#91e4aa;
+}
+
+.danger-btn{
+    background:#291719;
+    border-color:#633136;
+    color:#ff8585;
+}
+
+.game-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:12px;
+}
+
+.game-card{
+    position:relative;
+    padding:18px;
+    min-height:190px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    background:var(--panel);
+    transition:.15s;
+}
+
+.game-card:hover{
+    transform:translateY(-2px);
+    border-color:#3c444f;
+}
+
+.game-icon{
+    width:50px;
+    height:50px;
+    display:grid;
+    place-items:center;
+    font-size:26px;
+    border-radius:13px;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    margin-bottom:12px;
+}
+
+.game-card h3{
+    margin:0 0 6px;
+}
+
+.game-card p{
+    color:var(--muted);
+    margin:0 0 15px;
+    line-height:1.4;
+}
+
+.game-meta{
+    color:#9aa3ae;
+    font-size:12px;
+    margin-bottom:12px;
+}
+
+.game-board-panel{
+    margin-top:15px;
+    padding:18px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:15px;
+}
+
+.game-topbar{
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+    flex-wrap:wrap;
+    align-items:center;
+    padding-bottom:15px;
+    border-bottom:1px solid var(--border);
+}
+
+.game-title{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+.game-title h2{
+    margin:0;
+}
+
+.game-status{
+    color:var(--muted);
+    font-size:13px;
+}
+
+.players-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin:15px 0;
+}
+
+.player-chip{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:7px 10px;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:13px;
+}
+
+.player-chip.host{
+    border-color:#75662c;
+}
+
+.player-chip.turn{
+    border-color:#34704b;
+    box-shadow:0 0 0 1px #34704b inset;
+}
+
+.turn-banner{
+    padding:12px;
+    margin-bottom:15px;
+    border-radius:10px;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    text-align:center;
+    font-weight:700;
+}
+
+.board{
+    margin:20px auto;
+    width:min(430px,100%);
+}
+
+/* TIC TAC TOE */
+
+.ttt-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:7px;
+}
+
+.ttt-cell{
+    aspect-ratio:1;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:var(--panel2);
+    color:var(--text);
+    font-size:clamp(35px,10vw,70px);
+    font-weight:800;
+}
+
+.ttt-cell:hover:not(:disabled){
+    background:var(--panel3);
+}
+
+/* DICE */
+
+.dice-board{
+    text-align:center;
+}
+
+.dice-number{
+    font-size:90px;
+    line-height:1;
+    margin:20px;
+}
+
+/* CONNECT FOUR */
+
+.connect-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:5px;
+    padding:8px;
+    background:#10151b;
+    border-radius:12px;
+}
+
+.connect-cell{
+    aspect-ratio:1;
+    border-radius:50%;
+    border:1px solid var(--border);
+    background:#242a31;
+}
+
+.connect-cell.red{
+    background:#d95757;
+}
+
+.connect-cell.yellow{
+    background:#e0c44d;
+}
+
+.connect-columns{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:5px;
+    margin-bottom:5px;
+}
+
+.connect-column{
+    padding:7px 2px;
+    border:1px solid var(--border);
+    background:var(--panel2);
+    color:var(--text);
+    border-radius:7px;
+}
+
+/* HIGHER/LOWER */
+
+.hl-board{
+    text-align:center;
+}
+
+.hl-number{
+    font-size:75px;
+    font-weight:800;
+    margin:20px;
+}
+
+/* ROCK PAPER SCISSORS */
+
+.rps-buttons{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.rps-button{
+    min-width:95px;
+    padding:14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--panel2);
+    color:var(--text);
+    font-size:25px;
+}
+
+/* LOBBY */
+
+.lobby-note{
+    margin-top:20px;
+    padding:12px;
+    color:var(--muted);
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--panel2);
+}
+
+.empty-games{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--muted);
+    border:1px dashed var(--border);
+    border-radius:14px;
+}
+
+/* MODALS */
+
+.overlay{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.72);
+    z-index:100;
+}
+
+.overlay.show{
+    display:flex;
+}
+
+.panel{
+    width:min(520px,calc(100vw - 25px));
+    max-height:calc(100vh - 25px);
+    overflow-y:auto;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:15px;
+    box-shadow:0 25px 80px #000b;
+}
+
+.panel-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px;
+    border-bottom:1px solid var(--border);
+}
+
+.panel-header h2{
+    margin:0;
+}
+
+.panel-body{
+    padding:18px;
+}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+.form-group label{
+    display:block;
+    color:#aab2bd;
+    font-size:13px;
+    margin-bottom:7px;
+}
+
+.form-group input,
+.form-group select{
+    width:100%;
+    padding:11px;
+    border:1px solid var(--border);
+    border-radius:9px;
+    background:#101419;
+    color:white;
+    outline:none;
+}
+
+.form-buttons{
+    display:flex;
+    gap:8px;
+    justify-content:flex-end;
+}
+
+/* SETTINGS */
+
+.category{
+    margin-bottom:12px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+    background:var(--panel2);
+}
+
+.category-title{
+    width:100%;
+    padding:14px;
+    border:0;
+    background:transparent;
+    color:var(--text);
+    display:flex;
+    justify-content:space-between;
+    font-weight:700;
+    text-align:left;
+}
+
+.category-body{
+    display:none;
+    padding:0 14px 14px;
+}
+
+.category.open .category-body{
+    display:block;
+}
+
+.setting{
+    margin-top:14px;
+}
+
+.setting label{
+    display:block;
+    margin-bottom:7px;
+    color:#aab2bd;
+    font-size:13px;
+}
+
+.setting input,
+.setting select{
+    width:100%;
+    padding:10px;
+    border:1px solid var(--border);
+    border-radius:9px;
+    outline:none;
+    background:#101419;
+    color:white;
+}
+
+.setting input[type="range"]{
+    padding:0;
+}
+
+.setting-value{
+    color:var(--muted);
+    font-size:12px;
+    margin-top:5px;
+}
+
+.save-btn{
+    width:100%;
+    margin-top:8px;
+    padding:12px;
+    border:0;
+    border-radius:9px;
+    background:var(--accent);
+    color:#111;
+    font-weight:700;
+}
+
+/* CONTEXT */
+
+.context-menu{
+    position:fixed;
+    display:none;
+    width:160px;
+    padding:5px;
+    z-index:200;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    border-radius:9px;
+    box-shadow:0 15px 40px #0009;
+}
+
+.context-menu.show{
+    display:block;
+}
+
+.context-menu button{
+    width:100%;
+    padding:9px 10px;
+    text-align:left;
+    border:0;
+    border-radius:6px;
+    background:transparent;
+    color:var(--text);
+}
+
+.context-menu button:hover{
+    background:#252b33;
+}
+
+.delete-option{
+    color:#ff7777!important;
+}
+
+/* IMAGE */
+
+.image-viewer{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:#000f;
+    z-index:300;
+}
+
+.image-viewer.show{
+    display:flex;
+}
+
+.full-image{
+    max-width:95vw;
+    max-height:90vh;
+    object-fit:contain;
+}
+
+.back-image{
+    position:absolute;
+    top:18px;
+    left:18px;
+    padding:10px 16px;
+    border-radius:9px;
+    border:1px solid #3a4049;
+    background:#171b21;
+    color:white;
+}
+
+/* EMPTY */
+
+.empty{
+    height:100%;
+    display:grid;
+    place-items:center;
+    color:#656d78;
+    text-align:center;
+}
+
+.empty strong{
+    display:block;
+    color:#aab2bd;
+    margin-bottom:5px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:600px){
+
+    .header{
+        padding:0 11px;
+    }
+
+    .messages{
+        padding:15px 11px;
+    }
+
+    .channel{
+        display:none;
+    }
+
+    .message-content{
+        max-width:calc(100vw - 70px);
+    }
+
+    .games-view{
+        padding:12px;
+    }
+
+    .games-heading{
+        flex-direction:column;
+    }
+
+    .game-actions{
+        width:100%;
+    }
+
+    .game-actions button{
+        flex:1;
+    }
+}
+</style>
 </head>
 
 <body>
 
 <div class="app">
 
-    <!-- =========================
-         TOP BAR
-    ========================== -->
+<header class="header">
 
-    <header class="topbar">
+    <div class="logo">
+        <div class="logo-icon">💬</div>
+        <span>Chat</span>
+        <span class="channel"># general</span>
+    </div>
 
-        <div class="logo">
-            Community
+    <button class="icon-btn" id="settingsBtn">⚙</button>
+
+</header>
+
+
+<!-- TABS -->
+
+<nav class="tabs">
+
+    <button class="tab active" data-view="chatView">
+        💬 Chat
+    </button>
+
+    <button class="tab" data-view="gamesView">
+        🎮 Games
+    </button>
+
+</nav>
+
+
+<!-- CHAT VIEW -->
+
+<main class="view chat-view active" id="chatView">
+
+    <main class="messages" id="messages"></main>
+
+    <div class="composer">
+
+        <div class="composer-box">
+
+            <input
+                type="file"
+                id="imageInput"
+                accept="image/*"
+                hidden
+            >
+
+            <button
+                class="attach-btn"
+                id="attachBtn"
+            >＋</button>
+
+            <textarea
+                id="messageInput"
+                rows="1"
+                placeholder="Message #general"
+            ></textarea>
+
+            <button
+                class="send-btn"
+                id="sendBtn"
+            >Send</button>
+
         </div>
 
-        <button
-            class="nav-button active"
-            id="chatNavButton"
-            type="button">
-            Chat
-        </button>
+    </div>
 
-        <button
-            class="nav-button"
-            id="gamesNavButton"
-            type="button">
-            Minigames
-        </button>
+</main>
 
-        <div class="top-spacer"></div>
 
-        <div
-            class="username-display"
-            id="usernameDisplay">
-            Not logged in
+<!-- GAMES VIEW -->
+
+<section class="view games-view" id="gamesView">
+
+<div class="games-container">
+
+    <div class="games-heading">
+
+        <div>
+            <h1>🎮 Games</h1>
+            <p>
+                Play games with everyone without filling the chat with game data.
+            </p>
         </div>
 
-    </header>
+        <div class="game-actions">
 
+            <button
+                class="secondary-btn"
+                id="refreshGamesBtn"
+            >
+                ↻ Refresh
+            </button>
 
-    <!-- =========================
-         MAIN
-    ========================== -->
+            <button
+                class="primary-btn"
+                id="createGameBtn"
+            >
+                ＋ Create game
+            </button>
 
-    <main class="main">
+        </div>
 
-        <!-- =====================
-             CHAT WINDOW
-        ====================== -->
+    </div>
 
-        <section
-            class="window active"
-            id="chatWindow">
 
-            <div class="window-header">
+    <div id="gamesLobby"></div>
 
-                <div class="window-title">
-                    Chat
-                </div>
+    <div
+        class="game-board-panel"
+        id="activeGamePanel"
+        style="display:none"
+    ></div>
 
-                <div
-                    class="window-subtitle"
-                    id="channelTitle">
-                    # general
-                </div>
+</div>
 
-            </div>
-
-
-            <div class="chat-layout">
-
-                <aside class="chat-sidebar">
-
-                    <div class="sidebar-title">
-                        Channels
-                    </div>
-
-                    <button
-                        class="channel-button active"
-                        data-channel="general"
-                        type="button">
-                        # general
-                    </button>
-
-                    <button
-                        class="channel-button"
-                        data-channel="games"
-                        type="button">
-                        # games
-                    </button>
-
-                    <button
-                        class="channel-button"
-                        data-channel="movies"
-                        type="button">
-                        # movies
-                    </button>
-
-                    <button
-                        class="channel-button"
-                        data-channel="ideas"
-                        type="button">
-                        # ideas
-                    </button>
-
-                </aside>
-
-
-                <div class="chat-content">
-
-                    <div
-                        class="messages"
-                        id="messages">
-
-                        <div class="empty-chat">
-                            Loading messages...
-                        </div>
-
-                    </div>
-
-
-                    <div class="chat-input-area">
-
-                        <div class="chat-input-row">
-
-                            <input
-                                id="messageInput"
-                                class="chat-input"
-                                type="text"
-                                maxlength="20000"
-                                placeholder="Write a message..."
-                                autocomplete="off">
-
-                            <button
-                                id="sendButton"
-                                class="send-button"
-                                type="button">
-                                Send
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================
-             MINIGAMES WINDOW
-        ====================== -->
-
-        <section
-            class="window"
-            id="gamesWindow">
-
-            <div class="window-header">
-
-                <div class="window-title">
-                    Minigames
-                </div>
-
-                <div class="window-subtitle">
-                    Play with others
-                </div>
-
-            </div>
-
-
-            <div class="games-content">
-
-                <div class="games-grid">
-
-                    <div class="game-card">
-
-                        <div class="game-icon">
-                            🎮
-                        </div>
-
-                        <div class="game-name">
-                            Test Game
-                        </div>
-
-                        <div class="game-description">
-                            Create a game and invite other players.
-                        </div>
-
-                        <div class="game-actions">
-
-                            <button
-                                class="game-button primary"
-                                type="button"
-                                data-game="test">
-                                Host
-                            </button>
-
-                            <button
-                                class="game-button"
-                                type="button"
-                                data-join-game="test">
-                                Join
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="game-card">
-
-                        <div class="game-icon">
-                            🏁
-                        </div>
-
-                        <div class="game-name">
-                            Race
-                        </div>
-
-                        <div class="game-description">
-                            Start a multiplayer race.
-                        </div>
-
-                        <div class="game-actions">
-
-                            <button
-                                class="game-button primary"
-                                type="button"
-                                data-game="race">
-                                Host
-                            </button>
-
-                            <button
-                                class="game-button"
-                                type="button"
-                                data-join-game="race">
-                                Join
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="game-card">
-
-                        <div class="game-icon">
-                            👻
-                        </div>
-
-                        <div class="game-name">
-                            Horror
-                        </div>
-
-                        <div class="game-description">
-                            Play a small multiplayer horror game.
-                        </div>
-
-                        <div class="game-actions">
-
-                            <button
-                                class="game-button primary"
-                                type="button"
-                                data-game="horror">
-                                Host
-                            </button>
-
-                            <button
-                                class="game-button"
-                                type="button"
-                                data-join-game="horror">
-                                Join
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="active-games">
-
-                    <div class="section-title">
-                        Active Games
-                    </div>
-
-                    <div
-                        class="server-list"
-                        id="serverList">
-
-                        <div class="empty-chat">
-                            No active games.
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================
-             HOST WINDOW
-        ====================== -->
-
-        <section
-            class="window"
-            id="hostWindow">
-
-            <div class="window-header">
-
-                <button
-                    class="nav-button"
-                    id="backToGames"
-                    type="button">
-                    ← Back
-                </button>
-
-                <div class="window-title">
-                    Host Game
-                </div>
-
-            </div>
-
-
-            <div
-                class="games-content"
-                style="display:flex;align-items:center;">
-
-                <div class="host-panel">
-
-                    <div class="host-title">
-                        Create Game
-                    </div>
-
-                    <div class="host-description">
-                        Create a multiplayer game server that other users can join.
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="hostGameName">
-                            Game name
-                        </label>
-
-                        <input
-                            id="hostGameName"
-                            type="text"
-                            maxlength="40"
-                            placeholder="My Game">
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="hostGameType">
-                            Game
-                        </label>
-
-                        <select id="hostGameType">
-
-                            <option value="test">
-                                Test Game
-                            </option>
-
-                            <option value="race">
-                                Race
-                            </option>
-
-                            <option value="horror">
-                                Horror
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="hostMaxPlayers">
-                            Max players
-                        </label>
-
-                        <select id="hostMaxPlayers">
-
-                            <option value="2">2</option>
-                            <option value="4">4</option>
-                            <option value="8">8</option>
-                            <option value="12">12</option>
-                            <option value="16">16</option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="host-actions">
-
-                        <button
-                            id="cancelHost"
-                            type="button">
-                            Cancel
-                        </button>
-
-                        <button
-                            id="createGameButton"
-                            class="primary"
-                            type="button">
-                            Create Game
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-    </main>
+</section>
 
 </div>
 
 
-<!-- =========================
-     JOIN MODAL
-========================== -->
+<!-- CREATE GAME -->
 
-<div
-    class="modal"
-    id="joinModal">
+<div class="overlay" id="createGameOverlay">
 
-    <div class="modal-box">
+<div class="panel">
 
-        <div class="modal-title">
-            Join Game
+    <div class="panel-header">
+
+        <h2>Create a game</h2>
+
+        <button class="icon-btn" id="closeCreateGame">×</button>
+
+    </div>
+
+    <div class="panel-body">
+
+        <div class="form-group">
+
+            <label>Game</label>
+
+            <select id="gameTypeSelect">
+
+                <option value="tictactoe">⭕ Tic-Tac-Toe</option>
+                <option value="connect4">🔴 Connect Four</option>
+                <option value="dice">🎲 Dice Battle</option>
+                <option value="higherlower">🔢 Higher or Lower</option>
+                <option value="rps">✊ Rock Paper Scissors</option>
+
+            </select>
+
         </div>
 
-        <div
-            class="modal-text"
-            id="joinModalText">
-            Are you sure you want to join this game?
+        <div class="form-group">
+
+            <label>Game name</label>
+
+            <input
+                id="gameNameInput"
+                maxlength="35"
+                placeholder="My game"
+            >
+
         </div>
 
-        <div class="modal-actions">
+        <div class="form-group">
+
+            <label>Maximum players</label>
+
+            <select id="maxPlayersSelect">
+
+                <option value="2">2 players</option>
+                <option value="3">3 players</option>
+                <option value="4">4 players</option>
+                <option value="5">5 players</option>
+                <option value="6">6 players</option>
+                <option value="8">8 players</option>
+
+            </select>
+
+        </div>
+
+        <div class="lobby-note">
+            You can host only one game at a time.
+            Players must join before you press Start.
+        </div>
+
+        <div class="form-buttons" style="margin-top:15px">
 
             <button
-                id="cancelJoin"
-                type="button">
+                class="secondary-btn"
+                id="cancelCreateGame"
+            >
                 Cancel
             </button>
 
             <button
-                id="confirmJoin"
-                class="primary"
-                type="button">
-                Join
+                class="primary-btn"
+                id="confirmCreateGame"
+            >
+                Create lobby
             </button>
 
         </div>
@@ -1130,280 +1077,3610 @@
 
 </div>
 
-
-<!-- =========================
-     STATUS
-========================== -->
-
-<div
-    class="status"
-    id="status">
-    Ready
 </div>
 
 
-<!-- =========================
-     JAVASCRIPT
-========================== -->
+<!-- SETTINGS -->
+
+<div class="overlay" id="settingsOverlay">
+
+<div class="panel">
+
+<div class="panel-header">
+
+    <h2>Settings</h2>
+
+    <button
+        class="icon-btn"
+        id="closeSettings"
+    >×</button>
+
+</div>
+
+<div class="panel-body">
+
+
+<div class="category open">
+
+<button class="category-title">
+    <span>👤 Profile</span>
+    <span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+
+<label>Your name</label>
+
+<input
+    id="usernameInput"
+    maxlength="24"
+    placeholder="Enter your name"
+>
+
+</div>
+
+<div class="setting">
+
+<label>Device ID</label>
+
+<input
+    id="deviceIdInput"
+    readonly
+>
+
+</div>
+
+</div>
+</div>
+
+
+<div class="category">
+
+<button class="category-title">
+    <span>📝 Text</span>
+    <span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+
+<label>Text size</label>
+
+<input
+    id="textSize"
+    type="range"
+    min="12"
+    max="24"
+    step="1"
+>
+
+<div class="setting-value" id="textSizeValue"></div>
+
+</div>
+
+<div class="setting">
+
+<label>Word spacing</label>
+
+<input
+    id="wordSpacing"
+    type="range"
+    min="0"
+    max="12"
+    step="1"
+>
+
+<div class="setting-value" id="wordSpacingValue"></div>
+
+</div>
+
+<div class="setting">
+
+<label>Line spacing</label>
+
+<input
+    id="lineSpacing"
+    type="range"
+    min="1"
+    max="2"
+    step=".05"
+>
+
+<div class="setting-value" id="lineSpacingValue"></div>
+
+</div>
+
+</div>
+</div>
+
+
+<div class="category">
+
+<button class="category-title">
+    <span>💬 Chat</span>
+    <span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+
+<label>Refresh rate</label>
+
+<select id="refreshRate">
+
+<option value="10000">10 seconds</option>
+<option value="5000">5 seconds</option>
+<option value="3000">3 seconds</option>
+<option value="2000">2 seconds</option>
+<option value="1000">1 second</option>
+<option value="500">0.5 seconds</option>
+<option value="100">0.1 seconds</option>
+
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Show timestamps</label>
+
+<select id="showTimestamps">
+
+<option value="true">On</option>
+<option value="false">Off</option>
+
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Compact messages</label>
+
+<select id="compactMessages">
+
+<option value="false">Off</option>
+<option value="true">On</option>
+
+</select>
+
+</div>
+
+</div>
+</div>
+
+
+<div class="category">
+
+<button class="category-title">
+    <span>🎨 Appearance</span>
+    <span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+
+<label>Theme</label>
+
+<select id="themeSelect">
+
+<option value="dark">Dark</option>
+<option value="midnight">Midnight</option>
+<option value="slate">Slate</option>
+<option value="black">Pure Black</option>
+<option value="blue">Dark Blue</option>
+<option value="purple">Dark Purple</option>
+<option value="green">Dark Green</option>
+<option value="red">Dark Red</option>
+<option value="gray">Classic Gray</option>
+<option value="light">Light</option>
+<option value="oled">OLED</option>
+
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Corner roundness</label>
+
+<input
+    id="cornerRadius"
+    type="range"
+    min="0"
+    max="25"
+>
+
+<div class="setting-value" id="cornerRadiusValue"></div>
+
+</div>
+
+<div class="setting">
+
+<label>UI scale</label>
+
+<input
+    id="uiScale"
+    type="range"
+    min=".8"
+    max="1.2"
+    step=".05"
+>
+
+<div class="setting-value" id="uiScaleValue"></div>
+
+</div>
+
+</div>
+</div>
+
+
+<div class="category">
+
+<button class="category-title">
+    <span>⚙️ Behavior</span>
+    <span>⌄</span>
+</button>
+
+<div class="category-body">
+
+<div class="setting">
+
+<label>Enter to send</label>
+
+<select id="enterToSend">
+
+<option value="true">On</option>
+<option value="false">Off</option>
+
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Auto-scroll</label>
+
+<select id="autoScroll">
+
+<option value="true">On</option>
+<option value="false">Off</option>
+
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Confirm before deleting</label>
+
+<select id="confirmDelete">
+
+<option value="true">On</option>
+<option value="false">Off</option>
+
+</select>
+
+</div>
+
+</div>
+</div>
+
+
+<button
+    class="save-btn"
+    id="saveSettings"
+>
+Save settings
+</button>
+
+</div>
+</div>
+</div>
+
+
+<!-- CONTEXT MENU -->
+
+<div class="context-menu" id="contextMenu">
+
+<button id="editMessage">Edit</button>
+
+<button
+    class="delete-option"
+    id="deleteMessage"
+>
+Delete
+</button>
+
+</div>
+
+
+<!-- IMAGE VIEWER -->
+
+<div class="image-viewer" id="imageViewer">
+
+<button class="back-image" id="backImage">
+← Back
+</button>
+
+<img
+    class="full-image"
+    id="fullImage"
+    alt="Full image"
+>
+
+</div>
+
+
+<!-- DIALOG -->
+
+<div class="overlay" id="dialogOverlay">
+
+<div class="panel" style="max-width:450px">
+
+<div class="panel-body">
+
+<h2 id="dialogTitle">Confirm</h2>
+
+<p
+    id="dialogText"
+    style="color:var(--muted);line-height:1.5"
+></p>
+
+<div class="form-buttons">
+
+<button
+    class="secondary-btn"
+    id="dialogCancel"
+>
+Cancel
+</button>
+
+<button
+    class="danger-btn"
+    id="dialogConfirm"
+>
+Yes
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
 
 <script>
-    /*
-     * These are loaded separately.
-     *
-     * chat.js
-     *  - Handles the chat UI
-     *  - Calls /api/message
-     *
-     * game.js
-     *  - Handles hosting
-     *  - Handles joining
-     *  - Handles active games
-     */
 
-    window.APP_CONFIG = {
-        messageApi: "/api/message",
-        gameApi: "/api/game"
-    };
+/*
+=========================================================
+CONFIG
+=========================================================
+*/
 
-    /*
-     * Small shared UI helpers.
-     * chat.js and game.js can also use these.
-     */
+const API_URL="/api/messages";
+const GAMES_API="/api/games";
+const CHANNEL="general";
 
-    window.showStatus = function(message) {
+/*
+Games are completely separate from messages.
 
-        const status =
-            document.getElementById("status");
+Expected /api/games endpoints:
 
-        if (!status) return;
+GET    /api/games
+POST   /api/games
+PATCH  /api/games
+DELETE /api/games
 
-        status.textContent = message;
-        status.classList.add("show");
+The HTML never stores game state in the messages table.
+*/
 
-        clearTimeout(
-            window.__statusTimer
+
+/*
+=========================================================
+DEVICE
+=========================================================
+*/
+
+let deviceId=localStorage.getItem("chat_device_id");
+
+if(!deviceId){
+
+    deviceId=
+        crypto.randomUUID();
+
+    localStorage.setItem(
+        "chat_device_id",
+        deviceId
+    );
+}
+
+
+/*
+=========================================================
+SETTINGS
+=========================================================
+*/
+
+const defaults={
+
+    username:"",
+    theme:"dark",
+
+    refreshRate:500,
+
+    showTimestamps:true,
+    compactMessages:false,
+
+    textSize:16,
+    wordSpacing:0,
+    lineSpacing:1.45,
+
+    cornerRadius:12,
+    uiScale:1,
+
+    enterToSend:true,
+    autoScroll:true,
+    confirmDelete:true
+
+};
+
+function getSetting(key){
+
+    const value=
+        localStorage.getItem(
+            "chat_"+key
         );
 
-        window.__statusTimer =
-            setTimeout(() => {
-                status.classList.remove("show");
-            }, 2500);
-    };
+    if(value===null)
+        return defaults[key];
+
+    if(value==="true")
+        return true;
+
+    if(value==="false")
+        return false;
+
+    const number=Number(value);
+
+    return Number.isNaN(number)
+        ?value
+        :number;
+}
+
+let settings={};
+
+Object.keys(defaults).forEach(key=>{
+    settings[key]=getSetting(key);
+});
 
 
-    window.showWindow = function(id) {
+/*
+=========================================================
+ELEMENTS
+=========================================================
+*/
+
+const messagesEl=
+    document.getElementById("messages");
+
+const messageInput=
+    document.getElementById("messageInput");
+
+const sendBtn=
+    document.getElementById("sendBtn");
+
+const imageInput=
+    document.getElementById("imageInput");
+
+const attachBtn=
+    document.getElementById("attachBtn");
+
+const settingsBtn=
+    document.getElementById("settingsBtn");
+
+const settingsOverlay=
+    document.getElementById("settingsOverlay");
+
+const closeSettings=
+    document.getElementById("closeSettings");
+
+const saveSettings=
+    document.getElementById("saveSettings");
+
+const usernameInput=
+    document.getElementById("usernameInput");
+
+const deviceIdInput=
+    document.getElementById("deviceIdInput");
+
+const themeSelect=
+    document.getElementById("themeSelect");
+
+const refreshRate=
+    document.getElementById("refreshRate");
+
+const showTimestamps=
+    document.getElementById("showTimestamps");
+
+const compactMessages=
+    document.getElementById("compactMessages");
+
+const textSize=
+    document.getElementById("textSize");
+
+const wordSpacing=
+    document.getElementById("wordSpacing");
+
+const lineSpacing=
+    document.getElementById("lineSpacing");
+
+const cornerRadius=
+    document.getElementById("cornerRadius");
+
+const uiScale=
+    document.getElementById("uiScale");
+
+const enterToSend=
+    document.getElementById("enterToSend");
+
+const autoScroll=
+    document.getElementById("autoScroll");
+
+const confirmDelete=
+    document.getElementById("confirmDelete");
+
+const textSizeValue=
+    document.getElementById("textSizeValue");
+
+const wordSpacingValue=
+    document.getElementById("wordSpacingValue");
+
+const lineSpacingValue=
+    document.getElementById("lineSpacingValue");
+
+const cornerRadiusValue=
+    document.getElementById("cornerRadiusValue");
+
+const uiScaleValue=
+    document.getElementById("uiScaleValue");
+
+const contextMenu=
+    document.getElementById("contextMenu");
+
+const editMessageBtn=
+    document.getElementById("editMessage");
+
+const deleteMessageBtn=
+    document.getElementById("deleteMessage");
+
+const imageViewer=
+    document.getElementById("imageViewer");
+
+const fullImage=
+    document.getElementById("fullImage");
+
+const backImage=
+    document.getElementById("backImage");
+
+const dialogOverlay=
+    document.getElementById("dialogOverlay");
+
+const dialogTitle=
+    document.getElementById("dialogTitle");
+
+const dialogText=
+    document.getElementById("dialogText");
+
+const dialogCancel=
+    document.getElementById("dialogCancel");
+
+const dialogConfirm=
+    document.getElementById("dialogConfirm");
+
+
+/*
+=========================================================
+GAME ELEMENTS
+=========================================================
+*/
+
+const gamesLobby=
+    document.getElementById("gamesLobby");
+
+const activeGamePanel=
+    document.getElementById("activeGamePanel");
+
+const createGameBtn=
+    document.getElementById("createGameBtn");
+
+const refreshGamesBtn=
+    document.getElementById("refreshGamesBtn");
+
+const createGameOverlay=
+    document.getElementById("createGameOverlay");
+
+const closeCreateGame=
+    document.getElementById("closeCreateGame");
+
+const cancelCreateGame=
+    document.getElementById("cancelCreateGame");
+
+const confirmCreateGame=
+    document.getElementById("confirmCreateGame");
+
+const gameTypeSelect=
+    document.getElementById("gameTypeSelect");
+
+const gameNameInput=
+    document.getElementById("gameNameInput");
+
+const maxPlayersSelect=
+    document.getElementById("maxPlayersSelect");
+
+
+/*
+=========================================================
+STATE
+=========================================================
+*/
+
+let selectedFile=null;
+let selectedMessage=null;
+let currentMessages=[];
+let confirmCallback=null;
+
+let chatRefreshTimer=null;
+let gamesRefreshTimer=null;
+
+let games=[];
+let activeGame=null;
+
+
+/*
+=========================================================
+TAB SYSTEM
+=========================================================
+*/
+
+document.querySelectorAll(".tab").forEach(tab=>{
+
+    tab.onclick=()=>{
 
         document
-            .querySelectorAll(".window")
-            .forEach(windowElement => {
-                windowElement.classList.remove("active");
+            .querySelectorAll(".tab")
+            .forEach(x=>{
+                x.classList.remove("active");
             });
 
-        const target =
-            document.getElementById(id);
+        document
+            .querySelectorAll(".view")
+            .forEach(x=>{
+                x.classList.remove("active");
+            });
 
-        if (target) {
-            target.classList.add("active");
+        tab.classList.add("active");
+
+        const view=
+            document.getElementById(
+                tab.dataset.view
+            );
+
+        view.classList.add("active");
+
+        if(tab.dataset.view==="gamesView"){
+            loadGames();
+        }
+
+    };
+
+});
+
+
+/*
+=========================================================
+SETTINGS
+=========================================================
+*/
+
+function applySettings(){
+
+    document.documentElement.style.setProperty(
+        "--text-size",
+        settings.textSize+"px"
+    );
+
+    document.documentElement.style.setProperty(
+        "--word-spacing",
+        settings.wordSpacing+"px"
+    );
+
+    document.documentElement.style.setProperty(
+        "--line-spacing",
+        settings.lineSpacing
+    );
+
+    document.documentElement.style.setProperty(
+        "--radius",
+        settings.cornerRadius+"px"
+    );
+
+    document.documentElement.style.setProperty(
+        "--ui-scale",
+        settings.uiScale
+    );
+
+    applyTheme(settings.theme);
+
+    renderMessages();
+
+    startChatRefresh();
+
+}
+
+
+function applyTheme(name){
+
+    const themes={
+
+        dark:["#0b0d10","#111419"],
+        midnight:["#080b14","#101522"],
+        slate:["#101418","#171d22"],
+        black:["#000","#090909"],
+        blue:["#091018","#101c29"],
+        purple:["#100b17","#191021"],
+        green:["#09120d","#101b15"],
+        red:["#140b0b","#1e1111"],
+        gray:["#151515","#202020"],
+        light:["#eeeeee","#fff"],
+        oled:["#000","#000"]
+
+    };
+
+    const t=
+        themes[name]||
+        themes.dark;
+
+    document.documentElement.style.setProperty(
+        "--bg",
+        t[0]
+    );
+
+    document.documentElement.style.setProperty(
+        "--panel",
+        t[1]
+    );
+
+    document.body.style.background=
+        t[0];
+
+}
+
+
+function loadSettingsUI(){
+
+    usernameInput.value=
+        settings.username;
+
+    deviceIdInput.value=
+        deviceId;
+
+    themeSelect.value=
+        settings.theme;
+
+    refreshRate.value=
+        settings.refreshRate;
+
+    showTimestamps.value=
+        String(settings.showTimestamps);
+
+    compactMessages.value=
+        String(settings.compactMessages);
+
+    textSize.value=
+        settings.textSize;
+
+    wordSpacing.value=
+        settings.wordSpacing;
+
+    lineSpacing.value=
+        settings.lineSpacing;
+
+    cornerRadius.value=
+        settings.cornerRadius;
+
+    uiScale.value=
+        settings.uiScale;
+
+    enterToSend.value=
+        String(settings.enterToSend);
+
+    autoScroll.value=
+        String(settings.autoScroll);
+
+    confirmDelete.value=
+        String(settings.confirmDelete);
+
+    updateRangeLabels();
+
+}
+
+
+function updateRangeLabels(){
+
+    textSizeValue.textContent=
+        settings.textSize+"px";
+
+    wordSpacingValue.textContent=
+        settings.wordSpacing+"px";
+
+    lineSpacingValue.textContent=
+        settings.lineSpacing;
+
+    cornerRadiusValue.textContent=
+        settings.cornerRadius+"px";
+
+    uiScaleValue.textContent=
+        Math.round(
+            settings.uiScale*100
+        )+"%";
+
+}
+
+
+settingsBtn.onclick=()=>{
+
+    loadSettingsUI();
+
+    settingsOverlay.classList.add("show");
+
+};
+
+
+closeSettings.onclick=()=>{
+
+    settingsOverlay.classList.remove("show");
+
+};
+
+
+saveSettings.onclick=()=>{
+
+    settings.username=
+        usernameInput.value
+        .trim()
+        .substring(0,24);
+
+    settings.theme=
+        themeSelect.value;
+
+    settings.refreshRate=
+        Number(refreshRate.value);
+
+    settings.showTimestamps=
+        showTimestamps.value==="true";
+
+    settings.compactMessages=
+        compactMessages.value==="true";
+
+    settings.textSize=
+        Number(textSize.value);
+
+    settings.wordSpacing=
+        Number(wordSpacing.value);
+
+    settings.lineSpacing=
+        Number(lineSpacing.value);
+
+    settings.cornerRadius=
+        Number(cornerRadius.value);
+
+    settings.uiScale=
+        Number(uiScale.value);
+
+    settings.enterToSend=
+        enterToSend.value==="true";
+
+    settings.autoScroll=
+        autoScroll.value==="true";
+
+    settings.confirmDelete=
+        confirmDelete.value==="true";
+
+    Object.keys(settings).forEach(key=>{
+
+        localStorage.setItem(
+            "chat_"+key,
+            settings[key]
+        );
+
+    });
+
+    applySettings();
+
+    settingsOverlay.classList.remove("show");
+
+};
+
+
+document.querySelectorAll(".category-title")
+.forEach(btn=>{
+
+    btn.onclick=()=>{
+
+        btn.parentElement
+            .classList
+            .toggle("open");
+
+    };
+
+});
+
+
+textSize.oninput=()=>{
+    textSizeValue.textContent=
+        textSize.value+"px";
+};
+
+wordSpacing.oninput=()=>{
+    wordSpacingValue.textContent=
+        wordSpacing.value+"px";
+};
+
+lineSpacing.oninput=()=>{
+    lineSpacingValue.textContent=
+        lineSpacing.value;
+};
+
+cornerRadius.oninput=()=>{
+    cornerRadiusValue.textContent=
+        cornerRadius.value+"px";
+};
+
+uiScale.oninput=()=>{
+    uiScaleValue.textContent=
+        Math.round(
+            uiScale.value*100
+        )+"%";
+};
+
+
+/*
+=========================================================
+CHAT
+=========================================================
+*/
+
+messageInput.addEventListener("input",()=>{
+
+    messageInput.style.height="auto";
+
+    messageInput.style.height=
+        Math.min(
+            messageInput.scrollHeight,
+            150
+        )+"px";
+
+});
+
+
+attachBtn.onclick=()=>{
+    imageInput.click();
+};
+
+
+imageInput.onchange=()=>{
+
+    selectedFile=
+        imageInput.files[0]||
+        null;
+
+    attachBtn.textContent=
+        selectedFile
+        ?"✓"
+        :"＋";
+
+};
+
+
+function resizeImage(file){
+
+    return new Promise((resolve,reject)=>{
+
+        const reader=
+            new FileReader();
+
+        reader.onload=()=>{
+
+            const img=
+                new Image();
+
+            img.onload=()=>{
+
+                let width=img.width;
+                let height=img.height;
+
+                const max=1500;
+
+                if(
+                    width>max||
+                    height>max
+                ){
+
+                    const scale=
+                        Math.min(
+                            max/width,
+                            max/height
+                        );
+
+                    width=
+                        Math.round(
+                            width*scale
+                        );
+
+                    height=
+                        Math.round(
+                            height*scale
+                        );
+
+                }
+
+                const canvas=
+                    document.createElement(
+                        "canvas"
+                    );
+
+                canvas.width=width;
+                canvas.height=height;
+
+                const ctx=
+                    canvas.getContext("2d");
+
+                ctx.drawImage(
+                    img,
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+                resolve(
+                    canvas.toDataURL(
+                        "image/jpeg",
+                        .78
+                    )
+                );
+
+            };
+
+            img.onerror=reject;
+            img.src=reader.result;
+
+        };
+
+        reader.onerror=reject;
+
+        reader.readAsDataURL(file);
+
+    });
+
+}
+
+
+sendBtn.onclick=
+    sendMessage;
+
+
+messageInput.addEventListener(
+    "keydown",
+    event=>{
+
+        if(
+            event.key==="Enter" &&
+            !event.shiftKey &&
+            settings.enterToSend
+        ){
+
+            event.preventDefault();
+
+            sendMessage();
+
+        }
+
+    }
+);
+
+
+async function sendMessage(){
+
+    const text=
+        messageInput.value.trim();
+
+    if(!settings.username){
+
+        settingsBtn.click();
+
+        usernameInput.focus();
+
+        alert(
+            "Set your name in Settings first."
+        );
+
+        return;
+
+    }
+
+    if(!text&&!selectedFile)
+        return;
+
+    sendBtn.disabled=true;
+
+    try{
+
+        let image=null;
+
+        if(selectedFile){
+            image=
+                await resizeImage(
+                    selectedFile
+                );
+        }
+
+        const response=
+            await fetch(
+                API_URL,
+                {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body:
+                        JSON.stringify({
+
+                            username:
+                                settings.username,
+
+                            channel:
+                                CHANNEL,
+
+                            message:text,
+
+                            image:image,
+
+                            device_id:
+                                deviceId
+
+                        })
+                }
+            );
+
+        const data=
+            await response.json();
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error||
+                "Failed to send message."
+            );
+
+        }
+
+        messageInput.value="";
+
+        messageInput.style.height=
+            "auto";
+
+        selectedFile=null;
+
+        imageInput.value="";
+
+        attachBtn.textContent="＋";
+
+        await loadMessages();
+
+    }catch(error){
+
+        alert(
+            "Failed to send:\n\n"+
+            error.message
+        );
+
+    }finally{
+
+        sendBtn.disabled=false;
+
+    }
+
+}
+
+
+async function loadMessages(){
+
+    try{
+
+        const response=
+            await fetch(
+                API_URL+
+                "?channel="+
+                encodeURIComponent(CHANNEL)
+            );
+
+        const data=
+            await response.json();
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error||
+                "Failed to load messages."
+            );
+
+        }
+
+        currentMessages=
+            Array.isArray(data.messages)
+            ?data.messages
+            :[];
+
+        renderMessages();
+
+    }catch(error){
+
+        messagesEl.innerHTML=`
+            <div class="empty">
+                <div>
+                    <strong>Unable to load messages</strong>
+                    ${escapeHtml(error.message)}
+                </div>
+            </div>
+        `;
+
+    }
+
+}
+
+
+function renderMessages(){
+
+    const wasBottom=
+        messagesEl.scrollHeight-
+        messagesEl.scrollTop-
+        messagesEl.clientHeight<100;
+
+    if(!currentMessages.length){
+
+        messagesEl.innerHTML=`
+            <div class="empty">
+                <div>
+                    <strong>No messages yet</strong>
+                    Be the first to send something.
+                </div>
+            </div>
+        `;
+
+        return;
+
+    }
+
+    const fragment=
+        document.createDocumentFragment();
+
+    currentMessages.forEach(message=>{
+
+        const item=
+            document.createElement("div");
+
+        item.className="message";
+
+        item.dataset.id=
+            message.id;
+
+        const avatar=
+            document.createElement("div");
+
+        avatar.className="avatar";
+
+        avatar.textContent=
+            (message.username||"?")
+            .charAt(0)
+            .toUpperCase();
+
+        const content=
+            document.createElement("div");
+
+        content.className=
+            "message-content";
+
+        const top=
+            document.createElement("div");
+
+        top.className="message-top";
+
+        const name=
+            document.createElement("span");
+
+        name.className="username";
+
+        name.textContent=
+            message.username||
+            "User";
+
+        top.appendChild(name);
+
+        if(settings.showTimestamps){
+
+            const time=
+                document.createElement(
+                    "span"
+                );
+
+            time.className="time";
+
+            time.textContent=
+                formatTime(
+                    message.created_at
+                );
+
+            top.appendChild(time);
+
+        }
+
+        if(message.edited){
+
+            const edited=
+                document.createElement(
+                    "span"
+                );
+
+            edited.className="edited";
+
+            edited.textContent=
+                "(edited)";
+
+            top.appendChild(edited);
+
+        }
+
+        content.appendChild(top);
+
+        if(message.message){
+
+            const text=
+                document.createElement(
+                    "div"
+                );
+
+            text.className=
+                "message-text";
+
+            text.textContent=
+                message.message;
+
+            content.appendChild(text);
+
+        }
+
+        if(message.image){
+
+            const img=
+                document.createElement(
+                    "img"
+                );
+
+            img.className=
+                "message-image";
+
+            img.src=
+                message.image;
+
+            img.alt="Image";
+
+            img.onclick=()=>{
+                openImage(
+                    message.image
+                );
+            };
+
+            content.appendChild(img);
+
+        }
+
+        item.appendChild(avatar);
+        item.appendChild(content);
+
+        if(
+            message.device_id &&
+            message.device_id===deviceId
+        ){
+
+            item.addEventListener(
+                "contextmenu",
+                event=>{
+
+                    event.preventDefault();
+
+                    showContextMenu(
+                        event.clientX,
+                        event.clientY,
+                        message
+                    );
+
+                }
+            );
+
+        }
+
+        fragment.appendChild(item);
+
+    });
+
+    messagesEl.replaceChildren(
+        fragment
+    );
+
+    if(
+        wasBottom &&
+        settings.autoScroll
+    ){
+
+        messagesEl.scrollTop=
+            messagesEl.scrollHeight;
+
+    }
+
+}
+
+
+/*
+=========================================================
+MESSAGE EDIT / DELETE
+=========================================================
+*/
+
+function showContextMenu(
+    x,
+    y,
+    message
+){
+
+    selectedMessage=
+        message;
+
+    contextMenu.style.left=
+        Math.min(
+            x,
+            window.innerWidth-170
+        )+"px";
+
+    contextMenu.style.top=
+        Math.min(
+            y,
+            window.innerHeight-100
+        )+"px";
+
+    contextMenu.classList.add(
+        "show"
+    );
+
+}
+
+
+document.addEventListener("click",()=>{
+
+    contextMenu.classList.remove(
+        "show"
+    );
+
+});
+
+
+editMessageBtn.onclick=
+async event=>{
+
+    event.stopPropagation();
+
+    contextMenu.classList.remove(
+        "show"
+    );
+
+    if(!selectedMessage)
+        return;
+
+    const newText=
+        prompt(
+            "Edit message:",
+            selectedMessage.message||
+            ""
+        );
+
+    if(newText===null)
+        return;
+
+    try{
+
+        const response=
+            await fetch(
+                API_URL,
+                {
+                    method:"PATCH",
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body:
+                        JSON.stringify({
+
+                            id:
+                                selectedMessage.id,
+
+                            device_id:
+                                deviceId,
+
+                            message:
+                                newText.trim()
+
+                        })
+                }
+            );
+
+        const data=
+            await response.json();
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error||
+                "Failed to edit message."
+            );
+
+        }
+
+        await loadMessages();
+
+    }catch(error){
+
+        alert(
+            "Failed to edit:\n\n"+
+            error.message
+        );
+
+    }
+
+};
+
+
+deleteMessageBtn.onclick=
+event=>{
+
+    event.stopPropagation();
+
+    contextMenu.classList.remove(
+        "show"
+    );
+
+    if(!selectedMessage)
+        return;
+
+    if(settings.confirmDelete){
+
+        openConfirm(
+            "Delete message?",
+            "This message will be permanently removed.",
+            deleteSelectedMessage
+        );
+
+    }else{
+
+        deleteSelectedMessage();
+
+    }
+
+};
+
+
+async function deleteSelectedMessage(){
+
+    if(!selectedMessage)
+        return;
+
+    try{
+
+        const response=
+            await fetch(
+                API_URL,
+                {
+                    method:"DELETE",
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body:
+                        JSON.stringify({
+
+                            id:
+                                selectedMessage.id,
+
+                            device_id:
+                                deviceId
+
+                        })
+                }
+            );
+
+        const data=
+            await response.json();
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error||
+                "Failed to delete message."
+            );
+
+        }
+
+        selectedMessage=null;
+
+        await loadMessages();
+
+    }catch(error){
+
+        alert(
+            "Failed to delete:\n\n"+
+            error.message
+        );
+
+    }
+
+}
+
+
+/*
+=========================================================
+IMAGE
+=========================================================
+*/
+
+function openImage(src){
+
+    fullImage.src=src;
+
+    imageViewer.classList.add(
+        "show"
+    );
+
+}
+
+function closeImage(){
+
+    imageViewer.classList.remove(
+        "show"
+    );
+
+    fullImage.src="";
+
+}
+
+backImage.onclick=
+    closeImage;
+
+imageViewer.onclick=
+event=>{
+
+    if(event.target===imageViewer){
+        closeImage();
+    }
+
+};
+
+
+/*
+=========================================================
+DIALOG
+=========================================================
+*/
+
+function openConfirm(
+    title,
+    text,
+    callback
+){
+
+    dialogTitle.textContent=
+        title;
+
+    dialogText.textContent=
+        text;
+
+    confirmCallback=
+        callback;
+
+    dialogOverlay.classList.add(
+        "show"
+    );
+
+}
+
+
+dialogCancel.onclick=()=>{
+
+    dialogOverlay.classList.remove(
+        "show"
+    );
+
+    confirmCallback=null;
+
+};
+
+
+dialogConfirm.onclick=
+async()=>{
+
+    const callback=
+        confirmCallback;
+
+    dialogOverlay.classList.remove(
+        "show"
+    );
+
+    confirmCallback=null;
+
+    if(callback)
+        await callback();
+
+};
+
+
+/*
+=========================================================
+CHAT REFRESH
+=========================================================
+*/
+
+function startChatRefresh(){
+
+    if(chatRefreshTimer)
+        clearInterval(
+            chatRefreshTimer
+        );
+
+    chatRefreshTimer=
+        setInterval(
+            loadMessages,
+            Number(settings.refreshRate)
+        );
+
+}
+
+
+/*
+=========================================================
+GAMES
+=========================================================
+*/
+
+const gameDefinitions={
+
+    tictactoe:{
+        name:"Tic-Tac-Toe",
+        icon:"⭕",
+        description:
+            "Classic 3×3 game. Get three in a row.",
+        maxPlayers:2
+    },
+
+    connect4:{
+        name:"Connect Four",
+        icon:"🔴",
+        description:
+            "Drop pieces and connect four.",
+        maxPlayers:2
+    },
+
+    dice:{
+        name:"Dice Battle",
+        icon:"🎲",
+        description:
+            "Roll against everyone. Highest roll wins.",
+        maxPlayers:8
+    },
+
+    higherlower:{
+        name:"Higher or Lower",
+        icon:"🔢",
+        description:
+            "Guess whether the next number is higher or lower.",
+        maxPlayers:8
+    },
+
+    rps:{
+        name:"Rock Paper Scissors",
+        icon:"✊",
+        description:
+            "Choose your move and battle the other players.",
+        maxPlayers:8
+    }
+
+};
+
+
+/*
+=========================================================
+GAME API
+=========================================================
+*/
+
+async function gameRequest(
+    method,
+    body=null,
+    query=""
+){
+
+    const options={
+        method,
+        headers:{
+            "Content-Type":
+                "application/json"
         }
     };
 
+    if(body!==null){
 
-    /*
-     * Main navigation.
-     */
+        options.body=
+            JSON.stringify(body);
+
+    }
+
+    const response=
+        await fetch(
+            GAMES_API+
+            query,
+            options
+        );
+
+    const data=
+        await response.json()
+        .catch(()=>({}));
+
+    if(!response.ok){
+
+        throw new Error(
+            data.error||
+            "Game server error."
+        );
+
+    }
+
+    return data;
+
+}
+
+
+/*
+=========================================================
+LOAD GAMES
+=========================================================
+*/
+
+async function loadGames(){
+
+    try{
+
+        const data=
+            await gameRequest(
+                "GET",
+                null,
+                "?channel="+
+                encodeURIComponent(CHANNEL)
+            );
+
+        games=
+            Array.isArray(data.games)
+            ?data.games
+            :[];
+
+        renderGames();
+
+    }catch(error){
+
+        gamesLobby.innerHTML=`
+            <div class="empty-games">
+                <strong>Game server unavailable</strong>
+                <br><br>
+                ${escapeHtml(error.message)}
+            </div>
+        `;
+
+    }
+
+}
+
+
+/*
+=========================================================
+RENDER GAME LOBBY
+=========================================================
+*/
+
+function renderGames(){
+
+    if(activeGame){
+
+        const found=
+            games.find(
+                game=>
+                    String(game.id)===
+                    String(activeGame.id)
+            );
+
+        if(found){
+
+            activeGame=
+                found;
+
+            renderActiveGame();
+
+        }else{
+
+            activeGame=null;
+
+            activeGamePanel.style.display=
+                "none";
+
+        }
+
+    }
+
+    const visibleGames=
+        games.filter(
+            game=>
+                game.status!=="finished" &&
+                game.status!=="stopped" &&
+                (
+                    Number(game.player_count||0)>0
+                )
+        );
+
+    if(!visibleGames.length){
+
+        gamesLobby.innerHTML=`
+            <div class="empty-games">
+
+                <div style="font-size:40px">
+                    🎮
+                </div>
+
+                <h2>No active games</h2>
+
+                <p>
+                    Create a game and invite everyone to play.
+                </p>
+
+            </div>
+        `;
+
+        return;
+
+    }
+
+    gamesLobby.innerHTML=`
+
+        <div class="game-grid">
+
+            ${visibleGames.map(
+                renderGameCard
+            ).join("")}
+
+        </div>
+
+    `;
 
     document
-        .getElementById("chatNavButton")
-        .addEventListener("click", () => {
+        .querySelectorAll(
+            "[data-join-game]"
+        )
+        .forEach(button=>{
 
-            window.showWindow("chatWindow");
+            button.onclick=()=>{
+                joinGame(
+                    button.dataset.joinGame
+                );
+            };
 
-            document
-                .getElementById("chatNavButton")
-                .classList.add("active");
-
-            document
-                .getElementById("gamesNavButton")
-                .classList.remove("active");
         });
 
-
     document
-        .getElementById("gamesNavButton")
-        .addEventListener("click", () => {
+        .querySelectorAll(
+            "[data-spectate-game]"
+        )
+        .forEach(button=>{
 
-            window.showWindow("gamesWindow");
+            button.onclick=()=>{
+                spectateGame(
+                    button.dataset.spectateGame
+                );
+            };
 
-            document
-                .getElementById("gamesNavButton")
-                .classList.add("active");
-
-            document
-                .getElementById("chatNavButton")
-                .classList.remove("active");
         });
 
+}
 
-    /*
-     * Host window buttons.
-     */
 
-    document
-        .querySelectorAll("[data-game]")
-        .forEach(button => {
+function renderGameCard(game){
 
-            button.addEventListener("click", () => {
+    const def=
+        gameDefinitions[
+            game.game_type
+        ]||
+        gameDefinitions.tictactoe;
 
-                const game =
-                    button.dataset.game;
+    const players=
+        Array.isArray(game.players)
+        ?game.players
+        :[];
 
-                const select =
-                    document.getElementById(
-                        "hostGameType"
-                    );
+    const joined=
+        players.some(
+            p=>
+                p.device_id===deviceId
+        );
 
-                if (select && game) {
-                    select.value = game;
+    const isHost=
+        game.host_device_id===
+        deviceId;
+
+    const started=
+        game.status==="playing";
+
+    let button="";
+
+    if(isHost){
+
+        button=`
+            <button
+                class="success-btn"
+                data-spectate-game="${escapeAttr(game.id)}"
+            >
+                ${started?"Open game":"Open lobby"}
+            </button>
+        `;
+
+    }else if(joined){
+
+        button=`
+            <button
+                class="success-btn"
+                data-spectate-game="${escapeAttr(game.id)}"
+            >
+                ${started?"Play / spectate":"Joined ✓"}
+            </button>
+        `;
+
+    }else if(!started){
+
+        button=`
+            <button
+                class="primary-btn"
+                data-join-game="${escapeAttr(game.id)}"
+            >
+                Join game
+            </button>
+        `;
+
+    }else{
+
+        button=`
+            <button
+                class="secondary-btn"
+                data-spectate-game="${escapeAttr(game.id)}"
+            >
+                Spectate
+            </button>
+        `;
+
+    }
+
+    return `
+
+        <div class="game-card">
+
+            <div class="game-icon">
+                ${def.icon}
+            </div>
+
+            <h3>
+                ${escapeHtml(
+                    game.name||
+                    def.name
+                )}
+            </h3>
+
+            <p>
+                ${escapeHtml(
+                    def.description
+                )}
+            </p>
+
+            <div class="game-meta">
+
+                👑 Host:
+                ${escapeHtml(
+                    game.host_username||
+                    "Unknown"
+                )}
+
+                <br>
+
+                👥
+                ${players.length}
+                /
+                ${Number(game.max_players||2)}
+                players
+
+                <br>
+
+                ${
+                    started
+                    ?"🟢 In progress"
+                    :"🟡 Waiting for players"
                 }
 
-                window.showWindow(
-                    "hostWindow"
-                );
-            });
-        });
+            </div>
+
+            ${button}
+
+        </div>
+    `;
+
+}
 
 
-    document
-        .getElementById("backToGames")
-        .addEventListener("click", () => {
+/*
+=========================================================
+CREATE GAME
+=========================================================
+*/
 
-            window.showWindow(
-                "gamesWindow"
+createGameBtn.onclick=()=>{
+
+    if(!settings.username){
+
+        settingsBtn.click();
+
+        alert(
+            "Set your name in Settings first."
+        );
+
+        return;
+
+    }
+
+    gameNameInput.value=
+        settings.username+
+        "'s game";
+
+    createGameOverlay.classList.add(
+        "show"
+    );
+
+};
+
+
+closeCreateGame.onclick=()=>{
+    createGameOverlay.classList.remove(
+        "show"
+    );
+};
+
+cancelCreateGame.onclick=()=>{
+    createGameOverlay.classList.remove(
+        "show"
+    );
+};
+
+
+gameTypeSelect.onchange=()=>{
+
+    const def=
+        gameDefinitions[
+            gameTypeSelect.value
+        ];
+
+    const max=
+        Number(
+            maxPlayersSelect.value
+        );
+
+    if(
+        def &&
+        def.maxPlayers<
+        max
+    ){
+
+        maxPlayersSelect.value=
+            String(
+                def.maxPlayers
             );
-        });
+
+    }
+
+};
 
 
-    document
-        .getElementById("cancelHost")
-        .addEventListener("click", () => {
+confirmCreateGame.onclick=
+async()=>{
 
-            window.showWindow(
-                "gamesWindow"
+    if(!settings.username){
+
+        alert(
+            "Set your name first."
+        );
+
+        return;
+
+    }
+
+    confirmCreateGame.disabled=
+        true;
+
+    try{
+
+        const data=
+            await gameRequest(
+                "POST",
+                {
+
+                    action:"create",
+
+                    channel:
+                        CHANNEL,
+
+                    game_type:
+                        gameTypeSelect.value,
+
+                    name:
+                        gameNameInput.value
+                        .trim()
+                        .substring(0,35),
+
+                    max_players:
+                        Number(
+                            maxPlayersSelect.value
+                        ),
+
+                    username:
+                        settings.username,
+
+                    device_id:
+                        deviceId
+
+                }
             );
-        });
+
+        createGameOverlay.classList.remove(
+            "show"
+        );
+
+        await loadGames();
+
+        if(data.game){
+
+            activeGame=
+                data.game;
+
+            activeGamePanel.style.display=
+                "block";
+
+            renderActiveGame();
+
+        }
+
+    }catch(error){
+
+        alert(
+            "Could not create game:\n\n"+
+            error.message
+        );
+
+    }finally{
+
+        confirmCreateGame.disabled=
+            false;
+
+    }
+
+};
 
 
-    /*
-     * Join modal.
-     *
-     * game.js can replace/use this.
-     */
+/*
+=========================================================
+JOIN
+=========================================================
+*/
 
-    let selectedGameToJoin = null;
+async function joinGame(gameId){
 
-    document
-        .querySelectorAll("[data-join-game]")
-        .forEach(button => {
+    if(!settings.username){
 
-            button.addEventListener("click", () => {
+        settingsBtn.click();
 
-                selectedGameToJoin =
-                    button.dataset.joinGame;
+        alert(
+            "Set your name in Settings first."
+        );
 
-                const modal =
-                    document.getElementById(
-                        "joinModal"
-                    );
+        return;
 
-                const text =
-                    document.getElementById(
-                        "joinModalText"
-                    );
+    }
 
-                text.textContent =
-                    "Join the " +
-                    selectedGameToJoin +
-                    " game?";
+    try{
 
-                modal.classList.add("show");
-            });
-        });
+        const data=
+            await gameRequest(
+                "POST",
+                {
+
+                    action:"join",
+
+                    game_id:
+                        gameId,
+
+                    username:
+                        settings.username,
+
+                    device_id:
+                        deviceId
+
+                }
+            );
+
+        if(data.game){
+
+            activeGame=
+                data.game;
+
+        }
+
+        await loadGames();
+
+        openGame(
+            gameId
+        );
+
+    }catch(error){
+
+        alert(
+            "Could not join game:\n\n"+
+            error.message
+        );
+
+    }
+
+}
 
 
-    document
-        .getElementById("cancelJoin")
-        .addEventListener("click", () => {
+/*
+=========================================================
+SPECTATE
+=========================================================
+*/
 
-            selectedGameToJoin = null;
+function spectateGame(gameId){
 
-            document
-                .getElementById("joinModal")
-                .classList.remove("show");
-        });
+    openGame(
+        gameId
+    );
+
+}
 
 
-    document
-        .getElementById("confirmJoin")
-        .addEventListener("click", async () => {
+function openGame(gameId){
 
-            const game =
-                selectedGameToJoin;
+    const game=
+        games.find(
+            x=>
+                String(x.id)===
+                String(gameId)
+        );
 
-            document
-                .getElementById("joinModal")
-                .classList.remove("show");
+    if(!game)
+        return;
 
-            if (!game) return;
+    activeGame=
+        game;
 
-            /*
-             * game.js can listen for this event.
-             */
+    activeGamePanel.style.display=
+        "block";
 
-            window.dispatchEvent(
-                new CustomEvent(
-                    "joinGameRequest",
-                    {
-                        detail: {
-                            game
+    renderActiveGame();
+
+    activeGamePanel.scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+    });
+
+}
+
+
+/*
+=========================================================
+ACTIVE GAME
+=========================================================
+*/
+
+function renderActiveGame(){
+
+    if(!activeGame){
+
+        activeGamePanel.style.display=
+            "none";
+
+        return;
+
+    }
+
+    const def=
+        gameDefinitions[
+            activeGame.game_type
+        ]||
+        gameDefinitions.tictactoe;
+
+    const players=
+        Array.isArray(activeGame.players)
+        ?activeGame.players
+        :[];
+
+    const myPlayer=
+        players.find(
+            p=>
+                p.device_id===
+                deviceId
+        );
+
+    const isHost=
+        activeGame.host_device_id===
+        deviceId;
+
+    const isJoined=
+        !!myPlayer;
+
+    const started=
+        activeGame.status==="playing";
+
+    let turnPlayer=null;
+
+    if(
+        activeGame.turn_device_id
+    ){
+
+        turnPlayer=
+            players.find(
+                p=>
+                    p.device_id===
+                    activeGame.turn_device_id
+            );
+
+    }
+
+    const turnText=
+        turnPlayer
+        ?(
+            turnPlayer.device_id===
+            deviceId
+            ?"🎯 Your turn!"
+            :"⏳ "+escapeHtml(
+                turnPlayer.username
+            )+"'s turn"
+        )
+        :"Waiting for game to start";
+
+    let controls="";
+
+    if(!started){
+
+        if(isHost){
+
+            controls=`
+
+                <button
+                    class="success-btn"
+                    id="startGameButton"
+                    ${players.length<1?"disabled":""}
+                >
+                    ▶ Start game
+                </button>
+
+                <button
+                    class="danger-btn"
+                    id="forceQuitGameButton"
+                >
+                    Force quit
+                </button>
+
+            `;
+
+        }else if(isJoined){
+
+            controls=`
+
+                <button
+                    class="danger-btn"
+                    id="leaveGameButton"
+                >
+                    Leave game
+                </button>
+
+            `;
+
+        }
+
+    }else{
+
+        if(isHost){
+
+            controls=`
+
+                <button
+                    class="danger-btn"
+                    id="forceQuitGameButton"
+                >
+                    Force quit
+                </button>
+
+            `;
+
+        }else if(isJoined){
+
+            controls=`
+
+                <button
+                    class="danger-btn"
+                    id="leaveGameButton"
+                >
+                    Leave
+                </button>
+
+            `;
+
+        }
+
+    }
+
+    activeGamePanel.innerHTML=`
+
+        <div class="game-topbar">
+
+            <div class="game-title">
+
+                <div style="font-size:35px">
+                    ${def.icon}
+                </div>
+
+                <div>
+
+                    <h2>
+                        ${escapeHtml(
+                            activeGame.name||
+                            def.name
+                        )}
+                    </h2>
+
+                    <div class="game-status">
+
+                        ${started
+                            ?"Game in progress"
+                            :"Lobby — waiting for host"
                         }
-                    }
-                )
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="game-actions">
+
+                ${controls}
+
+            </div>
+
+        </div>
+
+
+        <div class="players-list">
+
+            ${players.map(
+                player=>`
+
+                    <div
+                        class="
+                            player-chip
+                            ${player.device_id===
+                              activeGame.host_device_id
+                              ?"host":""}
+                            ${player.device_id===
+                              activeGame.turn_device_id
+                              ?"turn":""}
+                        "
+                    >
+
+                        ${
+                            player.device_id===
+                            activeGame.host_device_id
+                            ?"👑 "
+                            :""
+                        }
+
+                        ${escapeHtml(
+                            player.username
+                        )}
+
+                        ${
+                            player.device_id===
+                            deviceId
+                            ?" (You)"
+                            :""
+                        }
+
+                    </div>
+
+                `
+            ).join("")}
+
+        </div>
+
+
+        <div class="turn-banner">
+
+            ${turnText}
+
+        </div>
+
+
+        <div
+            class="board"
+            id="gameBoard"
+        ></div>
+
+    `;
+
+    renderGameBoard(
+        activeGame,
+        myPlayer
+    );
+
+    const startBtn=
+        document.getElementById(
+            "startGameButton"
+        );
+
+    if(startBtn){
+
+        startBtn.onclick=
+            startGame;
+
+    }
+
+    const leaveBtn=
+        document.getElementById(
+            "leaveGameButton"
+        );
+
+    if(leaveBtn){
+
+        leaveBtn.onclick=
+            leaveGame;
+
+    }
+
+    const forceBtn=
+        document.getElementById(
+            "forceQuitGameButton"
+        );
+
+    if(forceBtn){
+
+        forceBtn.onclick=
+            forceQuitGame;
+
+    }
+
+}
+
+
+/*
+=========================================================
+START / LEAVE / FORCE QUIT
+=========================================================
+*/
+
+async function startGame(){
+
+    if(!activeGame)
+        return;
+
+    try{
+
+        const data=
+            await gameRequest(
+                "PATCH",
+                {
+
+                    action:"start",
+
+                    game_id:
+                        activeGame.id,
+
+                    device_id:
+                        deviceId
+
+                }
             );
-        });
+
+        if(data.game)
+            activeGame=
+                data.game;
+
+        await loadGames();
+
+    }catch(error){
+
+        alert(
+            "Could not start game:\n\n"+
+            error.message
+        );
+
+    }
+
+}
 
 
-    /*
-     * Close modal when clicking outside it.
-     */
+async function leaveGame(){
 
-    document
-        .getElementById("joinModal")
-        .addEventListener("click", event => {
+    if(!activeGame)
+        return;
 
-            if (
-                event.target.id ===
-                "joinModal"
-            ) {
-                event.currentTarget
-                    .classList.remove("show");
+    try{
 
-                selectedGameToJoin = null;
+        await gameRequest(
+            "PATCH",
+            {
+
+                action:"leave",
+
+                game_id:
+                    activeGame.id,
+
+                device_id:
+                    deviceId
+
             }
+        );
+
+        activeGame=null;
+
+        activeGamePanel.style.display=
+            "none";
+
+        await loadGames();
+
+    }catch(error){
+
+        alert(
+            "Could not leave game:\n\n"+
+            error.message
+        );
+
+    }
+
+}
+
+
+async function forceQuitGame(){
+
+    if(!activeGame)
+        return;
+
+    const yes=
+        confirm(
+            "Force quit this game?\n\nEveryone will be removed from the game."
+        );
+
+    if(!yes)
+        return;
+
+    try{
+
+        await gameRequest(
+            "DELETE",
+            {
+
+                game_id:
+                    activeGame.id,
+
+                device_id:
+                    deviceId
+
+            }
+        );
+
+        activeGame=null;
+
+        activeGamePanel.style.display=
+            "none";
+
+        await loadGames();
+
+    }catch(error){
+
+        alert(
+            "Could not force quit game:\n\n"+
+            error.message
+        );
+
+    }
+
+}
+
+
+/*
+=========================================================
+GAME BOARD
+=========================================================
+*/
+
+function renderGameBoard(
+    game,
+    myPlayer
+){
+
+    const board=
+        document.getElementById(
+            "gameBoard"
+        );
+
+    if(!board)
+        return;
+
+    if(game.status!=="playing"){
+
+        board.innerHTML=`
+
+            <div class="lobby-note">
+
+                ${
+                    game.host_device_id===
+                    deviceId
+
+                    ?`
+                        <strong>
+                            You are the host.
+                        </strong>
+                        <br>
+                        Everyone who wants to play
+                        needs to join before you start.
+                    `
+
+                    :`
+                        ${
+                            myPlayer
+                            ?"You joined this game. Waiting for the host to start."
+                            :"You are spectating. Join before the host starts to play."
+                        }
+                    `
+                }
+
+            </div>
+        `;
+
+        return;
+
+    }
+
+    switch(game.game_type){
+
+        case "tictactoe":
+            renderTicTacToe(
+                board,
+                game,
+                myPlayer
+            );
+            break;
+
+        case "connect4":
+            renderConnectFour(
+                board,
+                game,
+                myPlayer
+            );
+            break;
+
+        case "dice":
+            renderDice(
+                board,
+                game,
+                myPlayer
+            );
+            break;
+
+        case "higherlower":
+            renderHigherLower(
+                board,
+                game,
+                myPlayer
+            );
+            break;
+
+        case "rps":
+            renderRPS(
+                board,
+                game,
+                myPlayer
+            );
+            break;
+
+        default:
+
+            board.innerHTML=
+                "<div class='empty-games'>Unknown game.</div>";
+
+    }
+
+}
+
+
+/*
+=========================================================
+TIC TAC TOE
+=========================================================
+*/
+
+function renderTicTacToe(
+    board,
+    game,
+    myPlayer
+){
+
+    const state=
+        game.state||{};
+
+    const cells=
+        Array.isArray(state.board)
+        ?state.board
+        :Array(9).fill("");
+
+    const playable=
+        !!myPlayer &&
+        game.turn_device_id===
+        deviceId &&
+        game.status==="playing";
+
+    board.innerHTML=`
+
+        <div class="ttt-grid">
+
+            ${cells.map(
+                (cell,index)=>`
+
+                    <button
+                        class="ttt-cell"
+                        data-ttt="${index}"
+                        ${cell||!playable?"disabled":""}
+                    >
+                        ${cell||""}
+                    </button>
+
+                `
+            ).join("")}
+
+        </div>
+
+    `;
+
+    board
+        .querySelectorAll(
+            "[data-ttt]"
+        )
+        .forEach(button=>{
+
+            button.onclick=()=>{
+
+                playGameAction({
+                    action:"move",
+                    position:
+                        Number(
+                            button.dataset.ttt
+                        )
+                });
+
+            };
+
         });
 
+}
+
+
+/*
+=========================================================
+CONNECT FOUR
+=========================================================
+*/
+
+function renderConnectFour(
+    board,
+    game,
+    myPlayer
+){
+
+    const state=
+        game.state||{};
+
+    const cells=
+        Array.isArray(state.board)
+        ?state.board
+        :Array(42).fill("");
+
+    const playable=
+        !!myPlayer &&
+        game.turn_device_id===
+        deviceId;
+
+    board.innerHTML=`
+
+        <div class="connect-columns">
+
+            ${Array.from(
+                {length:7},
+                (_,i)=>`
+
+                    <button
+                        class="connect-column"
+                        data-connect-column="${i}"
+                        ${!playable?"disabled":""}
+                    >
+                        ↓
+                    </button>
+
+                `
+            ).join("")}
+
+        </div>
+
+        <div class="connect-grid">
+
+            ${cells.map(
+                cell=>`
+
+                    <div
+                        class="
+                            connect-cell
+                            ${
+                                cell==="R"
+                                ?"red"
+                                :cell==="Y"
+                                ?"yellow"
+                                :""
+                            }
+                        "
+                    ></div>
+
+                `
+            ).join("")}
+
+        </div>
+
+    `;
+
+    board
+        .querySelectorAll(
+            "[data-connect-column]"
+        )
+        .forEach(button=>{
+
+            button.onclick=()=>{
+
+                playGameAction({
+
+                    action:"move",
+
+                    column:
+                        Number(
+                            button.dataset
+                                .connectColumn
+                        )
+
+                });
+
+            };
+
+        });
+
+}
+
+
+/*
+=========================================================
+DICE
+=========================================================
+*/
+
+function renderDice(
+    board,
+    game,
+    myPlayer
+){
+
+    const state=
+        game.state||{};
+
+    const lastRoll=
+        state.last_roll||
+        "—";
+
+    const playable=
+        !!myPlayer &&
+        game.turn_device_id===
+        deviceId;
+
+    board.innerHTML=`
+
+        <div class="dice-board">
+
+            <div class="dice-number">
+                ${escapeHtml(
+                    String(lastRoll)
+                )}
+            </div>
+
+            <p style="color:var(--muted)">
+                ${
+                    state.message||
+                    "Roll the dice when it is your turn."
+                }
+            </p>
+
+            <button
+                class="primary-btn"
+                id="rollDiceButton"
+                ${!playable?"disabled":""}
+            >
+                🎲 Roll dice
+            </button>
+
+        </div>
+
+    `;
+
+    const button=
+        document.getElementById(
+            "rollDiceButton"
+        );
+
+    if(button){
+
+        button.onclick=()=>{
+
+            playGameAction({
+                action:"roll"
+            });
+
+        };
+
+    }
+
+}
+
+
+/*
+=========================================================
+HIGHER LOWER
+=========================================================
+*/
+
+function renderHigherLower(
+    board,
+    game,
+    myPlayer
+){
+
+    const state=
+        game.state||{};
+
+    const number=
+        state.current_number||
+        "?";
+
+    const playable=
+        !!myPlayer &&
+        game.turn_device_id===
+        deviceId;
+
+    board.innerHTML=`
+
+        <div class="hl-board">
+
+            <div class="hl-number">
+                ${escapeHtml(
+                    String(number)
+                )}
+            </div>
+
+            <p style="color:var(--muted)">
+                ${
+                    state.message||
+                    "Will the next number be higher or lower?"
+                }
+            </p>
+
+            <div style="
+                display:flex;
+                justify-content:center;
+                gap:8px;
+                flex-wrap:wrap;
+            ">
+
+                <button
+                    class="primary-btn"
+                    data-hl="higher"
+                    ${!playable?"disabled":""}
+                >
+                    ⬆ Higher
+                </button>
+
+                <button
+                    class="secondary-btn"
+                    data-hl="lower"
+                    ${!playable?"disabled":""}
+                >
+                    ⬇ Lower
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+    board
+        .querySelectorAll(
+            "[data-hl]"
+        )
+        .forEach(button=>{
+
+            button.onclick=()=>{
+
+                playGameAction({
+
+                    action:"guess",
+
+                    guess:
+                        button.dataset.hl
+
+                });
+
+            };
+
+        });
+
+}
+
+
+/*
+=========================================================
+ROCK PAPER SCISSORS
+=========================================================
+*/
+
+function renderRPS(
+    board,
+    game,
+    myPlayer
+){
+
+    const state=
+        game.state||{};
+
+    const playable=
+        !!myPlayer &&
+        game.turn_device_id===
+        deviceId;
+
+    board.innerHTML=`
+
+        <div style="text-align:center">
+
+            <p style="color:var(--muted)">
+                ${
+                    state.message||
+                    "Choose your move."
+                }
+            </p>
+
+            <div class="rps-buttons">
+
+                <button
+                    class="rps-button"
+                    data-rps="rock"
+                    ${!playable?"disabled":""}
+                >
+                    🪨
+                </button>
+
+                <button
+                    class="rps-button"
+                    data-rps="paper"
+                    ${!playable?"disabled":""}
+                >
+                    📄
+                </button>
+
+                <button
+                    class="rps-button"
+                    data-rps="scissors"
+                    ${!playable?"disabled":""}
+                >
+                    ✂️
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+    board
+        .querySelectorAll(
+            "[data-rps]"
+        )
+        .forEach(button=>{
+
+            button.onclick=()=>{
+
+                playGameAction({
+
+                    action:"move",
+
+                    choice:
+                        button.dataset.rps
+
+                });
+
+            };
+
+        });
+
+}
+
+
+/*
+=========================================================
+GAME ACTION
+=========================================================
+*/
+
+async function playGameAction(
+    action
+){
+
+    if(!activeGame)
+        return;
+
+    try{
+
+        const data=
+            await gameRequest(
+                "PATCH",
+                {
+
+                    ...action,
+
+                    game_id:
+                        activeGame.id,
+
+                    device_id:
+                        deviceId,
+
+                    username:
+                        settings.username
+
+                }
+            );
+
+        if(data.game){
+
+            activeGame=
+                data.game;
+
+        }
+
+        await loadGames();
+
+    }catch(error){
+
+        alert(
+            "Game action failed:\n\n"+
+            error.message
+        );
+
+    }
+
+}
+
+
+/*
+=========================================================
+GAME REFRESH
+=========================================================
+*/
+
+async function refreshGamesSilently(){
+
+    if(
+        !document
+            .getElementById("gamesView")
+            .classList
+            .contains("active")
+    ){
+
+        return;
+
+    }
+
+    try{
+
+        const data=
+            await gameRequest(
+                "GET",
+                null,
+                "?channel="+
+                encodeURIComponent(CHANNEL)
+            );
+
+        games=
+            Array.isArray(data.games)
+            ?data.games
+            :[];
+
+        if(activeGame){
+
+            const found=
+                games.find(
+                    game=>
+                        String(game.id)===
+                        String(activeGame.id)
+                );
+
+            if(found){
+
+                activeGame=
+                    found;
+
+            }else{
+
+                activeGame=null;
+
+                activeGamePanel.style.display=
+                    "none";
+
+            }
+
+        }
+
+        renderGames();
+
+    }catch(error){
+
+        /*
+        Silent refresh errors are ignored so
+        the game UI does not constantly popup errors.
+        */
+
+    }
+
+}
+
+
+function startGamesRefresh(){
+
+    if(gamesRefreshTimer)
+        clearInterval(
+            gamesRefreshTimer
+        );
 
     /*
-     * Load the new client files.
-     *
-     * IMPORTANT:
-     * Do NOT load api/message.js here.
-     * That file is the server endpoint.
-     */
+    Games deliberately refresh every 0.5 seconds,
+    independently of the normal chat refresh setting.
+    */
+
+    gamesRefreshTimer=
+        setInterval(
+            refreshGamesSilently,
+            500
+        );
+
+}
+
+
+/*
+=========================================================
+HELPERS
+=========================================================
+*/
+
+function formatTime(date){
+
+    if(!date)
+        return "";
+
+    return new Date(date)
+        .toLocaleTimeString(
+            [],
+            {
+                hour:"2-digit",
+                minute:"2-digit"
+            }
+        );
+
+}
+
+
+function escapeHtml(value){
+
+    return String(value)
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+
+function escapeAttr(value){
+
+    return escapeHtml(value);
+
+}
+
+
+/*
+=========================================================
+START
+=========================================================
+*/
+
+loadSettingsUI();
+
+applySettings();
+
+loadMessages();
+
+startGamesRefresh();
 
 </script>
-
-<script type="module" src="./chat.js"></script>
-<script type="module" src="./game.js"></script>
 
 </body>
 </html>
