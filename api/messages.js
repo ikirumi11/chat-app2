@@ -63,7 +63,7 @@ export default async function handler(req, res) {
         //
 
         const supabaseKey =
-            "sb_secret_k-fKuI9vqWxsXX2y9bF4KA_bqqYQKff";
+            "sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL";
 
 
         // ==============================
