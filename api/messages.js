@@ -47,10 +47,11 @@ export default async function handler(req, res) {
                 .trim()
                 .substring(0, 32);
 
+            // Added 'files' to the select query
             const url =
                 cleanUrl +
                 "/rest/v1/messages" +
-                "?select=id,username,channel,message,image,device_id,edited,created_at" +
+                "?select=id,username,channel,message,image,files,device_id,edited,created_at" +
                 "&channel=eq." +
                 encodeURIComponent(channel) +
                 "&order=created_at.asc";
@@ -126,6 +127,38 @@ export default async function handler(req, res) {
                 image = body.image;
             }
 
+            // NEW: File handling
+            let files = [];
+            if (
+                body.files &&
+                Array.isArray(body.files) &&
+                body.files.length > 0
+            ) {
+                const MAX_FILES = 5;
+                const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+                for (const file of body.files) {
+                    if (files.length >= MAX_FILES) break;
+                    
+                    if (!file.data || typeof file.data !== 'string') continue;
+                    if (!file.name || typeof file.name !== 'string') continue;
+                    
+                    // Check size (data URL length vs actual size)
+                    const base64Data = file.data.split(',')[1] || '';
+                    const sizeInBytes = Math.ceil((base64Data.length * 3) / 4);
+                    
+                    if (sizeInBytes > MAX_FILE_SIZE) continue;
+                    if (file.data.length > 5000000) continue; // 5MB raw string limit
+                    
+                    files.push({
+                        name: file.name.substring(0, 255),
+                        data: file.data,
+                        size: file.size || sizeInBytes,
+                        type: file.type || 'application/octet-stream'
+                    });
+                }
+            }
+
 
             /* GAME SERVER */
 
@@ -155,6 +188,7 @@ export default async function handler(req, res) {
                     channel,
                     message,
                     image: null,
+                    files: [], // Game server doesn't use files
                     device_id: deviceId,
                     edited: false
                 };
@@ -204,10 +238,10 @@ export default async function handler(req, res) {
                 });
             }
 
-            if (!message && !image) {
+            if (!message && !image && files.length === 0) {
                 return res.status(400).json({
                     error:
-                        "Message or image is required."
+                        "Message, image, or files are required."
                 });
             }
 
@@ -236,6 +270,7 @@ export default async function handler(req, res) {
                 channel,
                 message,
                 image,
+                files, // NEW: Include files array
                 device_id: deviceId,
                 edited: false
             };
