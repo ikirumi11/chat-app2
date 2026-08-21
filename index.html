@@ -1499,6 +1499,49 @@ textarea{
     .icon-btn{width:34px;height:34px;}
     .send-btn{padding:0 10px;}
 }
+
+/* VOICE MESSAGES */
+.voice-btn.recording{
+    background:#ff4d67;
+    color:#fff;
+    animation:voicePulse 1s infinite;
+}
+@keyframes voicePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.voice-recording-status{
+    display:none;
+    align-items:center;
+    gap:8px;
+    padding:7px 10px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--panel3);
+    color:var(--text);
+    font-size:13px;
+}
+.voice-recording-status.show{display:flex;}
+.voice-dot{width:8px;height:8px;border-radius:50%;background:#ff4d67;animation:voicePulse 1s infinite;}
+.message-audio{display:flex;align-items:center;gap:10px;margin-top:8px;max-width:min(500px,82vw);padding:8px 10px;border:1px solid var(--border);border-radius:12px;background:var(--panel2);}
+.message-audio audio{width:min(380px,65vw);max-width:100%;}
+@media(max-width:600px){
+    html,body{height:100%;height:100dvh;overflow:hidden;}
+    .app{height:100dvh;min-height:0;}
+    .header{height:56px;min-height:56px;padding-top:env(safe-area-inset-top);box-sizing:content-box;}
+    .messages{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:10px 9px;}
+    .composer{padding:7px 8px calc(7px + env(safe-area-inset-bottom));flex-shrink:0;}
+    .composer-box{gap:4px;padding:5px;border-radius:12px;flex-wrap:nowrap;}
+    .attach-btn,.send-btn{height:40px;min-height:40px;}
+    .attach-btn{width:40px;min-width:40px;font-size:18px;}
+    textarea{min-width:0;width:0;min-height:40px;max-height:90px;padding:9px 6px;}
+    .send-btn{padding:0 12px;}
+    .file-preview{position:absolute;bottom:100%;left:0;right:0;background:var(--panel);max-height:90px;overflow:auto;}
+    .composer{position:relative;}
+    .message-video,.message-image{max-width:calc(100vw - 70px);max-height:45dvh;}
+    .message-audio{max-width:calc(100vw - 70px);}
+    .message-audio audio{width:100%;}
+    .overlay{padding:env(safe-area-inset-top) 8px env(safe-area-inset-bottom);}
+    .panel{width:100%;max-width:620px;max-height:calc(100dvh - 16px);border-radius:14px;}
+}
+
 </style>
 </head>
 
@@ -1553,14 +1596,16 @@ textarea{
     <div class="composer-box">
 
         <button class="attach-btn" id="attachBtn" title="Attach files">📎</button>
+        <button class="attach-btn voice-btn" id="voiceBtn" title="Record voice message" aria-label="Record voice message">🎙️</button>
         <input type="file" id="fileInput" accept="image/*,video/*,*/*" multiple style="display:none">
 
         <div class="file-preview" id="filePreview"></div>
+        <div class="voice-recording-status" id="voiceStatus"><span class="voice-dot"></span><span id="voiceStatusText">Recording 0:00</span></div>
 
         <textarea
             id="messageInput"
             rows="1"
-            placeholder="Message #general · /wipe"
+            placeholder="Message #general · "
         ></textarea>
 
         <button
@@ -2088,11 +2133,91 @@ const GAME_PREFIX="__CHAT_GAME_STATE__:";
 
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB per file
+const MAX_VOICE_BYTES = 5 * 1024 * 1024;
 
 
 /* =====================================================
    DEVICE
 ===================================================== */
+
+let mediaRecorder = null;
+let voiceChunks = [];
+let voiceStream = null;
+let voiceStartedAt = 0;
+let voiceTimer = null;
+
+const voiceBtn = document.getElementById("voiceBtn");
+const voiceStatus = document.getElementById("voiceStatus");
+const voiceStatusText = document.getElementById("voiceStatusText");
+
+function formatVoiceTime(seconds){
+    const m=Math.floor(seconds/60);
+    const sec=String(seconds%60).padStart(2,"0");
+    return `${m}:${sec}`;
+}
+
+function stopVoiceStream(){
+    if(voiceTimer){clearInterval(voiceTimer);voiceTimer=null;}
+    if(voiceStream){voiceStream.getTracks().forEach(t=>t.stop());voiceStream=null;}
+    voiceBtn.classList.remove("recording");
+    voiceStatus.classList.remove("show");
+}
+
+async function startVoiceRecording(){
+    if(mediaRecorder) return;
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+        alert("Voice recording is not supported by this browser.");
+        return;
+    }
+    try{
+        voiceStream=await navigator.mediaDevices.getUserMedia({audio:true});
+        const mimeTypes=["audio/webm;codecs=opus","audio/webm","audio/mp4","audio/ogg;codecs=opus"];
+        const mime=mimeTypes.find(t=>MediaRecorder.isTypeSupported(t)) || "";
+        mediaRecorder=new MediaRecorder(voiceStream,mime?{mimeType:mime}:undefined);
+        voiceChunks=[];
+        voiceStartedAt=Date.now();
+        voiceBtn.classList.add("recording");
+        voiceStatus.classList.add("show");
+        voiceStatusText.textContent="Recording 0:00 — tap 🎙️ to stop";
+        voiceTimer=setInterval(()=>{
+            voiceStatusText.textContent=`Recording ${formatVoiceTime(Math.floor((Date.now()-voiceStartedAt)/1000))} — tap 🎙️ to stop`;
+        },500);
+        mediaRecorder.ondataavailable=e=>{if(e.data&&e.data.size)voiceChunks.push(e.data);};
+        mediaRecorder.onstop=async()=>{
+            const type=mediaRecorder.mimeType || "audio/webm";
+            const blob=new Blob(voiceChunks,{type});
+            const recorder=mediaRecorder;
+            mediaRecorder=null;
+            stopVoiceStream();
+            if(blob.size>MAX_VOICE_BYTES){
+                alert("Voice message is too large. Please record a shorter message.");
+                return;
+            }
+            if(blob.size<1000)return;
+            const ext=type.includes("mp4")?"m4a":type.includes("ogg")?"ogg":"webm";
+            pendingFiles.push({
+                name:`Voice message.${ext}`,
+                data:await blobToDataURL(blob),
+                size:blob.size,
+                type,
+                audio:true,
+                base64:true
+            });
+            renderFilePreview();
+        };
+        mediaRecorder.start(250);
+    }catch(error){
+        stopVoiceStream();
+        mediaRecorder=null;
+        alert("Microphone permission is required to record a voice message.");
+    }
+}
+
+function stopVoiceRecording(){
+    if(mediaRecorder && mediaRecorder.state!=="inactive") mediaRecorder.stop();
+}
+
+voiceBtn.addEventListener("click",()=>mediaRecorder?stopVoiceRecording():startVoiceRecording());
 
 let deviceId=localStorage.getItem("chat_device_id");
 
@@ -3137,7 +3262,7 @@ messageInput.addEventListener(
 
 async function handleChatCommand(text){
     const command=text.trim().toLowerCase();
-    if(command === "/wipe"){
+    if(command === ""){
         removeEverything.click();
         return true;
     }
@@ -3824,6 +3949,23 @@ function createMessageElement(message) {
                 };
 
                 content.appendChild(img);
+                return;
+            }
+
+            const isAudio =
+                file.audio === true ||
+                type.startsWith('audio/') ||
+                (typeof file.data === 'string' && file.data.startsWith('data:audio/'));
+
+            if (isAudio && file.data) {
+                const audioWrap=document.createElement("div");
+                audioWrap.className="message-audio";
+                const audio=document.createElement("audio");
+                audio.src=file.data;
+                audio.controls=true;
+                audio.preload="metadata";
+                audioWrap.appendChild(audio);
+                content.appendChild(audioWrap);
                 return;
             }
 
