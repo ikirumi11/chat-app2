@@ -2223,6 +2223,9 @@ const API_URL="/api/messages";
 const CHANNEL="general";
 
 const GAME_PREFIX="__CHAT_GAME_STATE__:";
+const GAME_CLEANUP_DELAY = 3000; // 3 seconds
+const gameCleanupTimers = new Map();
+
 
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB per file
@@ -3679,6 +3682,129 @@ async function safeJson(response){
 }
 
 
+
+/* =====================================================
+   AUTOMATIC GAME CLEANUP
+   Finished games are removed after 3 seconds.
+   Empty/abandoned games are removed after 3 seconds.
+   ===================================================== */
+
+function getGameCleanupState(game){
+    if(!game) return null;
+
+    const status = String(
+        game.status ||
+        game.state ||
+        game.data?.status ||
+        ""
+    ).toLowerCase();
+
+    const finished =
+        status === "finished" ||
+        status === "gameover" ||
+        status === "game_over" ||
+        status === "won" ||
+        status === "lost" ||
+        status === "draw" ||
+        status === "complete" ||
+        status === "completed";
+
+    const players = Array.isArray(game.players)
+        ? game.players
+        : Array.isArray(game.data?.players)
+            ? game.data.players
+            : [];
+
+    const maxPlayers = Number(
+        game.maxPlayers ||
+        game.data?.maxPlayers ||
+        0
+    );
+
+    const empty =
+        players.length === 0 ||
+        (maxPlayers > 0 && players.length < 1);
+
+    return { finished, empty };
+}
+
+function scheduleGameCleanup(game){
+    if(!game || !game.id) return;
+
+    const state = getGameCleanupState(game);
+    if(!state) return;
+
+    if(!state.finished && !state.empty){
+        cancelGameCleanup(game.id);
+        return;
+    }
+
+    if(gameCleanupTimers.has(game.id)) return;
+
+    const reason = state.finished ? "finished" : "empty";
+
+    const timer = setTimeout(async ()=>{
+        gameCleanupTimers.delete(game.id);
+
+        try{
+            await apiDelete({
+                id: game.id,
+                device_id: game.hostDeviceId || deviceId,
+                game_server: true
+            });
+
+            // Remove it locally immediately as well.
+            currentMessages =
+                currentMessages.filter(
+                    msg => msg.id !== game.id
+                );
+
+            games =
+                games.filter(
+                    g => g.id !== game.id
+                );
+
+            seenGameIds.delete(game.id);
+
+            const element =
+                document.querySelector(
+                    `[data-game-id="${CSS.escape(String(game.id))}"]`
+                );
+
+            if(element) element.remove();
+
+            console.log(
+                `Game ${game.id} automatically removed after 3 seconds (${reason}).`
+            );
+        }catch(error){
+            console.warn(
+                "Automatic game cleanup failed:",
+                error
+            );
+        }
+    }, GAME_CLEANUP_DELAY);
+
+    gameCleanupTimers.set(game.id, timer);
+}
+
+function cancelGameCleanup(gameId){
+    if(!gameId) return;
+
+    const timer = gameCleanupTimers.get(gameId);
+
+    if(timer){
+        clearTimeout(timer);
+        gameCleanupTimers.delete(gameId);
+    }
+}
+
+function scheduleAllGameCleanups(){
+    for(const game of games){
+        scheduleGameCleanup(game);
+    }
+}
+
+
 /* =====================================================
    LOAD MESSAGES
 ===================================================== */
@@ -3742,6 +3868,7 @@ async function loadMessages(){
             currentMessages = newMessages;
             processProfiles();
             processGameMessages();
+            scheduleAllGameCleanups();
             
             for (const game of games) {
                 if (!seenGameIds.has(game.id)) {
@@ -7417,3 +7544,27 @@ loadMessages();
 
 </body>
 </html>
+
+<script>
+/* Extra cleanup observer: catches games rendered by any existing game renderer. */
+(function(){
+    const originalSchedule =
+        window.scheduleGameCleanup;
+
+    if(typeof originalSchedule !== "function") return;
+
+    // Re-check cleanup state frequently enough to catch a game that becomes
+    // finished/empty through an existing renderer.
+    setInterval(()=>{
+        try{
+            if(typeof games !== "undefined"){
+                for(const game of games){
+                    originalSchedule(game);
+                }
+            }
+        }catch(error){
+            console.warn("Game cleanup watcher error:", error);
+        }
+    }, 1000);
+})();
+</script>
