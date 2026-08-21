@@ -368,6 +368,10 @@ button{
     background:#222831;
 }
 
+.ttt .symbol-X{ color:#ff6b6b; }
+.ttt .symbol-O{ color:#4ecdc4; }
+.ttt .symbol-triangle{ color:#ffd93d; }
+
 /* REACTION TIME */
 
 .reaction-area{
@@ -1083,6 +1087,189 @@ textarea{
     color:white;
 }
 
+/* NEW GAME: TRIVIA */
+
+.trivia-area{
+    text-align:center;
+    padding:15px;
+}
+
+.trivia-question{
+    font-size:22px;
+    font-weight:700;
+    padding:20px;
+    background:#1a1f26;
+    border-radius:12px;
+    border:1px solid var(--border);
+    margin:10px auto;
+    max-width:600px;
+}
+
+.trivia-options{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    max-width:500px;
+    margin:10px auto;
+}
+
+.trivia-option{
+    padding:12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#1a1f26;
+    color:white;
+    font-size:16px;
+    transition:0.15s;
+}
+
+.trivia-option:hover:not(:disabled){
+    background:#2a303a;
+    transform:scale(1.02);
+}
+
+.trivia-option:disabled{
+    opacity:0.5;
+    cursor:not-allowed;
+}
+
+.trivia-option.correct{
+    background:#1a3a2a;
+    border-color:#2a6a4a;
+}
+
+.trivia-option.wrong{
+    background:#3a1a1a;
+    border-color:#6a2a2a;
+}
+
+/* NEW GAME: WORD SCRAMBLE */
+
+.wordscramble-area{
+    text-align:center;
+    padding:15px;
+}
+
+.wordscramble-word{
+    font-size:36px;
+    font-weight:900;
+    letter-spacing:8px;
+    padding:20px;
+    background:#1a1f26;
+    border-radius:12px;
+    border:1px solid var(--border);
+    margin:10px auto;
+    max-width:500px;
+    color:#ffd93d;
+}
+
+.wordscramble-input{
+    padding:12px 20px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#1a1f26;
+    color:white;
+    font-size:18px;
+    width:250px;
+    text-align:center;
+}
+
+/* NEW GAME: MATH RACE */
+
+.mathrace-area{
+    text-align:center;
+    padding:15px;
+}
+
+.mathrace-problem{
+    font-size:40px;
+    font-weight:900;
+    padding:20px;
+    background:#1a1f26;
+    border-radius:12px;
+    border:1px solid var(--border);
+    margin:10px auto;
+    max-width:400px;
+    color:white;
+}
+
+.mathrace-input{
+    padding:12px 20px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#1a1f26;
+    color:white;
+    font-size:18px;
+    width:150px;
+    text-align:center;
+}
+
+/* NEW GAME: TIC TAC TOE TOURNAMENT */
+
+.ttt-tournament-area{
+    text-align:center;
+    padding:15px;
+}
+
+.ttt-tournament-bracket{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    max-width:600px;
+    margin:10px auto;
+}
+
+.ttt-match{
+    padding:10px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#1a1f26;
+    font-size:13px;
+}
+
+.ttt-match .match-players{
+    font-weight:700;
+    color:white;
+    font-size:14px;
+}
+
+.ttt-match .match-result{
+    color:#7affb0;
+}
+
+/* NEW GAME: RPS TOURNAMENT */
+
+.rps-tournament-area{
+    text-align:center;
+    padding:15px;
+}
+
+.rps-tournament-bracket{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    max-width:600px;
+    margin:10px auto;
+}
+
+.rps-match{
+    padding:10px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#1a1f26;
+    font-size:13px;
+}
+
+.rps-match .match-players{
+    font-weight:700;
+    color:white;
+    font-size:14px;
+}
+
+.rps-match .match-result{
+    color:#7affb0;
+}
+
 @media(max-width:600px){
 
     .header{
@@ -1148,6 +1335,18 @@ textarea{
 
     .game-settings-row label{
         min-width:auto;
+    }
+
+    .trivia-options{
+        grid-template-columns:1fr;
+    }
+
+    .ttt-tournament-bracket{
+        grid-template-columns:1fr;
+    }
+
+    .rps-tournament-bracket{
+        grid-template-columns:1fr;
     }
 }
 </style>
@@ -1241,38 +1440,32 @@ Choose a game to create a lobby. Others can join before you start.
 
 <div class="game-grid">
 
-<!-- Tic Tac Toe Games -->
+<!-- Tic Tac Toe Games (2-3 players) -->
 <button class="game-choice" data-game="ttt3">
     <strong>❌⭕ Tic-Tac-Toe 3x3</strong>
-    <span>Classic 2-player, get 3 in a row</span>
-    <div class="game-players">2 players</div>
+    <span>Get 3 in a row</span>
+    <div class="game-players">2-3 players</div>
 </button>
 
 <button class="game-choice" data-game="ttt4">
     <strong>❌⭕ Tic-Tac-Toe 4x4</strong>
-    <span>2-player, get 4 in a row</span>
-    <div class="game-players">2 players</div>
+    <span>Get 4 in a row</span>
+    <div class="game-players">2-3 players</div>
 </button>
 
 <button class="game-choice" data-game="ttt5">
     <strong>❌⭕ Tic-Tac-Toe 5x5</strong>
-    <span>2-player, get 5 in a row</span>
-    <div class="game-players">2 players</div>
+    <span>Get 5 in a row</span>
+    <div class="game-players">2-3 players</div>
 </button>
 
 <button class="game-choice" data-game="ttt6">
     <strong>❌⭕ Tic-Tac-Toe 6x6</strong>
-    <span>2-player, get 6 in a row</span>
-    <div class="game-players">2 players</div>
+    <span>Get 6 in a row</span>
+    <div class="game-players">2-3 players</div>
 </button>
 
-<button class="game-choice" data-game="ttt3p">
-    <strong>❌⭕🔺 Tic-Tac-Toe 3-Player</strong>
-    <span>3 players on 4x4 grid, get 4 in a row</span>
-    <div class="game-players">3 players</div>
-</button>
-
-<!-- New Mini Games -->
+<!-- Original Games -->
 <button class="game-choice" data-game="memory">
     <strong>🧠 Memory Match</strong>
     <span>Flip cards and match pairs</span>
@@ -1303,7 +1496,6 @@ Choose a game to create a lobby. Others can join before you start.
     <div class="game-players">2-6 players</div>
 </button>
 
-<!-- Other Games -->
 <button class="game-choice" data-game="reaction">
     <strong>⚡ Reaction Time</strong>
     <span>Click when the screen turns green</span>
@@ -1319,6 +1511,37 @@ Choose a game to create a lobby. Others can join before you start.
 <button class="game-choice" data-game="boss">
     <strong>👹 Boss Battle</strong>
     <span>Defeat the monster with 100M HP!</span>
+    <div class="game-players">2-6 players</div>
+</button>
+
+<!-- 5 NEW GAMES -->
+<button class="game-choice" data-game="trivia">
+    <strong>🧠 Trivia Quiz</strong>
+    <span>Answer questions correctly</span>
+    <div class="game-players">2-6 players</div>
+</button>
+
+<button class="game-choice" data-game="wordscramble">
+    <strong>🔤 Word Scramble</strong>
+    <span>Unscramble the letters</span>
+    <div class="game-players">2-6 players</div>
+</button>
+
+<button class="game-choice" data-game="mathrace">
+    <strong>➗ Math Race</strong>
+    <span>Solve math problems fast</span>
+    <div class="game-players">2-6 players</div>
+</button>
+
+<button class="game-choice" data-game="ttttournament">
+    <strong>🏆 Tic-Tac-Toe Tournament</strong>
+    <span>Round-robin Tic-Tac-Toe</span>
+    <div class="game-players">2-6 players</div>
+</button>
+
+<button class="game-choice" data-game="rpstournament">
+    <strong>🏆 RPS Tournament</strong>
+    <span>Rock Paper Scissors tournament</span>
     <div class="game-players">2-6 players</div>
 </button>
 
@@ -1913,54 +2136,41 @@ let pendingImageData=null;
 
 const GAME_TYPES={
 
-    // Tic Tac Toe Games
+    // Tic Tac Toe Games (2-3 players)
     ttt3:{
         name:"Tic-Tac-Toe 3x3",
         icon:"❌",
         min:2,
-        max:2,
-        desc:"Classic 2-player, get 3 in a row",
-        size:3,
-        players:2
+        max:3,
+        desc:"Get 3 in a row",
+        size:3
     },
     ttt4:{
         name:"Tic-Tac-Toe 4x4",
         icon:"❌",
         min:2,
-        max:2,
-        desc:"2-player, get 4 in a row",
-        size:4,
-        players:2
+        max:3,
+        desc:"Get 4 in a row",
+        size:4
     },
     ttt5:{
         name:"Tic-Tac-Toe 5x5",
         icon:"❌",
         min:2,
-        max:2,
-        desc:"2-player, get 5 in a row",
-        size:5,
-        players:2
+        max:3,
+        desc:"Get 5 in a row",
+        size:5
     },
     ttt6:{
         name:"Tic-Tac-Toe 6x6",
         icon:"❌",
         min:2,
-        max:2,
-        desc:"2-player, get 6 in a row",
-        size:6,
-        players:2
-    },
-    ttt3p:{
-        name:"Tic-Tac-Toe 3-Player",
-        icon:"❌",
-        min:3,
         max:3,
-        desc:"3 players on 4x4, get 4 in a row",
-        size:4,
-        players:3
+        desc:"Get 6 in a row",
+        size:6
     },
     
-    // Mini Games
+    // Original Games
     memory:{
         name:"Memory Match",
         icon:"🧠",
@@ -1996,8 +2206,6 @@ const GAME_TYPES={
         max:6,
         desc:"Click the target as fast as you can"
     },
-    
-    // Other Games
     reaction:{
         name:"Reaction Time",
         icon:"⚡",
@@ -2018,6 +2226,43 @@ const GAME_TYPES={
         min:2,
         max:6,
         desc:"Defeat the monster with 100M HP!"
+    },
+    
+    // 5 NEW GAMES
+    trivia:{
+        name:"Trivia Quiz",
+        icon:"🧠",
+        min:2,
+        max:6,
+        desc:"Answer questions correctly"
+    },
+    wordscramble:{
+        name:"Word Scramble",
+        icon:"🔤",
+        min:2,
+        max:6,
+        desc:"Unscramble the letters"
+    },
+    mathrace:{
+        name:"Math Race",
+        icon:"➗",
+        min:2,
+        max:6,
+        desc:"Solve math problems fast"
+    },
+    ttttournament:{
+        name:"Tic-Tac-Toe Tournament",
+        icon:"🏆",
+        min:2,
+        max:6,
+        desc:"Round-robin Tic-Tac-Toe"
+    },
+    rpstournament:{
+        name:"RPS Tournament",
+        icon:"🏆",
+        min:2,
+        max:6,
+        desc:"Rock Paper Scissors tournament"
     }
 };
 
@@ -3107,6 +3352,9 @@ async function createGame(gameType){
         maxPlayers:
             info.max,
 
+        minPlayers:
+            info.min,
+
         turnIndex:0,
 
         createdAt:
@@ -3124,7 +3372,6 @@ async function createGame(gameType){
     // Set game-specific size
     if (info.size) {
         game.data.settings.boardSize = info.size;
-        game.data.settings.players = info.players || 2;
     }
 
     try{
@@ -3150,11 +3397,10 @@ async function createGame(gameType){
 
 function getDefaultSettings(gameType){
     const settings = {
-        ttt3: { boardSize: 3, players: 2 },
-        ttt4: { boardSize: 4, players: 2 },
-        ttt5: { boardSize: 5, players: 2 },
-        ttt6: { boardSize: 6, players: 2 },
-        ttt3p: { boardSize: 4, players: 3 },
+        ttt3: { boardSize: 3 },
+        ttt4: { boardSize: 4 },
+        ttt5: { boardSize: 5 },
+        ttt6: { boardSize: 6 },
         memory: { gridSize: 4 },
         quickdraw: { rounds: 3 },
         coinflip: { targetScore: 3 },
@@ -3162,7 +3408,12 @@ function getDefaultSettings(gameType){
         target: { targets: 5 },
         reaction: { rounds: 1 },
         type: { sentenceCount: 1 },
-        boss: { bossHealth: 100000000 }
+        boss: { bossHealth: 100000000 },
+        trivia: { questions: 5 },
+        wordscramble: { rounds: 5 },
+        mathrace: { problems: 5 },
+        ttttournament: { rounds: 3 },
+        rpstournament: { rounds: 3 }
     };
     return settings[gameType] || {};
 }
@@ -3238,6 +3489,9 @@ function createGameElement(game){
         <div class="game-pill">
             Players: <strong>${game.players.length}/${game.maxPlayers}</strong>
         </div>
+        <div class="game-pill">
+            Min Players: <strong>${game.minPlayers || 2}</strong>
+        </div>
     `;
     body.appendChild(info);
 
@@ -3310,7 +3564,7 @@ function createGameElement(game){
             const start = document.createElement("button");
             start.className = "game-btn primary";
             start.textContent = "Start game";
-            start.disabled = game.players.length < GAME_TYPES[game.gameType].min;
+            start.disabled = game.players.length < (game.minPlayers || 2);
             start.onclick = async () => await startGame(game);
             actions.appendChild(start);
 
@@ -3358,41 +3612,41 @@ function createSettingsUI(game){
     const gameType = game.gameType;
     const settings = game.data.settings || {};
 
+    // Tic Tac Toe settings (2-3 players)
     if (gameType === "ttt3" || gameType === "ttt4" || gameType === "ttt5" || gameType === "ttt6") {
-        // 2-player Tic Tac Toe - just show info
         const row = document.createElement("div");
         row.className = "game-settings-row";
         const size = settings.boardSize || 3;
+        const playerCount = game.players.length;
+        const maxPlayers = game.maxPlayers || 3;
         row.innerHTML = `
             <label>Board:</label>
             <span style="color:white;font-weight:600;">${size}x${size}</span>
-            <span style="color:#6a7a8a;font-size:11px;margin-left:5px;">(2 players, get ${size} in a row)</span>
+            <span style="color:#6a7a8a;font-size:11px;margin-left:5px;">(get ${size} in a row)</span>
         `;
         container.appendChild(row);
-    }
-
-    if (gameType === "ttt3p") {
-        // 3-player Tic Tac Toe
-        const row = document.createElement("div");
-        row.className = "game-settings-row";
-        row.innerHTML = `
-            <label>Board:</label>
-            <span style="color:white;font-weight:600;">4x4</span>
-            <span style="color:#6a7a8a;font-size:11px;margin-left:5px;">(3 players, get 4 in a row)</span>
+        
+        const playersRow = document.createElement("div");
+        playersRow.className = "game-settings-row";
+        playersRow.innerHTML = `
+            <label>Players:</label>
+            <span style="color:white;font-weight:600;">${playerCount}/${maxPlayers}</span>
+            <span style="color:#6a7a8a;font-size:11px;margin-left:5px;">(2-3 players supported)</span>
         `;
-        container.appendChild(row);
+        container.appendChild(playersRow);
         
         const symbolsRow = document.createElement("div");
         symbolsRow.className = "game-settings-row";
         symbolsRow.innerHTML = `
             <label>Symbols:</label>
-            <span style="color:white;">❌ Player 1</span>
-            <span style="color:white;">⭕ Player 2</span>
-            <span style="color:white;">🔺 Player 3</span>
+            <span style="color:#ff6b6b;">❌ Player 1</span>
+            <span style="color:#4ecdc4;">⭕ Player 2</span>
+            ${playerCount >= 3 ? `<span style="color:#ffd93d;">🔺 Player 3</span>` : ''}
         `;
         container.appendChild(symbolsRow);
     }
 
+    // Memory settings
     if (gameType === "memory") {
         const row = document.createElement("div");
         row.className = "game-settings-row";
@@ -3420,6 +3674,7 @@ function createSettingsUI(game){
         container.appendChild(saveBtn);
     }
 
+    // Quick Draw settings
     if (gameType === "quickdraw") {
         const row = document.createElement("div");
         row.className = "game-settings-row";
@@ -3443,6 +3698,7 @@ function createSettingsUI(game){
         container.appendChild(saveBtn);
     }
 
+    // Coin Flip settings
     if (gameType === "coinflip") {
         const row = document.createElement("div");
         row.className = "game-settings-row";
@@ -3466,6 +3722,7 @@ function createSettingsUI(game){
         container.appendChild(saveBtn);
     }
 
+    // Number Guess settings
     if (gameType === "numberguess") {
         const row = document.createElement("div");
         row.className = "game-settings-row";
@@ -3494,6 +3751,7 @@ function createSettingsUI(game){
         container.appendChild(saveBtn);
     }
 
+    // Target Click settings
     if (gameType === "target") {
         const row = document.createElement("div");
         row.className = "game-settings-row";
@@ -3517,6 +3775,126 @@ function createSettingsUI(game){
         container.appendChild(saveBtn);
     }
 
+    // Trivia settings
+    if (gameType === "trivia") {
+        const row = document.createElement("div");
+        row.className = "game-settings-row";
+        row.innerHTML = `
+            <label>Questions:</label>
+            <input type="number" id="triviaQuestions" value="${settings.questions || 5}" min="3" max="15">
+        `;
+        container.appendChild(row);
+        
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "game-btn";
+        saveBtn.textContent = "Apply Settings";
+        saveBtn.style.marginTop = "8px";
+        saveBtn.onclick = async () => {
+            const count = parseInt(document.getElementById("triviaQuestions").value) || 5;
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.settings.questions = Math.max(3, Math.min(15, count));
+            await writeGameState(copy);
+            await loadMessages();
+        };
+        container.appendChild(saveBtn);
+    }
+
+    // Word Scramble settings
+    if (gameType === "wordscramble") {
+        const row = document.createElement("div");
+        row.className = "game-settings-row";
+        row.innerHTML = `
+            <label>Rounds:</label>
+            <input type="number" id="wordscrambleRounds" value="${settings.rounds || 5}" min="3" max="15">
+        `;
+        container.appendChild(row);
+        
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "game-btn";
+        saveBtn.textContent = "Apply Settings";
+        saveBtn.style.marginTop = "8px";
+        saveBtn.onclick = async () => {
+            const rounds = parseInt(document.getElementById("wordscrambleRounds").value) || 5;
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.settings.rounds = Math.max(3, Math.min(15, rounds));
+            await writeGameState(copy);
+            await loadMessages();
+        };
+        container.appendChild(saveBtn);
+    }
+
+    // Math Race settings
+    if (gameType === "mathrace") {
+        const row = document.createElement("div");
+        row.className = "game-settings-row";
+        row.innerHTML = `
+            <label>Problems:</label>
+            <input type="number" id="mathraceProblems" value="${settings.problems || 5}" min="3" max="15">
+        `;
+        container.appendChild(row);
+        
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "game-btn";
+        saveBtn.textContent = "Apply Settings";
+        saveBtn.style.marginTop = "8px";
+        saveBtn.onclick = async () => {
+            const count = parseInt(document.getElementById("mathraceProblems").value) || 5;
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.settings.problems = Math.max(3, Math.min(15, count));
+            await writeGameState(copy);
+            await loadMessages();
+        };
+        container.appendChild(saveBtn);
+    }
+
+    // Tic-Tac-Toe Tournament settings
+    if (gameType === "ttttournament") {
+        const row = document.createElement("div");
+        row.className = "game-settings-row";
+        row.innerHTML = `
+            <label>Rounds:</label>
+            <input type="number" id="ttttRounds" value="${settings.rounds || 3}" min="1" max="5">
+        `;
+        container.appendChild(row);
+        
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "game-btn";
+        saveBtn.textContent = "Apply Settings";
+        saveBtn.style.marginTop = "8px";
+        saveBtn.onclick = async () => {
+            const rounds = parseInt(document.getElementById("ttttRounds").value) || 3;
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.settings.rounds = Math.max(1, Math.min(5, rounds));
+            await writeGameState(copy);
+            await loadMessages();
+        };
+        container.appendChild(saveBtn);
+    }
+
+    // RPS Tournament settings
+    if (gameType === "rpstournament") {
+        const row = document.createElement("div");
+        row.className = "game-settings-row";
+        row.innerHTML = `
+            <label>Rounds:</label>
+            <input type="number" id="rpstRounds" value="${settings.rounds || 3}" min="1" max="5">
+        `;
+        container.appendChild(row);
+        
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "game-btn";
+        saveBtn.textContent = "Apply Settings";
+        saveBtn.style.marginTop = "8px";
+        saveBtn.onclick = async () => {
+            const rounds = parseInt(document.getElementById("rpstRounds").value) || 3;
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.settings.rounds = Math.max(1, Math.min(5, rounds));
+            await writeGameState(copy);
+            await loadMessages();
+        };
+        container.appendChild(saveBtn);
+    }
+
     return container;
 }
 
@@ -3527,11 +3905,10 @@ function createSettingsUI(game){
 
 function getGameDescription(game){
     const descs = {
-        ttt3: "Classic Tic-Tac-Toe. 2 players take turns placing X and O. First to get 3 in a row wins!",
-        ttt4: "4x4 Tic-Tac-Toe. 2 players take turns placing X and O. First to get 4 in a row wins!",
-        ttt5: "5x5 Tic-Tac-Toe. 2 players take turns placing X and O. First to get 5 in a row wins!",
-        ttt6: "6x6 Tic-Tac-Toe. 2 players take turns placing X and O. First to get 6 in a row wins!",
-        ttt3p: "3-player Tic-Tac-Toe on a 4x4 board. ❌ Player 1, ⭕ Player 2, 🔺 Player 3. First to get 4 in a row wins!",
+        ttt3: "Classic Tic-Tac-Toe on a 3x3 board. Get 3 in a row to win! Supports 2-3 players.",
+        ttt4: "4x4 Tic-Tac-Toe. Get 4 in a row to win! Supports 2-3 players.",
+        ttt5: "5x5 Tic-Tac-Toe. Get 5 in a row to win! Supports 2-3 players.",
+        ttt6: "6x6 Tic-Tac-Toe. Get 6 in a row to win! Supports 2-3 players.",
         memory: "Flip cards and find matching pairs. Most pairs at the end wins!",
         quickdraw: "Wait for the countdown, then click when DRAW! appears. Fastest wins!",
         coinflip: "Choose Heads or Tails. Correct guesses earn points. First to reach the target score wins!",
@@ -3539,7 +3916,12 @@ function getGameDescription(game){
         target: "Click the target that appears on screen. Most hits and accuracy wins!",
         reaction: "Click when the screen turns green. Fastest reaction time wins!",
         type: "Type the displayed sentence as fast as you can. Fastest wins!",
-        boss: "Work together to defeat the boss! Upgrade your weapons for more damage."
+        boss: "Work together to defeat the boss! Upgrade your weapons for more damage.",
+        trivia: "Answer trivia questions correctly. Most correct answers wins!",
+        wordscramble: "Unscramble the letters to form a word. Fastest correct answer wins!",
+        mathrace: "Solve math problems as fast as you can. Most correct wins!",
+        ttttournament: "Round-robin Tic-Tac-Toe tournament. Most points wins!",
+        rpstournament: "Rock Paper Scissors tournament. Most wins takes the crown!"
     };
     return descs[game.gameType] || "Game in progress.";
 }
@@ -3557,7 +3939,6 @@ function createGameBoard(game){
         ttt4: createTTT,
         ttt5: createTTT,
         ttt6: createTTT,
-        ttt3p: createTTT3P,
         memory: createMemory,
         quickdraw: createQuickDraw,
         coinflip: createCoinFlip,
@@ -3565,7 +3946,12 @@ function createGameBoard(game){
         target: createTarget,
         reaction: createReaction,
         type: createTypeSentence,
-        boss: createBossBattle
+        boss: createBossBattle,
+        trivia: createTrivia,
+        wordscramble: createWordScramble,
+        mathrace: createMathRace,
+        ttttournament: createTTTTournament,
+        rpstournament: createRPSTournament
     };
     
     return boards[game.gameType] ? boards[game.gameType](game) : null;
@@ -3573,13 +3959,14 @@ function createGameBoard(game){
 
 
 /* =====================================================
-   TIC TAC TOE (2 Player)
+   TIC TAC TOE (2-3 Players)
 ===================================================== */
 
 function createTTT(game){
     const size = game.data.settings?.boardSize || 3;
     const total = size * size;
     const winCount = size;
+    const playerCount = game.players.length;
     
     if (!game.data.board || game.data.board.length !== total) {
         game.data.board = Array(total).fill("");
@@ -3595,11 +3982,17 @@ function createTTT(game){
     const current = game.players[game.turnIndex % game.players.length];
     const myTurn = mine && current && current.deviceId === deviceId;
 
-    const symbols = ["X", "O"];
+    const symbols = ["❌", "⭕", "🔺"];
+    const symbolClasses = ["symbol-X", "symbol-O", "symbol-triangle"];
 
     for (let i = 0; i < total; i++) {
         const button = document.createElement("button");
-        button.textContent = game.data.board[i] || "";
+        const value = game.data.board[i];
+        button.textContent = value || "";
+        if (value) {
+            const idx = symbols.indexOf(value);
+            if (idx !== -1) button.className = symbolClasses[idx];
+        }
         button.style.fontSize = size <= 3 ? "32px" : size <= 4 ? "28px" : size <= 5 ? "24px" : "20px";
         button.disabled = !myTurn || !!game.data.board[i] || !!game.winner;
         button.onclick = async () => {
@@ -3642,59 +4035,6 @@ function checkTTTWin(board, size, pos, symbol, winCount){
         if (count >= winCount) return true;
     }
     return false;
-}
-
-
-/* =====================================================
-   TIC TAC TOE (3 Player)
-===================================================== */
-
-function createTTT3P(game){
-    const size = 4;
-    const total = size * size;
-    const winCount = 4;
-    const players = game.players.length;
-    
-    if (!game.data.board || game.data.board.length !== total) {
-        game.data.board = Array(total).fill("");
-    }
-
-    const board = document.createElement("div");
-    board.className = "ttt";
-    board.style.gridTemplateColumns = `repeat(${size}, 70px)`;
-    board.style.gridTemplateRows = `repeat(${size}, 70px)`;
-
-    const mine = game.players.some(p => p.deviceId === deviceId);
-    const current = game.players[game.turnIndex % game.players.length];
-    const myTurn = mine && current && current.deviceId === deviceId;
-
-    const symbols = ["❌", "⭕", "🔺"];
-
-    for (let i = 0; i < total; i++) {
-        const button = document.createElement("button");
-        button.textContent = game.data.board[i] || "";
-        button.style.fontSize = "28px";
-        button.disabled = !myTurn || !!game.data.board[i] || !!game.winner;
-        button.onclick = async () => {
-            const copy = JSON.parse(JSON.stringify(game));
-            const idx = copy.turnIndex % copy.players.length;
-            const symbol = symbols[idx];
-            copy.data.board[i] = symbol;
-            
-            if (checkTTTWin(copy.data.board, size, i, symbol, winCount)) {
-                copy.winner = current.username;
-                copy.status = "finished";
-            } else if (copy.data.board.every(c => c)) {
-                copy.winner = "draw";
-                copy.status = "finished";
-            } else {
-                copy.turnIndex++;
-            }
-            await publishGameAndCleanup(game, copy);
-        };
-        board.appendChild(button);
-    }
-    return board;
 }
 
 
@@ -3761,7 +4101,6 @@ function createMemory(game){
                         copy.data.scores = copy.data.scores || {};
                         copy.data.scores[current.deviceId] = (copy.data.scores[current.deviceId] || 0) + 1;
                         if (copy.data.matched.length === copy.data.cards.length) {
-                            // Find winner
                             let winner = null;
                             let max = -1;
                             for (const [id, score] of Object.entries(copy.data.scores)) {
@@ -3791,7 +4130,6 @@ function createMemory(game){
     }
     area.appendChild(grid);
 
-    // Score display
     const scoreDiv = document.createElement("div");
     scoreDiv.style.cssText = "text-align:center;margin-top:10px;color:#9da5b0;";
     const scores = game.data.scores || {};
@@ -3859,10 +4197,8 @@ function createQuickDraw(game){
                 copy.data.round = (round + 1);
                 
                 if (copy.data.round >= totalRounds) {
-                    // All done
                     let winner = null;
                     let best = Infinity;
-                    // Find player with best average
                     const averages = {};
                     for (const player of copy.players) {
                         const times = [];
@@ -3902,7 +4238,6 @@ function createQuickDraw(game){
 
     area.appendChild(box);
 
-    // Show results so far
     if (Object.keys(results).length > 0) {
         const resultsDiv = document.createElement("div");
         resultsDiv.style.cssText = "color:#9da5b0;margin-top:10px;font-size:13px;";
@@ -3935,12 +4270,10 @@ function createCoinFlip(game){
     const state = game.data.state || "waiting";
     const coinResult = game.data.coinResult || null;
 
-    // Initialize player choices
     if (!game.data.choices) {
         game.data.choices = {};
     }
 
-    // Score display
     const scoreDiv = document.createElement("div");
     scoreDiv.style.cssText = "color:#9da5b0;margin-bottom:10px;font-size:16px;";
     scoreDiv.textContent = game.players.map(p => 
@@ -3948,7 +4281,6 @@ function createCoinFlip(game){
     ).join(" | ");
     area.appendChild(scoreDiv);
 
-    // Coin display
     const coinDisplay = document.createElement("div");
     coinDisplay.className = "coin-display";
     if (coinResult === "heads") coinDisplay.textContent = "🪙 Heads";
@@ -3972,7 +4304,6 @@ function createCoinFlip(game){
         return area;
     }
 
-    // Choice buttons
     const choiceDiv = document.createElement("div");
     choiceDiv.className = "coin-buttons";
     
@@ -3987,14 +4318,12 @@ function createCoinFlip(game){
             copy.data.choices = copy.data.choices || {};
             copy.data.choices[deviceId] = choice;
             
-            // If everyone has chosen, flip
             const allChosen = copy.players.every(p => copy.data.choices[p.deviceId]);
             if (allChosen && copy.data.state !== "flipping") {
                 copy.data.state = "flipping";
                 const result = Math.random() < 0.5 ? "heads" : "tails";
                 copy.data.coinResult = result;
                 
-                // Check winners
                 for (const player of copy.players) {
                     if (copy.data.choices[player.deviceId] === result) {
                         copy.data.scores = copy.data.scores || {};
@@ -4002,7 +4331,6 @@ function createCoinFlip(game){
                     }
                 }
                 
-                // Check if anyone reached target
                 let winner = null;
                 for (const player of copy.players) {
                     if ((copy.data.scores[player.deviceId] || 0) >= targetScore) {
@@ -4015,7 +4343,6 @@ function createCoinFlip(game){
                     copy.winner = winner;
                     copy.status = "finished";
                 } else {
-                    // Reset for next round
                     copy.data.choices = {};
                     copy.data.coinResult = null;
                     copy.data.state = "waiting";
@@ -4028,19 +4355,16 @@ function createCoinFlip(game){
     });
     area.appendChild(choiceDiv);
 
-    // Flip button (host only)
     if (game.hostDeviceId === deviceId && state !== "flipping") {
         const flipBtn = document.createElement("button");
         flipBtn.className = "game-btn primary";
         flipBtn.textContent = "🪙 Flip Coin";
         flipBtn.onclick = async () => {
             const copy = JSON.parse(JSON.stringify(game));
-            // Force flip if everyone hasn't chosen
             const result = Math.random() < 0.5 ? "heads" : "tails";
             copy.data.coinResult = result;
             copy.data.state = "flipping";
             
-            // Check winners for those who chose
             for (const player of copy.players) {
                 if (copy.data.choices[player.deviceId] === result) {
                     copy.data.scores = copy.data.scores || {};
@@ -4087,7 +4411,6 @@ function createNumberGuess(game){
     const current = game.players[game.turnIndex % game.players.length];
     const myTurn = mine && current && current.deviceId === deviceId;
 
-    // Initialize secret number
     if (!game.data.secretNumber) {
         game.data.secretNumber = Math.floor(Math.random() * maxNumber) + 1;
         game.data.guesses = [];
@@ -4110,13 +4433,11 @@ function createNumberGuess(game){
         return area;
     }
 
-    // Hint display
     const hint = document.createElement("div");
     hint.className = "numberguess-hint";
     hint.textContent = game.data.hint || "🔢 Guess a number";
     area.appendChild(hint);
 
-    // Guess input
     const input = document.createElement("input");
     input.className = "numberguess-input";
     input.type = "number";
@@ -4149,7 +4470,6 @@ function createNumberGuess(game){
 
     area.appendChild(input);
 
-    // Previous guesses
     if (game.data.guesses && game.data.guesses.length > 0) {
         const guessesDiv = document.createElement("div");
         guessesDiv.style.cssText = "color:#6a7a8a;font-size:12px;margin-top:10px;";
@@ -4194,18 +4514,15 @@ function createTarget(game){
             copy.data.targets = [];
             copy.data.targetIndex = 0;
             copy.data.totalTargets = totalTargets;
-            // Spawn first target
             spawnTarget(copy);
             await publishGameAndCleanup(game, copy);
         };
         box.innerHTML = `<div style="display:grid;place-items:center;height:100%;color:#6a7a8a;font-size:20px;">👆 Click to start (${totalTargets} targets)</div>`;
     } else if (state === "playing") {
-        // Show targets
         const targetPos = game.data.targets || [];
         const targetIndex = game.data.targetIndex || 0;
         
         if (targetIndex < totalTargets) {
-            // Show current target
             const pos = targetPos[targetIndex] || { x: 50, y: 50 };
             const dot = document.createElement("div");
             dot.className = "target-dot";
@@ -4232,7 +4549,6 @@ function createTarget(game){
                         copy.turnIndex++;
                         
                         if (copy.turnIndex >= copy.players.length) {
-                            // Find winner
                             let winner = null;
                             let bestScore = -1;
                             for (const [id, res] of Object.entries(copy.data.results)) {
@@ -4266,7 +4582,6 @@ function createTarget(game){
 
     area.appendChild(box);
 
-    // Stats
     const stats = document.createElement("div");
     stats.className = "target-stats";
     const res = results[deviceId];
@@ -4570,7 +4885,6 @@ function createBossBattle(game){
         return area;
     }
 
-    // Attack button
     const attackBtn = document.createElement("button");
     attackBtn.className = "game-btn boss";
     
@@ -4628,7 +4942,6 @@ function createBossBattle(game){
     dmgDisplay.textContent = "⚔️ " + damage.toLocaleString() + " base damage";
     area.appendChild(dmgDisplay);
 
-    // Upgrades
     const upgradesDiv = document.createElement("div");
     upgradesDiv.className = "boss-upgrades";
     
@@ -4691,6 +5004,689 @@ function createBossBattle(game){
 
 
 /* =====================================================
+   TRIVIA QUIZ
+===================================================== */
+
+function createTrivia(game){
+    const area = document.createElement("div");
+    area.className = "trivia-area";
+
+    const questions = [
+        { q: "What is the capital of France?", options: ["London", "Paris", "Berlin", "Madrid"], answer: 1 },
+        { q: "What is 2 + 2?", options: ["3", "4", "5", "6"], answer: 1 },
+        { q: "What color is the sky on a clear day?", options: ["Green", "Red", "Blue", "Yellow"], answer: 2 },
+        { q: "What is the largest planet in our solar system?", options: ["Earth", "Mars", "Jupiter", "Saturn"], answer: 2 },
+        { q: "What is the fastest animal on land?", options: ["Lion", "Cheetah", "Horse", "Dog"], answer: 1 },
+        { q: "How many continents are there?", options: ["5", "6", "7", "8"], answer: 2 },
+        { q: "What is the boiling point of water?", options: ["90°C", "100°C", "110°C", "120°C"], answer: 1 },
+        { q: "What is the square root of 144?", options: ["10", "11", "12", "13"], answer: 2 },
+        { q: "What is the tallest mountain in the world?", options: ["Everest", "K2", "Kilimanjaro", "Denali"], answer: 0 },
+        { q: "How many days are in a leap year?", options: ["364", "365", "366", "367"], answer: 2 },
+        { q: "What is the chemical symbol for water?", options: ["H2O", "CO2", "NaCl", "HCl"], answer: 0 },
+        { q: "What is the smallest country in the world?", options: ["Monaco", "Vatican City", "San Marino", "Liechtenstein"], answer: 1 }
+    ];
+
+    const totalQuestions = game.data.settings?.questions || 5;
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
+
+    if (!game.data.questions) {
+        const shuffled = [...questions].sort(() => Math.random() - 0.5);
+        game.data.questions = shuffled.slice(0, totalQuestions);
+        game.data.currentQuestion = 0;
+        game.data.scores = {};
+        game.data.answered = {};
+    }
+
+    if (game.data.currentQuestion >= game.data.questions.length || game.winner) {
+        const win = document.createElement("div");
+        win.className = "turn-banner";
+        let winner = null;
+        let max = -1;
+        for (const [id, score] of Object.entries(game.data.scores || {})) {
+            if (score > max) {
+                max = score;
+                winner = game.players.find(p => p.deviceId === id)?.username;
+            }
+        }
+        win.textContent = "🏆 " + (winner || "No one") + " wins with " + max + " correct!";
+        area.appendChild(win);
+        return area;
+    }
+
+    const qData = game.data.questions[game.data.currentQuestion];
+    const answered = game.data.answered || {};
+
+    const questionDiv = document.createElement("div");
+    questionDiv.className = "trivia-question";
+    questionDiv.textContent = `Q${game.data.currentQuestion + 1}. ${qData.q}`;
+    area.appendChild(questionDiv);
+
+    if (!myTurn) {
+        const waiting = document.createElement("div");
+        waiting.className = "turn-banner";
+        waiting.textContent = "Waiting for " + current.username + "...";
+        area.appendChild(waiting);
+        return area;
+    }
+
+    const optionsDiv = document.createElement("div");
+    optionsDiv.className = "trivia-options";
+
+    qData.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "trivia-option";
+        btn.textContent = opt;
+        btn.disabled = answered[deviceId] !== undefined;
+        
+        if (answered[deviceId] !== undefined) {
+            if (idx === qData.answer) btn.classList.add("correct");
+            else if (idx === answered[deviceId]) btn.classList.add("wrong");
+        }
+        
+        btn.onclick = async () => {
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.answered = copy.data.answered || {};
+            copy.data.answered[deviceId] = idx;
+            
+            if (idx === qData.answer) {
+                copy.data.scores = copy.data.scores || {};
+                copy.data.scores[deviceId] = (copy.data.scores[deviceId] || 0) + 1;
+            }
+            
+            // Check if everyone answered
+            const allAnswered = copy.players.every(p => copy.data.answered[p.deviceId] !== undefined);
+            if (allAnswered) {
+                copy.data.currentQuestion++;
+                copy.data.answered = {};
+                copy.turnIndex++;
+                if (copy.data.currentQuestion >= copy.data.questions.length) {
+                    let winner = null;
+                    let max = -1;
+                    for (const [id, score] of Object.entries(copy.data.scores || {})) {
+                        if (score > max) {
+                            max = score;
+                            winner = copy.players.find(p => p.deviceId === id)?.username;
+                        }
+                    }
+                    copy.winner = winner || "draw";
+                    copy.status = "finished";
+                }
+            }
+            await publishGameAndCleanup(game, copy);
+        };
+        optionsDiv.appendChild(btn);
+    });
+    area.appendChild(optionsDiv);
+
+    // Score display
+    const scoreDiv = document.createElement("div");
+    scoreDiv.style.cssText = "color:#9da5b0;margin-top:10px;font-size:14px;";
+    scoreDiv.textContent = game.players.map(p => 
+        escapeHtml(p.username) + ": " + (game.data.scores?.[p.deviceId] || 0)
+    ).join(" · ");
+    area.appendChild(scoreDiv);
+
+    return area;
+}
+
+
+/* =====================================================
+   WORD SCRAMBLE
+===================================================== */
+
+function createWordScramble(game){
+    const area = document.createElement("div");
+    area.className = "wordscramble-area";
+
+    const words = [
+        "apple", "banana", "cherry", "dragon", "eagle", "forest", "garden", "honey",
+        "island", "joker", "kingdom", "lunar", "magic", "nature", "ocean", "planet",
+        "queen", "rabbit", "spirit", "tiger", "unique", "vortex", "whale", "xenon",
+        "yellow", "zebra", "angel", "blaze", "cloud", "dream", "eagle", "flame"
+    ];
+
+    const totalRounds = game.data.settings?.rounds || 5;
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
+
+    if (!game.data.words) {
+        const shuffled = [...words].sort(() => Math.random() - 0.5);
+        game.data.words = shuffled.slice(0, totalRounds);
+        game.data.currentRound = 0;
+        game.data.scores = {};
+        game.data.answered = {};
+    }
+
+    if (game.data.currentRound >= game.data.words.length || game.winner) {
+        const win = document.createElement("div");
+        win.className = "turn-banner";
+        let winner = null;
+        let max = -1;
+        for (const [id, score] of Object.entries(game.data.scores || {})) {
+            if (score > max) {
+                max = score;
+                winner = game.players.find(p => p.deviceId === id)?.username;
+            }
+        }
+        win.textContent = "🏆 " + (winner || "No one") + " wins with " + max + " points!";
+        area.appendChild(win);
+        return area;
+    }
+
+    const word = game.data.words[game.data.currentRound];
+    const scrambled = word.split('').sort(() => Math.random() - 0.5).join('');
+    const answered = game.data.answered || {};
+
+    const wordDiv = document.createElement("div");
+    wordDiv.className = "wordscramble-word";
+    wordDiv.textContent = scrambled;
+    area.appendChild(wordDiv);
+
+    if (!myTurn) {
+        const waiting = document.createElement("div");
+        waiting.className = "turn-banner";
+        waiting.textContent = "Waiting for " + current.username + "...";
+        area.appendChild(waiting);
+        return area;
+    }
+
+    const input = document.createElement("input");
+    input.className = "wordscramble-input";
+    input.placeholder = "Unscramble the word...";
+    input.disabled = answered[deviceId] !== undefined;
+
+    input.onkeydown = async (e) => {
+        if (e.key === "Enter" && !input.disabled) {
+            const guess = input.value.trim().toLowerCase();
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.answered = copy.data.answered || {};
+            copy.data.answered[deviceId] = guess;
+            
+            if (guess === word) {
+                copy.data.scores = copy.data.scores || {};
+                copy.data.scores[deviceId] = (copy.data.scores[deviceId] || 0) + 1;
+            }
+            
+            const allAnswered = copy.players.every(p => copy.data.answered[p.deviceId] !== undefined);
+            if (allAnswered) {
+                copy.data.currentRound++;
+                copy.data.answered = {};
+                copy.turnIndex++;
+                if (copy.data.currentRound >= copy.data.words.length) {
+                    let winner = null;
+                    let max = -1;
+                    for (const [id, score] of Object.entries(copy.data.scores || {})) {
+                        if (score > max) {
+                            max = score;
+                            winner = copy.players.find(p => p.deviceId === id)?.username;
+                        }
+                    }
+                    copy.winner = winner || "draw";
+                    copy.status = "finished";
+                }
+            }
+            await publishGameAndCleanup(game, copy);
+        }
+    };
+
+    area.appendChild(input);
+
+    const scoreDiv = document.createElement("div");
+    scoreDiv.style.cssText = "color:#9da5b0;margin-top:10px;font-size:14px;";
+    scoreDiv.textContent = game.players.map(p => 
+        escapeHtml(p.username) + ": " + (game.data.scores?.[p.deviceId] || 0)
+    ).join(" · ");
+    area.appendChild(scoreDiv);
+
+    return area;
+}
+
+
+/* =====================================================
+   MATH RACE
+===================================================== */
+
+function createMathRace(game){
+    const area = document.createElement("div");
+    area.className = "mathrace-area";
+
+    const totalProblems = game.data.settings?.problems || 5;
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
+
+    if (!game.data.problems) {
+        const problems = [];
+        for (let i = 0; i < totalProblems; i++) {
+            const a = Math.floor(Math.random() * 20) + 1;
+            const b = Math.floor(Math.random() * 20) + 1;
+            const ops = ['+', '-', '*'];
+            const op = ops[Math.floor(Math.random() * ops.length)];
+            let answer;
+            if (op === '+') answer = a + b;
+            else if (op === '-') answer = a - b;
+            else answer = a * b;
+            problems.push({ a, b, op, answer });
+        }
+        game.data.problems = problems;
+        game.data.currentProblem = 0;
+        game.data.scores = {};
+        game.data.answered = {};
+    }
+
+    if (game.data.currentProblem >= game.data.problems.length || game.winner) {
+        const win = document.createElement("div");
+        win.className = "turn-banner";
+        let winner = null;
+        let max = -1;
+        for (const [id, score] of Object.entries(game.data.scores || {})) {
+            if (score > max) {
+                max = score;
+                winner = game.players.find(p => p.deviceId === id)?.username;
+            }
+        }
+        win.textContent = "🏆 " + (winner || "No one") + " wins with " + max + " correct!";
+        area.appendChild(win);
+        return area;
+    }
+
+    const problem = game.data.problems[game.data.currentProblem];
+    const answered = game.data.answered || {};
+
+    const problemDiv = document.createElement("div");
+    problemDiv.className = "mathrace-problem";
+    problemDiv.textContent = `${problem.a} ${problem.op} ${problem.b} = ?`;
+    area.appendChild(problemDiv);
+
+    if (!myTurn) {
+        const waiting = document.createElement("div");
+        waiting.className = "turn-banner";
+        waiting.textContent = "Waiting for " + current.username + "...";
+        area.appendChild(waiting);
+        return area;
+    }
+
+    const input = document.createElement("input");
+    input.className = "mathrace-input";
+    input.type = "number";
+    input.placeholder = "Answer";
+    input.disabled = answered[deviceId] !== undefined;
+
+    input.onkeydown = async (e) => {
+        if (e.key === "Enter" && !input.disabled) {
+            const guess = parseInt(input.value);
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.answered = copy.data.answered || {};
+            copy.data.answered[deviceId] = guess;
+            
+            if (guess === problem.answer) {
+                copy.data.scores = copy.data.scores || {};
+                copy.data.scores[deviceId] = (copy.data.scores[deviceId] || 0) + 1;
+            }
+            
+            const allAnswered = copy.players.every(p => copy.data.answered[p.deviceId] !== undefined);
+            if (allAnswered) {
+                copy.data.currentProblem++;
+                copy.data.answered = {};
+                copy.turnIndex++;
+                if (copy.data.currentProblem >= copy.data.problems.length) {
+                    let winner = null;
+                    let max = -1;
+                    for (const [id, score] of Object.entries(copy.data.scores || {})) {
+                        if (score > max) {
+                            max = score;
+                            winner = copy.players.find(p => p.deviceId === id)?.username;
+                        }
+                    }
+                    copy.winner = winner || "draw";
+                    copy.status = "finished";
+                }
+            }
+            await publishGameAndCleanup(game, copy);
+        }
+    };
+
+    area.appendChild(input);
+
+    const scoreDiv = document.createElement("div");
+    scoreDiv.style.cssText = "color:#9da5b0;margin-top:10px;font-size:14px;";
+    scoreDiv.textContent = game.players.map(p => 
+        escapeHtml(p.username) + ": " + (game.data.scores?.[p.deviceId] || 0)
+    ).join(" · ");
+    area.appendChild(scoreDiv);
+
+    return area;
+}
+
+
+/* =====================================================
+   TIC-TAC-TOE TOURNAMENT
+===================================================== */
+
+function createTTTTournament(game){
+    const area = document.createElement("div");
+    area.className = "ttt-tournament-area";
+
+    const totalRounds = game.data.settings?.rounds || 3;
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
+
+    if (!game.data.matches) {
+        const matches = [];
+        const players = game.players;
+        for (let round = 0; round < totalRounds; round++) {
+            const shuffled = [...players].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < shuffled.length - 1; i += 2) {
+                matches.push({
+                    player1: shuffled[i].deviceId,
+                    player2: shuffled[i + 1].deviceId,
+                    winner: null,
+                    round: round,
+                    board: Array(9).fill(""),
+                    turn: 0
+                });
+            }
+        }
+        game.data.matches = matches;
+        game.data.currentMatch = 0;
+        game.data.scores = {};
+    }
+
+    if (game.data.currentMatch >= game.data.matches.length || game.winner) {
+        const win = document.createElement("div");
+        win.className = "turn-banner";
+        let winner = null;
+        let max = -1;
+        for (const [id, score] of Object.entries(game.data.scores || {})) {
+            if (score > max) {
+                max = score;
+                winner = game.players.find(p => p.deviceId === id)?.username;
+            }
+        }
+        win.textContent = "🏆 Tournament Winner: " + (winner || "No one") + " with " + max + " points!";
+        area.appendChild(win);
+        return area;
+    }
+
+    const match = game.data.matches[game.data.currentMatch];
+    const p1 = game.players.find(p => p.deviceId === match.player1);
+    const p2 = game.players.find(p => p.deviceId === match.player2);
+
+    // Check if current player is in this match
+    const inMatch = mine && (deviceId === match.player1 || deviceId === match.player2);
+    const myTurnNow = inMatch && ((match.turn % 2 === 0 && deviceId === match.player1) || 
+                                   (match.turn % 2 === 1 && deviceId === match.player2));
+
+    // Bracket display
+    const bracket = document.createElement("div");
+    bracket.className = "ttt-tournament-bracket";
+    
+    const matchDiv = document.createElement("div");
+    matchDiv.className = "ttt-match";
+    const player1Name = p1 ? escapeHtml(p1.username) : "Unknown";
+    const player2Name = p2 ? escapeHtml(p2.username) : "Unknown";
+    const symbol1 = match.turn % 2 === 0 ? "❌" : "⭕";
+    const symbol2 = match.turn % 2 === 0 ? "⭕" : "❌";
+    
+    matchDiv.innerHTML = `
+        <div class="match-players">${player1Name} ${symbol1} vs ${symbol2} ${player2Name}</div>
+        <div style="font-size:11px;color:#6a7a8a;">Match ${game.data.currentMatch + 1}/${game.data.matches.length}</div>
+        <div class="match-result">${match.winner ? '🏆 Winner: ' + (game.players.find(p => p.deviceId === match.winner)?.username || 'Unknown') : '⚔️ In Progress'}</div>
+    `;
+    bracket.appendChild(matchDiv);
+    area.appendChild(bracket);
+
+    if (match.winner) {
+        const next = document.createElement("div");
+        next.className = "turn-banner";
+        next.textContent = "Click to continue to next match";
+        area.appendChild(next);
+        
+        const nextBtn = document.createElement("button");
+        nextBtn.className = "game-btn primary";
+        nextBtn.textContent = "Next Match →";
+        nextBtn.onclick = async () => {
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.currentMatch++;
+            await publishGameAndCleanup(game, copy);
+        };
+        area.appendChild(nextBtn);
+        return area;
+    }
+
+    // Mini Tic-Tac-Toe board for the match
+    const board = document.createElement("div");
+    board.className = "ttt";
+    board.style.gridTemplateColumns = "repeat(3, 60px)";
+    board.style.gridTemplateRows = "repeat(3, 60px)";
+
+    for (let i = 0; i < 9; i++) {
+        const button = document.createElement("button");
+        button.textContent = match.board[i] || "";
+        button.style.fontSize = "24px";
+        button.disabled = !myTurnNow || !!match.board[i];
+        
+        button.onclick = async () => {
+            const copy = JSON.parse(JSON.stringify(game));
+            const m = copy.data.matches[copy.data.currentMatch];
+            const symbol = m.turn % 2 === 0 ? "❌" : "⭕";
+            m.board[i] = symbol;
+            
+            // Check win
+            if (checkTTTWin(m.board, 3, i, symbol, 3)) {
+                m.winner = copy.players[m.turn % 2].deviceId;
+                copy.data.scores = copy.data.scores || {};
+                copy.data.scores[m.winner] = (copy.data.scores[m.winner] || 0) + 3;
+                // Check for draw
+            } else if (m.board.every(c => c)) {
+                // Draw - no points
+                m.winner = "draw";
+            } else {
+                m.turn++;
+            }
+            await publishGameAndCleanup(game, copy);
+        };
+        board.appendChild(button);
+    }
+    area.appendChild(board);
+
+    // Score display
+    const scoreDiv = document.createElement("div");
+    scoreDiv.style.cssText = "color:#9da5b0;margin-top:10px;font-size:14px;";
+    scoreDiv.textContent = game.players.map(p => 
+        escapeHtml(p.username) + ": " + (game.data.scores?.[p.deviceId] || 0) + " pts"
+    ).join(" · ");
+    area.appendChild(scoreDiv);
+
+    if (!myTurnNow && inMatch) {
+        const waiting = document.createElement("div");
+        waiting.className = "turn-banner";
+        waiting.textContent = "Waiting for the other player...";
+        area.appendChild(waiting);
+    }
+
+    return area;
+}
+
+
+/* =====================================================
+   RPS TOURNAMENT
+===================================================== */
+
+function createRPSTournament(game){
+    const area = document.createElement("div");
+    area.className = "rps-tournament-area";
+
+    const totalRounds = game.data.settings?.rounds || 3;
+    const mine = game.players.some(p => p.deviceId === deviceId);
+    const current = game.players[game.turnIndex % game.players.length];
+    const myTurn = mine && current && current.deviceId === deviceId;
+
+    if (!game.data.matches) {
+        const matches = [];
+        const players = game.players;
+        for (let round = 0; round < totalRounds; round++) {
+            const shuffled = [...players].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < shuffled.length - 1; i += 2) {
+                matches.push({
+                    player1: shuffled[i].deviceId,
+                    player2: shuffled[i + 1].deviceId,
+                    winner: null,
+                    round: round,
+                    choices: {},
+                    result: null
+                });
+            }
+        }
+        game.data.matches = matches;
+        game.data.currentMatch = 0;
+        game.data.scores = {};
+    }
+
+    if (game.data.currentMatch >= game.data.matches.length || game.winner) {
+        const win = document.createElement("div");
+        win.className = "turn-banner";
+        let winner = null;
+        let max = -1;
+        for (const [id, score] of Object.entries(game.data.scores || {})) {
+            if (score > max) {
+                max = score;
+                winner = game.players.find(p => p.deviceId === id)?.username;
+            }
+        }
+        win.textContent = "🏆 RPS Tournament Winner: " + (winner || "No one") + " with " + max + " wins!";
+        area.appendChild(win);
+        return area;
+    }
+
+    const match = game.data.matches[game.data.currentMatch];
+    const p1 = game.players.find(p => p.deviceId === match.player1);
+    const p2 = game.players.find(p => p.deviceId === match.player2);
+
+    // Check if current player is in this match
+    const inMatch = mine && (deviceId === match.player1 || deviceId === match.player2);
+
+    // Bracket display
+    const bracket = document.createElement("div");
+    bracket.className = "rps-tournament-bracket";
+    
+    const matchDiv = document.createElement("div");
+    matchDiv.className = "rps-match";
+    const player1Name = p1 ? escapeHtml(p1.username) : "Unknown";
+    const player2Name = p2 ? escapeHtml(p2.username) : "Unknown";
+    
+    matchDiv.innerHTML = `
+        <div class="match-players">${player1Name} 🆚 ${player2Name}</div>
+        <div style="font-size:11px;color:#6a7a8a;">Match ${game.data.currentMatch + 1}/${game.data.matches.length}</div>
+        <div class="match-result">${match.winner ? '🏆 Winner: ' + (game.players.find(p => p.deviceId === match.winner)?.username || 'Unknown') : match.result || '⚔️ In Progress'}</div>
+    `;
+    bracket.appendChild(matchDiv);
+    area.appendChild(bracket);
+
+    if (match.winner) {
+        const next = document.createElement("div");
+        next.className = "turn-banner";
+        next.textContent = "Click to continue to next match";
+        area.appendChild(next);
+        
+        const nextBtn = document.createElement("button");
+        nextBtn.className = "game-btn primary";
+        nextBtn.textContent = "Next Match →";
+        nextBtn.onclick = async () => {
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.currentMatch++;
+            await publishGameAndCleanup(game, copy);
+        };
+        area.appendChild(nextBtn);
+        return area;
+    }
+
+    if (!inMatch || !myTurn) {
+        const waiting = document.createElement("div");
+        waiting.className = "turn-banner";
+        waiting.textContent = inMatch ? "Waiting for the other player..." : "Spectating...";
+        area.appendChild(waiting);
+        return area;
+    }
+
+    // RPS choices
+    const choices = ["✊ Rock", "✋ Paper", "✌️ Scissors"];
+    const choiceValues = ["rock", "paper", "scissors"];
+    
+    const buttons = document.createElement("div");
+    buttons.className = "rps-buttons";
+    buttons.style.display = "flex";
+    buttons.style.gap = "10px";
+    buttons.style.justifyContent = "center";
+    buttons.style.margin = "10px 0";
+
+    choices.forEach((label, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "rps-btn";
+        btn.textContent = label;
+        btn.style.width = "100px";
+        btn.style.height = "60px";
+        btn.style.borderRadius = "12px";
+        btn.style.border = "1px solid var(--border)";
+        btn.style.background = "#1a1f26";
+        btn.style.color = "white";
+        btn.style.fontSize = "16px";
+        btn.style.fontWeight = "700";
+        btn.disabled = match.choices[deviceId] !== undefined;
+        
+        btn.onclick = async () => {
+            const copy = JSON.parse(JSON.stringify(game));
+            const m = copy.data.matches[copy.data.currentMatch];
+            m.choices = m.choices || {};
+            m.choices[deviceId] = choiceValues[idx];
+            
+            // Check if both chose
+            if (m.choices[m.player1] && m.choices[m.player2]) {
+                const c1 = m.choices[m.player1];
+                const c2 = m.choices[m.player2];
+                let winner = null;
+                
+                if (c1 === c2) {
+                    m.result = "Draw!";
+                } else if (
+                    (c1 === "rock" && c2 === "scissors") ||
+                    (c1 === "paper" && c2 === "rock") ||
+                    (c1 === "scissors" && c2 === "paper")
+                ) {
+                    m.winner = m.player1;
+                    m.result = player1Name + " wins!";
+                    copy.data.scores = copy.data.scores || {};
+                    copy.data.scores[m.player1] = (copy.data.scores[m.player1] || 0) + 1;
+                } else {
+                    m.winner = m.player2;
+                    m.result = player2Name + " wins!";
+                    copy.data.scores = copy.data.scores || {};
+                    copy.data.scores[m.player2] = (copy.data.scores[m.player2] || 0) + 1;
+                }
+            }
+            await publishGameAndCleanup(game, copy);
+        };
+        buttons.appendChild(btn);
+    });
+    area.appendChild(buttons);
+
+    // Score display
+    const scoreDiv = document.createElement("div");
+    scoreDiv.style.cssText = "color:#9da5b0;margin-top:10px;font-size:14px;";
+    scoreDiv.textContent = game.players.map(p => 
+        escapeHtml(p.username) + ": " + (game.data.scores?.[p.deviceId] || 0) + " wins"
+    ).join(" · ");
+    area.appendChild(scoreDiv);
+
+    return area;
+}
+
+
+/* =====================================================
    GAME HELPERS
 ===================================================== */
 
@@ -4732,21 +5728,18 @@ async function leaveGame(game){
 
 async function startGame(game){
     if (game.hostDeviceId !== deviceId) return;
-    if (game.players.length < GAME_TYPES[game.gameType].min) return;
+    if (game.players.length < (game.minPlayers || 2)) return;
     
     const copy = JSON.parse(JSON.stringify(game));
     copy.status = "playing";
     copy.turnIndex = 0;
     
-    // Initialize game data
     const settings = copy.data.settings || {};
     
+    // Initialize game data
     if (copy.gameType === "ttt3" || copy.gameType === "ttt4" || copy.gameType === "ttt5" || copy.gameType === "ttt6") {
         const size = settings.boardSize || 3;
         copy.data.board = Array(size * size).fill("");
-    }
-    if (copy.gameType === "ttt3p") {
-        copy.data.board = Array(16).fill("");
     }
     if (copy.gameType === "memory") {
         const gridSize = settings.gridSize || 4;
@@ -4824,6 +5817,94 @@ async function startGame(game){
         copy.data.multiHit = 1;
         const names = ["Cthulhu", "Mega Dragon", "Shadow Lord", "Void Beast", "Eldritch Horror", "Demon King"];
         copy.data.monsterName = names[Math.floor(Math.random() * names.length)];
+    }
+    if (copy.gameType === "trivia") {
+        const questions = [
+            { q: "What is the capital of France?", options: ["London", "Paris", "Berlin", "Madrid"], answer: 1 },
+            { q: "What is 2 + 2?", options: ["3", "4", "5", "6"], answer: 1 },
+            { q: "What color is the sky on a clear day?", options: ["Green", "Red", "Blue", "Yellow"], answer: 2 },
+            { q: "What is the largest planet?", options: ["Earth", "Mars", "Jupiter", "Saturn"], answer: 2 },
+            { q: "What is the fastest land animal?", options: ["Lion", "Cheetah", "Horse", "Dog"], answer: 1 },
+            { q: "How many continents?", options: ["5", "6", "7", "8"], answer: 2 },
+            { q: "Boiling point of water?", options: ["90°C", "100°C", "110°C", "120°C"], answer: 1 },
+            { q: "Square root of 144?", options: ["10", "11", "12", "13"], answer: 2 }
+        ];
+        const shuffled = [...questions].sort(() => Math.random() - 0.5);
+        const count = settings.questions || 5;
+        copy.data.questions = shuffled.slice(0, Math.min(count, shuffled.length));
+        copy.data.currentQuestion = 0;
+        copy.data.scores = {};
+        copy.data.answered = {};
+    }
+    if (copy.gameType === "wordscramble") {
+        const words = ["apple", "banana", "cherry", "dragon", "eagle", "forest", "garden", "honey", "island", "joker", "kingdom", "lunar", "magic", "nature", "ocean", "planet", "queen", "rabbit", "spirit", "tiger", "unique", "vortex", "whale", "yellow", "zebra"];
+        const shuffled = [...words].sort(() => Math.random() - 0.5);
+        const count = settings.rounds || 5;
+        copy.data.words = shuffled.slice(0, Math.min(count, shuffled.length));
+        copy.data.currentRound = 0;
+        copy.data.scores = {};
+        copy.data.answered = {};
+    }
+    if (copy.gameType === "mathrace") {
+        const problems = [];
+        const count = settings.problems || 5;
+        for (let i = 0; i < count; i++) {
+            const a = Math.floor(Math.random() * 20) + 1;
+            const b = Math.floor(Math.random() * 20) + 1;
+            const ops = ['+', '-', '*'];
+            const op = ops[Math.floor(Math.random() * ops.length)];
+            let answer;
+            if (op === '+') answer = a + b;
+            else if (op === '-') answer = a - b;
+            else answer = a * b;
+            problems.push({ a, b, op, answer });
+        }
+        copy.data.problems = problems;
+        copy.data.currentProblem = 0;
+        copy.data.scores = {};
+        copy.data.answered = {};
+    }
+    if (copy.gameType === "ttttournament") {
+        const matches = [];
+        const players = copy.players;
+        const rounds = settings.rounds || 3;
+        for (let round = 0; round < rounds; round++) {
+            const shuffled = [...players].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < shuffled.length - 1; i += 2) {
+                matches.push({
+                    player1: shuffled[i].deviceId,
+                    player2: shuffled[i + 1].deviceId,
+                    winner: null,
+                    round: round,
+                    board: Array(9).fill(""),
+                    turn: 0
+                });
+            }
+        }
+        copy.data.matches = matches;
+        copy.data.currentMatch = 0;
+        copy.data.scores = {};
+    }
+    if (copy.gameType === "rpstournament") {
+        const matches = [];
+        const players = copy.players;
+        const rounds = settings.rounds || 3;
+        for (let round = 0; round < rounds; round++) {
+            const shuffled = [...players].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < shuffled.length - 1; i += 2) {
+                matches.push({
+                    player1: shuffled[i].deviceId,
+                    player2: shuffled[i + 1].deviceId,
+                    winner: null,
+                    round: round,
+                    choices: {},
+                    result: null
+                });
+            }
+        }
+        copy.data.matches = matches;
+        copy.data.currentMatch = 0;
+        copy.data.scores = {};
     }
     
     await publishGameAndCleanup(game, copy);
