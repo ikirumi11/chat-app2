@@ -74,80 +74,6 @@ button{
 }
 
 /* ============================================
-   OPENING SCREEN
-============================================ */
-
-.opening-screen{
-    position:fixed;
-    inset:0;
-    z-index:1000;
-    background:var(--bg);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    transition:opacity 0.6s ease, transform 0.6s ease;
-    padding:20px;
-}
-
-.opening-screen.hidden{
-    opacity:0;
-    transform:scale(1.05);
-    pointer-events:none;
-}
-
-.opening-logo{
-    font-size:72px;
-    margin-bottom:10px;
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse{
-    0%,100%{ transform:scale(1); }
-    50%{ transform:scale(1.1); }
-}
-
-.opening-title{
-    font-size:32px;
-    font-weight:900;
-    background:linear-gradient(135deg,#ff6b6b,#ffd93d,#4ecdc4);
-    -webkit-background-clip:text;
-    -webkit-text-color:transparent;
-    background-clip:text;
-    margin-bottom:5px;
-}
-
-.opening-sub{
-    color:var(--muted);
-    font-size:14px;
-    margin-bottom:30px;
-}
-
-.opening-btn{
-    padding:14px 40px;
-    border-radius:14px;
-    border:none;
-    background:var(--accent);
-    color:#111;
-    font-weight:700;
-    font-size:18px;
-    transition:0.2s;
-    touch-action:manipulation;
-}
-
-.opening-btn:active{
-    transform:scale(0.95);
-}
-
-.opening-version{
-    position:absolute;
-    bottom:20px;
-    color:var(--muted);
-    font-size:11px;
-    opacity:0.5;
-}
-
-/* ============================================
    HEADER
 ============================================ */
 
@@ -1202,19 +1128,6 @@ textarea{
         font-size:13px;
     }
 
-    .opening-logo{
-        font-size:56px;
-    }
-
-    .opening-title{
-        font-size:26px;
-    }
-
-    .opening-btn{
-        padding:12px 32px;
-        font-size:16px;
-    }
-
     .notification{
         bottom:70px;
         padding:10px 16px;
@@ -1564,15 +1477,6 @@ textarea{
 
 <body>
 
-<!-- OPENING SCREEN -->
-<div class="opening-screen" id="openingScreen">
-    <div class="opening-logo">🎮</div>
-    <div class="opening-title">Game Hub</div>
-    <div class="opening-sub">Chat &amp; Multiplayer Games</div>
-    <button class="opening-btn" id="enterBtn">Enter Chat</button>
-    <div class="opening-version">v2.0 • 10 Games</div>
-</div>
-
 <div class="app" id="app">
 
 <header class="header">
@@ -1832,9 +1736,6 @@ const defaults={
     username:"",
     refreshRate:500,
     showTimestamps:true,
-    textSize:16,
-    wordSpacing:0,
-    lineSpacing:1.45,
     cornerRadius:12,
     uiScale:1,
     theme:"dark",
@@ -1892,8 +1793,6 @@ const confirmText=document.getElementById("confirmText");
 const confirmCancel=document.getElementById("confirmCancel");
 const confirmYes=document.getElementById("confirmYes");
 const removeEverything=document.getElementById("removeEverything");
-const openingScreen=document.getElementById("openingScreen");
-const enterBtn=document.getElementById("enterBtn");
 const notification=document.getElementById("notification");
 const notifText=document.getElementById("notifText");
 const gameBadge=document.getElementById("gameBadge");
@@ -1914,6 +1813,7 @@ let seenGameIds=new Set();
 let pendingFileData=null;
 let pendingFileName=null;
 let pendingFileType=null;
+let pendingFileSize=null;
 let activeGameCount=0;
 let notificationTimeout=null;
 
@@ -1940,23 +1840,6 @@ const GAME_TYPES={
     target:{name:"Target Click",icon:"🎯",min:2,max:6,desc:"Click the target fast"},
     quickdraw:{name:"Quick Draw",icon:"🏁",min:2,max:6,desc:"Click when DRAW! appears"},
     type:{name:"Type Race",icon:"⌨️",min:2,max:6,desc:"Type the sentence fast"}
-};
-
-
-/* =====================================================
-   OPENING SCREEN
-===================================================== */
-
-enterBtn.onclick=()=>{
-    openingScreen.classList.add("hidden");
-    setTimeout(()=>{
-        openingScreen.style.display="none";
-    },600);
-    loadMessages();
-    loadSettingsUI();
-    applySettings();
-    restartRefresh();
-    renderGameGrid();
 };
 
 
@@ -2036,6 +1919,7 @@ fileInput.onchange=async()=>{
             pendingFileData=resized;
             pendingFileName=file.name;
             pendingFileType='image';
+            pendingFileSize=resized.length;
         }else{
             // For other files, keep as base64
             const data=await fileToBase64(file);
@@ -2048,6 +1932,7 @@ fileInput.onchange=async()=>{
             pendingFileData=data;
             pendingFileName=file.name;
             pendingFileType='file';
+            pendingFileSize=file.size;
         }
         attachBtn.textContent='✅';
         attachBtn.style.color='#7affb0';
@@ -2090,8 +1975,6 @@ function resizeImage(file,maxSize){
    VOICE RECORDING
 ===================================================== */
 
-let audioContext=null;
-
 voiceBtn.onclick=async()=>{
     if(isRecording){
         stopRecording();
@@ -2122,6 +2005,7 @@ async function startRecording(){
                 pendingFileData=base64Data;
                 pendingFileName='voice-' + Date.now() + '.webm';
                 pendingFileType='voice';
+                pendingFileSize=audioBlob.size;
                 attachBtn.textContent='🎤';
                 attachBtn.style.color='#7affb0';
                 attachBtn.classList.add('has-file');
@@ -2305,6 +2189,7 @@ function clearPendingFile(){
     pendingFileData=null;
     pendingFileName=null;
     pendingFileType=null;
+    pendingFileSize=null;
     attachBtn.textContent='📎';
     attachBtn.style.color='#adb5c0';
     attachBtn.classList.remove('has-file');
@@ -2335,9 +2220,10 @@ async function sendChatMessage(){
             payload.file_data=pendingFileData;
             payload.file_name=pendingFileName;
             payload.file_type=pendingFileType;
+            payload.file_size=pendingFileSize;
         }
         
-        await apiPost(payload);
+        const result=await apiPost(payload);
         
         messageInput.value="";
         messageInput.style.height="auto";
@@ -2796,7 +2682,7 @@ async function writeGameState(game){
 
 
 /* =====================================================
-   CREATE GAME ELEMENT (Simplified)
+   CREATE GAME ELEMENT
 ===================================================== */
 
 function createGameElement(game){
@@ -4158,6 +4044,13 @@ document.querySelectorAll(".settings-category-title").forEach(btn=>{
         this.parentElement.classList.toggle("open");
     };
 });
+
+// Load initial data
+loadMessages();
+loadSettingsUI();
+applySettings();
+restartRefresh();
+renderGameGrid();
 
 document.getElementById("app").style.display="flex";
 
