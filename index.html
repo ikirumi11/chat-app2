@@ -2255,6 +2255,11 @@ const CHANNEL="general";
 
 const GAME_PREFIX="__CHAT_GAME_STATE__:";
 const GAME_CLEANUP_DELAY = 3000; // 3 seconds
+const GAME_HOST_HEARTBEAT_MS = 2000;
+const GAME_HOST_TIMEOUT_MS = 5000;
+let gameHostHeartbeatTimer = null;
+let gameHostWatchTimer = null;
+
 const gameCleanupTimers = new Map();
 
 
@@ -3969,6 +3974,287 @@ function checkFinishedGames(){
 }
 
 
+
+/* =====================================================
+   GAME LIFECYCLE
+   Leave / Force Stop / Host Disconnect
+   ===================================================== */
+
+let currentActiveGameId = null;
+
+function findGameById(gameId){
+    if(!gameId || typeof games === "undefined") return null;
+    return games.find(g => String(g.id) === String(gameId)) || null;
+}
+
+function getGamePlayers(game){
+    if(!game) return [];
+    return Array.isArray(game.players)
+        ? game.players
+        : Array.isArray(game.data?.players)
+            ? game.data.players
+            : [];
+}
+
+function getGameHostId(game){
+    if(!game) return "";
+    return String(
+        game.hostDeviceId ||
+        game.data?.hostDeviceId ||
+        game.host_device_id ||
+        game.data?.host_device_id ||
+        ""
+    );
+}
+
+function isCurrentGameHost(game){
+    return !!game &&
+        !!deviceId &&
+        getGameHostId(game) === String(deviceId);
+}
+
+async function deleteGameState(game){
+    if(!game || !game.id) return false;
+
+    const hostId = getGameHostId(game);
+
+    // The API requires the host device ID for game-server deletion.
+    // A non-host cannot force-delete another player's game.
+    if(!hostId || String(hostId) !== String(deviceId)){
+        return false;
+    }
+
+    try{
+        await apiDelete({
+            id: game.id,
+            device_id: deviceId,
+            game_server: true
+        });
+
+        currentMessages =
+            currentMessages.filter(
+                msg => String(msg.id) !== String(game.id)
+            );
+
+        games =
+            games.filter(
+                g => String(g.id) !== String(game.id)
+            );
+
+        seenGameIds.delete(game.id);
+        cancelGameCleanup(game.id);
+
+        const element =
+            document.querySelector(
+                `[data-game-id="${CSS.escape(String(game.id))}"]`
+            );
+
+        if(element) element.remove();
+
+        if(String(currentActiveGameId) === String(game.id)){
+            currentActiveGameId = null;
+        }
+
+        return true;
+    }catch(error){
+        console.warn("Could not remove game state:", error);
+        return false;
+    }
+}
+
+async function leaveCurrentGame(game){
+    if(!game) return;
+
+    const players = getGamePlayers(game);
+
+    const nextPlayers =
+        players.filter(
+            player => String(
+                typeof player === "string"
+                    ? player
+                    : player.device_id || player.deviceId || player.id
+            ) !== String(deviceId)
+        );
+
+    // Host leaving means the entire game stops.
+    if(isCurrentGameHost(game)){
+        await deleteGameState(game);
+        return;
+    }
+
+    // For a non-host, update the shared state through the host-owned
+    // game message only when the game implementation supports players.
+    if(game.id && nextPlayers.length !== players.length){
+        const copy = structuredClone(game);
+
+        if(Array.isArray(copy.players)){
+            copy.players = nextPlayers;
+        }else if(copy.data && Array.isArray(copy.data.players)){
+            copy.data.players = nextPlayers;
+        }
+
+        // Only the host is authorized to PATCH the game state.
+        // Therefore a client that is not the host leaves locally and
+        // waits for the host to process the disconnect/leave.
+        games =
+            games.map(
+                g => String(g.id) === String(game.id)
+                    ? copy
+                    : g
+            );
+
+        renderMessages();
+    }
+}
+
+async function forceStopGame(game){
+    if(!game) return false;
+
+    // Force Stop is host-only because the API authorizes game deletion
+    // using the host's device ID.
+    if(!isCurrentGameHost(game)){
+        alert("Only the game host can force stop this game.");
+        return false;
+    }
+
+    return await deleteGameState(game);
+}
+
+function startGameHostHeartbeat(game){
+    stopGameHostHeartbeat();
+
+    if(!game || !isCurrentGameHost(game)) return;
+
+    currentActiveGameId = game.id;
+
+    // The API has no dedicated heartbeat endpoint. We therefore keep
+    // the game state message updated with a host timestamp using PATCH.
+    const heartbeat = async ()=>{
+        const active = findGameById(game.id);
+
+        if(!active || !isCurrentGameHost(active)){
+            stopGameHostHeartbeat();
+            return;
+        }
+
+        try{
+            const copy = structuredClone(active);
+
+            copy.hostHeartbeat =
+                Date.now();
+
+            if(copy.data && typeof copy.data === "object"){
+                copy.data.hostHeartbeat =
+                    Date.now();
+            }
+
+            await apiPatch({
+                id: active.id,
+                device_id: deviceId,
+                game_server: true,
+                game_state: JSON.stringify(copy)
+            });
+        }catch(error){
+            console.warn(
+                "Game host heartbeat failed:",
+                error
+            );
+        }
+    };
+
+    heartbeat();
+
+    gameHostHeartbeatTimer =
+        setInterval(
+            heartbeat,
+            GAME_HOST_HEARTBEAT_MS
+        );
+}
+
+function stopGameHostHeartbeat(){
+    if(gameHostHeartbeatTimer){
+        clearInterval(gameHostHeartbeatTimer);
+        gameHostHeartbeatTimer = null;
+    }
+
+    currentActiveGameId = null;
+}
+
+function checkDisconnectedGameHosts(){
+    if(typeof games === "undefined") return;
+
+    const now = Date.now();
+
+    for(const game of games){
+        if(!game || !game.id) continue;
+
+        const hostHeartbeat = Number(
+            game.hostHeartbeat ||
+            game.data?.hostHeartbeat ||
+            0
+        );
+
+        if(!hostHeartbeat) continue;
+
+        // Only clients other than the host perform this check.
+        if(isCurrentGameHost(game)) continue;
+
+        if(now - hostHeartbeat > GAME_HOST_TIMEOUT_MS){
+            // The server's DELETE authorization requires the host ID,
+            // so a client cannot impersonate the disconnected host.
+            // Mark it locally as stopped; the host's next heartbeat
+            // cannot revive it because the state is no longer active.
+            game.__hostDisconnected = true;
+            game.__finishedShown = true;
+
+            const element =
+                document.querySelector(
+                    `[data-game-id="${CSS.escape(String(game.id))}"]`
+                );
+
+            if(element){
+                const result =
+                    document.createElement("div");
+
+                result.className =
+                    "game-finished-result";
+
+                result.innerHTML = `
+                    <div class="game-finished-icon">⛔</div>
+                    <div class="game-finished-title">
+                        Host disconnected
+                    </div>
+                    <div class="game-finished-subtitle">
+                        Game stopped
+                    </div>
+                `;
+
+                element.replaceChildren(result);
+            }
+
+            scheduleFinishedGameCleanup(game);
+        }
+    }
+}
+
+function startGameHostWatcher(){
+    if(currentActiveGameId &&
+       !findGameById(currentActiveGameId)){
+        stopGameHostHeartbeat();
+    }
+
+    if(gameHostWatchTimer) return;
+
+    gameHostWatchTimer =
+        setInterval(
+            checkDisconnectedGameHosts,
+            1000
+        );
+}
+
+startGameHostWatcher();
+
+
 /* =====================================================
    LOAD MESSAGES
 ===================================================== */
@@ -4036,6 +4322,10 @@ async function loadMessages(){
             scheduleAllGameCleanups();
             
             for (const game of games) {
+
+                if(isCurrentGameHost(game)){
+                    startGameHostHeartbeat(game);
+                }
                 if (!seenGameIds.has(game.id)) {
                     hasNewGames = true;
                     seenGameIds.add(game.id);
@@ -7734,3 +8024,45 @@ loadMessages();
     }, 1000);
 })();
 </script>
+
+
+/* =====================================================
+   LEAVE / FORCE STOP BUTTON HOOKS
+   ===================================================== */
+
+function getVisibleCurrentGame(){
+    if(currentActiveGameId){
+        const active = findGameById(currentActiveGameId);
+        if(active) return active;
+    }
+
+    if(typeof games !== "undefined" && games.length === 1){
+        return games[0];
+    }
+
+    return null;
+}
+
+const leaveGameBtn =
+    document.getElementById("leaveGame");
+
+if(leaveGameBtn){
+    leaveGameBtn.onclick = async ()=>{
+        const game = getVisibleCurrentGame();
+        if(!game) return;
+
+        await leaveCurrentGame(game);
+    };
+}
+
+const forceStopGameBtn =
+    document.getElementById("forceStopGame");
+
+if(forceStopGameBtn){
+    forceStopGameBtn.onclick = async ()=>{
+        const game = getVisibleCurrentGame();
+        if(!game) return;
+
+        await forceStopGame(game);
+    };
+}
