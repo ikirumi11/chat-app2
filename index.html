@@ -1350,6 +1350,45 @@ textarea{
     color:#7affb0;
 }
 
+
+/* CLEAN START / OPENING */
+#startupScreen{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,#252b34 0%,#111419 35%,#07080a 100%);opacity:1;visibility:visible;transition:opacity .55s cubic-bezier(.4,0,.2,1),visibility .55s}
+#startupScreen.hide{opacity:0;visibility:hidden;pointer-events:none}
+.startup-inner{width:min(420px,82vw);text-align:center;animation:startupIn .75s cubic-bezier(.16,1,.3,1) both}
+.startup-icon{width:76px;height:76px;margin:0 auto 18px;display:grid;place-items:center;border-radius:22px;background:linear-gradient(145deg,#272d36,#14181e);border:1px solid #3b424d;box-shadow:0 20px 60px #0009,inset 0 1px #ffffff12;font-size:36px}
+.startup-title{margin:0;font-size:clamp(28px,7vw,42px);font-weight:900;letter-spacing:-1.5px}
+.startup-subtitle{margin:8px 0 22px;color:#858e9a;font-size:13px}
+.startup-loader{height:3px;width:100%;overflow:hidden;border-radius:99px;background:#20252d}
+.startup-loader::after{content:"";display:block;width:42%;height:100%;border-radius:inherit;background:#edf0f4;animation:startupLoad 1s cubic-bezier(.4,0,.2,1) infinite}
+@keyframes startupIn{from{opacity:0;transform:translateY(18px) scale(.96);filter:blur(5px)}to{opacity:1;transform:none;filter:none}}
+@keyframes startupLoad{from{transform:translateX(-120%)}to{transform:translateX(270%)}}
+.header{box-shadow:0 8px 30px #0005;position:relative;z-index:2}
+.logo-icon{box-shadow:inset 0 1px #ffffff10,0 8px 25px #0005;transition:transform .2s ease,background .2s ease}
+.logo:hover .logo-icon{transform:rotate(-4deg) scale(1.04)}
+.icon-btn{transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease}
+.icon-btn:hover{transform:translateY(-1px);border-color:#3c4450;box-shadow:0 8px 20px #0005}
+.messages{scroll-behavior:smooth;background:radial-gradient(circle at 50% 0%,#ffffff03,transparent 35%)}
+.message{padding:7px 9px;margin:0 -9px 8px;border-radius:12px;transition:background .16s ease,transform .16s ease}
+.message:hover{background:#ffffff04}
+.avatar{box-shadow:inset 0 1px #ffffff0a;transition:transform .16s ease}
+.message:hover .avatar{transform:translateY(-1px)}
+.message-video,.message-image{box-shadow:0 12px 35px #0006;transition:transform .18s ease,border-color .18s ease}
+.message-video:hover,.message-image:hover{border-color:#3b434f}
+.composer{box-shadow:0 -12px 35px #0006}
+.composer-box{box-shadow:0 8px 30px #0004,inset 0 1px #ffffff08;transition:border-color .18s ease,box-shadow .18s ease}
+.composer-box:focus-within{border-color:#414955;box-shadow:0 10px 35px #0006,0 0 0 3px #ffffff06}
+.send-btn{transition:transform .15s ease,filter .15s ease,box-shadow .15s ease;box-shadow:0 5px 18px #0004}
+.send-btn:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 8px 22px #0006}
+.game-card,.panel{box-shadow:0 25px 70px #0008,inset 0 1px #ffffff06}
+.game-choice{transition:transform .16s ease,background .16s ease,border-color .16s ease,box-shadow .16s ease}
+.game-choice:hover{transform:translateY(-2px);border-color:#3c4450;box-shadow:0 10px 25px #0005}
+.game-btn,.category,.setting input,.setting select{transition:border-color .16s ease,background .16s ease,transform .16s ease}
+.game-btn:hover:not(:disabled){transform:translateY(-1px)}
+.overlay{backdrop-filter:blur(8px)}
+.panel{animation:panelIn .22s cubic-bezier(.16,1,.3,1)}
+@keyframes panelIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
 @media(max-width:600px){
 
     .header{
@@ -1437,6 +1476,15 @@ textarea{
 </head>
 
 <body>
+
+<div id="startupScreen" aria-hidden="true">
+    <div class="startup-inner">
+        <div class="startup-icon">🎮</div>
+        <h1 class="startup-title">Game Chat</h1>
+        <div class="startup-subtitle">Connecting to your games...</div>
+        <div class="startup-loader"></div>
+    </div>
+</div>
 
 <div class="app">
 
@@ -2215,6 +2263,7 @@ let refreshTimer=null;
 let syncing=false;
 let confirmCallback=null;
 let renderedElements=new Map();
+let renderedData=new Map();
 let seenMessageIds=new Set();
 let seenGameIds=new Set();
 
@@ -2853,6 +2902,7 @@ function applySettings(){
     );
 
     renderedElements.clear();
+    renderedData.clear();
     seenMessageIds.clear();
     seenGameIds.clear();
     renderMessages();
@@ -3346,28 +3396,51 @@ async function loadMessages(){
     }
 }
 
+function filesEquivalent(a, b) {
+    if (a === b) return true;
+    if (!Array.isArray(a) || !Array.isArray(b)) return a == null && b == null;
+    if (a.length !== b.length) return false;
+
+    for (let i = 0; i < a.length; i++) {
+        const x = a[i] || {};
+        const y = b[i] || {};
+        if (x.name !== y.name || x.type !== y.type || x.size !== y.size ||
+            x.image !== y.image || x.video !== y.video || x.data !== y.data) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function messagesEquivalent(a, b) {
+    if (!a || !b) return false;
+    return a.id === b.id &&
+        a.message === b.message &&
+        a.username === b.username &&
+        a.edited === b.edited &&
+        a.created_at === b.created_at &&
+        a.image === b.image &&
+        filesEquivalent(a.files, b.files);
+}
+
+function gameDataEquivalent(a, b) {
+    if (!a || !b) return false;
+    try { return JSON.stringify(a) === JSON.stringify(b); }
+    catch { return false; }
+}
+
 function getMessageChanges(oldMessages, newMessages) {
     if (oldMessages.length !== newMessages.length) {
         return { changed: true };
     }
-    
-    let changed = false;
+
     for (let i = 0; i < oldMessages.length; i++) {
-        const oldMsg = oldMessages[i];
-        const newMsg = newMessages[i];
-        
-        if (oldMsg.id !== newMsg.id || 
-            oldMsg.message !== newMsg.message || 
-            oldMsg.username !== newMsg.username || 
-            oldMsg.edited !== newMsg.edited ||
-            oldMsg.image !== newMsg.image ||
-            oldMsg.files !== newMsg.files) {
-            changed = true;
-            break;
+        if (!messagesEquivalent(oldMessages[i], newMessages[i])) {
+            return { changed: true };
         }
     }
-    
-    return { changed };
+
+    return { changed: false };
 }
 
 
@@ -3456,19 +3529,11 @@ function processGameMessages(){
 ===================================================== */
 
 function renderMessages(shouldAutoScroll){
-
-    const normal =
-        currentMessages.filter(
-            message =>
-                !isGameMessage(message)
-        );
-
-    const activeGames =
-        games.filter(
-            game =>
-                game.status !== "finished" &&
-                game.status !== "forcequit"
-        );
+    const normal = currentMessages.filter(message => !isGameMessage(message));
+    const activeGames = games.filter(game =>
+        game.status !== "finished" &&
+        game.status !== "forcequit"
+    );
 
     if (!normal.length && !activeGames.length) {
         messagesEl.innerHTML = `
@@ -3480,87 +3545,59 @@ function renderMessages(shouldAutoScroll){
             </div>
         `;
         renderedElements.clear();
+        renderedData.clear();
         return;
     }
 
-    const fragment = document.createDocumentFragment();
-    const elementIds = [];
+    const desired = [];
+    const desiredIds = [];
 
     for (const message of normal) {
-        const item = createMessageElement(message);
-        fragment.appendChild(item);
-        elementIds.push('msg_' + message.id);
+        const id = "msg_" + message.id;
+        const oldEl = renderedElements.get(id);
+        const oldData = renderedData.get(id);
+        const el = oldEl && oldData && messagesEquivalent(oldData, message)
+            ? oldEl
+            : createMessageElement(message);
+        desired.push(el);
+        desiredIds.push(id);
     }
 
     for (const game of activeGames) {
-        const gameEl = createGameElement(game);
-        fragment.appendChild(gameEl);
-        elementIds.push('game_' + game.id);
+        const id = "game_" + game.id;
+        const oldEl = renderedElements.get(id);
+        const oldData = renderedData.get(id);
+        const el = oldEl && oldData && gameDataEquivalent(oldData, game)
+            ? oldEl
+            : createGameElement(game);
+        desired.push(el);
+        desiredIds.push(id);
     }
 
-    const currentChildren = messagesEl.children;
-    const currentIds = [];
+    const currentIds = Array.from(messagesEl.children).map(
+        child => child.dataset && child.dataset.id ? child.dataset.id : ""
+    );
 
-    for (let i = 0; i < currentChildren.length; i++) {
-        const child = currentChildren[i];
-        if (child.dataset && child.dataset.id) {
-            currentIds.push(child.dataset.id);
-        } else {
-            currentIds.push('__temp_' + i);
-        }
-    }
-
-    const newChildren = Array.from(fragment.children);
-    
-    if (currentIds.length !== elementIds.length || 
-        currentIds.some((id, idx) => id !== elementIds[idx])) {
-        
+    if (currentIds.length !== desiredIds.length ||
+        currentIds.some((id, index) => id !== desiredIds[index])) {
+        const fragment = document.createDocumentFragment();
+        desired.forEach(el => fragment.appendChild(el));
         messagesEl.replaceChildren(fragment);
-        
-        renderedElements.clear();
-        for (let i = 0; i < newChildren.length; i++) {
-            const el = newChildren[i];
-            if (el.dataset && el.dataset.id) {
-                renderedElements.set(el.dataset.id, el);
+    } else {
+        for (let i = 0; i < desired.length; i++) {
+            if (messagesEl.children[i] !== desired[i]) {
+                messagesEl.children[i].replaceWith(desired[i]);
             }
-        }
-        
-        if (shouldAutoScroll && settings.autoScroll) {
-            requestAnimationFrame(() => {
-                messagesEl.scrollTop = messagesEl.scrollHeight;
-            });
-        }
-        
-        return;
-    }
-
-    let hasNewElement = false;
-    
-    for (let i = 0; i < newChildren.length; i++) {
-        const newEl = newChildren[i];
-        const oldEl = currentChildren[i];
-        
-        if (newEl.dataset && newEl.dataset.id !== oldEl.dataset.id) {
-            hasNewElement = true;
-        }
-        
-        if (newEl.dataset && newEl.dataset.id === oldEl.dataset.id) {
-            oldEl.replaceWith(newEl);
-            renderedElements.set(newEl.dataset.id, newEl);
-        } else {
-            oldEl.replaceWith(newEl);
-            if (newEl.dataset && newEl.dataset.id) {
-                renderedElements.set(newEl.dataset.id, newEl);
-            }
-            hasNewElement = true;
         }
     }
 
-    const validIds = new Set(elementIds);
-    for (const [id, el] of renderedElements) {
-        if (!validIds.has(id)) {
-            renderedElements.delete(id);
-        }
+    renderedElements.clear();
+    renderedData.clear();
+
+    for (let i = 0; i < desired.length; i++) {
+        const id = desiredIds[i];
+        renderedElements.set(id, desired[i]);
+        renderedData.set(id, id.startsWith("msg_") ? normal[i] : activeGames[i - normal.length]);
     }
 
     if (shouldAutoScroll && settings.autoScroll) {
@@ -6581,6 +6618,7 @@ removeEverything.onclick = () => {
             currentMessages = [];
             games = [];
             renderedElements.clear();
+            renderedData.clear();
             seenMessageIds.clear();
             seenGameIds.clear();
             renderMessages();
@@ -6608,6 +6646,26 @@ function escapeHtml(value){
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
 }
+
+
+/* =====================================================
+   STARTUP ANIMATION
+===================================================== */
+
+function playStartupAnimation(){
+    const screen = document.getElementById("startupScreen");
+    if (!screen) return;
+
+    screen.classList.remove("hide");
+    clearTimeout(window.__startupTimer);
+
+    window.__startupTimer = setTimeout(() => {
+        screen.classList.add("hide");
+    }, 1150);
+}
+
+window.addEventListener("pageshow", playStartupAnimation);
+playStartupAnimation();
 
 
 /* =====================================================
