@@ -1,3 +1,34 @@
+
+<style>
+.game-finished-result{
+    min-height:160px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:28px 18px;
+    border-radius:inherit;
+}
+
+.game-finished-icon{
+    font-size:42px;
+    margin-bottom:10px;
+}
+
+.game-finished-title{
+    font-size:24px;
+    font-weight:800;
+    letter-spacing:.2px;
+}
+
+.game-finished-subtitle{
+    margin-top:7px;
+    opacity:.65;
+    font-size:14px;
+}
+</style>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -3805,6 +3836,139 @@ function scheduleAllGameCleanups(){
 }
 
 
+
+/* =====================================================
+   GAME WIN / FINISH FLOW
+   Shows the winner to everyone for 3 seconds, then
+   removes the visible game and its invisible state.
+   ===================================================== */
+
+function getGameWinner(game){
+    if(!game) return "";
+
+    return String(
+        game.winner ||
+        game.data?.winner ||
+        game.winnerUsername ||
+        game.data?.winnerUsername ||
+        ""
+    ).trim();
+}
+
+function isGameFinished(game){
+    if(!game) return false;
+
+    const status = String(
+        game.status ||
+        game.state ||
+        game.data?.status ||
+        ""
+    ).toLowerCase();
+
+    return (
+        status === "finished" ||
+        status === "gameover" ||
+        status === "game_over" ||
+        status === "won" ||
+        status === "lost" ||
+        status === "draw" ||
+        status === "complete" ||
+        status === "completed"
+    );
+}
+
+function showGameFinishedMessage(game){
+    if(!game) return;
+
+    const winner = getGameWinner(game);
+    const title = winner
+        ? `${winner} won!`
+        : "Game Over";
+
+    // Mark the game so its normal board is replaced by the result.
+    game.__finishedShown = true;
+    game.__finishShownAt = Date.now();
+
+    const gameElement =
+        document.querySelector(
+            `[data-game-id="${CSS.escape(String(game.id))}"]`
+        );
+
+    if(gameElement){
+        const result =
+            document.createElement("div");
+
+        result.className = "game-finished-result";
+        result.innerHTML = `
+            <div class="game-finished-icon">🏆</div>
+            <div class="game-finished-title">
+                ${escapeHtml(title)}
+            </div>
+            <div class="game-finished-subtitle">
+                Game finished
+            </div>
+        `;
+
+        gameElement.replaceChildren(result);
+    }
+}
+
+function scheduleFinishedGameCleanup(game){
+    if(!game || !game.id || !isGameFinished(game)) return;
+
+    if(game.__finishCleanupScheduled) return;
+
+    game.__finishCleanupScheduled = true;
+
+    showGameFinishedMessage(game);
+
+    setTimeout(async ()=>{
+        try{
+            await apiDelete({
+                id: game.id,
+                device_id: game.hostDeviceId || deviceId,
+                game_server: true
+            });
+        }catch(error){
+            console.warn(
+                "Finished game cleanup failed:",
+                error
+            );
+        }
+
+        currentMessages =
+            currentMessages.filter(
+                msg => msg.id !== game.id
+            );
+
+        games =
+            games.filter(
+                g => g.id !== game.id
+            );
+
+        seenGameIds.delete(game.id);
+
+        const element =
+            document.querySelector(
+                `[data-game-id="${CSS.escape(String(game.id))}"]`
+            );
+
+        if(element) element.remove();
+
+    }, GAME_CLEANUP_DELAY);
+}
+
+function checkFinishedGames(){
+    if(typeof games === "undefined") return;
+
+    for(const game of games){
+        if(isGameFinished(game)){
+            scheduleFinishedGameCleanup(game);
+        }
+    }
+}
+
+
 /* =====================================================
    LOAD MESSAGES
 ===================================================== */
@@ -3868,6 +4032,7 @@ async function loadMessages(){
             currentMessages = newMessages;
             processProfiles();
             processGameMessages();
+            checkFinishedGames();
             scheduleAllGameCleanups();
             
             for (const game of games) {
@@ -7560,6 +7725,7 @@ loadMessages();
             if(typeof games !== "undefined"){
                 for(const game of games){
                     originalSchedule(game);
+                    if(typeof checkFinishedGames === "function") checkFinishedGames();
                 }
             }
         }catch(error){
