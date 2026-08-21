@@ -2513,6 +2513,8 @@ const removeEverything=
 let currentMessages=[];
 let games=[];
 let refreshTimer=null;
+// Local stop tombstones prevent stale UI/game callbacks from creating new invisible state messages.
+const stoppedGames = new Set();
 let syncing=false;
 let confirmCallback=null;
 let renderedElements=new Map();
@@ -4446,29 +4448,23 @@ function getDefaultSettings(gameType){
 ===================================================== */
 
 async function writeGameState(game){
+    if (!game?.id || stoppedGames.has(game.id)) {
+        return false;
+    }
 
-    const payload=
-        GAME_PREFIX+
+    const payload =
+        GAME_PREFIX +
         JSON.stringify(game);
 
     await apiPost({
-
-        username:
-            "__GAME__",
-
-        channel:
-            CHANNEL,
-
-        message:
-            payload,
-
-        image:null,
-
-        files: [],
-
-        device_id:
-            game.hostDeviceId
+        game_server: true,
+        username: "__GAME_SERVER__",
+        channel: CHANNEL,
+        message: payload,
+        device_id: game.hostDeviceId
     });
+
+    return true;
 }
 
 
@@ -6958,10 +6954,11 @@ function createRPSTournament(game){
 ===================================================== */
 
 async function joinGame(game){
+    if (!game?.id || stoppedGames.has(game.id)) return;
     if (game.status !== "lobby") return;
     if (game.players.some(p => p.deviceId === deviceId)) return;
     if (game.players.length >= game.maxPlayers) return;
-    
+
     const copy = JSON.parse(JSON.stringify(game));
     copy.players.push({ deviceId, username: getDisplayName(deviceId, settings.username) });
     await writeGameState(copy);
@@ -6969,36 +6966,30 @@ async function joinGame(game){
 }
 
 async function leaveGame(game){
-    const copy = JSON.parse(JSON.stringify(game));
-    copy.players = copy.players.filter(p => p.deviceId !== deviceId);
-    
-    // An empty game is deleted immediately and is never left as a stale game state.
-    if (copy.players.length === 0) {
-        hideGameImmediately(game);
-        await removeGameMessages(game);
-        await loadMessages();
-        return;
+    if (!game?.id || stoppedGames.has(game.id)) return;
+    stoppedGames.add(game.id);
+    hideGameImmediately(game);
+
+    try {
+        await apiPost({
+            game_server: true,
+            game_action: "leave",
+            game_id: game.id,
+            channel: CHANNEL,
+            device_id: deviceId
+        });
+    } catch (error) {
+        console.warn("Could not leave game on server:", error);
     }
-    
-    if (game.hostDeviceId === deviceId) {
-        const newHost = copy.players[0];
-        copy.host = newHost.username;
-        copy.hostDeviceId = newHost.deviceId;
-    }
-    
-    if (copy.status === "playing" && copy.turnIndex >= copy.players.length) {
-        copy.turnIndex = 0;
-    }
-    
-    await writeGameState(copy);
-    await deleteStateMessage(game);
+
     await loadMessages();
 }
 
 async function startGame(game){
+    if (!game?.id || stoppedGames.has(game.id)) return;
     if (game.hostDeviceId !== deviceId) return;
     if (game.players.length < (game.minPlayers || 2)) return;
-    
+
     const copy = JSON.parse(JSON.stringify(game));
     copy.status = "playing";
     copy.turnIndex = 0;
@@ -7211,7 +7202,6 @@ async function startGame(game){
 }
 
 function hideGameImmediately(game){
-    // Remove the game from the local UI/state first so it disappears in the same tick.
     const gameId = game?.id;
     if (!gameId) return;
 
@@ -7232,63 +7222,109 @@ function hideGameImmediately(game){
 }
 
 async function forceQuitGame(game){
-    if (game.hostDeviceId !== deviceId) return;
+    if (!game?.id || game.hostDeviceId !== deviceId) return;
 
-    // Force quit is immediate locally; server cleanup follows without keeping the game visible.
+    stoppedGames.add(game.id);
     hideGameImmediately(game);
+
     try {
-        await removeGameMessages(game);
-        await loadMessages();
+        await apiPost({
+            game_server: true,
+            game_action: "stop",
+            game_id: game.id,
+            channel: CHANNEL,
+            device_id: deviceId
+        });
     } catch(error) {
-        // The game is already hidden locally; do not restore a stale game card.
-        console.warn("Could not remove game from server:", error);
+        console.warn("Could not stop game on server:", error);
     }
+
+    await loadMessages();
+}
+
+async function stopGameOnExit(game){
+    if (!game?.id) return;
+    stoppedGames.add(game.id);
+
+    // Never transfer hosting when the host leaves. A host leaving ends the game.
+    const body = game.hostDeviceId === deviceId
+        ? { game_server:true, game_action:"stop", game_id:game.id, channel:CHANNEL, device_id:deviceId }
+        : { game_server:true, game_action:"leave", game_id:game.id, channel:CHANNEL, device_id:deviceId };
+
+    try {
+        await fetch(API_URL, {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify(body),
+            keepalive:true
+        });
+    } catch {}
 }
 
 async function publishGameAndCleanup(oldGame, newGame){
-    // Completed games disappear immediately for every game type. Do not publish a
-    // final state message that would briefly reappear in the chat.
+    if (!oldGame?.id || stoppedGames.has(oldGame.id)) return;
+
     if (newGame.status === "finished" || newGame.status === "forcequit") {
+        stoppedGames.add(oldGame.id);
         hideGameImmediately(oldGame);
-        await removeGameMessages(oldGame);
+        try {
+            await apiPost({
+                game_server:true,
+                game_action:"stop",
+                game_id:oldGame.id,
+                channel:CHANNEL,
+                device_id:oldGame.hostDeviceId
+            });
+        } catch {}
         await loadMessages();
         return;
     }
 
     await writeGameState(newGame);
-    
-    // Replace the old state without leaving duplicate/stale game messages behind.
     if (oldGame.messageId) {
         try {
-            await apiDelete({ id: oldGame.messageId, device_id: oldGame.hostDeviceId });
+            await apiDelete({
+                game_server:true,
+                id:oldGame.messageId,
+                device_id:oldGame.hostDeviceId
+            });
         } catch {}
     }
-    
     await loadMessages();
 }
 
 async function removeGameMessages(game){
-    const gameMessages = currentMessages.filter(message => {
-        if (!isGameMessage(message)) return false;
-        const state = parseGameMessage(message);
-        return state && state.id === game.id;
-    });
-    
-    // Delete all copies of this game's state, not only the currently known messageId.
-    await Promise.all(gameMessages.map(async message => {
-        try {
-            await apiDelete({ id: message.id, device_id: game.hostDeviceId });
-        } catch {}
-    }));
-}
-
-async function deleteStateMessage(game){
-    if (!game.messageId) return;
+    if (!game?.id) return;
     try {
-        await apiDelete({ id: game.messageId, device_id: game.hostDeviceId });
+        await apiDelete({
+            game_server:true,
+            game_id:game.id,
+            device_id:game.hostDeviceId
+        });
     } catch {}
 }
 
+async function deleteStateMessage(game){
+    if (!game?.messageId) return;
+    try {
+        await apiDelete({
+            game_server:true,
+            id:game.messageId,
+            device_id:game.hostDeviceId
+        });
+    } catch {}
+}
+
+// Leaving the site removes the current player from every game. If the player is
+// the host, the whole game is stopped. keepalive lets the request survive navigation
+// in browsers that support it.
+window.addEventListener("pagehide", () => {
+    for (const game of [...games]) {
+        if (game.players?.some(p => p.deviceId === deviceId)) {
+            stopGameOnExit(game);
+        }
+    }
+});
 
 /* =====================================================
    REFRESH
