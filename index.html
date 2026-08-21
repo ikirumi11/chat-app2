@@ -2361,82 +2361,142 @@ const GAME_TYPES={
 
 
 /* =====================================================
-   BASE64 MEDIA PROCESSING
-   Images: max 1500x1500, no upscaling.
-   Videos: compressed to fit within 5 MB when possible.
+   FILE HANDLING / BASE64 MEDIA
 ===================================================== */
 
 const MAX_IMAGE_DIMENSION = 1500;
 const MAX_VIDEO_BYTES = 5 * 1024 * 1024;
+const MAX_VIDEO_DURATION_SECONDS = 60 * 60;
 
-function loadImage(file) {
+function formatFileSize(bytes) {
+    if (!Number.isFinite(bytes)) return '';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+function getFileIcon(mimeType, fileName) {
+    const type = (mimeType || '').toLowerCase();
+    if (type.startsWith('image/')) return '🖼️';
+    if (type.startsWith('video/')) return '🎬';
+    if (type.startsWith('audio/')) return '🎵';
+    if (type.includes('pdf')) return '📄';
+    if (type.includes('zip') || type.includes('rar') || type.includes('7z')) return '📦';
+    if (type.includes('text')) return '📝';
+    if (type.includes('word') || type.includes('document')) return '📘';
+    if (type.includes('sheet') || type.includes('excel')) return '📊';
+    if (type.includes('presentation') || type.includes('powerpoint')) return '📙';
+    if (type.includes('json') || type.includes('xml')) return '📋';
+    if (type.includes('javascript') || type.includes('python') || type.includes('html')) return '💻';
+    return '📎';
+}
+
+function readFileAsDataURL(file) {
     return new Promise((resolve, reject) => {
-        const img = new Image();
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Could not read the file.'));
+        reader.readAsDataURL(file);
+    });
+}
+
+function loadImageFromFile(file) {
+    return new Promise((resolve, reject) => {
         const url = URL.createObjectURL(file);
+        const img = new Image();
         img.onload = () => {
             URL.revokeObjectURL(url);
             resolve(img);
         };
         img.onerror = () => {
             URL.revokeObjectURL(url);
-            reject(new Error("Could not read image."));
+            reject(new Error(`"${file.name}" could not be read as an image.`));
         };
         img.src = url;
     });
 }
 
+function canvasToDataURL(canvas, type, quality) {
+    return new Promise((resolve, reject) => {
+        canvas.toBlob(blob => {
+            if (!blob) {
+                reject(new Error('Could not convert image.'));
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(new Error('Could not encode image.'));
+            reader.readAsDataURL(blob);
+        }, type, quality);
+    });
+}
+
 async function imageToBase64(file) {
-    const img = await loadImage(file);
+    const img = await loadImageFromFile(file);
+    const originalWidth = img.naturalWidth || img.width;
+    const originalHeight = img.naturalHeight || img.height;
 
     const scale = Math.min(
         1,
-        MAX_IMAGE_DIMENSION / img.width,
-        MAX_IMAGE_DIMENSION / img.height
+        MAX_IMAGE_DIMENSION / originalWidth,
+        MAX_IMAGE_DIMENSION / originalHeight
     );
 
-    const width = Math.max(1, Math.round(img.width * scale));
-    const height = Math.max(1, Math.round(img.height * scale));
-
-    const canvas = document.createElement("canvas");
+    const width = Math.max(1, Math.round(originalWidth * scale));
+    const height = Math.max(1, Math.round(originalHeight * scale));
+    const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
 
-    const ctx = canvas.getContext("2d", { alpha: false });
+    const ctx = canvas.getContext('2d', { alpha: true });
+    if (!ctx) throw new Error('Your browser does not support image conversion.');
+
+    const inputType = (file.type || '').toLowerCase();
+    const outputType = inputType === 'image/png' ? 'image/png' : 'image/jpeg';
+
+    if (outputType === 'image/jpeg') {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+    }
+
     ctx.drawImage(img, 0, 0, width, height);
 
-    // JPEG keeps the Base64 payload much smaller.
-    const quality = file.type === "image/png" && scale === 1
-        ? 0.90
-        : 0.88;
-
-    const data = canvas.toDataURL("image/jpeg", quality);
+    const data = await canvasToDataURL(
+        canvas,
+        outputType,
+        outputType === 'image/png' ? undefined : 0.88
+    );
 
     return {
-        name: file.name.replace(/\.[^.]+$/, "") + ".jpg",
+        name: file.name.replace(/\.[^.]+$/, '') + (outputType === 'image/png' ? '.png' : '.jpg'),
         data,
-        size: Math.round((data.length - data.indexOf(",") - 1) * 0.75),
-        type: "image/jpeg"
+        size: Math.round((data.length - data.indexOf(',') - 1) * 0.75),
+        type: outputType,
+        base64: true,
+        image: true,
+        width,
+        height,
+        originalSize: file.size
     };
 }
 
 function getVideoMetadata(file) {
     return new Promise((resolve, reject) => {
-        const video = document.createElement("video");
         const url = URL.createObjectURL(file);
-
-        video.preload = "metadata";
+        const video = document.createElement('video');
+        video.preload = 'metadata';
         video.onloadedmetadata = () => {
             const result = {
                 width: video.videoWidth || 1280,
                 height: video.videoHeight || 720,
-                duration: video.duration || 0
+                duration: Number.isFinite(video.duration) ? video.duration : 0
             };
             URL.revokeObjectURL(url);
             resolve(result);
         };
         video.onerror = () => {
             URL.revokeObjectURL(url);
-            reject(new Error("Could not read video."));
+            reject(new Error(`"${file.name}" could not be read as a video.`));
         };
         video.src = url;
     });
@@ -2446,324 +2506,170 @@ function blobToDataURL(blob) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
+        reader.onerror = () => reject(new Error('Could not encode video.'));
         reader.readAsDataURL(blob);
     });
 }
 
-/*
- * Browser video encoding support differs by browser.
- * We first try MediaRecorder with WebM/VP8/VP9 and progressively
- * lower resolution/bitrate until the result is <= 5 MB.
- */
-async function compressVideoToBase64(file) {
-    const meta = await getVideoMetadata(file);
+function chooseVideoMimeType() {
+    const types = [
+        'video/webm;codecs=vp9',
+        'video/webm;codecs=vp8',
+        'video/webm'
+    ];
+    return types.find(type =>
+        window.MediaRecorder && MediaRecorder.isTypeSupported(type)
+    ) || '';
+}
 
-    // If already <= 5 MB, keep the original Base64.
-    if (file.size <= MAX_VIDEO_BYTES) {
-        return {
-            name: file.name,
-            data: await getFileDataUrl(file),
-            size: file.size,
-            type: file.type || "video/mp4"
-        };
-    }
+async function encodeVideo(file, width, height, bitrate) {
+    const mimeType = chooseVideoMimeType();
+    if (!mimeType) return null;
 
-    if (!window.MediaRecorder) {
-        throw new Error(
-            "This browser cannot compress this video. Please choose a video under 5 MB."
-        );
-    }
-
-    const source = document.createElement("video");
     const sourceURL = URL.createObjectURL(file);
-    source.src = sourceURL;
-    source.preload = "auto";
-    source.muted = true;
-    source.playsInline = true;
+    const video = document.createElement('video');
+    video.src = sourceURL;
+    video.preload = 'auto';
+    video.muted = true;
+    video.playsInline = true;
 
     await new Promise((resolve, reject) => {
-        source.onloadedmetadata = resolve;
-        source.onerror = () => reject(new Error("Could not load video."));
+        video.onloadedmetadata = resolve;
+        video.onerror = () => reject(new Error('Could not load video.'));
     });
-
-    const presets = [
-        { scale: 1, bitrate: 2500000 },
-        { scale: 0.85, bitrate: 1800000 },
-        { scale: 0.70, bitrate: 1200000 },
-        { scale: 0.55, bitrate: 800000 },
-        { scale: 0.40, bitrate: 500000 }
-    ];
-
-    for (const preset of presets) {
-        const width = Math.max(
-            2,
-            Math.floor((meta.width * preset.scale) / 2) * 2
-        );
-        const height = Math.max(
-            2,
-            Math.floor((meta.height * preset.scale) / 2) * 2
-        );
-
-        // Use a canvas to force the requested output resolution.
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext("2d");
-
-        const stream = canvas.captureStream(30);
-
-        const mimeTypes = [
-            "video/webm;codecs=vp9",
-            "video/webm;codecs=vp8",
-            "video/webm"
-        ];
-
-        const mimeType = mimeTypes.find(type =>
-            MediaRecorder.isTypeSupported(type)
-        );
-
-        if (!mimeType) continue;
-
-        const recorder = new MediaRecorder(stream, {
-            mimeType,
-            videoBitsPerSecond: preset.bitrate
-        });
-
-        const chunks = [];
-
-        const finished = new Promise((resolve, reject) => {
-            recorder.ondataavailable = e => {
-                if (e.data && e.data.size) chunks.push(e.data);
-            };
-            recorder.onerror = () => reject(new Error("Video encoding failed."));
-            recorder.onstop = () => resolve(new Blob(chunks, { type: mimeType }));
-        });
-
-        const drawFrame = () => {
-            if (source.ended || source.paused) return;
-            ctx.drawImage(source, 0, 0, width, height);
-            requestAnimationFrame(drawFrame);
-        };
-
-        recorder.start(250);
-
-        try {
-            await source.play();
-        } catch {
-            recorder.stop();
-            continue;
-        }
-
-        drawFrame();
-
-        await new Promise(resolve => {
-            source.onended = resolve;
-        });
-
-        if (recorder.state !== "inactive") recorder.stop();
-
-        const blob = await finished;
-
-        if (blob.size <= MAX_VIDEO_BYTES) {
-            URL.revokeObjectURL(sourceURL);
-
-            return {
-                name: file.name.replace(/\.[^.]+$/, "") + ".webm",
-                data: await blobToDataURL(blob),
-                size: blob.size,
-                type: "video/webm"
-            };
-        }
-    }
-
-    URL.revokeObjectURL(sourceURL);
-
-    throw new Error(
-        "This video could not be compressed below 5 MB. Try a shorter video."
-    );
-}
-
-async function processMediaFile(file) {
-    if ((file.type || "").startsWith("image/")) {
-        return await imageToBase64(file);
-    }
-
-    if ((file.type || "").startsWith("video/")) {
-        return await compressVideoToBase64(file);
-    }
-
-    return {
-        name: file.name,
-        data: await getFileDataUrl(file),
-        size: file.size,
-        type: file.type || "application/octet-stream"
-    };
-}
-
-/* =====================================================
-   FILE HANDLING
-===================================================== */
-
-function formatFileSize(bytes) {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / 1048576).toFixed(1) + ' MB';
-}
-
-function getFileIcon(mimeType, fileName) {
-    if ((mimeType || '').startsWith('image/')) return '🖼️';
-    if ((mimeType || '').startsWith('video/')) return '🎬';
-    if ((mimeType || '').startsWith('audio/')) return '🎵';
-    if ((mimeType || '').includes('pdf')) return '📄';
-    if ((mimeType || '').includes('zip') || (mimeType || '').includes('rar') || (mimeType || '').includes('7z')) return '📦';
-    if ((mimeType || '').includes('text')) return '📝';
-    if ((mimeType || '').includes('word') || (mimeType || '').includes('document')) return '📘';
-    if ((mimeType || '').includes('sheet') || (mimeType || '').includes('excel')) return '📊';
-    if ((mimeType || '').includes('presentation') || (mimeType || '').includes('powerpoint')) return '📙';
-    if ((mimeType || '').includes('json') || (mimeType || '').includes('xml')) return '📋';
-    if ((mimeType || '').includes('javascript') || (mimeType || '').includes('python') || (mimeType || '').includes('html')) return '💻';
-    return '📎';
-}
-
-/*
-   IMAGE -> BASE64 SYSTEM
-
-   Every selected image is decoded in the browser, resized so neither
-   dimension is larger than 1500px, converted back to an image, and
-   stored as a complete data URL:
-
-       data:image/jpeg;base64,...
-
-   That data URL is sent to /api/messages and is what the server stores.
-   Non-image files keep the normal Base64/data-URL file system.
-*/
-const MAX_IMAGE_DIMENSION = 1500;
-const IMAGE_OUTPUT_QUALITY = 0.88;
-
-function readFileAsDataURL(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-}
-
-function getFileExtension(filename) {
-    const parts = filename.split('.');
-    return parts.length > 1 ? parts[parts.length - 1] : '';
-}
-
-function loadImageFromFile(file) {
-    return new Promise((resolve, reject) => {
-        const objectUrl = URL.createObjectURL(file);
-        const img = new Image();
-
-        img.onload = () => {
-            URL.revokeObjectURL(objectUrl);
-            resolve(img);
-        };
-
-        img.onerror = () => {
-            URL.revokeObjectURL(objectUrl);
-            reject(new Error(`"${file.name}" could not be read as an image.`));
-        };
-
-        img.src = objectUrl;
-    });
-}
-
-function canvasToDataURL(canvas, type, quality) {
-    return new Promise((resolve, reject) => {
-        canvas.toBlob(blob => {
-            if (!blob) {
-                reject(new Error("Could not convert image."));
-                return;
-            }
-
-            const reader = new FileReader();
-
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        }, type, quality);
-    });
-}
-
-async function imageToBase64(file) {
-    const img = await loadImageFromFile(file);
-
-    const originalWidth = img.naturalWidth || img.width;
-    const originalHeight = img.naturalHeight || img.height;
-
-    if (!originalWidth || !originalHeight) {
-        throw new Error(`"${file.name}" has no usable image dimensions.`);
-    }
-
-    // Never upscale. Only shrink images larger than .
-    const scale = Math.min(
-        1,
-        MAX_IMAGE_DIMENSION / originalWidth,
-        MAX_IMAGE_DIMENSION / originalHeight
-    );
-
-    const width = Math.max(1, Math.round(originalWidth * scale));
-    const height = Math.max(1, Math.round(originalHeight * scale));
 
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
-
-    const ctx = canvas.getContext('2d', { alpha: true });
-
+    const ctx = canvas.getContext('2d');
     if (!ctx) {
-        throw new Error("Your browser does not support image conversion.");
+        URL.revokeObjectURL(sourceURL);
+        throw new Error('Canvas video encoding is not supported.');
     }
 
-    // Keep transparency for PNG input. Other image types become JPEG.
-    const inputType = (file.type || '').toLowerCase();
-    const outputType = inputType === 'image/png'
-        ? 'image/png'
-        : 'image/jpeg';
+    const stream = canvas.captureStream(30);
+    const recorder = new MediaRecorder(stream, {
+        mimeType,
+        videoBitsPerSecond: bitrate
+    });
+    const chunks = [];
 
-    if (outputType === 'image/jpeg') {
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, width, height);
+    const finished = new Promise((resolve, reject) => {
+        recorder.ondataavailable = e => {
+            if (e.data && e.data.size) chunks.push(e.data);
+        };
+        recorder.onerror = () => reject(new Error('Video encoding failed.'));
+        recorder.onstop = () => resolve(new Blob(chunks, { type: mimeType }));
+    });
+
+    let drawing = true;
+    const draw = () => {
+        if (!drawing) return;
+        if (!video.paused && !video.ended) {
+            ctx.drawImage(video, 0, 0, width, height);
+        }
+        requestAnimationFrame(draw);
+    };
+
+    recorder.start(250);
+    try {
+        await video.play();
+    } catch (error) {
+        drawing = false;
+        if (recorder.state !== 'inactive') recorder.stop();
+        URL.revokeObjectURL(sourceURL);
+        throw new Error('This video could not be played for compression.');
     }
 
-    ctx.drawImage(img, 0, 0, width, height);
+    draw();
 
-    const dataUrl = await canvasToDataURL(
-        canvas,
-        outputType,
-        IMAGE_OUTPUT_QUALITY
+    await new Promise(resolve => {
+        video.onended = resolve;
+    });
+
+    drawing = false;
+    if (recorder.state !== 'inactive') recorder.stop();
+    const blob = await finished;
+    URL.revokeObjectURL(sourceURL);
+    return blob;
+}
+
+async function compressVideoToBase64(file) {
+    const meta = await getVideoMetadata(file);
+
+    if (meta.duration > MAX_VIDEO_DURATION_SECONDS) {
+        throw new Error('Video is too long. Maximum video length is 60 minutes.');
+    }
+
+    // Files already under the 5 MB file limit do not need re-encoding.
+    if (file.size <= MAX_VIDEO_BYTES) {
+        return {
+            name: file.name,
+            data: await readFileAsDataURL(file),
+            size: file.size,
+            type: file.type || 'video/mp4',
+            base64: true,
+            image: false,
+            video: true
+        };
+    }
+
+    if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) {
+        throw new Error('This browser cannot compress this video. Please choose a video under 5 MB.');
+    }
+
+    // Keep enough room for the Base64 string in the request while targeting
+    // a real binary file size of <= 5 MB.
+    const duration = Math.max(meta.duration, 1);
+    const targetTotalBitrate = Math.max(
+        160000,
+        Math.floor((MAX_VIDEO_BYTES * 8 * 0.90) / duration)
     );
 
-    return {
-        data: dataUrl,
-        width,
-        height,
-        type: outputType
-    };
-}
+    const presets = [
+        { scale: 1.00, bitrate: Math.min(2800000, targetTotalBitrate) },
+        { scale: 0.85, bitrate: Math.min(2000000, targetTotalBitrate) },
+        { scale: 0.70, bitrate: Math.min(1400000, targetTotalBitrate) },
+        { scale: 0.55, bitrate: Math.min(900000, targetTotalBitrate) },
+        { scale: 0.40, bitrate: Math.min(550000, targetTotalBitrate) },
+        { scale: 0.30, bitrate: Math.min(350000, targetTotalBitrate) }
+    ];
 
-async function getFileDataUrl(file) {
-    if ((file.type || '').startsWith('image/')) {
-        const image = await imageToBase64(file);
-        return image.data;
+    for (const preset of presets) {
+        const width = Math.max(2, Math.floor(meta.width * preset.scale / 2) * 2);
+        const height = Math.max(2, Math.floor(meta.height * preset.scale / 2) * 2);
+        const bitrate = Math.max(120000, preset.bitrate);
+
+        try {
+            const blob = await encodeVideo(file, width, height, bitrate);
+            if (!blob) continue;
+
+            if (blob.size <= MAX_VIDEO_BYTES) {
+                return {
+                    name: file.name.replace(/\.[^.]+$/, '') + '.webm',
+                    data: await blobToDataURL(blob),
+                    size: blob.size,
+                    type: 'video/webm',
+                    base64: true,
+                    image: false,
+                    video: true,
+                    width,
+                    height,
+                    originalSize: file.size
+                };
+            }
+        } catch (error) {
+            // Try the next, smaller preset.
+        }
     }
 
-    return readFileAsDataURL(file);
+    throw new Error('This video could not be compressed below 5 MB. Try a shorter video.');
 }
 
-attachBtn.onclick = () => {
-    fileInput.click();
-};
+attachBtn.onclick = () => fileInput.click();
 
 fileInput.onchange = async () => {
-    const files = Array.from(fileInput.files);
+    const files = Array.from(fileInput.files || []);
     if (!files.length) return;
 
     for (const file of files) {
@@ -2772,11 +2678,12 @@ fileInput.onchange = async () => {
             break;
         }
 
-        const isImage = (file.type || '').startsWith('image/');
+        const type = (file.type || '').toLowerCase();
+        const isImage = type.startsWith('image/');
+        const isVideo = type.startsWith('video/');
 
-        // The 5MB limit applies only to non-images.
-        // Images are resized before their Base64 data is sent.
-        if (!isImage && file.size > MAX_FILE_SIZE) {
+        // Images and videos have their own processing rules.
+        if (!isImage && !isVideo && file.size > MAX_FILE_SIZE) {
             alert(
                 `File "${file.name}" is too large ` +
                 `(${formatFileSize(file.size)}). ` +
@@ -2786,55 +2693,27 @@ fileInput.onchange = async () => {
         }
 
         try {
-            const dataUrl = await getFileDataUrl(file);
-
-            let storedType = file.type || 'application/octet-stream';
-            let storedSize = file.size;
-            let imageWidth = null;
-            let imageHeight = null;
+            let processed;
 
             if (isImage) {
-                const image = await imageToBase64(file);
-
-                // The server receives this resized Base64 data URL.
-                const base64Bytes = Math.max(
-                    0,
-                    Math.ceil(
-                        (image.data.split(',')[1] || '').length * 0.75
-                    )
-                );
-
-                storedType = image.type;
-                storedSize = base64Bytes;
-                imageWidth = image.width;
-                imageHeight = image.height;
-
-                pendingFiles.push({
-                    name: file.name,
-                    data: image.data,
-                    size: storedSize,
-                    originalSize: file.size,
-                    type: storedType,
-                    width: imageWidth,
-                    height: imageHeight,
-                    base64: true,
-                    image: true
-                });
+                processed = await imageToBase64(file);
+            } else if (isVideo) {
+                processed = await compressVideoToBase64(file);
             } else {
-                pendingFiles.push({
+                processed = {
                     name: file.name,
-                    data: dataUrl,
-                    size: storedSize,
-                    type: storedType,
+                    data: await readFileAsDataURL(file),
+                    size: file.size,
+                    type: file.type || 'application/octet-stream',
                     base64: true,
-                    image: false
-                });
+                    image: false,
+                    video: false
+                };
             }
+
+            pendingFiles.push(processed);
         } catch (error) {
-            alert(
-                `Could not process "${file.name}":\n\n` +
-                error.message
-            );
+            alert(`Could not process "${file.name}":\n\n${error.message}`);
         }
     }
 
@@ -2845,32 +2724,35 @@ fileInput.onchange = async () => {
 function renderFilePreview() {
     filePreview.innerHTML = '';
     if (!pendingFiles.length) return;
-    
+
     pendingFiles.forEach((file, index) => {
         const item = document.createElement('div');
         item.className = 'file-preview-item';
-        const imageLabel = file.image
-            ? `🖼️ ${file.width}×${file.height} • Base64`
-            : `${getFileIcon(file.type, file.name)}`;
 
-        item.innerHTML = `
-            <span>${imageLabel}</span>
-            <span>${escapeHtml(file.name)}</span>
-            <span style="color:var(--muted);font-size:10px;">${formatFileSize(file.size)}</span>
-            <span class="remove-file" data-index="${index}">✕</span>
-        `;
+        const icon = document.createElement('span');
+        icon.textContent = getFileIcon(file.type, file.name);
+
+        const name = document.createElement('span');
+        name.textContent = file.name;
+
+        const remove = document.createElement('span');
+        remove.className = 'remove-file';
+        remove.dataset.index = index;
+        remove.textContent = '✕';
+
+        item.appendChild(icon);
+        item.appendChild(name);
+        item.appendChild(remove);
         filePreview.appendChild(item);
     });
-    
+
     filePreview.querySelectorAll('.remove-file').forEach(el => {
         el.onclick = () => {
-            const idx = parseInt(el.dataset.index);
-            pendingFiles.splice(idx, 1);
+            pendingFiles.splice(Number(el.dataset.index), 1);
             renderFilePreview();
         };
     });
 }
-
 
 /* =====================================================
    SETTINGS UI
@@ -3861,17 +3743,25 @@ function createMessageElement(message) {
                 };
 
                 content.appendChild(img);
+                return;
+            }
 
-                const imageInfo = document.createElement("div");
-                imageInfo.className = "file-size";
-                imageInfo.style.marginTop = "4px";
-                imageInfo.textContent =
-                    `${file.width || 1500}×${file.height || 1500}` +
-                    (file.originalSize
-                        ? ` • ${formatFileSize(file.originalSize)} original`
-                        : '');
+            // Videos are shown as previews with controls. They never autoplay.
+            const isVideo =
+                file.video === true ||
+                type.startsWith('video/') ||
+                (typeof file.data === 'string' && file.data.startsWith('data:video/'));
 
-                content.appendChild(imageInfo);
+            if (isVideo && file.data) {
+                const video = document.createElement('video');
+                video.className = 'message-video';
+                video.src = file.data;
+                video.controls = true;
+                video.autoplay = false;
+                video.preload = 'metadata';
+                video.playsInline = true;
+                video.setAttribute('playsinline', '');
+                content.appendChild(video);
                 return;
             }
 
