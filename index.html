@@ -2003,13 +2003,14 @@ async function startRecording(){
             reader.onload=()=>{
                 const base64Data=reader.result;
                 pendingFileData=base64Data;
-                pendingFileName='voice-'+Date.now()+'.webm';
+                pendingFileName='voice-' + Date.now() + '.webm';
                 pendingFileType='voice';
                 pendingFileSize=audioBlob.size;
                 attachBtn.textContent='🎤';
                 attachBtn.style.color='#7affb0';
                 attachBtn.classList.add('has-file');
                 showNotification("Voice message recorded!","🎤");
+                // Clean up
                 stream.getTracks().forEach(track=>track.stop());
             };
             reader.readAsDataURL(audioBlob);
@@ -2046,6 +2047,7 @@ function cancelRecording(){
             voiceBtn.classList.remove('recording');
             voiceIndicator.classList.remove('active');
             clearInterval(recordingTimer);
+            // Clean up
             if(mediaRecorder.stream) mediaRecorder.stream.getTracks().forEach(track=>track.stop());
             showNotification("Recording cancelled","✕");
         };
@@ -2221,7 +2223,7 @@ async function sendChatMessage(){
             payload.file_size=pendingFileSize;
         }
         
-        await apiPost(payload);
+        const result=await apiPost(payload);
         
         messageInput.value="";
         messageInput.style.height="auto";
@@ -3896,6 +3898,7 @@ async function startGame(game){
     copy.turnIndex=0;
     const settings=copy.data.settings||{};
     
+    // Initialize game data
     const initMap={
         ttt:()=>{const s=settings.boardSize||3;copy.data.board=Array(s*s).fill("");},
         connect4:()=>{const s=settings.boardSize||"7x6";const[c,r]=s.split('x').map(Number);copy.data.board=Array(c*r).fill("");},
