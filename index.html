@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Game Chat</title>
+<title>Chat - Multiplayer Games</title>
 
 <style>
 *{
@@ -171,6 +171,8 @@ button{
     word-spacing:var(--word-spacing);
     line-height:var(--line-spacing);
 }
+
+.message-video{display:block;max-width:min(600px,80vw);max-height:500px;margin-top:8px;border:1px solid var(--border);border-radius:var(--radius);background:#000;object-fit:contain;}
 
 .message-image{
     display:block;
@@ -1348,126 +1350,6 @@ textarea{
     color:#7affb0;
 }
 
-/* =====================================================
-   ANIMATED INTRO
-===================================================== */
-
-.intro-overlay{
-    position:fixed;
-    inset:0;
-    z-index:1000;
-    background:#0b0d10;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    animation:fadeOut 0.8s ease 2.5s forwards;
-}
-
-.intro-overlay.hidden{
-    display:none;
-}
-
-@keyframes fadeOut{
-    to{
-        opacity:0;
-        pointer-events:none;
-    }
-}
-
-.intro-logo{
-    font-size:80px;
-    animation:bounceIn 1s ease forwards;
-}
-
-@keyframes bounceIn{
-    0%{
-        transform:scale(0) rotate(-180deg);
-        opacity:0;
-    }
-    50%{
-        transform:scale(1.3) rotate(10deg);
-        opacity:1;
-    }
-    70%{
-        transform:scale(0.9) rotate(-5deg);
-    }
-    100%{
-        transform:scale(1) rotate(0deg);
-    }
-}
-
-.intro-title{
-    font-size:48px;
-    font-weight:900;
-    margin-top:20px;
-    background:linear-gradient(135deg,#ff6b6b,#ffd93d,#4ecdc4,#ff6b6b);
-    background-size:300% 300%;
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    animation:gradientShift 2s ease infinite;
-}
-
-@keyframes gradientShift{
-    0%{background-position:0% 50%;}
-    50%{background-position:100% 50%;}
-    100%{background-position:0% 50%;}
-}
-
-.intro-subtitle{
-    font-size:18px;
-    color:var(--muted);
-    margin-top:10px;
-    opacity:0;
-    animation:slideUp 0.6s ease 0.5s forwards;
-}
-
-@keyframes slideUp{
-    from{
-        opacity:0;
-        transform:translateY(30px);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
-
-.intro-loading{
-    margin-top:30px;
-    display:flex;
-    gap:8px;
-}
-
-.intro-dot{
-    width:14px;
-    height:14px;
-    border-radius:50%;
-    background:var(--border);
-    animation:dotPulse 1.2s ease infinite;
-}
-
-.intro-dot:nth-child(2){
-    animation-delay:0.2s;
-}
-.intro-dot:nth-child(3){
-    animation-delay:0.4s;
-}
-.intro-dot:nth-child(4){
-    animation-delay:0.6s;
-}
-
-@keyframes dotPulse{
-    0%,100%{
-        transform:scale(0.6);
-        background:var(--border);
-    }
-    50%{
-        transform:scale(1.2);
-        background:var(--accent);
-    }
-}
-
 @media(max-width:600px){
 
     .header{
@@ -1550,32 +1432,11 @@ textarea{
     .composer-box{
         flex-wrap:wrap;
     }
-
-    .intro-title{
-        font-size:32px;
-    }
-    .intro-logo{
-        font-size:60px;
-    }
 }
 </style>
 </head>
 
 <body>
-
-<!-- ANIMATED INTRO -->
-<div class="intro-overlay" id="introOverlay">
-    <div class="intro-logo">🎮</div>
-    <div class="intro-title">Game Chat</div>
-    <div class="intro-subtitle">Multiplayer Games &amp; Chat</div>
-    <div class="intro-loading">
-        <div class="intro-dot"></div>
-        <div class="intro-dot"></div>
-        <div class="intro-dot"></div>
-        <div class="intro-dot"></div>
-    </div>
-</div>
-
 
 <div class="app">
 
@@ -1615,7 +1476,7 @@ textarea{
     <div class="composer-box">
 
         <button class="attach-btn" id="attachBtn" title="Attach files">📎</button>
-        <input type="file" id="fileInput" accept="*/*" multiple style="display:none">
+        <input type="file" id="fileInput" accept="image/*,video/*,*/*" multiple style="display:none">
 
         <div class="file-preview" id="filePreview"></div>
 
@@ -2150,19 +2011,6 @@ const GAME_PREFIX="__CHAT_GAME_STATE__:";
 
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB per file
-const MAX_IMAGE_SIZE = 1000; // 1000x1000 max
-
-
-/* =====================================================
-   INTRO
-===================================================== */
-
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        const intro = document.getElementById('introOverlay');
-        intro.classList.add('hidden');
-    }, 2800);
-});
 
 
 /* =====================================================
@@ -2522,19 +2370,34 @@ function formatFileSize(bytes) {
 }
 
 function getFileIcon(mimeType, fileName) {
-    if (mimeType.startsWith('image/')) return '🖼️';
-    if (mimeType.startsWith('video/')) return '🎬';
-    if (mimeType.startsWith('audio/')) return '🎵';
-    if (mimeType.includes('pdf')) return '📄';
-    if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('7z')) return '📦';
-    if (mimeType.includes('text')) return '📝';
-    if (mimeType.includes('word') || mimeType.includes('document')) return '📘';
-    if (mimeType.includes('sheet') || mimeType.includes('excel')) return '📊';
-    if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) return '📙';
-    if (mimeType.includes('json') || mimeType.includes('xml')) return '📋';
-    if (mimeType.includes('javascript') || mimeType.includes('python') || mimeType.includes('html')) return '💻';
+    if ((mimeType || '').startsWith('image/')) return '🖼️';
+    if ((mimeType || '').startsWith('video/')) return '🎬';
+    if ((mimeType || '').startsWith('audio/')) return '🎵';
+    if ((mimeType || '').includes('pdf')) return '📄';
+    if ((mimeType || '').includes('zip') || (mimeType || '').includes('rar') || (mimeType || '').includes('7z')) return '📦';
+    if ((mimeType || '').includes('text')) return '📝';
+    if ((mimeType || '').includes('word') || (mimeType || '').includes('document')) return '📘';
+    if ((mimeType || '').includes('sheet') || (mimeType || '').includes('excel')) return '📊';
+    if ((mimeType || '').includes('presentation') || (mimeType || '').includes('powerpoint')) return '📙';
+    if ((mimeType || '').includes('json') || (mimeType || '').includes('xml')) return '📋';
+    if ((mimeType || '').includes('javascript') || (mimeType || '').includes('python') || (mimeType || '').includes('html')) return '💻';
     return '📎';
 }
+
+/*
+   IMAGE -> BASE64 SYSTEM
+
+   Every selected image is decoded in the browser, resized so neither
+   dimension is larger than 1500px, converted back to an image, and
+   stored as a complete data URL:
+
+       data:image/jpeg;base64,...
+
+   That data URL is sent to /api/messages and is what the server stores.
+   Non-image files keep the normal Base64/data-URL file system.
+*/
+const MAX_IMAGE_DIMENSION = 1500;
+const IMAGE_OUTPUT_QUALITY = 0.88;
 
 function readFileAsDataURL(file) {
     return new Promise((resolve, reject) => {
@@ -2550,50 +2413,106 @@ function getFileExtension(filename) {
     return parts.length > 1 ? parts[parts.length - 1] : '';
 }
 
-function getFileDataUrl(file) {
+function loadImageFromFile(file) {
     return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+        const objectUrl = URL.createObjectURL(file);
+        const img = new Image();
+
+        img.onload = () => {
+            URL.revokeObjectURL(objectUrl);
+            resolve(img);
+        };
+
+        img.onerror = () => {
+            URL.revokeObjectURL(objectUrl);
+            reject(new Error(`"${file.name}" could not be read as an image.`));
+        };
+
+        img.src = objectUrl;
     });
 }
 
-// Image resizing function - max 1000x1000
-function resizeImage(file, maxSize) {
+function canvasToDataURL(canvas, type, quality) {
     return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.onload = function() {
-                let width = img.width;
-                let height = img.height;
-                
-                // Only resize if larger than maxSize
-                if (width > maxSize || height > maxSize) {
-                    const ratio = Math.min(maxSize / width, maxSize / height);
-                    width = Math.round(width * ratio);
-                    height = Math.round(height * ratio);
-                }
-                
-                const canvas = document.createElement('canvas');
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                // Use high quality image rendering
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
-                ctx.drawImage(img, 0, 0, width, height);
-                
-                // Use maximum quality (1.0)
-                resolve(canvas.toDataURL('image/jpeg', 1.0));
-            };
-            img.onerror = reject;
-            img.src = e.target.result;
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+        canvas.toBlob(blob => {
+            if (!blob) {
+                reject(new Error("Could not convert image."));
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        }, type, quality);
     });
+}
+
+async function imageToBase64(file) {
+    const img = await loadImageFromFile(file);
+
+    const originalWidth = img.naturalWidth || img.width;
+    const originalHeight = img.naturalHeight || img.height;
+
+    if (!originalWidth || !originalHeight) {
+        throw new Error(`"${file.name}" has no usable image dimensions.`);
+    }
+
+    // Never upscale. Only shrink images larger than .
+    const scale = Math.min(
+        1,
+        MAX_IMAGE_DIMENSION / originalWidth,
+        MAX_IMAGE_DIMENSION / originalHeight
+    );
+
+    const width = Math.max(1, Math.round(originalWidth * scale));
+    const height = Math.max(1, Math.round(originalHeight * scale));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext('2d', { alpha: true });
+
+    if (!ctx) {
+        throw new Error("Your browser does not support image conversion.");
+    }
+
+    // Keep transparency for PNG input. Other image types become JPEG.
+    const inputType = (file.type || '').toLowerCase();
+    const outputType = inputType === 'image/png'
+        ? 'image/png'
+        : 'image/jpeg';
+
+    if (outputType === 'image/jpeg') {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+    }
+
+    ctx.drawImage(img, 0, 0, width, height);
+
+    const dataUrl = await canvasToDataURL(
+        canvas,
+        outputType,
+        IMAGE_OUTPUT_QUALITY
+    );
+
+    return {
+        data: dataUrl,
+        width,
+        height,
+        type: outputType
+    };
+}
+
+async function getFileDataUrl(file) {
+    if ((file.type || '').startsWith('image/')) {
+        const image = await imageToBase64(file);
+        return image.data;
+    }
+
+    return readFileAsDataURL(file);
 }
 
 attachBtn.onclick = () => {
@@ -2603,38 +2522,79 @@ attachBtn.onclick = () => {
 fileInput.onchange = async () => {
     const files = Array.from(fileInput.files);
     if (!files.length) return;
-    
+
     for (const file of files) {
         if (pendingFiles.length >= MAX_FILES) {
             alert(`Maximum ${MAX_FILES} files per message.`);
             break;
         }
-        
-        if (file.size > MAX_FILE_SIZE) {
-            alert(`File "${file.name}" is too large (${formatFileSize(file.size)}). Max ${formatFileSize(MAX_FILE_SIZE)}.`);
+
+        const isImage = (file.type || '').startsWith('image/');
+
+        // The 5MB limit applies only to non-images.
+        // Images are resized before their Base64 data is sent.
+        if (!isImage && file.size > MAX_FILE_SIZE) {
+            alert(
+                `File "${file.name}" is too large ` +
+                `(${formatFileSize(file.size)}). ` +
+                `Max ${formatFileSize(MAX_FILE_SIZE)}.`
+            );
             continue;
         }
-        
-        let dataUrl;
-        // Resize images to max 1000x1000
-        if (file.type.startsWith('image/')) {
-            try {
-                dataUrl = await resizeImage(file, MAX_IMAGE_SIZE);
-            } catch (e) {
-                dataUrl = await getFileDataUrl(file);
+
+        try {
+            const dataUrl = await getFileDataUrl(file);
+
+            let storedType = file.type || 'application/octet-stream';
+            let storedSize = file.size;
+            let imageWidth = null;
+            let imageHeight = null;
+
+            if (isImage) {
+                const image = await imageToBase64(file);
+
+                // The server receives this resized Base64 data URL.
+                const base64Bytes = Math.max(
+                    0,
+                    Math.ceil(
+                        (image.data.split(',')[1] || '').length * 0.75
+                    )
+                );
+
+                storedType = image.type;
+                storedSize = base64Bytes;
+                imageWidth = image.width;
+                imageHeight = image.height;
+
+                pendingFiles.push({
+                    name: file.name,
+                    data: image.data,
+                    size: storedSize,
+                    originalSize: file.size,
+                    type: storedType,
+                    width: imageWidth,
+                    height: imageHeight,
+                    base64: true,
+                    image: true
+                });
+            } else {
+                pendingFiles.push({
+                    name: file.name,
+                    data: dataUrl,
+                    size: storedSize,
+                    type: storedType,
+                    base64: true,
+                    image: false
+                });
             }
-        } else {
-            dataUrl = await getFileDataUrl(file);
+        } catch (error) {
+            alert(
+                `Could not process "${file.name}":\n\n` +
+                error.message
+            );
         }
-        
-        pendingFiles.push({
-            name: file.name,
-            data: dataUrl,
-            size: file.size,
-            type: file.type || 'application/octet-stream'
-        });
     }
-    
+
     renderFilePreview();
     fileInput.value = '';
 };
@@ -2646,9 +2606,13 @@ function renderFilePreview() {
     pendingFiles.forEach((file, index) => {
         const item = document.createElement('div');
         item.className = 'file-preview-item';
+        const imageLabel = file.image
+            ? `🖼️ ${file.width}×${file.height} • Base64`
+            : `${getFileIcon(file.type, file.name)}`;
+
         item.innerHTML = `
-            <span>${getFileIcon(file.type, file.name)}</span>
-            <span>${file.name}</span>
+            <span>${imageLabel}</span>
+            <span>${escapeHtml(file.name)}</span>
             <span style="color:var(--muted);font-size:10px;">${formatFileSize(file.size)}</span>
             <span class="remove-file" data-index="${index}">✕</span>
         `;
@@ -3486,6 +3450,15 @@ function renderMessages(shouldAutoScroll){
    CREATE MESSAGE ELEMENT
 ===================================================== */
 
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 function createMessageElement(message) {
 
     const item =
@@ -3588,51 +3561,124 @@ function createMessageElement(message) {
         content.appendChild(img);
     }
 
-    // Files (new multi-file support)
+    // Files / Images
+    // Images are stored by the server as Base64 data URLs.
     if (message.files && Array.isArray(message.files) && message.files.length) {
         const fileList = document.createElement("div");
         fileList.className = "file-list";
-        
+
         message.files.forEach(file => {
+            const type = file.type || '';
+            const isImage =
+                file.image === true ||
+                type.startsWith('image/') ||
+                (
+                    typeof file.data === 'string' &&
+                    file.data.startsWith('data:image/')
+                );
+
+            if (isImage && file.data) {
+                const img = document.createElement("img");
+                img.className = "message-image";
+                img.src = file.data;
+                img.alt = file.name || "Image";
+                img.loading = "lazy";
+                img.decoding = "async";
+
+                img.onclick = () => {
+                    const viewer = window.open('', '_blank');
+                    if (viewer) {
+                        viewer.document.write(`
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                                <title>${escapeHtml(file.name || 'Image')}</title>
+                                <style>
+                                    html,body{
+                                        margin:0;
+                                        min-height:100%;
+                                        background:#111;
+                                        display:grid;
+                                        place-items:center;
+                                    }
+                                    img{
+                                        max-width:100vw;
+                                        max-height:100vh;
+                                        object-fit:contain;
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <img src="${file.data}" alt="">
+                            </body>
+                            </html>
+                        `);
+                        viewer.document.close();
+                    }
+                };
+
+                content.appendChild(img);
+
+                const imageInfo = document.createElement("div");
+                imageInfo.className = "file-size";
+                imageInfo.style.marginTop = "4px";
+                imageInfo.textContent =
+                    `${file.width || 1500}×${file.height || 1500}` +
+                    (file.originalSize
+                        ? ` • ${formatFileSize(file.originalSize)} original`
+                        : '');
+
+                content.appendChild(imageInfo);
+                return;
+            }
+
+            // Non-image files remain downloadable Base64 data URLs.
             const fileEl = document.createElement("div");
             fileEl.className = "message-file";
-            
+
             const icon = document.createElement("span");
             icon.className = "file-icon";
-            icon.textContent = getFileIcon(file.type || '', file.name || 'file');
-            
+            icon.textContent =
+                getFileIcon(type, file.name || 'file');
+
             const info = document.createElement("div");
             info.className = "file-info";
-            
+
             const nameEl = document.createElement("div");
             nameEl.className = "file-name";
-            nameEl.textContent = file.name || 'Unknown file';
-            
+            nameEl.textContent =
+                file.name || 'Unknown file';
+
             const sizeEl = document.createElement("div");
             sizeEl.className = "file-size";
-            sizeEl.textContent = file.size ? formatFileSize(file.size) : '';
-            
+            sizeEl.textContent =
+                file.size ? formatFileSize(file.size) : '';
+
             info.appendChild(nameEl);
             info.appendChild(sizeEl);
-            
+
             fileEl.appendChild(icon);
             fileEl.appendChild(info);
-            
-            // Click to download
+
             fileEl.onclick = () => {
                 if (file.data) {
-                    const a = document.createElement('a');
+                    const a =
+                        document.createElement('a');
+
                     a.href = file.data;
-                    a.download = file.name || 'download';
+                    a.download =
+                        file.name || 'download';
                     a.target = '_blank';
                     a.click();
                 }
             };
-            
+
             fileList.appendChild(fileEl);
         });
-        
-        content.appendChild(fileList);
+
+        if (fileList.children.length) {
+            content.appendChild(fileList);
+        }
     }
 
     item.appendChild(avatar);
