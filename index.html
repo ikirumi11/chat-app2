@@ -1522,6 +1522,19 @@ textarea{
 .voice-dot{width:8px;height:8px;border-radius:50%;background:#ff4d67;animation:voicePulse 1s infinite;}
 .message-audio{display:flex;align-items:center;gap:10px;margin-top:8px;max-width:min(500px,82vw);padding:8px 10px;border:1px solid var(--border);border-radius:12px;background:var(--panel2);}
 .message-audio audio{width:min(380px,65vw);max-width:100%;}
+
+.profile-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid var(--border);display:block;background:var(--panel2);flex-shrink:0;}
+.profile-preview{width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid var(--border);background:var(--panel2);display:block;margin-top:8px;}
+.hangman-board{display:flex;flex-direction:column;gap:12px;margin-top:12px;padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--panel2);}
+.hangman-players{font-weight:700;font-size:14px;}
+.hangman-word{font-size:28px;letter-spacing:8px;text-align:center;font-weight:800;padding:8px 4px;overflow-wrap:anywhere;}
+.hangman-used{color:var(--muted);font-size:13px;}
+.hangman-attempts{font-weight:700;}
+.hangman-letters{display:grid;grid-template-columns:repeat(9,minmax(28px,1fr));gap:5px;}
+.hangman-letter{min-height:36px;border:1px solid var(--border);border-radius:8px;background:var(--panel3);color:var(--text);font-weight:700;}
+.hangman-letter:hover:not(:disabled){filter:brightness(1.15);}
+.hangman-letter:disabled{opacity:.35;cursor:not-allowed;}
+.hangman-result{text-align:center;font-weight:900;font-size:20px;padding:8px;border-radius:10px;background:var(--panel3);}
 @media(max-width:600px){
     html,body{height:100%;height:100dvh;overflow:hidden;}
     .app{height:100dvh;min-height:0;}
@@ -1538,6 +1551,8 @@ textarea{
     .message-video,.message-image{max-width:calc(100vw - 70px);max-height:45dvh;}
     .message-audio{max-width:calc(100vw - 70px);}
     .message-audio audio{width:100%;}
+    .hangman-letters{grid-template-columns:repeat(7,minmax(28px,1fr));}
+    .hangman-word{font-size:22px;letter-spacing:5px;}
     .overlay{padding:env(safe-area-inset-top) 8px env(safe-area-inset-bottom);}
     .panel{width:100%;max-width:620px;max-height:calc(100dvh - 16px);border-radius:14px;}
 }
@@ -1673,6 +1688,13 @@ Choose a game to create a lobby. Others can join before you start.
     <div class="game-players">2-3 players</div>
 </button>
 
+<!-- Hangman -->
+<button class="game-choice" data-game="hangman">
+    <strong>🎮 Hangman</strong>
+    <span>Choose a word and guess letters</span>
+    <div class="game-players">2 players</div>
+</button>
+
 <!-- Original Games -->
 <button class="game-choice" data-game="memory">
     <strong>🧠 Memory Match</strong>
@@ -1801,6 +1823,12 @@ Choose a game to create a lobby. Others can join before you start.
     placeholder="Enter your name"
 >
 
+</div>
+
+<div class="setting">
+<label>Profile picture</label>
+<input id="profilePictureInput" type="file" accept="image/*">
+<img id="profilePicturePreview" class="profile-preview" alt="Profile picture preview">
 </div>
 
 <div class="setting">
@@ -2343,6 +2371,12 @@ const usernameInput=
 const deviceIdInput=
     document.getElementById("deviceIdInput");
 
+const profilePictureInput=
+    document.getElementById("profilePictureInput");
+
+const profilePicturePreview=
+    document.getElementById("profilePicturePreview");
+
 const refreshRate=
     document.getElementById("refreshRate");
 
@@ -2420,6 +2454,8 @@ let renderedElements=new Map();
 let renderedData=new Map();
 let seenMessageIds=new Set();
 let seenGameIds=new Set();
+let profiles={};
+let pendingProfilePicture="";
 
 // File state - array of {name, data, size, type}
 let pendingFiles=[];
@@ -2465,6 +2501,14 @@ const GAME_TYPES={
         size:6
     },
     
+    hangman:{
+        name:"Hangman",
+        icon:"🎮",
+        min:2,
+        max:2,
+        desc:"One player chooses a word. The other guesses letters. 6 attempts.",
+        size:null
+    },
     // Original Games
     memory:{
         name:"Memory Match",
@@ -2969,6 +3013,9 @@ function loadSettingsUI(){
     deviceIdInput.value=
         deviceId;
 
+    pendingProfilePicture = profiles[deviceId]?.pfp || localStorage.getItem("chat_profile_pfp") || "";
+    profilePicturePreview.src = pendingProfilePicture || defaultAvatarData(settings.username || "?");
+
     refreshRate.value=
         settings.refreshRate;
 
@@ -3180,6 +3227,9 @@ saveSettings.onclick=()=>{
         );
     });
 
+    localStorage.setItem("chat_profile_pfp", pendingProfilePicture || "");
+    publishProfile().catch(error => console.warn("Profile update failed:", error));
+
     applySettings();
 
     settingsOverlay.classList.remove(
@@ -3216,6 +3266,112 @@ document.querySelectorAll(
 
 });
 
+
+async function compressProfilePicture(file){
+    return new Promise((resolve,reject)=>{
+        const reader=new FileReader();
+        reader.onload=()=>{
+            const img=new Image();
+            img.onload=()=>{
+                const size=128;
+                const canvas=document.createElement("canvas");
+                canvas.width=size; canvas.height=size;
+                const ctx=canvas.getContext("2d");
+                const scale=Math.max(size/img.width,size/img.height);
+                const w=img.width*scale,h=img.height*scale;
+                ctx.drawImage(img,(size-w)/2,(size-h)/2,w,h);
+                resolve(canvas.toDataURL("image/jpeg",0.55));
+            };
+            img.onerror=reject; img.src=reader.result;
+        };
+        reader.onerror=reject; reader.readAsDataURL(file);
+    });
+}
+
+profilePictureInput.addEventListener("change",async()=>{
+    const file=profilePictureInput.files?.[0];
+    if(!file)return;
+    try{
+        pendingProfilePicture=await compressProfilePicture(file);
+        profilePicturePreview.src=pendingProfilePicture;
+    }catch{ alert("Could not load that profile picture."); }
+});
+
+function defaultAvatarData(name){
+    const letter=String(name||"?").charAt(0).toUpperCase();
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect width="128" height="128" rx="64" fill="#20252d"/><text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" fill="#edf0f4" font-size="58" font-family="Arial">${letter}</text></svg>`;
+    return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(svg);
+}
+
+function isProfileMessage(message){
+    return message && message.username === "__PROFILE__";
+}
+
+function parseProfileMessage(message){
+    if(!isProfileMessage(message))return null;
+    try{ return JSON.parse(message.message || "{}"); }catch{return null;}
+}
+
+function processProfiles(){
+    const map={};
+    for(const message of currentMessages){
+        const profile=parseProfileMessage(message);
+        if(!profile || !profile.deviceId) continue;
+
+        const updatedAt=Number(profile.updatedAt || message.created_at || 0);
+        const previous=map[profile.deviceId];
+
+        // Always keep the newest profile for this Device ID.
+        if(!previous || updatedAt >= Number(previous.updatedAt || 0)){
+            map[profile.deviceId]={
+                name:String(profile.name||"User").slice(0,24),
+                pfp:typeof profile.pfp === "string" ? profile.pfp : "",
+                updatedAt
+            };
+        }
+    }
+    profiles=map;
+    renderedElements.clear();
+    renderedData.clear();
+}
+
+function getDisplayName(id,fallback="User"){
+    return profiles[id]?.name || fallback || "User";
+}
+
+function getDisplayPfp(id,fallbackName="?"){
+    return profiles[id]?.pfp || defaultAvatarData(getDisplayName(id,fallbackName));
+}
+
+async function publishProfile(){
+    const profile={
+        type:"profile",
+        deviceId,
+        name:settings.username||"User",
+        pfp:pendingProfilePicture||"",
+        updatedAt:Date.now()
+    };
+
+    await apiPost({
+        username:"__PROFILE__",
+        channel:CHANNEL,
+        message:JSON.stringify(profile),
+        image:null,
+        files:[],
+        device_id:deviceId
+    });
+
+    // Normal messages only store the Device ID. Their displayed name/PFP
+    // always comes from this current profile.
+    profiles[deviceId]={
+        name:profile.name,
+        pfp:profile.pfp,
+        updatedAt:profile.updatedAt
+    };
+
+    // Immediately update old messages and game player cards on screen.
+    renderMessages(false);
+}
 
 /* =====================================================
    CHAT SEND
@@ -3260,26 +3416,11 @@ messageInput.addEventListener(
 );
 
 
-async function handleChatCommand(text){
-    const command=text.trim().toLowerCase();
-    if(command === ""){
-        removeEverything.click();
-        return true;
-    }
-    return false;
-}
-
 async function sendChatMessage(){
 
     const text=
         messageInput.value
             .trim();
-
-    if(text && await handleChatCommand(text)){
-        messageInput.value="";
-        messageInput.style.height="auto";
-        return;
-    }
 
     const files = pendingFiles.length ? [...pendingFiles] : [];
 
@@ -3303,7 +3444,7 @@ async function sendChatMessage(){
         await apiPost({
 
             username:
-                settings.username,
+                "__USER__",
 
             channel:
                 CHANNEL,
@@ -3509,7 +3650,7 @@ async function loadMessages(){
             
             for (const msg of newMessages) {
                 if (!seenMessageIds.has(msg.id)) {
-                    if (!isGameMessage(msg)) {
+                    if (!isGameMessage(msg) && !isProfileMessage(msg)) {
                         hasNewMessages = true;
                     }
                     seenMessageIds.add(msg.id);
@@ -3518,6 +3659,7 @@ async function loadMessages(){
             
             const oldGames = [...games];
             currentMessages = newMessages;
+            processProfiles();
             processGameMessages();
             
             for (const game of games) {
@@ -3698,10 +3840,10 @@ function processGameMessages(){
 ===================================================== */
 
 function renderMessages(shouldAutoScroll){
-    const normal = currentMessages.filter(message => !isGameMessage(message));
+    const normal = currentMessages.filter(message => !isGameMessage(message) && !isProfileMessage(message));
     const activeGames = games.filter(game =>
-        game.status !== "finished" &&
-        game.status !== "forcequit"
+        (game.status !== "finished" && game.status !== "forcequit") ||
+        game.gameType === "hangman"
     );
 
     if (!normal.length && !activeGames.length) {
@@ -3803,13 +3945,17 @@ function createMessageElement(message) {
 
     avatar.className = "avatar";
 
-    avatar.textContent =
-        (
-            message.username ||
-            "?"
-        )
-        .charAt(0)
-        .toUpperCase();
+    const profileName = getDisplayName(message.device_id, message.username === "__USER__" ? "User" : message.username);
+    const profilePfp = getDisplayPfp(message.device_id, profileName);
+    avatar.textContent = profileName.charAt(0).toUpperCase();
+    if (profilePfp) {
+        avatar.innerHTML = "";
+        const avatarImg=document.createElement("img");
+        avatarImg.className="profile-avatar";
+        avatarImg.src=profilePfp;
+        avatarImg.alt=profileName;
+        avatar.appendChild(avatarImg);
+    }
 
     const content =
         document.createElement("div");
@@ -3830,8 +3976,7 @@ function createMessageElement(message) {
         "username";
 
     name.textContent =
-        message.username ||
-        "User";
+        profileName;
 
     top.appendChild(name);
 
@@ -4125,7 +4270,7 @@ async function createGame(gameType){
             info.icon,
 
         host:
-            settings.username,
+            getDisplayName(deviceId, settings.username),
 
         hostDeviceId:
             deviceId,
@@ -4138,7 +4283,7 @@ async function createGame(gameType){
             {
                 deviceId,
                 username:
-                    settings.username
+                    getDisplayName(deviceId, settings.username)
             }
 
         ],
@@ -4191,6 +4336,7 @@ async function createGame(gameType){
 
 function getDefaultSettings(gameType){
     const settings = {
+        hangman: { word: "" },
         ttt3: { boardSize: 3 },
         ttt4: { boardSize: 4 },
         ttt5: { boardSize: 5 },
@@ -4266,7 +4412,7 @@ function createGameElement(game){
 
     const status = document.createElement("div");
     status.className = "game-status";
-    status.textContent = game.status === "lobby" ? "WAITING" : "PLAYING";
+    status.textContent = game.status === "lobby" ? "WAITING" : game.status === "finished" ? "FINISHED" : "PLAYING";
 
     header.appendChild(title);
     header.appendChild(status);
@@ -4280,7 +4426,7 @@ function createGameElement(game){
     info.className = "game-info";
     info.innerHTML = `
         <div class="game-pill">
-            Host: <strong>${escapeHtml(game.host)}</strong>
+            Host: <strong>${escapeHtml(getDisplayName(game.hostDeviceId, game.host))}</strong>
         </div>
         <div class="game-pill">
             Players: <strong>${game.players.length}/${game.maxPlayers}</strong>
@@ -4306,7 +4452,7 @@ function createGameElement(game){
         const chip = document.createElement("div");
         chip.className = "player-chip";
         if (player.deviceId === game.hostDeviceId) chip.classList.add("host");
-        chip.textContent = player.username + (player.deviceId === game.hostDeviceId ? " 👑" : "");
+        chip.textContent = getDisplayName(player.deviceId, player.username) + (player.deviceId === game.hostDeviceId ? " 👑" : "");
         players.appendChild(chip);
     });
     body.appendChild(players);
@@ -4326,7 +4472,7 @@ function createGameElement(game){
         turn.className = "turn-banner";
         const current = game.players[game.turnIndex % Math.max(game.players.length, 1)];
         if (current) {
-            turn.innerHTML = "Current turn: <strong>" + escapeHtml(current.username) + "</strong>";
+            turn.innerHTML = "Current turn: <strong>" + escapeHtml(getDisplayName(current.deviceId, current.username)) + "</strong>";
         }
         body.appendChild(turn);
     }
@@ -4440,6 +4586,33 @@ function createSettingsUI(game){
             ${playerCount >= 3 ? `<span style="color:#ffd93d;">🔺 Player 3</span>` : ''}
         `;
         container.appendChild(symbolsRow);
+    }
+
+    // Hangman settings
+    if (gameType === "hangman") {
+        const row = document.createElement("div");
+        row.className = "game-settings-row";
+        row.innerHTML = `
+            <label>Secret word:</label>
+            <input id="hangmanWord" type="text" maxlength="24" autocomplete="off" placeholder="Enter a word">
+        `;
+        const input = row.querySelector("#hangmanWord");
+        input.value = settings.word || "";
+        container.appendChild(row);
+
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "game-btn";
+        saveBtn.textContent = "Save word";
+        saveBtn.style.marginTop = "8px";
+        saveBtn.onclick = async () => {
+            const word = input.value.trim().replace(/[^A-Za-zÆØÅæøå]/g, "").toUpperCase();
+            if (word.length < 2) { alert("Enter a word with at least 2 letters."); return; }
+            const copy = JSON.parse(JSON.stringify(game));
+            copy.data.settings.word = word;
+            await writeGameState(copy);
+            await loadMessages();
+        };
+        container.appendChild(saveBtn);
     }
 
     // Memory settings
@@ -4701,6 +4874,7 @@ function createSettingsUI(game){
 
 function getGameDescription(game){
     const descs = {
+        hangman: "One player chooses a word and the other guesses it letter by letter. Exactly 2 players. 6 attempts.",
         ttt3: "Classic Tic-Tac-Toe on a 3x3 board. Get 3 in a row to win! Supports 2-3 players.",
         ttt4: "4x4 Tic-Tac-Toe. Get 4 in a row to win! Supports 2-3 players.",
         ttt5: "5x5 Tic-Tac-Toe. Get 5 in a row to win! Supports 2-3 players.",
@@ -4731,6 +4905,7 @@ function createGameBoard(game){
     if (game.status !== "playing") return null;
     
     const boards = {
+        hangman: createHangman,
         ttt3: createTTT,
         ttt4: createTTT,
         ttt5: createTTT,
@@ -4753,6 +4928,83 @@ function createGameBoard(game){
     return boards[game.gameType] ? boards[game.gameType](game) : null;
 }
 
+
+/* =====================================================
+   HANGMAN (2 Players)
+===================================================== */
+function createHangman(game){
+    const data=game.data||{};
+    const word=String(data.word||"").toUpperCase();
+    const guessed=Array.isArray(data.guessed)?data.guessed:[];
+    const attempts=Number(data.attempts ?? 6);
+    const maxAttempts=Number(data.maxAttempts ?? 6);
+    const board=document.createElement("div");
+    board.className="hangman-board";
+
+    const players=document.createElement("div");
+    players.className="hangman-players";
+    players.textContent=`👤 ${getDisplayName(game.players[0]?.deviceId,game.players[0]?.username)} vs ${getDisplayName(game.players[1]?.deviceId,game.players[1]?.username)}`;
+    board.appendChild(players);
+
+    const wordEl=document.createElement("div");
+    wordEl.className="hangman-word";
+    wordEl.textContent=word.split("").map(ch=>guessed.includes(ch)||data.status==="won"||data.status==="lost"?ch:"_").join(" ");
+    board.appendChild(wordEl);
+
+    const used=document.createElement("div");
+    used.className="hangman-used";
+    used.textContent="❌ Used letters: "+(guessed.length?guessed.join(", "):"None");
+    board.appendChild(used);
+
+    const att=document.createElement("div");
+    att.className="hangman-attempts";
+    att.textContent=`❤️ Attempts: ${Math.max(0,attempts)}/${maxAttempts}`;
+    board.appendChild(att);
+
+    if(data.status==="won" || data.status==="lost" || game.status==="finished") {
+        const result=document.createElement("div");
+        result.className="hangman-result";
+        result.textContent=data.status==="won"?`🎉 ${getDisplayName(data.winnerDeviceId,"Player")} won!`:`💀 ${getDisplayName(data.loserDeviceId,"Player")} lost!`;
+        board.appendChild(result);
+        const wordResult=document.createElement("div");
+        wordResult.textContent=`The word was ${word}`;
+        wordResult.style.textAlign="center";
+        board.appendChild(wordResult);
+        return board;
+    }
+
+    const canGuess=game.status==="playing" && game.players[1]?.deviceId===deviceId;
+    const letters=document.createElement("div");
+    letters.className="hangman-letters";
+    const alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ";
+    [...alphabet].forEach(letter=>{
+        const btn=document.createElement("button");
+        btn.className="hangman-letter";
+        btn.textContent=letter;
+        btn.disabled=!canGuess || guessed.includes(letter) || attempts<=0;
+        btn.onclick=()=>guessHangman(game,letter);
+        letters.appendChild(btn);
+    });
+    board.appendChild(letters);
+    return board;
+}
+
+async function guessHangman(game,letter){
+    if(game.gameType!=="hangman" || game.status!=="playing")return;
+    if(game.players[1]?.deviceId!==deviceId)return;
+    if(game.data.guessed?.includes(letter))return;
+    const copy=JSON.parse(JSON.stringify(game));
+    copy.data.guessed=Array.isArray(copy.data.guessed)?copy.data.guessed:[];
+    copy.data.guessed.push(letter);
+    if(!copy.data.word.includes(letter)) copy.data.attempts=Math.max(0,(copy.data.attempts??6)-1);
+    const won=copy.data.word.split("").every(ch=>copy.data.guessed.includes(ch));
+    if(won){
+        copy.data.status="won"; copy.data.winnerDeviceId=deviceId; copy.data.loserDeviceId=copy.players[0]?.deviceId; copy.status="finished";
+    } else if(copy.data.attempts<=0){
+        copy.data.status="lost"; copy.data.loserDeviceId=deviceId; copy.data.winnerDeviceId=copy.players[0]?.deviceId; copy.status="finished";
+    }
+    await publishGameAndCleanup(game,copy);
+}
 
 /* =====================================================
    TIC TAC TOE (2-3 Players)
@@ -6492,7 +6744,7 @@ async function joinGame(game){
     if (game.players.length >= game.maxPlayers) return;
     
     const copy = JSON.parse(JSON.stringify(game));
-    copy.players.push({ deviceId, username: settings.username });
+    copy.players.push({ deviceId, username: getDisplayName(deviceId, settings.username) });
     await writeGameState(copy);
     await loadMessages();
 }
@@ -6531,6 +6783,21 @@ async function startGame(game){
     copy.turnIndex = 0;
     
     const settings = copy.data.settings || {};
+
+    if (copy.gameType === "hangman") {
+        const word = String(settings.word || "").trim().toUpperCase().replace(/[^A-ZÆØÅ]/g, "");
+        if (word.length < 2) {
+            alert("Choose a word before starting Hangman.");
+            return;
+        }
+        copy.data.word = word;
+        copy.data.guessed = [];
+        copy.data.attempts = 6;
+        copy.data.maxAttempts = 6;
+        copy.data.status = "playing";
+        copy.data.winnerDeviceId = null;
+        copy.data.winnerName = null;
+    }
     
     // Initialize game data
     if (copy.gameType === "ttt3" || copy.gameType === "ttt4" || copy.gameType === "ttt5" || copy.gameType === "ttt6") {
@@ -6717,7 +6984,7 @@ async function forceQuitGame(game){
 }
 
 async function publishGameAndCleanup(oldGame, newGame){
-    if (newGame.status === "finished") {
+    if (newGame.status === "finished" && newGame.gameType !== "hangman") {
         await removeGameMessages(oldGame);
         await loadMessages();
         return;
@@ -6858,6 +7125,7 @@ playStartupAnimation();
    START
 ===================================================== */
 
+processProfiles();
 loadSettingsUI();
 applySettings();
 loadMessages();
