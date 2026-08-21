@@ -3898,6 +3898,12 @@ function processGameMessages(){
             continue;
         }
 
+        // A force-ended game stays blocked locally. If an old message
+        // arrives again during refresh, do not resurrect the game.
+        if (stoppedGames.has(state.id)) {
+            continue;
+        }
+
         map.set(
             state.id,
             {
@@ -7210,9 +7216,13 @@ function hideGameImmediately(game){
         const state = parseGameMessage(message);
         return !state || state.id !== gameId;
     });
+
     games = games.filter(g => g.id !== gameId);
 
-    const element = document.querySelector('[data-id="game_' + CSS.escape(gameId) + '"]');
+    const element = document.querySelector(
+        '[data-id="game_' + CSS.escape(gameId) + '"]'
+    );
+
     if (element) element.remove();
 
     renderedElements.delete('game_' + gameId);
@@ -7221,41 +7231,141 @@ function hideGameImmediately(game){
     renderMessages(false);
 }
 
-async function forceQuitGame(game){
-    if (!game?.id || game.hostDeviceId !== deviceId) return;
+/*
+ * Hard game cleanup.
+ *
+ * There is no SQL here. Cleanup uses the existing API DELETE endpoint.
+ * The game is blocked locally before deletion starts, so refreshes cannot
+ * recreate it while cleanup is running.
+ *
+ * Multiple cleanup passes cover the case where an old state message arrives
+ * again shortly after the first DELETE request.
+ */
+async function forceEndGame(game, options = {}){
+    if (!game?.id) return;
 
-    stoppedGames.add(game.id);
+    const gameId = game.id;
+    const hostDeviceId = game.hostDeviceId || deviceId;
+
+    stoppedGames.add(gameId);
     hideGameImmediately(game);
 
-    try {
-        await apiPost({
-            game_server: true,
-            game_action: "stop",
-            game_id: game.id,
-            channel: CHANNEL,
-            device_id: deviceId
-        });
-    } catch(error) {
-        console.warn("Could not stop game on server:", error);
+    const cleanup = async (keepalive = false) => {
+        try {
+            await fetch(API_URL, {
+                method: "POST",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({
+                    game_server: true,
+                    game_action: "stop",
+                    game_id: gameId,
+                    channel: CHANNEL,
+                    device_id: hostDeviceId
+                }),
+                keepalive
+            });
+        } catch {}
+
+        try {
+            await fetch(API_URL, {
+                method: "DELETE",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({
+                    game_server: true,
+                    game_id: gameId,
+                    channel: CHANNEL,
+                    device_id: hostDeviceId
+                }),
+                keepalive
+            });
+        } catch {}
+
+        // Remove any copy that may have appeared in the local refresh data.
+        hideGameImmediately({id: gameId});
+    };
+
+    // Immediate pass.
+    await cleanup(Boolean(options.keepalive));
+
+    // Repeated passes during the first second. This is intentionally short
+    // and prevents a late/stale game message from remaining visible.
+    const delays = [100, 250, 500, 1000];
+
+    for (const delay of delays) {
+        setTimeout(() => {
+            if (!stoppedGames.has(gameId)) return;
+            cleanup(false);
+        }, delay);
     }
 
-    await loadMessages();
+    // Refresh once after the cleanup window, while still refusing to render
+    // the stopped game if an old message is returned.
+    setTimeout(() => {
+        if (!stoppedGames.has(gameId)) return;
+        loadMessages().catch(() => {});
+    }, 1100);
+}
+
+async function forceQuitGame(game){
+    if (!game?.id || game.hostDeviceId !== deviceId) return;
+    await forceEndGame(game);
 }
 
 async function stopGameOnExit(game){
     if (!game?.id) return;
-    stoppedGames.add(game.id);
 
-    // Never transfer hosting when the host leaves. A host leaving ends the game.
-    const body = game.hostDeviceId === deviceId
-        ? { game_server:true, game_action:"stop", game_id:game.id, channel:CHANNEL, device_id:deviceId }
-        : { game_server:true, game_action:"leave", game_id:game.id, channel:CHANNEL, device_id:deviceId };
+    // Host leaving ends the entire game. The request is sent with keepalive
+    // so browsers can finish it while the page is being unloaded.
+    if (game.hostDeviceId === deviceId) {
+        stoppedGames.add(game.id);
+        hideGameImmediately(game);
+
+        try {
+            await fetch(API_URL, {
+                method: "POST",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({
+                    game_server:true,
+                    game_action:"stop",
+                    game_id:game.id,
+                    channel:CHANNEL,
+                    device_id:deviceId
+                }),
+                keepalive:true
+            });
+        } catch {}
+
+        try {
+            await fetch(API_URL, {
+                method: "DELETE",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify({
+                    game_server:true,
+                    game_id:game.id,
+                    channel:CHANNEL,
+                    device_id:deviceId
+                }),
+                keepalive:true
+            });
+        } catch {}
+
+        return;
+    }
+
+    // A normal player leaving uses the existing player-leave operation.
+    stoppedGames.add(game.id);
 
     try {
         await fetch(API_URL, {
             method:"POST",
             headers:{"Content-Type":"application/json"},
-            body:JSON.stringify(body),
+            body:JSON.stringify({
+                game_server:true,
+                game_action:"leave",
+                game_id:game.id,
+                channel:CHANNEL,
+                device_id:deviceId
+            }),
             keepalive:true
         });
     } catch {}
@@ -7265,23 +7375,16 @@ async function publishGameAndCleanup(oldGame, newGame){
     if (!oldGame?.id || stoppedGames.has(oldGame.id)) return;
 
     if (newGame.status === "finished" || newGame.status === "forcequit") {
-        stoppedGames.add(oldGame.id);
-        hideGameImmediately(oldGame);
-        try {
-            await apiPost({
-                game_server:true,
-                game_action:"stop",
-                game_id:oldGame.id,
-                channel:CHANNEL,
-                device_id:oldGame.hostDeviceId
-            });
-        } catch {}
-        await loadMessages();
+        await forceEndGame(oldGame);
         return;
     }
 
+    // Never publish a new state after the game has been stopped.
+    if (stoppedGames.has(oldGame.id)) return;
+
     await writeGameState(newGame);
-    if (oldGame.messageId) {
+
+    if (oldGame.messageId && !stoppedGames.has(oldGame.id)) {
         try {
             await apiDelete({
                 game_server:true,
@@ -7290,11 +7393,16 @@ async function publishGameAndCleanup(oldGame, newGame){
             });
         } catch {}
     }
+
     await loadMessages();
 }
 
 async function removeGameMessages(game){
     if (!game?.id) return;
+
+    stoppedGames.add(game.id);
+    hideGameImmediately(game);
+
     try {
         await apiDelete({
             game_server:true,
@@ -7306,6 +7414,7 @@ async function removeGameMessages(game){
 
 async function deleteStateMessage(game){
     if (!game?.messageId) return;
+
     try {
         await apiDelete({
             game_server:true,
