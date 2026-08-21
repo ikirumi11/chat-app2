@@ -1,15 +1,28 @@
 export default async function handler(req, res) {
     res.setHeader("Content-Type", "application/json");
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET,POST,PATCH,DELETE,OPTIONS"
+    );
+    res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Content-Type"
+    );
 
-    if (req.method === "OPTIONS") return res.status(200).end();
+    if (req.method === "OPTIONS") {
+        return res.status(200).end();
+    }
 
     try {
-        const supabaseUrl = "https://wlvbkdzcueqkknysisfw.supabase.co";
-        const supabaseKey = "sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL";
-        const cleanUrl = supabaseUrl.replace(/\/+$/, "");
+        const supabaseUrl =
+            "https://wlvbkdzcueqkknysisfw.supabase.co";
+
+        const supabaseKey =
+            "sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL";
+
+        const cleanUrl =
+            supabaseUrl.replace(/\/+$/, "");
 
         const headers = {
             "apikey": supabaseKey,
@@ -18,8 +31,17 @@ export default async function handler(req, res) {
             "Accept": "application/json"
         };
 
+        /*
+         * =====================================================
+         * GET
+         * =====================================================
+         */
+
         if (req.method === "GET") {
-            const channel = String(req.query.channel || "general")
+            const channel =
+                String(
+                    req.query.channel || "general"
+                )
                 .trim()
                 .substring(0, 32);
 
@@ -31,73 +53,157 @@ export default async function handler(req, res) {
                 encodeURIComponent(channel) +
                 "&order=created_at.asc";
 
-            const response = await fetch(url, {
-                method: "GET",
-                headers
-            });
+            const response = await fetch(
+                url,
+                {
+                    method: "GET",
+                    headers
+                }
+            );
 
-            const data = await readJson(response);
+            const data =
+                await readJson(response);
 
             if (!response.ok) {
-                return supabaseError(res, response, data);
+                return supabaseError(
+                    res,
+                    response,
+                    data
+                );
             }
 
             return res.status(200).json({
                 success: true,
-                messages: Array.isArray(data) ? data : []
+                messages:
+                    Array.isArray(data)
+                        ? data
+                        : []
             });
         }
 
+        /*
+         * =====================================================
+         * POST
+         * =====================================================
+         */
+
         if (req.method === "POST") {
-            const body = req.body || {};
+            const body =
+                req.body || {};
 
-            const username = String(body.username || "")
-                .trim()
-                .substring(0, 24);
+            const username =
+                String(body.username || "")
+                    .trim()
+                    .substring(0, 24);
 
-            const channel = String(body.channel || "general")
+            const channel =
+                String(
+                    body.channel || "general"
+                )
                 .trim()
                 .substring(0, 32);
 
-            const message = String(body.message || "")
-                .trim()
-                .substring(0, 20000);
+            const message =
+                String(body.message || "")
+                    .trim()
+                    .substring(0, 20000);
 
-            const deviceId = String(body.device_id || "")
-                .trim()
-                .substring(0, 100);
+            const deviceId =
+                String(body.device_id || "")
+                    .trim()
+                    .substring(0, 100);
 
-            const gameServer = body.game_server === true;
+            const gameServer =
+                body.game_server === true;
+
+            /*
+             * =================================================
+             * GAME SERVER
+             * =================================================
+             */
 
             if (gameServer) {
                 if (!deviceId) {
                     return res.status(400).json({
-                        error: "Device ID is required for a game server."
+                        error:
+                            "Device ID is required for a game server."
                     });
                 }
 
-                // Server-side lifecycle commands.
-                // These never become visible chat messages.
+                /*
+                 * STOP GAME
+                 *
+                 * No host transfer.
+                 * Every invisible game message is deleted.
+                 */
+
                 if (
-                    body.game_action === "stop" ||
-                    body.game_action === "leave"
+                    body.game_action === "stop"
                 ) {
-                    const gameId = String(body.game_id || "")
-                        .trim()
-                        .substring(0, 120);
+                    const gameId =
+                        String(body.game_id || "")
+                            .trim()
+                            .substring(0, 120);
 
                     if (!gameId) {
                         return res.status(400).json({
-                            error: "Game ID is required."
+                            error:
+                                "Game ID is required."
                         });
                     }
 
-                    const gameMessages = await getGameMessages(
-                        cleanUrl,
-                        headers,
-                        channel,
-                        gameId
-                    );
+                    const gameMessages =
+                        await getGameMessages(
+                            cleanUrl,
+                            headers,
+                            channel,
+                            gameId
+                        );
+
+                    const removed =
+                        await deleteGameMessages(
+                            cleanUrl,
+                            headers,
+                            gameMessages
+                        );
+
+                    return res.status(200).json({
+                        success: true,
+                        stopped: true,
+                        removed
+                    });
+                }
+
+                /*
+                 * LEAVE GAME
+                 *
+                 * IMPORTANT:
+                 * If the host leaves, the entire game is deleted.
+                 * There is NO automatic host transfer.
+                 */
+
+                if (
+                    body.game_action === "leave"
+                ) {
+                    const gameId =
+                        String(body.game_id || "")
+                            .trim()
+                            .substring(0, 120);
+
+                    if (!gameId) {
+                        return res.status(400).json({
+                            error:
+                                "Game ID is required."
+                        });
+                    }
+
+                    const gameMessages =
+                        await getGameMessages(
+                            cleanUrl,
+                            headers,
+                            channel,
+                            gameId
+                        );
 
                     if (!gameMessages.length) {
                         return res.status(200).json({
@@ -107,14 +213,21 @@ export default async function handler(req, res) {
                         });
                     }
 
-                    // STOP:
-                    // Delete every invisible state message for the game.
-                    if (body.game_action === "stop") {
-                        const removed = await deleteGameMessages(
-                            cleanUrl,
-                            headers,
-                            gameMessages
+                    const latest =
+                        gameMessages[0];
+
+                    const state =
+                        parseGameState(
+                            latest.message
                         );
+
+                    if (!state) {
+                        const removed =
+                            await deleteGameMessages(
+                                cleanUrl,
+                                headers,
+                                gameMessages
+                            );
 
                         return res.status(200).json({
                             success: true,
@@ -123,76 +236,81 @@ export default async function handler(req, res) {
                         });
                     }
 
-                    // LEAVE:
-                    // Remove the leaving player from the latest state.
-                    const latest = gameMessages[0];
-
-                    let state = parseGameState(latest.message);
-
-                    if (!state || state.type !== "game") {
-                        const removed = await deleteGameMessages(
-                            cleanUrl,
-                            headers,
-                            gameMessages
-                        );
-
-                        return res.status(200).json({
-                            success: true,
-                            stopped: true,
-                            removed
-                        });
-                    }
-
-                    state.players = Array.isArray(state.players)
-                        ? state.players.filter(
-                            p => p && p.deviceId !== deviceId
-                        )
-                        : [];
-
-                    // No players left = remove the entire game.
-                    if (!state.players.length) {
-                        const removed = await deleteGameMessages(
-                            cleanUrl,
-                            headers,
-                            gameMessages
-                        );
-
-                        return res.status(200).json({
-                            success: true,
-                            stopped: true,
-                            removed
-                        });
-                    }
-
-                    // If the host leaves, transfer hosting.
-                    if (state.hostDeviceId === deviceId) {
-                        const nextHost = state.players[0];
-
-                        state.hostDeviceId = nextHost.deviceId;
-                        state.host = nextHost.username;
-                    }
+                    /*
+                     * HOST LEAVES:
+                     * DELETE THE WHOLE GAME.
+                     *
+                     * Never assign another host.
+                     */
 
                     if (
-                        state.status === "playing" &&
-                        state.turnIndex >= state.players.length
+                        state.hostDeviceId === deviceId
                     ) {
-                        state.turnIndex = 0;
+                        const removed =
+                            await deleteGameMessages(
+                                cleanUrl,
+                                headers,
+                                gameMessages
+                            );
+
+                        return res.status(200).json({
+                            success: true,
+                            stopped: true,
+                            hostLeft: true,
+                            removed
+                        });
                     }
 
-                    // Remove all old invisible copies before creating
-                    // the one authoritative state.
+                    /*
+                     * NORMAL PLAYER LEAVES.
+                     */
+
+                    state.players =
+                        Array.isArray(state.players)
+                            ? state.players.filter(
+                                player =>
+                                    player &&
+                                    player.deviceId !== deviceId
+                            )
+                            : [];
+
+                    /*
+                     * EMPTY GAME:
+                     * DELETE EVERYTHING.
+                     */
+
+                    if (!state.players.length) {
+                        const removed =
+                            await deleteGameMessages(
+                                cleanUrl,
+                                headers,
+                                gameMessages
+                            );
+
+                        return res.status(200).json({
+                            success: true,
+                            stopped: true,
+                            removed
+                        });
+                    }
+
+                    /*
+                     * Never change hostDeviceId here.
+                     */
+
                     await deleteGameMessages(
                         cleanUrl,
                         headers,
                         gameMessages
                     );
 
-                    const inserted = await insertGameState(
-                        cleanUrl,
-                        headers,
-                        channel,
-                        state
-                    );
+                    const inserted =
+                        await insertGameState(
+                            cleanUrl,
+                            headers,
+                            channel,
+                            state
+                        );
 
                     return res.status(200).json({
                         success: true,
@@ -202,47 +320,83 @@ export default async function handler(req, res) {
                     });
                 }
 
+                /*
+                 * NORMAL GAME STATE WRITE
+                 */
+
                 if (!message) {
                     return res.status(400).json({
-                        error: "Game state is required."
+                        error:
+                            "Game state is required."
                     });
                 }
 
                 const gameData = {
-                    username: "__GAME_SERVER__",
+                    username:
+                        "__GAME_SERVER__",
+
                     channel,
+
                     message,
+
                     image: null,
+
                     files: [],
-                    device_id: deviceId,
+
+                    device_id:
+                        deviceId,
+
                     edited: false
                 };
 
-                const response = await fetch(
-                    cleanUrl + "/rest/v1/messages",
-                    {
-                        method: "POST",
-                        headers: {
-                            ...headers,
-                            "Prefer": "return=representation"
-                        },
-                        body: JSON.stringify(gameData)
-                    }
-                );
+                const response =
+                    await fetch(
+                        cleanUrl +
+                        "/rest/v1/messages",
+                        {
+                            method: "POST",
 
-                const data = await readJson(response);
+                            headers: {
+                                ...headers,
+                                "Prefer":
+                                    "return=representation"
+                            },
+
+                            body:
+                                JSON.stringify(
+                                    gameData
+                                )
+                        }
+                    );
+
+                const data =
+                    await readJson(
+                        response
+                    );
 
                 if (!response.ok) {
-                    return supabaseError(res, response, data);
+                    return supabaseError(
+                        res,
+                        response,
+                        data
+                    );
                 }
 
                 return res.status(200).json({
                     success: true,
-                    game: Array.isArray(data)
-                        ? data[0]
-                        : data
+
+                    game:
+                        Array.isArray(data)
+                            ? data[0]
+                            : data
                 });
             }
+
+            /*
+             * =================================================
+             * NORMAL MESSAGE
+             * =================================================
+             */
 
             let image = null;
 
@@ -250,54 +404,83 @@ export default async function handler(req, res) {
                 body.image &&
                 typeof body.image === "string"
             ) {
-                image = body.image;
+                image =
+                    body.image;
             }
 
             let files = [];
 
             if (
+                body.files &&
                 Array.isArray(body.files) &&
                 body.files.length
             ) {
                 const MAX_FILES = 5;
-                const MAX_FILE_SIZE = 5 * 1024 * 1024;
+                const MAX_FILE_SIZE =
+                    5 * 1024 * 1024;
 
-                for (const file of body.files) {
-                    if (files.length >= MAX_FILES) break;
+                for (
+                    const file of body.files
+                ) {
+                    if (
+                        files.length >=
+                        MAX_FILES
+                    ) {
+                        break;
+                    }
 
                     if (
                         !file.data ||
-                        typeof file.data !== "string"
+                        typeof file.data !==
+                            "string"
                     ) {
                         continue;
                     }
 
                     if (
                         !file.name ||
-                        typeof file.name !== "string"
+                        typeof file.name !==
+                            "string"
                     ) {
                         continue;
                     }
 
                     const base64Data =
-                        file.data.split(",")[1] || "";
+                        file.data
+                            .split(",")[1] ||
+                        "";
 
                     const sizeInBytes =
                         Math.ceil(
-                            (base64Data.length * 3) / 4
+                            (
+                                base64Data.length *
+                                3
+                            ) / 4
                         );
 
                     if (
-                        sizeInBytes > MAX_FILE_SIZE ||
-                        file.data.length > 5000000
+                        sizeInBytes >
+                            MAX_FILE_SIZE ||
+                        file.data.length >
+                            5000000
                     ) {
                         continue;
                     }
 
                     files.push({
-                        name: file.name.substring(0, 255),
-                        data: file.data,
-                        size: file.size || sizeInBytes,
+                        name:
+                            file.name.substring(
+                                0,
+                                255
+                            ),
+
+                        data:
+                            file.data,
+
+                        size:
+                            file.size ||
+                            sizeInBytes,
+
                         type:
                             file.type ||
                             "application/octet-stream"
@@ -307,7 +490,8 @@ export default async function handler(req, res) {
 
             if (!username) {
                 return res.status(400).json({
-                    error: "Username is required."
+                    error:
+                        "Username is required."
                 });
             }
 
@@ -324,19 +508,24 @@ export default async function handler(req, res) {
 
             if (
                 image &&
-                image.length > 5000000
+                image.length >
+                    5000000
             ) {
                 return res.status(413).json({
-                    error: "Image is too large."
+                    error:
+                        "Image is too large."
                 });
             }
 
             if (
                 image &&
-                !image.startsWith("data:image/")
+                !image.startsWith(
+                    "data:image/"
+                )
             ) {
                 return res.status(400).json({
-                    error: "Invalid image data."
+                    error:
+                        "Invalid image data."
                 });
             }
 
@@ -346,41 +535,71 @@ export default async function handler(req, res) {
                 message,
                 image,
                 files,
-                device_id: deviceId,
+                device_id:
+                    deviceId,
                 edited: false
             };
 
-            const response = await fetch(
-                cleanUrl + "/rest/v1/messages",
-                {
-                    method: "POST",
-                    headers: {
-                        ...headers,
-                        "Prefer": "return=representation"
-                    },
-                    body: JSON.stringify(messageData)
-                }
-            );
+            const response =
+                await fetch(
+                    cleanUrl +
+                    "/rest/v1/messages",
+                    {
+                        method: "POST",
 
-            const data = await readJson(response);
+                        headers: {
+                            ...headers,
+                            "Prefer":
+                                "return=representation"
+                        },
+
+                        body:
+                            JSON.stringify(
+                                messageData
+                            )
+                    }
+                );
+
+            const data =
+                await readJson(
+                    response
+                );
 
             if (!response.ok) {
-                return supabaseError(res, response, data);
+                return supabaseError(
+                    res,
+                    response,
+                    data
+                );
             }
 
             return res.status(200).json({
                 success: true,
-                message: Array.isArray(data)
-                    ? data[0]
-                    : data
+
+                message:
+                    Array.isArray(data)
+                        ? data[0]
+                        : data
             });
         }
 
-        if (req.method === "PATCH") {
-            const body = req.body || {};
+        /*
+         * =====================================================
+         * PATCH
+         * =====================================================
+         */
 
-            const id = String(body.id || "").trim();
-            const deviceId = String(body.device_id || "").trim();
+        if (req.method === "PATCH") {
+            const body =
+                req.body || {};
+
+            const id =
+                String(body.id || "")
+                    .trim();
+
+            const deviceId =
+                String(body.device_id || "")
+                    .trim();
 
             if (!id || !deviceId) {
                 return res.status(400).json({
@@ -389,41 +608,70 @@ export default async function handler(req, res) {
                 });
             }
 
-            if (body.game_server === true) {
-                const gameState = String(body.game_state || "")
+            if (
+                body.game_server === true
+            ) {
+                const gameState =
+                    String(
+                        body.game_state || ""
+                    )
                     .trim()
-                    .substring(0, 20000);
+                    .substring(
+                        0,
+                        20000
+                    );
 
                 if (!gameState) {
                     return res.status(400).json({
-                        error: "Game state is required."
+                        error:
+                            "Game state is required."
                     });
                 }
 
                 const url =
                     cleanUrl +
-                    "/rest/v1/messages?id=eq." +
+                    "/rest/v1/messages" +
+                    "?id=eq." +
                     encodeURIComponent(id) +
                     "&username=eq.__GAME_SERVER__" +
                     "&device_id=eq." +
-                    encodeURIComponent(deviceId);
+                    encodeURIComponent(
+                        deviceId
+                    );
 
-                const response = await fetch(url, {
-                    method: "PATCH",
-                    headers: {
-                        ...headers,
-                        "Prefer": "return=representation"
-                    },
-                    body: JSON.stringify({
-                        message: gameState,
-                        edited: true
-                    })
-                });
+                const response =
+                    await fetch(
+                        url,
+                        {
+                            method: "PATCH",
 
-                const data = await readJson(response);
+                            headers: {
+                                ...headers,
+                                "Prefer":
+                                    "return=representation"
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    message:
+                                        gameState,
+                                    edited:
+                                        true
+                                })
+                        }
+                    );
+
+                const data =
+                    await readJson(
+                        response
+                    );
 
                 if (!response.ok) {
-                    return supabaseError(res, response, data);
+                    return supabaseError(
+                        res,
+                        response,
+                        data
+                    );
                 }
 
                 if (
@@ -438,38 +686,63 @@ export default async function handler(req, res) {
 
                 return res.status(200).json({
                     success: true,
-                    game: data[0]
+                    game:
+                        data[0]
                 });
             }
 
-            const message = String(body.message || "")
+            const message =
+                String(
+                    body.message || ""
+                )
                 .trim()
-                .substring(0, 2000);
+                .substring(
+                    0,
+                    2000
+                );
 
             const url =
                 cleanUrl +
-                "/rest/v1/messages?id=eq." +
+                "/rest/v1/messages" +
+                "?id=eq." +
                 encodeURIComponent(id) +
                 "&device_id=eq." +
-                encodeURIComponent(deviceId) +
+                encodeURIComponent(
+                    deviceId
+                ) +
                 "&username=neq.__GAME_SERVER__";
 
-            const response = await fetch(url, {
-                method: "PATCH",
-                headers: {
-                    ...headers,
-                    "Prefer": "return=representation"
-                },
-                body: JSON.stringify({
-                    message,
-                    edited: true
-                })
-            });
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: "PATCH",
 
-            const data = await readJson(response);
+                        headers: {
+                            ...headers,
+                            "Prefer":
+                                "return=representation"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                message,
+                                edited: true
+                            })
+                    }
+                );
+
+            const data =
+                await readJson(
+                    response
+                );
 
             if (!response.ok) {
-                return supabaseError(res, response, data);
+                return supabaseError(
+                    res,
+                    response,
+                    data
+                );
             }
 
             if (
@@ -484,28 +757,48 @@ export default async function handler(req, res) {
 
             return res.status(200).json({
                 success: true,
-                message: data[0]
+                message:
+                    data[0]
             });
         }
 
+        /*
+         * =====================================================
+         * DELETE
+         * =====================================================
+         */
+
         if (req.method === "DELETE") {
-            const body = req.body || {};
+            const body =
+                req.body || {};
 
-            // FULL CHAT WIPE
-            if (body.delete_all === true) {
-                const response = await fetch(
-                    cleanUrl +
-                    "/rest/v1/messages?id=not.is.null",
-                    {
-                        method: "DELETE",
-                        headers: {
-                            ...headers,
-                            "Prefer": "return=minimal"
+            /*
+             * FULL CHAT WIPE
+             */
+
+            if (
+                body.delete_all === true
+            ) {
+                const response =
+                    await fetch(
+                        cleanUrl +
+                        "/rest/v1/messages?id=not.is.null",
+                        {
+                            method:
+                                "DELETE",
+
+                            headers: {
+                                ...headers,
+                                "Prefer":
+                                    "return=minimal"
+                            }
                         }
-                    }
-                );
+                    );
 
-                const data = await readJson(response);
+                const data =
+                    await readJson(
+                        response
+                    );
 
                 if (!response.ok) {
                     return supabaseError(
@@ -517,42 +810,69 @@ export default async function handler(req, res) {
 
                 return res.status(200).json({
                     success: true,
-                    message: "Everything was deleted."
+                    message:
+                        "Everything was deleted."
                 });
             }
 
-            // DELETE GAME SERVER
-            if (body.game_server === true) {
+            /*
+             * DELETE GAME
+             */
+
+            if (
+                body.game_server === true
+            ) {
                 const deviceId =
-                    String(body.device_id || "").trim();
+                    String(
+                        body.device_id || ""
+                    )
+                    .trim();
 
                 const id =
-                    String(body.id || "").trim();
+                    String(
+                        body.id || ""
+                    )
+                    .trim();
 
                 const gameId =
-                    String(body.game_id || "")
-                        .trim()
-                        .substring(0, 120);
+                    String(
+                        body.game_id || ""
+                    )
+                    .trim()
+                    .substring(
+                        0,
+                        120
+                    );
 
                 if (!deviceId) {
                     return res.status(400).json({
-                        error: "Device ID is required."
+                        error:
+                            "Device ID is required."
                     });
                 }
 
-                // Delete every invisible message belonging
-                // to the specified game.
+                /*
+                 * Delete every invisible message
+                 * belonging to the game.
+                 */
+
                 if (gameId) {
+                    const channel =
+                        String(
+                            body.channel ||
+                            "general"
+                        )
+                        .trim()
+                        .substring(
+                            0,
+                            32
+                        );
+
                     const gameMessages =
                         await getGameMessages(
                             cleanUrl,
                             headers,
-                            String(
-                                body.channel ||
-                                "general"
-                            )
-                                .trim()
-                                .substring(0, 32),
+                            channel,
                             gameId
                         );
 
@@ -571,7 +891,10 @@ export default async function handler(req, res) {
                     });
                 }
 
-                // Delete one invisible game-server message.
+                /*
+                 * Delete one invisible message.
+                 */
+
                 if (!id) {
                     return res.status(400).json({
                         error:
@@ -581,21 +904,34 @@ export default async function handler(req, res) {
 
                 const url =
                     cleanUrl +
-                    "/rest/v1/messages?id=eq." +
+                    "/rest/v1/messages" +
+                    "?id=eq." +
                     encodeURIComponent(id) +
                     "&username=eq.__GAME_SERVER__" +
                     "&device_id=eq." +
-                    encodeURIComponent(deviceId);
+                    encodeURIComponent(
+                        deviceId
+                    );
 
-                const response = await fetch(url, {
-                    method: "DELETE",
-                    headers: {
-                        ...headers,
-                        "Prefer": "return=representation"
-                    }
-                });
+                const response =
+                    await fetch(
+                        url,
+                        {
+                            method:
+                                "DELETE",
 
-                const data = await readJson(response);
+                            headers: {
+                                ...headers,
+                                "Prefer":
+                                    "return=representation"
+                            }
+                        }
+                    );
+
+                const data =
+                    await readJson(
+                        response
+                    );
 
                 if (!response.ok) {
                     return supabaseError(
@@ -612,12 +948,21 @@ export default async function handler(req, res) {
                 });
             }
 
-            // NORMAL MESSAGE DELETE
+            /*
+             * NORMAL MESSAGE DELETE
+             */
+
             const id =
-                String(body.id || "").trim();
+                String(
+                    body.id || ""
+                )
+                .trim();
 
             const deviceId =
-                String(body.device_id || "").trim();
+                String(
+                    body.device_id || ""
+                )
+                .trim();
 
             if (!id || !deviceId) {
                 return res.status(400).json({
@@ -628,21 +973,34 @@ export default async function handler(req, res) {
 
             const url =
                 cleanUrl +
-                "/rest/v1/messages?id=eq." +
+                "/rest/v1/messages" +
+                "?id=eq." +
                 encodeURIComponent(id) +
                 "&device_id=eq." +
-                encodeURIComponent(deviceId) +
+                encodeURIComponent(
+                    deviceId
+                ) +
                 "&username=neq.__GAME_SERVER__";
 
-            const response = await fetch(url, {
-                method: "DELETE",
-                headers: {
-                    ...headers,
-                    "Prefer": "return=representation"
-                }
-            });
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method:
+                            "DELETE",
 
-            const data = await readJson(response);
+                        headers: {
+                            ...headers,
+                            "Prefer":
+                                "return=representation"
+                        }
+                    }
+                );
+
+            const data =
+                await readJson(
+                    response
+                );
 
             if (!response.ok) {
                 return supabaseError(
@@ -664,12 +1022,14 @@ export default async function handler(req, res) {
 
             return res.status(200).json({
                 success: true,
-                message: "Message deleted."
+                message:
+                    "Message deleted."
             });
         }
 
         return res.status(405).json({
-            error: "Method not allowed."
+            error:
+                "Method not allowed."
         });
 
     } catch (error) {
@@ -687,9 +1047,11 @@ export default async function handler(req, res) {
 }
 
 
-/* =========================================================
-   GAME HELPERS
-========================================================= */
+/*
+ * =========================================================
+ * GAME HELPERS
+ * =========================================================
+ */
 
 async function getGameMessages(
     baseUrl,
@@ -709,12 +1071,19 @@ async function getGameMessages(
         "*" +
         "&order=created_at.desc";
 
-    const response = await fetch(url, {
-        method: "GET",
-        headers
-    });
+    const response =
+        await fetch(
+            url,
+            {
+                method: "GET",
+                headers
+            }
+        );
 
-    const data = await readJson(response);
+    const data =
+        await readJson(
+            response
+        );
 
     if (!response.ok) {
         throw new Error(
@@ -737,28 +1106,45 @@ async function deleteGameMessages(
 ) {
     let removed = 0;
 
-    for (const message of messages) {
-        if (!message?.id) continue;
+    for (
+        const message of messages
+    ) {
+        if (!message?.id) {
+            continue;
+        }
 
         const url =
             baseUrl +
-            "/rest/v1/messages?id=eq." +
-            encodeURIComponent(message.id) +
+            "/rest/v1/messages" +
+            "?id=eq." +
+            encodeURIComponent(
+                message.id
+            ) +
             "&username=eq.__GAME_SERVER__" +
             "&device_id=eq." +
             encodeURIComponent(
                 message.device_id || ""
             );
 
-        const response = await fetch(url, {
-            method: "DELETE",
-            headers: {
-                ...headers,
-                "Prefer": "return=representation"
-            }
-        });
+        const response =
+            await fetch(
+                url,
+                {
+                    method:
+                        "DELETE",
 
-        const data = await readJson(response);
+                    headers: {
+                        ...headers,
+                        "Prefer":
+                            "return=representation"
+                    }
+                }
+            );
+
+        const data =
+            await readJson(
+                response
+            );
 
         if (!response.ok) {
             throw new Error(
@@ -768,8 +1154,11 @@ async function deleteGameMessages(
             );
         }
 
-        if (Array.isArray(data)) {
-            removed += data.length;
+        if (
+            Array.isArray(data)
+        ) {
+            removed +=
+                data.length;
         }
     }
 
@@ -784,30 +1173,48 @@ async function insertGameState(
     state
 ) {
     const row = {
-        username: "__GAME_SERVER__",
+        username:
+            "__GAME_SERVER__",
+
         channel,
+
         message:
             "__CHAT_GAME_STATE__:" +
             JSON.stringify(state),
+
         image: null,
+
         files: [],
-        device_id: state.hostDeviceId,
+
+        device_id:
+            state.hostDeviceId,
+
         edited: false
     };
 
-    const response = await fetch(
-        baseUrl + "/rest/v1/messages",
-        {
-            method: "POST",
-            headers: {
-                ...headers,
-                "Prefer": "return=representation"
-            },
-            body: JSON.stringify(row)
-        }
-    );
+    const response =
+        await fetch(
+            baseUrl +
+            "/rest/v1/messages",
+            {
+                method:
+                    "POST",
 
-    const data = await readJson(response);
+                headers: {
+                    ...headers,
+                    "Prefer":
+                        "return=representation"
+                },
+
+                body:
+                    JSON.stringify(row)
+            }
+        );
+
+    const data =
+        await readJson(
+            response
+        );
 
     if (!response.ok) {
         throw new Error(
@@ -823,20 +1230,27 @@ async function insertGameState(
 }
 
 
-function parseGameState(message) {
+function parseGameState(
+    message
+) {
     const prefix =
         "__CHAT_GAME_STATE__:";
 
     if (
-        typeof message !== "string" ||
-        !message.startsWith(prefix)
+        typeof message !==
+            "string" ||
+        !message.startsWith(
+            prefix
+        )
     ) {
         return null;
     }
 
     try {
         return JSON.parse(
-            message.substring(prefix.length)
+            message.substring(
+                prefix.length
+            )
         );
     } catch {
         return null;
@@ -844,18 +1258,26 @@ function parseGameState(message) {
 }
 
 
-/* =========================================================
-   GENERAL HELPERS
-========================================================= */
+/*
+ * =========================================================
+ * GENERAL HELPERS
+ * =========================================================
+ */
 
-async function readJson(response) {
+async function readJson(
+    response
+) {
     const text =
         await response.text();
 
-    if (!text) return {};
+    if (!text) {
+        return {};
+    }
 
     try {
-        return JSON.parse(text);
+        return JSON.parse(
+            text
+        );
     } catch {
         return {
             message: text
@@ -876,6 +1298,8 @@ function supabaseError(
             data.message ||
             data.error ||
             "Supabase request failed.",
-        details: data
+
+        details:
+            data
     });
-}
+                    }
