@@ -1389,6 +1389,31 @@ textarea{
 @keyframes panelIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
+
+/* BATTLESHIP */
+.battleship-board{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--panel2);overflow:hidden;}
+.battleship-toolbar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;}
+.battleship-toolbar .game-btn{min-height:36px;}
+.battleship-status{font-weight:700;padding:8px 10px;border-radius:9px;background:var(--panel3);}
+.battleship-grid-wrap{overflow:auto;max-width:100%;padding-bottom:3px;}
+.battleship-grid{display:grid;grid-template-columns:24px repeat(10,32px);grid-template-rows:24px repeat(10,32px);gap:3px;width:max-content;margin:auto;}
+.bs-label{display:grid;place-items:center;color:var(--muted);font-size:11px;font-weight:800;}
+.bs-cell{width:32px;height:32px;border:1px solid var(--border);border-radius:5px;background:#17222c;color:white;font-weight:800;padding:0;}
+.bs-cell.ship{background:#31556c;}
+.bs-cell.hit{background:#8b3030;}
+.bs-cell.miss{background:#29323b;color:#9da8b3;}
+.bs-cell.sunk{background:#b64242;}
+.bs-cell.targetable:hover:not(:disabled){filter:brightness(1.2);transform:translateY(-1px);}
+.bs-cell:disabled{cursor:default;}
+.battleship-ships{display:flex;flex-wrap:wrap;gap:6px;}
+.bs-ship-chip{padding:6px 9px;border:1px solid var(--border);border-radius:8px;background:var(--panel3);font-size:12px;}
+.bs-ship-chip.done{opacity:.45;text-decoration:line-through;}
+.battleship-result{text-align:center;font-weight:900;font-size:20px;padding:10px;border-radius:10px;background:var(--panel3);}
+@media(max-width:600px){
+    .battleship-grid{grid-template-columns:22px repeat(10,28px);grid-template-rows:22px repeat(10,28px);gap:2px;}
+    .bs-cell{width:28px;height:28px;font-size:11px;}
+    .battleship-board{padding:9px;}
+}
 @media(max-width:600px){
 
     .header{
@@ -1692,6 +1717,12 @@ Choose a game to create a lobby. Others can join before you start.
 <button class="game-choice" data-game="hangman">
     <strong>🎮 Hangman</strong>
     <span>Choose a word and guess letters</span>
+    <div class="game-players">2 players</div>
+</button>
+
+<button class="game-choice" data-game="battleship">
+    <strong>🚢 Battleship</strong>
+    <span>Place ships and destroy your opponent</span>
     <div class="game-players">2 players</div>
 </button>
 
@@ -2508,6 +2539,14 @@ const GAME_TYPES={
         max:2,
         desc:"One player chooses a word. The other guesses letters. 6 attempts.",
         size:null
+    },
+    battleship:{
+        name:"Battleship",
+        icon:"🚢",
+        min:2,
+        max:2,
+        desc:"Place your fleet on a hidden 10x10 grid and destroy your opponent's ships.",
+        size:10
     },
     // Original Games
     memory:{
@@ -4337,6 +4376,7 @@ async function createGame(gameType){
 function getDefaultSettings(gameType){
     const settings = {
         hangman: { word: "" },
+        battleship: { size: 10 },
         ttt3: { boardSize: 3 },
         ttt4: { boardSize: 4 },
         ttt5: { boardSize: 5 },
@@ -4875,6 +4915,7 @@ function createSettingsUI(game){
 function getGameDescription(game){
     const descs = {
         hangman: "One player chooses a word and the other guesses it letter by letter. Exactly 2 players. 6 attempts.",
+        battleship: "Two players place Carrier (5), Battleship (4), Destroyer (3), Submarine (3), and Patrol Boat (2) on hidden 10x10 grids. Take turns attacking coordinates until all enemy ships are destroyed.",
         ttt3: "Classic Tic-Tac-Toe on a 3x3 board. Get 3 in a row to win! Supports 2-3 players.",
         ttt4: "4x4 Tic-Tac-Toe. Get 4 in a row to win! Supports 2-3 players.",
         ttt5: "5x5 Tic-Tac-Toe. Get 5 in a row to win! Supports 2-3 players.",
@@ -4906,6 +4947,7 @@ function createGameBoard(game){
     
     const boards = {
         hangman: createHangman,
+        battleship: createBattleship,
         ttt3: createTTT,
         ttt4: createTTT,
         ttt5: createTTT,
@@ -5003,6 +5045,141 @@ async function guessHangman(game,letter){
     } else if(copy.data.attempts<=0){
         copy.data.status="lost"; copy.data.loserDeviceId=deviceId; copy.data.winnerDeviceId=copy.players[0]?.deviceId; copy.status="finished";
     }
+    await publishGameAndCleanup(game,copy);
+}
+
+
+/* =====================================================
+   BATTLESHIP (2 Players)
+===================================================== */
+const BS_SHIPS = [
+    {name:"Carrier", icon:"🚢", size:5},
+    {name:"Battleship", icon:"🚢", size:4},
+    {name:"Destroyer", icon:"🚤", size:3},
+    {name:"Submarine", icon:"🚤", size:3},
+    {name:"Patrol Boat", icon:"🚤", size:2}
+];
+const BS_COLS = "ABCDEFGHIJ";
+
+function bsKey(r,c){ return r + ":" + c; }
+function bsInside(r,c){ return r>=0 && r<10 && c>=0 && c<10; }
+function bsCellsFor(r,c,size,vertical){
+    const cells=[];
+    for(let i=0;i<size;i++) cells.push({r:r+(vertical?i:0),c:c+(vertical?0:i)});
+    return cells;
+}
+function bsCanPlace(ships,r,c,size,vertical){
+    const cells=bsCellsFor(r,c,size,vertical);
+    if(cells.some(x=>!bsInside(x.r,x.c))) return false;
+    const occupied=new Set((ships||[]).flatMap(s=>s.cells||[]).map(x=>bsKey(x.r,x.c)));
+    return !cells.some(x=>occupied.has(bsKey(x.r,x.c)));
+}
+function bsFleetReady(placement){ return Array.isArray(placement?.ships) && placement.ships.length===BS_SHIPS.length; }
+function bsFleetCells(placement){ return new Set((placement?.ships||[]).flatMap(s=>s.cells||[]).map(x=>bsKey(x.r,x.c))); }
+
+function createBattleship(game){
+    const board=document.createElement("div"); board.className="battleship-board";
+    const data=game.data||{};
+    const me=game.players.find(p=>p.deviceId===deviceId);
+    const opp=game.players.find(p=>p.deviceId!==deviceId);
+    const myPlacement=data.placements?.[deviceId] || {ships:[],shots:[]};
+    const phase=data.phase||"placement";
+
+    const status=document.createElement("div"); status.className="battleship-status";
+    if(phase==="placement") status.textContent=bsFleetReady(myPlacement)?"✅ Fleet placed — waiting for the other player.":"📍 Place your fleet on your hidden 10×10 grid.";
+    else if(game.status==="finished") status.textContent=data.winnerDeviceId===deviceId?"🏆 You destroyed the enemy fleet!":"💀 Your fleet was destroyed!";
+    else status.textContent=data.turnIndex===game.players.findIndex(p=>p.deviceId===deviceId)?"⚔️ Your turn — attack the enemy grid.":"⏳ Opponent's turn.";
+    board.appendChild(status);
+
+    if(phase==="placement" && me){
+        const controls=document.createElement("div"); controls.className="battleship-toolbar";
+        let vertical=false;
+        const rotate=document.createElement("button"); rotate.className="game-btn"; rotate.textContent="↕ Rotate: Horizontal";
+        rotate.onclick=()=>{vertical=!vertical; rotate.textContent=vertical?"↔ Rotate: Vertical":"↕ Rotate: Horizontal";};
+        controls.appendChild(rotate);
+        const shipInfo=document.createElement("div"); shipInfo.className="battleship-ships";
+        const placedNames=new Set((myPlacement.ships||[]).map(s=>s.name));
+        BS_SHIPS.forEach(s=>{const chip=document.createElement("div");chip.className="bs-ship-chip"+(placedNames.has(s.name)?" done":"");chip.textContent=`${s.icon} ${s.name} — ${s.size}`;shipInfo.appendChild(chip);});
+        board.appendChild(controls); board.appendChild(shipInfo);
+        board.appendChild(bsMakeGrid(game,deviceId,true,vertical));
+    } else if(phase==="placement") {
+        board.appendChild(bsMakeGrid(game,deviceId,false,false));
+    } else {
+        const mine=bsMakeGrid(game,deviceId,false,false);
+        const target=opp?bsMakeGrid(game,opp.deviceId,true,false):null;
+        const title1=document.createElement("div"); title1.textContent="🛡️ Your fleet"; title1.style.fontWeight="800";
+        board.appendChild(title1); board.appendChild(mine);
+        if(target){ const title2=document.createElement("div"); title2.textContent="🎯 Enemy grid"; title2.style.fontWeight="800"; title2.style.marginTop="8px"; board.appendChild(title2); board.appendChild(target); }
+    }
+    if(game.status==="finished"){
+        const result=document.createElement("div"); result.className="battleship-result";
+        result.textContent=data.winnerDeviceId===deviceId?"🏆 YOU WIN!":"💀 YOU LOSE!"; board.appendChild(result);
+    }
+    return board;
+}
+
+function bsMakeGrid(game,ownerId,attackGrid,vertical){
+    const wrap=document.createElement("div"); wrap.className="battleship-grid-wrap";
+    const grid=document.createElement("div"); grid.className="battleship-grid";
+    grid.appendChild(document.createElement("div"));
+    for(let c=0;c<10;c++){const l=document.createElement("div");l.className="bs-label";l.textContent=BS_COLS[c];grid.appendChild(l);}
+    const placement=game.data.placements?.[ownerId] || {ships:[],shots:[]};
+    const shipMap=new Map(); (placement.ships||[]).forEach(s=>(s.cells||[]).forEach(x=>shipMap.set(bsKey(x.r,x.c),s.name)));
+    const shots=placement.shots||[];
+    const shotMap=new Map(shots.map(x=>[bsKey(x.r,x.c),x]));
+    const isMe=ownerId===deviceId;
+    const currentPlayer=game.players[game.turnIndex]?.deviceId;
+    for(let r=0;r<10;r++){
+        const rl=document.createElement("div");rl.className="bs-label";rl.textContent=r+1;grid.appendChild(rl);
+        for(let c=0;c<10;c++){
+            const key=bsKey(r,c), btn=document.createElement("button"); btn.className="bs-cell";
+            const ship=shipMap.get(key), shot=shotMap.get(key);
+            if(isMe && ship) btn.classList.add("ship");
+            if(shot){btn.classList.add(shot.hit?"hit":"miss");btn.textContent=shot.hit?"💥":"•";}
+            if(attackGrid && !isMe && game.status==="playing" && game.data.phase==="battle" && currentPlayer===deviceId && !shot){
+                btn.classList.add("targetable"); btn.onclick=()=>bsAttack(game,ownerId,r,c);
+            } else if(!attackGrid && isMe && game.data.phase==="placement" && game.status==="playing" && !bsFleetReady(placement)){
+                btn.onclick=()=>bsPlace(game,r,c,vertical);
+            } else btn.disabled=true;
+            grid.appendChild(btn);
+        }
+    }
+    wrap.appendChild(grid); return wrap;
+}
+
+async function bsPlace(game,r,c,vertical){
+    if(game.data.phase!=="placement" || game.status!=="playing")return;
+    const copy=JSON.parse(JSON.stringify(game));
+    copy.data.placements=copy.data.placements||{};
+    const mine=copy.data.placements[deviceId]||{ships:[],shots:[]};
+    const shipDef=BS_SHIPS[mine.ships.length]; if(!shipDef)return;
+    if(!bsCanPlace(mine.ships,r,c,shipDef.size,vertical)){alert("That ship does not fit there or overlaps another ship.");return;}
+    mine.ships.push({name:shipDef.name,size:shipDef.size,cells:bsCellsFor(r,c,shipDef.size,vertical)});
+    copy.data.placements[deviceId]=mine;
+    if(bsFleetReady(mine) && copy.players.every(p=>bsFleetReady(copy.data.placements?.[p.deviceId]))){
+        copy.data.phase="battle"; copy.turnIndex=0; copy.data.lastAction=null;
+    }
+    await publishGameAndCleanup(game,copy);
+}
+
+async function bsAttack(game,targetId,r,c){
+    if(game.data.phase!=="battle" || game.status!=="playing")return;
+    if(game.players[game.turnIndex]?.deviceId!==deviceId)return;
+    const target=game.data.placements?.[targetId]; if(!target)return;
+    const existing=(target.shots||[]).find(x=>x.r===r&&x.c===c); if(existing)return;
+    const copy=JSON.parse(JSON.stringify(game));
+    const t=copy.data.placements[targetId]; t.shots=t.shots||[];
+    const key=bsKey(r,c), fleet=bsFleetCells(t); const hit=fleet.has(key);
+    let sunk=null;
+    t.shots.push({r,c,hit});
+    if(hit){
+        const ship=t.ships.find(s=>(s.cells||[]).some(x=>bsKey(x.r,x.c)===key));
+        if(ship){const shipKeys=new Set(ship.cells.map(x=>bsKey(x.r,x.c))); const hitKeys=new Set(t.shots.filter(x=>x.hit).map(x=>bsKey(x.r,x.c))); if([...shipKeys].every(k=>hitKeys.has(k))) sunk=ship.name;}
+    }
+    const allSunk=(t.ships||[]).length>0 && t.ships.every(s=>s.cells.every(x=>t.shots.some(q=>q.hit&&q.r===x.r&&q.c===x.c)));
+    copy.data.lastAction={attacker:deviceId,target:targetId,r,c,hit,sunk};
+    if(allSunk){copy.status="finished";copy.data.phase="finished";copy.data.winnerDeviceId=deviceId;}
+    else copy.turnIndex=(copy.turnIndex+1)%copy.players.length;
     await publishGameAndCleanup(game,copy);
 }
 
@@ -6799,6 +6976,22 @@ async function startGame(game){
         copy.data.winnerName = null;
     }
     
+    // Initialize Battleship
+    if (copy.gameType === "battleship") {
+        copy.data.phase = "placement";
+        copy.data.placements = {};
+        copy.data.ships = [
+            { name:"Carrier", icon:"🚢", size:5 },
+            { name:"Battleship", icon:"🚢", size:4 },
+            { name:"Destroyer", icon:"🚤", size:3 },
+            { name:"Submarine", icon:"🚤", size:3 },
+            { name:"Patrol Boat", icon:"🚤", size:2 }
+        ];
+        copy.data.turnIndex = 0;
+        copy.data.winnerDeviceId = null;
+        copy.data.lastAction = null;
+    }
+
     // Initialize game data
     if (copy.gameType === "ttt3" || copy.gameType === "ttt4" || copy.gameType === "ttt5" || copy.gameType === "ttt6") {
         const size = settings.boardSize || 3;
@@ -6984,7 +7177,7 @@ async function forceQuitGame(game){
 }
 
 async function publishGameAndCleanup(oldGame, newGame){
-    if (newGame.status === "finished" && newGame.gameType !== "hangman") {
+    if (newGame.status === "finished" && newGame.gameType !== "hangman" && newGame.gameType !== "battleship") {
         await removeGameMessages(oldGame);
         await loadMessages();
         return;
