@@ -2009,6 +2009,11 @@ const CHANNEL="general";
 
 const GAME_PREFIX="__CHAT_GAME_STATE__:";
 
+// Every running game owns one hidden temporary message in the API.
+// This message is state storage only: it is never rendered as chat and
+// never counts as a normal chat notification.
+const GAME_SERVER_USERNAME="__GAME_SERVER__";
+
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB per file
 
@@ -3290,7 +3295,9 @@ async function loadMessages(){
             
             for (const msg of newMessages) {
                 if (!seenMessageIds.has(msg.id)) {
-                    if (!isGameMessage(msg)) {
+                    // Hidden game-state messages are storage only. They never
+                    // create a normal chat notification or unread event.
+                    if (!isHiddenGameStateMessage(msg) && !isGameMessage(msg)) {
                         hasNewMessages = true;
                     }
                     seenMessageIds.add(msg.id);
@@ -3316,7 +3323,9 @@ async function loadMessages(){
                 }
             }
             
-            const shouldScroll = settings.autoScroll && (hasNewMessages || hasNewGames);
+            // Game creation/state updates are not chat notifications and do not
+            // trigger normal chat auto-scroll. Only real chat messages do.
+            const shouldScroll = settings.autoScroll && hasNewMessages;
             const wasNearBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight < 100;
             
             renderMessages(shouldScroll || (wasNearBottom && settings.autoScroll));
@@ -3380,12 +3389,24 @@ function isGameMessage(message){
     return (
         message &&
         (
-            message.username === "__GAME_SERVER__" ||
+            message.username === GAME_SERVER_USERNAME ||
             (
                 typeof message.message === "string" &&
                 message.message.startsWith(GAME_PREFIX)
             )
         )
+    );
+}
+
+
+function isHiddenGameStateMessage(message){
+
+    if(!message) return false;
+
+    return (
+        message.username === GAME_SERVER_USERNAME &&
+        typeof message.message === "string" &&
+        message.message.startsWith(GAME_PREFIX)
     );
 }
 
@@ -4003,10 +4024,12 @@ async function writeGameState(game){
         GAME_PREFIX+
         JSON.stringify(game);
 
-    // Every game is backed by one hidden temporary game-server message.
-    // It is never rendered as chat and is excluded from new-message
-    // notification/scroll logic. Settings and gameplay use this same state.
+    // Every running game has exactly ONE invisible temporary game-server
+    // message. It contains the complete shared game state, including the
+    // game settings. The first write creates the hidden message; every later
+    // write PATCHES that same message.
     if(game.messageId){
+
         return await apiPatch({
             id: game.messageId,
             device_id: game.hostDeviceId,
@@ -4016,7 +4039,7 @@ async function writeGameState(game){
     }
 
     const result = await apiPost({
-        username: "__GAME_SERVER__",
+        username: GAME_SERVER_USERNAME,
         channel: CHANNEL,
         message: payload,
         image: null,
@@ -4025,8 +4048,8 @@ async function writeGameState(game){
         game_server: true
     });
 
-    // Remember the database message ID so all later updates PATCH the same
-    // invisible message instead of creating extra hidden messages.
+    // Save the database row ID. Settings and gameplay now always update the
+    // same invisible message instead of creating additional hidden rows.
     if(result && result.game && result.game.id){
         game.messageId = result.game.id;
     }
