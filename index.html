@@ -2359,6 +2359,249 @@ const GAME_TYPES={
 };
 
 
+
+/* =====================================================
+   BASE64 MEDIA PROCESSING
+   Images: max 1500x1500, no upscaling.
+   Videos: compressed to fit within 5 MB when possible.
+===================================================== */
+
+const MAX_IMAGE_DIMENSION = 1500;
+const MAX_VIDEO_BYTES = 5 * 1024 * 1024;
+
+function loadImage(file) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            resolve(img);
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error("Could not read image."));
+        };
+        img.src = url;
+    });
+}
+
+async function imageToBase64(file) {
+    const img = await loadImage(file);
+
+    const scale = Math.min(
+        1,
+        MAX_IMAGE_DIMENSION / img.width,
+        MAX_IMAGE_DIMENSION / img.height
+    );
+
+    const width = Math.max(1, Math.round(img.width * scale));
+    const height = Math.max(1, Math.round(img.height * scale));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext("2d", { alpha: false });
+    ctx.drawImage(img, 0, 0, width, height);
+
+    // JPEG keeps the Base64 payload much smaller.
+    const quality = file.type === "image/png" && scale === 1
+        ? 0.90
+        : 0.88;
+
+    const data = canvas.toDataURL("image/jpeg", quality);
+
+    return {
+        name: file.name.replace(/\.[^.]+$/, "") + ".jpg",
+        data,
+        size: Math.round((data.length - data.indexOf(",") - 1) * 0.75),
+        type: "image/jpeg"
+    };
+}
+
+function getVideoMetadata(file) {
+    return new Promise((resolve, reject) => {
+        const video = document.createElement("video");
+        const url = URL.createObjectURL(file);
+
+        video.preload = "metadata";
+        video.onloadedmetadata = () => {
+            const result = {
+                width: video.videoWidth || 1280,
+                height: video.videoHeight || 720,
+                duration: video.duration || 0
+            };
+            URL.revokeObjectURL(url);
+            resolve(result);
+        };
+        video.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error("Could not read video."));
+        };
+        video.src = url;
+    });
+}
+
+function blobToDataURL(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
+/*
+ * Browser video encoding support differs by browser.
+ * We first try MediaRecorder with WebM/VP8/VP9 and progressively
+ * lower resolution/bitrate until the result is <= 5 MB.
+ */
+async function compressVideoToBase64(file) {
+    const meta = await getVideoMetadata(file);
+
+    // If already <= 5 MB, keep the original Base64.
+    if (file.size <= MAX_VIDEO_BYTES) {
+        return {
+            name: file.name,
+            data: await getFileDataUrl(file),
+            size: file.size,
+            type: file.type || "video/mp4"
+        };
+    }
+
+    if (!window.MediaRecorder) {
+        throw new Error(
+            "This browser cannot compress this video. Please choose a video under 5 MB."
+        );
+    }
+
+    const source = document.createElement("video");
+    const sourceURL = URL.createObjectURL(file);
+    source.src = sourceURL;
+    source.preload = "auto";
+    source.muted = true;
+    source.playsInline = true;
+
+    await new Promise((resolve, reject) => {
+        source.onloadedmetadata = resolve;
+        source.onerror = () => reject(new Error("Could not load video."));
+    });
+
+    const presets = [
+        { scale: 1, bitrate: 2500000 },
+        { scale: 0.85, bitrate: 1800000 },
+        { scale: 0.70, bitrate: 1200000 },
+        { scale: 0.55, bitrate: 800000 },
+        { scale: 0.40, bitrate: 500000 }
+    ];
+
+    for (const preset of presets) {
+        const width = Math.max(
+            2,
+            Math.floor((meta.width * preset.scale) / 2) * 2
+        );
+        const height = Math.max(
+            2,
+            Math.floor((meta.height * preset.scale) / 2) * 2
+        );
+
+        // Use a canvas to force the requested output resolution.
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+
+        const stream = canvas.captureStream(30);
+
+        const mimeTypes = [
+            "video/webm;codecs=vp9",
+            "video/webm;codecs=vp8",
+            "video/webm"
+        ];
+
+        const mimeType = mimeTypes.find(type =>
+            MediaRecorder.isTypeSupported(type)
+        );
+
+        if (!mimeType) continue;
+
+        const recorder = new MediaRecorder(stream, {
+            mimeType,
+            videoBitsPerSecond: preset.bitrate
+        });
+
+        const chunks = [];
+
+        const finished = new Promise((resolve, reject) => {
+            recorder.ondataavailable = e => {
+                if (e.data && e.data.size) chunks.push(e.data);
+            };
+            recorder.onerror = () => reject(new Error("Video encoding failed."));
+            recorder.onstop = () => resolve(new Blob(chunks, { type: mimeType }));
+        });
+
+        const drawFrame = () => {
+            if (source.ended || source.paused) return;
+            ctx.drawImage(source, 0, 0, width, height);
+            requestAnimationFrame(drawFrame);
+        };
+
+        recorder.start(250);
+
+        try {
+            await source.play();
+        } catch {
+            recorder.stop();
+            continue;
+        }
+
+        drawFrame();
+
+        await new Promise(resolve => {
+            source.onended = resolve;
+        });
+
+        if (recorder.state !== "inactive") recorder.stop();
+
+        const blob = await finished;
+
+        if (blob.size <= MAX_VIDEO_BYTES) {
+            URL.revokeObjectURL(sourceURL);
+
+            return {
+                name: file.name.replace(/\.[^.]+$/, "") + ".webm",
+                data: await blobToDataURL(blob),
+                size: blob.size,
+                type: "video/webm"
+            };
+        }
+    }
+
+    URL.revokeObjectURL(sourceURL);
+
+    throw new Error(
+        "This video could not be compressed below 5 MB. Try a shorter video."
+    );
+}
+
+async function processMediaFile(file) {
+    if ((file.type || "").startsWith("image/")) {
+        return await imageToBase64(file);
+    }
+
+    if ((file.type || "").startsWith("video/")) {
+        return await compressVideoToBase64(file);
+    }
+
+    return {
+        name: file.name,
+        data: await getFileDataUrl(file),
+        size: file.size,
+        type: file.type || "application/octet-stream"
+    };
+}
+
 /* =====================================================
    FILE HANDLING
 ===================================================== */
