@@ -1,5 +1,3 @@
-
-
 /* =====================================================
    CONFIG
 ===================================================== */
@@ -221,12 +219,6 @@ const usernameInput=
 const deviceIdInput=
     document.getElementById("deviceIdInput");
 
-const profilePictureInput=
-    document.getElementById("profilePictureInput");
-
-const profilePicturePreview=
-    document.getElementById("profilePicturePreview");
-
 const refreshRate=
     document.getElementById("refreshRate");
 
@@ -307,7 +299,6 @@ let renderedData=new Map();
 let seenMessageIds=new Set();
 let seenGameIds=new Set();
 let profiles={};
-let pendingProfilePicture="";
 
 // File state - array of {name, data, size, type}
 let pendingFiles=[];
@@ -589,16 +580,6 @@ function hideGameImmediately(game){
     renderMessages(false);
 }
 
-/*
- * Hard game cleanup.
- *
- * There is no SQL here. Cleanup uses the existing API DELETE endpoint.
- * The game is blocked locally before deletion starts, so refreshes cannot
- * recreate it while cleanup is running.
- *
- * Multiple cleanup passes cover the case where an old state message arrives
- * again shortly after the first DELETE request.
- */
 async function forceEndGame(game, options = {}){
     if (!game?.id) return;
 
@@ -638,15 +619,11 @@ async function forceEndGame(game, options = {}){
             });
         } catch {}
 
-        // Remove any copy that may have appeared in the local refresh data.
         hideGameImmediately({id: gameId});
     };
 
-    // Immediate pass.
     await cleanup(Boolean(options.keepalive));
 
-    // Repeated passes during the first second. This is intentionally short
-    // and prevents a late/stale game message from remaining visible.
     const delays = [100, 250, 500, 1000];
 
     for (const delay of delays) {
@@ -656,8 +633,6 @@ async function forceEndGame(game, options = {}){
         }, delay);
     }
 
-    // Refresh once after the cleanup window, while still refusing to render
-    // the stopped game if an old message is returned.
     setTimeout(() => {
         if (!stoppedGames.has(gameId)) return;
         loadMessages().catch(() => {});
@@ -672,8 +647,6 @@ async function forceQuitGame(game){
 async function stopGameOnExit(game){
     if (!game?.id) return;
 
-    // Host leaving ends the entire game. The request is sent with keepalive
-    // so browsers can finish it while the page is being unloaded.
     if (game.hostDeviceId === deviceId) {
         stoppedGames.add(game.id);
         hideGameImmediately(game);
@@ -710,7 +683,6 @@ async function stopGameOnExit(game){
         return;
     }
 
-    // A normal player leaving uses the existing player-leave operation.
     stoppedGames.add(game.id);
 
     try {
@@ -737,7 +709,6 @@ async function publishGameAndCleanup(oldGame, newGame){
         return;
     }
 
-    // Never publish a new state after the game has been stopped.
     if (stoppedGames.has(oldGame.id)) return;
 
     await writeGameState(newGame);
@@ -755,36 +726,6 @@ async function publishGameAndCleanup(oldGame, newGame){
     await loadMessages();
 }
 
-async function removeGameMessages(game){
-    if (!game?.id) return;
-
-    stoppedGames.add(game.id);
-    hideGameImmediately(game);
-
-    try {
-        await apiDelete({
-            game_server:true,
-            game_id:game.id,
-            device_id:game.hostDeviceId
-        });
-    } catch {}
-}
-
-async function deleteStateMessage(game){
-    if (!game?.messageId) return;
-
-    try {
-        await apiDelete({
-            game_server:true,
-            id:game.messageId,
-            device_id:game.hostDeviceId
-        });
-    } catch {}
-}
-
-// Leaving the site removes the current player from every game. If the player is
-// the host, the whole game is stopped. keepalive lets the request survive navigation
-// in browsers that support it.
 window.addEventListener("pagehide", () => {
     for (const game of [...games]) {
         if (game.players?.some(p => p.deviceId === deviceId)) {
@@ -793,19 +734,10 @@ window.addEventListener("pagehide", () => {
     }
 });
 
-/* =====================================================
-   REFRESH
-===================================================== */
-
 function restartRefresh(){
     if (refreshTimer) clearInterval(refreshTimer);
     refreshTimer = setInterval(loadMessages, 500);
 }
-
-
-/* =====================================================
-   CONFIRM
-===================================================== */
 
 function openConfirm(title, text, callback){
     confirmTitle.textContent = title;
@@ -829,11 +761,6 @@ confirmYes.onclick = async () => {
     }
 };
 
-
-/* =====================================================
-   REMOVE EVERYTHING
-===================================================== */
-
 removeEverything.onclick = () => {
     openConfirm("Remove everything?", "This permanently removes every message from the chat.", async () => {
         try {
@@ -851,11 +778,6 @@ removeEverything.onclick = () => {
     });
 };
 
-
-/* =====================================================
-   HELPERS
-===================================================== */
-
 function formatTime(date){
     if (!date) return "";
     return new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -869,11 +791,6 @@ function escapeHtml(value){
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
 }
-
-
-/* =====================================================
-   STARTUP ANIMATION
-===================================================== */
 
 function playStartupAnimation(){
     const screen = document.getElementById("startupScreen");
@@ -890,13 +807,919 @@ function playStartupAnimation(){
 window.addEventListener("pageshow", playStartupAnimation);
 playStartupAnimation();
 
-
-/* =====================================================
-   START
-===================================================== */
-
 processProfiles();
 loadSettingsUI();
 applySettings();
 loadMessages();
 
+function loadSettingsUI(){
+    usernameInput.value = settings.username;
+    deviceIdInput.value = deviceId;
+    refreshRate.value = settings.refreshRate;
+    showTimestamps.value = String(settings.showTimestamps);
+    themeSelect.value = settings.theme;
+    textSize.value = settings.textSize;
+    wordSpacing.value = settings.wordSpacing;
+    lineSpacing.value = settings.lineSpacing;
+    cornerRadius.value = settings.cornerRadius;
+    uiScale.value = settings.uiScale;
+    enterToSend.value = String(settings.enterToSend);
+    autoScroll.value = String(settings.autoScroll);
+    updateRangeLabels();
+}
+
+function updateRangeLabels(){
+    textSizeValue.textContent = textSize.value + "px";
+    wordSpacingValue.textContent = wordSpacing.value + "px";
+    lineSpacingValue.textContent = lineSpacing.value;
+    cornerRadiusValue.textContent = cornerRadius.value + "px";
+    uiScaleValue.textContent = Math.round(Number(uiScale.value) * 100) + "%";
+}
+
+function applySettings(){
+    document.documentElement.style.setProperty("--text-size", settings.textSize + "px");
+    document.documentElement.style.setProperty("--word-spacing", settings.wordSpacing + "px");
+    document.documentElement.style.setProperty("--line-spacing", settings.lineSpacing);
+    document.documentElement.style.setProperty("--radius", settings.cornerRadius + "px");
+    document.documentElement.style.setProperty("--ui-scale", settings.uiScale);
+    applyTheme(settings.theme);
+    renderedElements.clear();
+    renderedData.clear();
+    seenMessageIds.clear();
+    seenGameIds.clear();
+    renderMessages();
+    restartRefresh();
+}
+
+function applyTheme(name){
+    const themes={
+        dark:["#0b0d10","#111419"],
+        midnight:["#080b14","#101522"],
+        slate:["#101418","#171d22"],
+        black:["#000","#090909"],
+        blue:["#091018","#101c29"],
+        purple:["#100b17","#191021"],
+        green:["#09120d","#101b15"],
+        red:["#140b0b","#1e1111"],
+        gray:["#151515","#202020"],
+        light:["#eeeeee","#ffffff"],
+        oled:["#000","#000"]
+    };
+    const t = themes[name] || themes.dark;
+    document.documentElement.style.setProperty("--bg", t[0]);
+    document.documentElement.style.setProperty("--panel", t[1]);
+    document.body.style.background = t[0];
+}
+
+settingsBtn.onclick = () => {
+    loadSettingsUI();
+    settingsOverlay.classList.add("show");
+};
+
+closeSettings.onclick = () => {
+    settingsOverlay.classList.remove("show");
+};
+
+gamesBtn.onclick = () => {
+    gamesOverlay.classList.add("show");
+};
+
+const gamesComposerBtn = document.getElementById("gamesComposerBtn");
+if (gamesComposerBtn) {
+    gamesComposerBtn.onclick = () => {
+        gamesOverlay.classList.add("show");
+    };
+}
+
+closeGames.onclick = () => {
+    gamesOverlay.classList.remove("show");
+};
+
+saveSettings.onclick = () => {
+    settings.username = usernameInput.value.trim().substring(0, 24);
+    settings.refreshRate = Number(refreshRate.value);
+    settings.showTimestamps = showTimestamps.value === "true";
+    settings.theme = themeSelect.value;
+    settings.textSize = Number(textSize.value);
+    settings.wordSpacing = Number(wordSpacing.value);
+    settings.lineSpacing = Number(lineSpacing.value);
+    settings.cornerRadius = Number(cornerRadius.value);
+    settings.uiScale = Number(uiScale.value);
+    settings.enterToSend = enterToSend.value === "true";
+    settings.autoScroll = autoScroll.value === "true";
+
+    Object.keys(settings).forEach(key => {
+        localStorage.setItem("chat_" + key, settings[key]);
+    });
+
+    publishProfile().catch(error => console.warn("Profile update failed:", error));
+    applySettings();
+    settingsOverlay.classList.remove("show");
+};
+
+document.querySelectorAll(".category-title").forEach(button => {
+    button.onclick = () => {
+        button.parentElement.classList.toggle("open");
+    };
+});
+
+[textSize, wordSpacing, lineSpacing, cornerRadius, uiScale].forEach(input => {
+    input.addEventListener("input", updateRangeLabels);
+});
+
+function isProfileMessage(message){
+    return message && message.username === "__PROFILE__";
+}
+
+function parseProfileMessage(message){
+    if(!isProfileMessage(message)) return null;
+    try{ return JSON.parse(message.message || "{}"); }catch{ return null; }
+}
+
+function processProfiles(){
+    const map={};
+    for(const message of currentMessages){
+        const profile = parseProfileMessage(message);
+        if(!profile || !profile.deviceId) continue;
+
+        const updatedAt = Number(profile.updatedAt || message.created_at || 0);
+        const previous = map[profile.deviceId];
+
+        if(!previous || updatedAt >= Number(previous.updatedAt || 0)){
+            map[profile.deviceId]={
+                name: String(profile.name || "User").slice(0, 24),
+                updatedAt
+            };
+        }
+    }
+    profiles = map;
+    renderedElements.clear();
+    renderedData.clear();
+}
+
+function getDisplayName(id, fallback="User"){
+    return profiles[id]?.name || fallback || "User";
+}
+
+async function publishProfile(){
+    const profile = {
+        type: "profile",
+        deviceId,
+        name: settings.username || "User",
+        updatedAt: Date.now()
+    };
+
+    await apiPost({
+        username: "__PROFILE__",
+        channel: CHANNEL,
+        message: JSON.stringify(profile),
+        image: null,
+        files: [],
+        device_id: deviceId
+    });
+
+    profiles[deviceId] = {
+        name: profile.name,
+        updatedAt: profile.updatedAt
+    };
+
+    renderMessages(false);
+}
+
+sendBtn.onclick = sendChatMessage;
+
+messageInput.addEventListener("keydown", event => {
+    if(event.key === "Enter" && !event.shiftKey && settings.enterToSend){
+        event.preventDefault();
+        sendChatMessage();
+    }
+});
+
+messageInput.addEventListener("input", () => {
+    messageInput.style.height = "auto";
+    messageInput.style.height = Math.min(messageInput.scrollHeight, 150) + "px";
+});
+
+async function sendChatMessage(){
+    const text = messageInput.value.trim();
+    const files = pendingFiles.length ? [...pendingFiles] : [];
+
+    if(!text && !files.length) return;
+
+    if(!settings.username){
+        settingsBtn.click();
+        alert("Set your name in Settings first.");
+        return;
+    }
+
+    sendBtn.disabled = true;
+
+    try{
+        await apiPost({
+            username: "__USER__",
+            channel: CHANNEL,
+            message: text || '',
+            image: null,
+            files: files,
+            device_id: deviceId
+        });
+
+        messageInput.value = "";
+        messageInput.style.height = "auto";
+        pendingFiles = [];
+        renderFilePreview();
+
+        await loadMessages();
+    }catch(error){
+        alert("Failed to send:\n\n" + error.message);
+    }finally{
+        sendBtn.disabled = false;
+    }
+}
+
+async function apiPost(body){
+    const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+    });
+    const data = await safeJson(response);
+    if(!response.ok){
+        throw new Error(data.error || "Request failed.");
+    }
+    return data;
+}
+
+async function apiDelete(body){
+    const response = await fetch(API_URL, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+    });
+    const data = await safeJson(response);
+    if(!response.ok){
+        throw new Error(data.error || "Delete failed.");
+    }
+    return data;
+}
+
+async function apiPatch(body){
+    const response = await fetch(API_URL, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+    });
+    const data = await safeJson(response);
+    if(!response.ok){
+        throw new Error(data.error || "Update failed.");
+    }
+    return data;
+}
+
+async function safeJson(response){
+    const text = await response.text();
+    if(!text) return {};
+    try{
+        return JSON.parse(text);
+    }catch{
+        return { error: text };
+    }
+}
+
+async function loadMessages(){
+    if(syncing) return;
+    syncing = true;
+
+    try{
+        const response = await fetch(
+            API_URL + "?channel=" + encodeURIComponent(CHANNEL) + "&_=" + Date.now(),
+            { cache: "no-store" }
+        );
+        const data = await safeJson(response);
+
+        if(!response.ok){
+            throw new Error(data.error || "Failed to load messages.");
+        }
+
+        const newMessages = Array.isArray(data.messages) ? data.messages : [];
+        const changeInfo = getMessageChanges(currentMessages, newMessages);
+        
+        if (changeInfo.changed) {
+            let hasNewMessages = false;
+            let hasNewGames = false;
+            
+            for (const msg of newMessages) {
+                if (!seenMessageIds.has(msg.id)) {
+                    if (!isGameMessage(msg) && !isProfileMessage(msg)) {
+                        hasNewMessages = true;
+                    }
+                    seenMessageIds.add(msg.id);
+                }
+            }
+            
+            const oldGames = [...games];
+            currentMessages = newMessages;
+            processProfiles();
+            processGameMessages();
+            
+            for (const game of games) {
+                if (!seenGameIds.has(game.id)) {
+                    hasNewGames = true;
+                    seenGameIds.add(game.id);
+                }
+            }
+            
+            const oldGameIds = new Set(oldGames.map(g => g.id));
+            const newGameIds = new Set(games.map(g => g.id));
+            for (const id of oldGameIds) {
+                if (!newGameIds.has(id)) {
+                    seenGameIds.delete(id);
+                }
+            }
+            
+            const shouldScroll = settings.autoScroll && (hasNewMessages || hasNewGames);
+            const wasNearBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight < 100;
+            
+            renderMessages(shouldScroll || (wasNearBottom && settings.autoScroll));
+        }
+    }catch(error){
+        if(!currentMessages.length){
+            messagesEl.innerHTML=`
+                <div class="empty">
+                    <div>
+                        <strong>Unable to load messages</strong>
+                        ${escapeHtml(error.message)}
+                    </div>
+                </div>
+            `;
+        }
+    }finally{
+        syncing = false;
+    }
+}
+
+function filesEquivalent(a, b) {
+    if (a === b) return true;
+    if (!Array.isArray(a) || !Array.isArray(b)) return a == null && b == null;
+    if (a.length !== b.length) return false;
+
+    for (let i = 0; i < a.length; i++) {
+        const x = a[i] || {};
+        const y = b[i] || {};
+        if (x.name !== y.name || x.type !== y.type || x.size !== y.size ||
+            x.image !== y.image || x.video !== y.video || x.data !== y.data) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function messagesEquivalent(a, b) {
+    if (!a || !b) return false;
+    return a.id === b.id &&
+        a.message === b.message &&
+        a.username === b.username &&
+        a.edited === b.edited &&
+        a.created_at === b.created_at &&
+        a.image === b.image &&
+        filesEquivalent(a.files, b.files);
+}
+
+function gameDataEquivalent(a, b) {
+    if (!a || !b) return false;
+    try { return JSON.stringify(a) === JSON.stringify(b); }
+    catch { return false; }
+}
+
+function getMessageChanges(oldMessages, newMessages) {
+    if (oldMessages.length !== newMessages.length) {
+        return { changed: true };
+    }
+
+    for (let i = 0; i < oldMessages.length; i++) {
+        if (!messagesEquivalent(oldMessages[i], newMessages[i])) {
+            return { changed: true };
+        }
+    }
+
+    return { changed: false };
+}
+
+function isGameMessage(message){
+    return (
+        message &&
+        typeof message.message==="string" &&
+        message.message.startsWith(GAME_PREFIX)
+    );
+}
+
+function parseGameMessage(message){
+    if(!isGameMessage(message)){
+        return null;
+    }
+    try{
+        return JSON.parse(message.message.substring(GAME_PREFIX.length));
+    }catch{
+        return null;
+    }
+}
+
+function processGameMessages(){
+    const map=new Map();
+
+    for(const message of currentMessages){
+        if(!isGameMessage(message)) continue;
+
+        const state = parseGameMessage(message);
+        if(!state) continue;
+        if(state.type !== "game") continue;
+
+        if (stoppedGames.has(state.id)) continue;
+
+        map.set(
+            state.id,
+            {
+                ...state,
+                messageId: message.id,
+                hostDeviceId: state.hostDeviceId || message.device_id || ""
+            }
+        );
+    }
+
+    games = [...map.values()];
+}
+
+function renderMessages(shouldAutoScroll){
+    const normal = currentMessages.filter(message => !isGameMessage(message) && !isProfileMessage(message));
+    const activeGames = games.filter(game => game.status !== "finished" && game.status !== "forcequit");
+
+    if (!normal.length && !activeGames.length) {
+        messagesEl.innerHTML = `
+            <div class="empty">
+                <div>
+                    <strong>No messages yet</strong>
+                    Be the first to send something.
+                </div>
+            </div>
+        `;
+        renderedElements.clear();
+        renderedData.clear();
+        return;
+    }
+
+    const desired = [];
+    const desiredIds = [];
+
+    for (const message of normal) {
+        const id = "msg_" + message.id;
+        const oldEl = renderedElements.get(id);
+        const oldData = renderedData.get(id);
+        const el = oldEl && oldData && messagesEquivalent(oldData, message)
+            ? oldEl
+            : createMessageElement(message);
+        desired.push(el);
+        desiredIds.push(id);
+    }
+
+    for (const game of activeGames) {
+        const id = "game_" + game.id;
+        const oldEl = renderedElements.get(id);
+        const oldData = renderedData.get(id);
+        const el = oldEl && oldData && gameDataEquivalent(oldData, game)
+            ? oldEl
+            : createGameElement(game);
+        desired.push(el);
+        desiredIds.push(id);
+    }
+
+    const currentIds = Array.from(messagesEl.children).map(
+        child => child.dataset && child.dataset.id ? child.dataset.id : ""
+    );
+
+    if (currentIds.length !== desiredIds.length ||
+        currentIds.some((id, index) => id !== desiredIds[index])) {
+        const fragment = document.createDocumentFragment();
+        desired.forEach(el => fragment.appendChild(el));
+        messagesEl.replaceChildren(fragment);
+    } else {
+        for (let i = 0; i < desired.length; i++) {
+            if (messagesEl.children[i] !== desired[i]) {
+                messagesEl.children[i].replaceWith(desired[i]);
+            }
+        }
+    }
+
+    renderedElements.clear();
+    renderedData.clear();
+
+    for (let i = 0; i < desired.length; i++) {
+        const id = desiredIds[i];
+        renderedElements.set(id, desired[i]);
+        renderedData.set(id, id.startsWith("msg_") ? normal[i] : activeGames[i - normal.length]);
+    }
+
+    if (shouldAutoScroll && settings.autoScroll) {
+        requestAnimationFrame(() => {
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        });
+    }
+}
+
+function createMessageElement(message) {
+    const item = document.createElement("div");
+    item.className = "message";
+    item.dataset.id = 'msg_' + message.id;
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+
+    const profileName = getDisplayName(message.device_id, message.username === "__USER__" ? "User" : message.username);
+    avatar.textContent = profileName.charAt(0).toUpperCase();
+
+    const content = document.createElement("div");
+    content.className = "message-content";
+
+    const top = document.createElement("div");
+    top.className = "message-top";
+
+    const name = document.createElement("span");
+    name.className = "username";
+    name.textContent = profileName;
+
+    top.appendChild(name);
+
+    if (settings.showTimestamps) {
+        const time = document.createElement("span");
+        time.className = "time";
+        time.textContent = formatTime(message.created_at);
+        top.appendChild(time);
+    }
+
+    if (message.edited) {
+        const edited = document.createElement("span");
+        edited.className = "edited";
+        edited.textContent = "(edited)";
+        top.appendChild(edited);
+    }
+
+    content.appendChild(top);
+
+    if (message.message) {
+        const text = document.createElement("div");
+        text.className = "message-text";
+        text.textContent = message.message;
+        content.appendChild(text);
+    }
+
+    if (message.image) {
+        const img = document.createElement("img");
+        img.className = "message-image";
+        img.src = message.image;
+        img.alt = "Image";
+        img.onclick = () => { window.open(message.image, '_blank'); };
+        content.appendChild(img);
+    }
+
+    if (message.files && Array.isArray(message.files) && message.files.length) {
+        const fileList = document.createElement("div");
+        fileList.className = "file-list";
+
+        message.files.forEach(file => {
+            const type = file.type || '';
+            const isImage = file.image === true || type.startsWith('image/') || (typeof file.data === 'string' && file.data.startsWith('data:image/'));
+
+            if (isImage && file.data) {
+                const img = document.createElement("img");
+                img.className = "message-image";
+                img.src = file.data;
+                img.alt = file.name || "Image";
+                img.loading = "lazy";
+                img.decoding = "async";
+
+                img.onclick = () => {
+                    const viewer = window.open('', '_blank');
+                    if (viewer) {
+                        viewer.document.write(`
+                            <!DOCTYPE html>
+                            <html>
+                            <head><title>${escapeHtml(file.name || 'Image')}</title></head>
+                            <body style="margin:0;min-height:100vh;background:#111;display:grid;place-items:center;">
+                                <img src="${file.data}" style="max-width:100vw;max-height:100vh;object-fit:contain;">
+                            </body>
+                            </html>
+                        `);
+                        viewer.document.close();
+                    }
+                };
+                content.appendChild(img);
+                return;
+            }
+
+            const isAudio = file.audio === true || type.startsWith('audio/') || (typeof file.data === 'string' && file.data.startsWith('data:audio/'));
+            if (isAudio && file.data) {
+                const audioWrap = document.createElement("div");
+                audioWrap.className = "message-audio";
+                const audio = document.createElement("audio");
+                audio.src = file.data;
+                audio.controls = true;
+                audio.preload = "metadata";
+                audioWrap.appendChild(audio);
+                content.appendChild(audioWrap);
+                return;
+            }
+
+            const isVideo = file.video === true || type.startsWith('video/') || (typeof file.data === 'string' && file.data.startsWith('data:video/'));
+            if (isVideo && file.data) {
+                const video = document.createElement('video');
+                video.className = 'message-video';
+                video.src = file.data;
+                video.controls = true;
+                video.autoplay = false;
+                video.preload = 'metadata';
+                video.playsInline = true;
+                video.setAttribute('playsinline', '');
+                content.appendChild(video);
+                return;
+            }
+
+            const fileEl = document.createElement("div");
+            fileEl.className = "message-file";
+
+            const icon = document.createElement("span");
+            icon.className = "file-icon";
+            icon.textContent = getFileIcon(type, file.name || 'file');
+
+            const info = document.createElement("div");
+            info.className = "file-info";
+
+            const nameEl = document.createElement("div");
+            nameEl.className = "file-name";
+            nameEl.textContent = file.name || 'Unknown file';
+
+            const sizeEl = document.createElement("div");
+            sizeEl.className = "file-size";
+            sizeEl.textContent = file.size ? formatFileSize(file.size) : '';
+
+            info.appendChild(nameEl);
+            info.appendChild(sizeEl);
+
+            fileEl.appendChild(icon);
+            fileEl.appendChild(info);
+
+            fileEl.onclick = () => {
+                if (file.data) {
+                    const a = document.createElement('a');
+                    a.href = file.data;
+                    a.download = file.name || 'download';
+                    a.target = '_blank';
+                    a.click();
+                }
+            };
+
+            fileList.appendChild(fileEl);
+        });
+
+        if (fileList.children.length) {
+            content.appendChild(fileList);
+        }
+    }
+
+    item.appendChild(avatar);
+    item.appendChild(content);
+
+    return item;
+}
+
+document.querySelectorAll(".game-choice").forEach(button => {
+    button.onclick = () => {
+        createGame(button.dataset.game);
+    };
+});
+
+async function createGame(gameType){
+    if(!settings.username){
+        settingsBtn.click();
+        alert("Set your name before creating a game.");
+        return;
+    }
+
+    const existing = games.find(
+        game => game.hostDeviceId === deviceId && game.status !== "finished" && game.status !== "forcequit"
+    );
+
+    if(existing){
+        alert("You are already hosting a game.");
+        gamesOverlay.classList.remove("show");
+        return;
+    }
+
+    const info = GAME_TYPES[gameType];
+    if(!info) return;
+
+    const game = {
+        type: "game",
+        id: "game_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,8),
+        gameType,
+        name: info.name,
+        icon: info.icon,
+        host: getDisplayName(deviceId, settings.username),
+        hostDeviceId: deviceId,
+        status: "lobby",
+        players: [{ deviceId, username: getDisplayName(deviceId, settings.username) }],
+        maxPlayers: info.max,
+        minPlayers: info.min,
+        turnIndex: 0,
+        createdAt: Date.now(),
+        board: [],
+        winner: null,
+        data: { settings: getDefaultSettings(gameType) }
+    };
+
+    if (info.size) {
+        game.data.settings.boardSize = info.size;
+    }
+
+    try{
+        await writeGameState(game);
+        gamesOverlay.classList.remove("show");
+        await loadMessages();
+    }catch(error){
+        alert("Could not create game:\n\n" + error.message);
+    }
+}
+
+function getDefaultSettings(gameType){
+    const settings = {
+        hangman: { word: "" },
+        battleship: { size: 10 },
+        ttt3: { boardSize: 3 },
+        ttt4: { boardSize: 4 },
+        ttt5: { boardSize: 5 },
+        ttt6: { boardSize: 6 },
+        memory: { gridSize: 4 },
+        quickdraw: { rounds: 3 },
+        coinflip: { targetScore: 3 },
+        numberguess: { maxNumber: 100 },
+        target: { targets: 5 },
+        reaction: { rounds: 1 },
+        type: { sentenceCount: 1 },
+        boss: { bossHealth: 100000000 },
+        trivia: { questions: 5 },
+        wordscramble: { rounds: 5 },
+        mathrace: { problems: 5 },
+        ttttournament: { rounds: 3 },
+        rpstournament: { rounds: 3 }
+    };
+    return settings[gameType] || {};
+}
+
+async function writeGameState(game){
+    if (!game?.id || stoppedGames.has(game.id)) {
+        return false;
+    }
+
+    const payload = GAME_PREFIX + JSON.stringify(game);
+
+    await apiPost({
+        game_server: true,
+        username: "__GAME_SERVER__",
+        channel: CHANNEL,
+        message: payload,
+        device_id: game.hostDeviceId
+    });
+
+    return true;
+}
+
+function createGameElement(game){
+    const wrapper = document.createElement("div");
+    wrapper.className = "game-message";
+    wrapper.dataset.id = 'game_' + game.id;
+
+    const card = document.createElement("div");
+    card.className = "game-card";
+
+    const header = document.createElement("div");
+    header.className = "game-header";
+
+    const title = document.createElement("div");
+    title.className = "game-title";
+    title.textContent = game.icon + " " + game.name;
+
+    const status = document.createElement("div");
+    status.className = "game-status";
+    status.textContent = game.status === "lobby" ? "WAITING" : game.status === "finished" ? "FINISHED" : "PLAYING";
+
+    header.appendChild(title);
+    header.appendChild(status);
+
+    const body = document.createElement("div");
+    body.className = "game-body";
+
+    const info = document.createElement("div");
+    info.className = "game-info";
+    info.innerHTML = `
+        <div class="game-pill">Host: <strong>${escapeHtml(getDisplayName(game.hostDeviceId, game.host))}</strong></div>
+        <div class="game-pill">Players: <strong>${game.players.length}/${game.maxPlayers}</strong></div>
+        <div class="game-pill">Min Players: <strong>${game.minPlayers || 2}</strong></div>
+    `;
+    body.appendChild(info);
+
+    const desc = document.createElement("div");
+    desc.className = "game-description";
+    desc.textContent = game.status === "lobby" ? "Join before the host starts. Everyone else can spectate." : getGameDescription(game);
+    body.appendChild(desc);
+
+    const players = document.createElement("div");
+    players.className = "players-list";
+    game.players.forEach(player => {
+        const chip = document.createElement("div");
+        chip.className = "player-chip";
+        if (player.deviceId === game.hostDeviceId) chip.classList.add("host");
+        chip.textContent = getDisplayName(player.deviceId, player.username) + (player.deviceId === game.hostDeviceId ? " 👑" : "");
+        players.appendChild(chip);
+    });
+    body.appendChild(players);
+
+    if (game.status === "lobby" && game.hostDeviceId === deviceId) {
+        const settingsDiv = document.createElement("div");
+        settingsDiv.className = "game-settings";
+        settingsDiv.innerHTML = `<h4>⚙️ Game Settings (Host only)</h4>`;
+        settingsDiv.appendChild(createSettingsUI(game));
+        body.appendChild(settingsDiv);
+    }
+
+    if (game.status === "playing") {
+        const turn = document.createElement("div");
+        turn.className = "turn-banner";
+        const current = game.players[game.turnIndex % Math.max(game.players.length, 1)];
+        if (current) {
+            turn.innerHTML = "Current turn: <strong>" + escapeHtml(getDisplayName(current.deviceId, current.username)) + "</strong>";
+        }
+        body.appendChild(turn);
+    }
+
+    const board = createGameBoard(game);
+    if (board) body.appendChild(board);
+
+    const actions = document.createElement("div");
+    actions.className = "game-actions";
+
+    if (game.status === "lobby") {
+        const joined = game.players.some(p => p.deviceId === deviceId);
+        
+        if (!joined && game.players.length < game.maxPlayers) {
+            const join = document.createElement("button");
+            join.className = "game-btn green";
+            join.textContent = "Join game";
+            join.onclick = async () => await joinGame(game);
+            actions.appendChild(join);
+        } else if (joined) {
+            const leave = document.createElement("button");
+            leave.className = "game-btn";
+            leave.textContent = "Leave";
+            leave.onclick = async () => await leaveGame(game);
+            actions.appendChild(leave);
+        }
+
+        if (game.hostDeviceId === deviceId) {
+            const start = document.createElement("button");
+            start.className = "game-btn primary";
+            start.textContent = "Start game";
+            start.disabled = game.players.length < (game.minPlayers || 2);
+            start.onclick = async () => await startGame(game);
+            actions.appendChild(start);
+
+            const quit = document.createElement("button");
+            quit.className = "game-btn danger";
+            quit.textContent = "Force quit";
+            quit.onclick = () => openConfirm("Force quit game?", "Everyone will be removed from this game.", () => forceQuitGame(game));
+            actions.appendChild(quit);
+        }
+    } else if (game.status === "playing") {
+        const mine = game.players.some(p => p.deviceId === deviceId);
+        
+        if (mine) {
+            const leave = document.createElement("button");
+            leave.className = "game-btn";
+            leave.textContent = "Leave game";
+            leave.onclick = async () => await leaveGame(game);
+            actions.appendChild(leave);
+        }
+
+        if (game.hostDeviceId === deviceId) {
+            const quit = document.createElement("button");
+            quit.className = "game-btn danger";
+            quit.textContent = "Force quit";
+            quit.onclick = () => openConfirm("Force quit game?", "Everyone will be removed.", () => forceQuitGame(game));
+            actions.appendChild(quit);
+        }
+    }
+
+    body.appendChild(actions);
+    card.appendChild(header);
+    card.appendChild(body);
+    wrapper.appendChild(card);
+
+    return wrapper;
+}
