@@ -2714,8 +2714,9 @@ function createTTT(game){
     const board = document.createElement("div");
     board.className = "ttt";
     const cellSize = size <= 3 ? 80 : size <= 4 ? 70 : size <= 5 ? 60 : 50;
-    board.style.gridTemplateColumns = `repeat(${size}, ${cellSize}px)`;
-    board.style.gridTemplateRows = `repeat(${size}, ${cellSize}px)`;
+    const responsiveCell = `min(${cellSize}px, calc((100vw - 112px) / ${size}))`;
+    board.style.gridTemplateColumns = `repeat(${size}, minmax(0, ${responsiveCell}))`;
+    board.style.gridTemplateRows = `repeat(${size}, minmax(0, ${responsiveCell}))`;
 
     const mine = game.players.some(p => p.deviceId === deviceId);
     const current = game.players[game.turnIndex % game.players.length];
@@ -2732,7 +2733,7 @@ function createTTT(game){
             const idx = symbols.indexOf(value);
             if (idx !== -1) button.className = symbolClasses[idx];
         }
-        button.style.fontSize = size <= 3 ? "32px" : size <= 4 ? "28px" : size <= 5 ? "24px" : "20px";
+        button.style.fontSize = `clamp(${size >= 6 ? 16 : 18}px, ${Math.max(2.2, 7 / size)}vw, ${size <= 3 ? 32 : size <= 4 ? 28 : size <= 5 ? 24 : 20}px)`;
         button.disabled = !myTurn || !!game.data.board[i] || !!game.winner;
         button.onclick = async () => {
             const copy = JSON.parse(JSON.stringify(game));
@@ -2804,7 +2805,8 @@ function createMemory(game){
 
     const grid = document.createElement("div");
     grid.className = "memory-grid";
-    grid.style.gridTemplateColumns = `repeat(${gridSize}, ${gridSize <= 4 ? 70 : 60}px)`;
+    const memoryCell = gridSize <= 4 ? 70 : 60;
+    grid.style.gridTemplateColumns = `repeat(${gridSize}, minmax(0, min(${memoryCell}px, calc((100vw - 118px) / ${gridSize}))))`;
 
     const mine = game.players.some(p => p.deviceId === deviceId);
     const current = game.players[game.turnIndex % game.players.length];
@@ -4200,13 +4202,13 @@ function createTTTTournament(game){
     // Mini Tic-Tac-Toe board for the match
     const board = document.createElement("div");
     board.className = "ttt";
-    board.style.gridTemplateColumns = "repeat(3, 60px)";
-    board.style.gridTemplateRows = "repeat(3, 60px)";
+    board.style.gridTemplateColumns = "repeat(3, minmax(0, min(60px, calc((100vw - 118px) / 3))))";
+    board.style.gridTemplateRows = "repeat(3, minmax(0, min(60px, calc((100vw - 118px) / 3))))";
 
     for (let i = 0; i < 9; i++) {
         const button = document.createElement("button");
         button.textContent = match.board[i] || "";
-        button.style.fontSize = "24px";
+        button.style.fontSize = "clamp(18px, 6vw, 24px)";
         button.disabled = !myTurnNow || !!match.board[i];
         
         button.onclick = async () => {

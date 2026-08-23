@@ -1601,16 +1601,514 @@ textarea{
 
 
 
-                                    html,body{
-                                        margin:0;
-                                        min-height:100%;
-                                        background:#111;
-                                        display:grid;
-                                        place-items:center;
-                                    }
-                                    img{
-                                        max-width:100vw;
-                                        max-height:100vh;
-                                        object-fit:contain;
-                                    }
+/* Full-screen media viewer fallback */
+body.media-viewer{
+    min-height:100%;
+    background:#111;
+    display:grid;
+    place-items:center;
+}
+body.media-viewer img{
+    max-width:100vw;
+    max-height:100vh;
+    object-fit:contain;
+}
                                 
+
+/* =====================================================
+   POLISH / RESPONSIVE PASS
+   Keeps the existing UI and functionality, but makes the
+   existing components smoother and more consistent.
+===================================================== */
+:root{
+    --surface-glow:rgba(255,255,255,.035);
+    --surface-hover:rgba(255,255,255,.055);
+    --surface-active:rgba(255,255,255,.08);
+    --focus-ring:rgba(232,234,237,.16);
+    --shadow-soft:0 12px 34px rgba(0,0,0,.22);
+    --shadow-panel:0 24px 70px rgba(0,0,0,.48);
+    --ease:cubic-bezier(.22,1,.36,1);
+}
+
+html{
+    background:var(--bg);
+    -webkit-text-size-adjust:100%;
+    text-size-adjust:100%;
+}
+
+body{
+    min-height:100dvh;
+    -webkit-tap-highlight-color:transparent;
+    overscroll-behavior:none;
+}
+
+button,
+a,
+input,
+textarea,
+select{
+    -webkit-tap-highlight-color:transparent;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible{
+    outline:2px solid rgba(232,234,237,.62);
+    outline-offset:2px;
+}
+
+/* Header */
+.header{
+    background:linear-gradient(180deg,rgba(20,24,29,.98),rgba(17,20,25,.98));
+    border-bottom-color:rgba(255,255,255,.075);
+    box-shadow:0 10px 30px rgba(0,0,0,.22);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+}
+
+.logo-icon,
+.icon-btn{
+    background:linear-gradient(145deg,#1d2229,#15191f);
+    border-color:rgba(255,255,255,.085);
+}
+
+.icon-btn:active,
+.games-composer-btn:active,
+.attach-btn:active,
+.send-btn:active,
+.game-btn:active,
+.game-choice:active{
+    transform:translateY(0) scale(.97);
+}
+
+/* Messages */
+.messages{
+    scrollbar-width:thin;
+    scrollbar-color:#343b45 transparent;
+    overscroll-behavior-y:contain;
+    scroll-padding-block:12px;
+}
+
+.messages::-webkit-scrollbar,
+.panel::-webkit-scrollbar{
+    width:9px;
+}
+
+.messages::-webkit-scrollbar-track,
+.panel::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+.messages::-webkit-scrollbar-thumb,
+.panel::-webkit-scrollbar-thumb{
+    background:#303741;
+    border:3px solid transparent;
+    background-clip:padding-box;
+    border-radius:99px;
+}
+
+.message{
+    contain:layout style paint;
+    content-visibility:auto;
+    contain-intrinsic-size:72px;
+    animation:messageIn .24s var(--ease) both;
+}
+
+.message-text,
+.message-top,
+.game-description,
+.game-info{
+    min-width:0;
+}
+
+@keyframes messageIn{
+    from{opacity:0;transform:translateY(5px)}
+    to{opacity:1;transform:none}
+}
+
+/* Existing game cards */
+.game-message{
+    contain:layout style paint;
+    animation:gameIn .28s var(--ease) both;
+}
+
+.game-card{
+    border-color:rgba(255,255,255,.085);
+    background:linear-gradient(145deg,rgba(25,30,37,.98),rgba(16,20,25,.98));
+    box-shadow:var(--shadow-panel),inset 0 1px rgba(255,255,255,.045);
+    overflow:hidden;
+}
+
+.game-header{
+    min-height:52px;
+    background:linear-gradient(180deg,rgba(255,255,255,.025),transparent);
+}
+
+.game-status{
+    border:1px solid rgba(255,255,255,.07);
+    box-shadow:inset 0 1px rgba(255,255,255,.04);
+}
+
+.game-pill{
+    border-color:rgba(255,255,255,.065);
+    background:rgba(255,255,255,.025);
+    transition:background .16s var(--ease),border-color .16s var(--ease),transform .16s var(--ease);
+}
+
+.game-pill:hover{
+    background:rgba(255,255,255,.045);
+    border-color:rgba(255,255,255,.1);
+}
+
+.game-btn,
+.boss-upgrade-btn,
+.hangman-letter,
+.bs-cell,
+.trivia-option,
+.ttt button,
+.game-choice{
+    touch-action:manipulation;
+}
+
+.game-btn,
+.boss-upgrade-btn,
+.trivia-option,
+.hangman-letter,
+.bs-cell,
+.ttt button{
+    min-height:40px;
+}
+
+.game-btn:hover:not(:disabled),
+.boss-upgrade-btn:hover:not(:disabled),
+.trivia-option:hover:not(:disabled),
+.hangman-letter:hover:not(:disabled){
+    box-shadow:0 8px 22px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.05);
+}
+
+.game-choice{
+    min-height:92px;
+    background:linear-gradient(145deg,#181d24,#14181e);
+    border-color:rgba(255,255,255,.075);
+}
+
+.game-choice:hover{
+    background:linear-gradient(145deg,#20262e,#171c22);
+}
+
+.game-choice:focus-visible{
+    border-color:#59616d;
+    box-shadow:0 0 0 3px var(--focus-ring),0 12px 28px rgba(0,0,0,.24);
+}
+
+.game-choice .game-players{
+    border:1px solid rgba(255,255,255,.05);
+}
+
+/* Game boards: preserve their existing sizes but make interaction feel cleaner. */
+.ttt button,
+.memory-card,
+.quickdraw-box,
+.target-dot,
+.reaction-box,
+.trivia-option,
+.bs-cell{
+    transition:transform .16s var(--ease),background .16s var(--ease),border-color .16s var(--ease),box-shadow .16s var(--ease),filter .16s var(--ease);
+}
+
+.ttt button:hover:not(:disabled),
+.memory-card:hover:not(.flipped):not(.matched),
+.target-dot:hover,
+.bs-cell.targetable:hover:not(:disabled){
+    transform:translateY(-2px);
+}
+
+.memory-card.flipped,
+.memory-card.matched{
+    transform:scale(1.02);
+}
+
+/* Tournament brackets remain the same information, but become easier to scan. */
+.ttt-match,
+.rps-match{
+    border-color:rgba(255,255,255,.075);
+    background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.018));
+    box-shadow:inset 0 1px rgba(255,255,255,.035);
+}
+
+/* Composer */
+.composer{
+    background:linear-gradient(180deg,rgba(17,20,25,.88),rgba(17,20,25,.99));
+    border-top-color:rgba(255,255,255,.07);
+    padding-bottom:max(12px,calc(12px + env(safe-area-inset-bottom)));
+}
+
+.composer-box{
+    border-color:rgba(255,255,255,.085);
+    background:linear-gradient(145deg,#1b2027,#171b21);
+    box-shadow:0 14px 38px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.045);
+}
+
+.composer-box:focus-within{
+    border-color:#4a535f;
+    box-shadow:0 16px 40px rgba(0,0,0,.3),0 0 0 3px rgba(232,234,237,.055),inset 0 1px rgba(255,255,255,.05);
+}
+
+textarea::placeholder{
+    color:#6f7884;
+    opacity:1;
+}
+
+textarea{
+    scrollbar-width:thin;
+}
+
+.send-btn{
+    background:linear-gradient(180deg,#f1f2f4,#dfe2e6);
+    box-shadow:0 7px 20px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.75);
+}
+
+.attach-btn,
+.games-composer-btn{
+    border:1px solid transparent;
+    transition:transform .16s var(--ease),background .16s var(--ease),color .16s var(--ease),border-color .16s var(--ease);
+}
+
+.attach-btn:hover,
+.games-composer-btn:hover{
+    background:rgba(255,255,255,.055);
+    border-color:rgba(255,255,255,.05);
+    color:#edf0f4;
+}
+
+/* Overlays / sheets */
+.overlay{
+    padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+    background:rgba(0,0,0,.68);
+    backdrop-filter:blur(14px) saturate(110%);
+    -webkit-backdrop-filter:blur(14px) saturate(110%);
+}
+
+.panel{
+    border-color:rgba(255,255,255,.09);
+    background:linear-gradient(145deg,#14181e,#101318);
+    box-shadow:0 30px 90px rgba(0,0,0,.58),inset 0 1px rgba(255,255,255,.045);
+    overscroll-behavior:contain;
+    scrollbar-width:thin;
+}
+
+.panel-header{
+    position:sticky;
+    top:0;
+    z-index:2;
+    background:rgba(17,20,25,.92);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+}
+
+.panel-body > p:first-child{
+    color:#929aa5;
+    line-height:1.55;
+}
+
+/* Settings */
+.category{
+    border-color:rgba(255,255,255,.075);
+    background:linear-gradient(145deg,#181d23,#15191f);
+}
+
+.category-title:hover{
+    background:rgba(255,255,255,.025);
+}
+
+.setting input,
+.setting select,
+.game-settings-row select,
+.game-settings-row input[type=number]{
+    border-color:rgba(255,255,255,.09);
+    background:#11151a;
+    transition:border-color .16s var(--ease),box-shadow .16s var(--ease),background .16s var(--ease);
+}
+
+.setting input:hover,
+.setting select:hover,
+.game-settings-row select:hover,
+.game-settings-row input[type=number]:hover{
+    border-color:#3b444f;
+}
+
+.setting input:focus,
+.setting select:focus,
+.game-settings-row select:focus,
+.game-settings-row input[type=number]:focus{
+    border-color:#555f6c;
+    box-shadow:0 0 0 3px rgba(232,234,237,.055);
+}
+
+.save-btn,
+.danger-btn{
+    transition:transform .16s var(--ease),filter .16s var(--ease),box-shadow .16s var(--ease);
+}
+
+.save-btn:hover,
+.danger-btn:hover{
+    transform:translateY(-1px);
+    filter:brightness(1.05);
+    box-shadow:0 8px 24px rgba(0,0,0,.22);
+}
+
+/* Media / files */
+.message-image,
+.message-video,
+.message-audio,
+.message-file{
+    box-shadow:0 12px 30px rgba(0,0,0,.2);
+}
+
+.message-file,
+.file-preview-item{
+    border-color:rgba(255,255,255,.075);
+    background:linear-gradient(145deg,#1b2027,#171b21);
+}
+
+.message-image,
+.message-video{
+    max-width:min(620px,100%);
+}
+
+/* Startup */
+#startupScreen{
+    background:radial-gradient(circle at 50% 32%,#2b323d 0%,#111419 36%,#060709 100%);
+    padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));
+}
+
+.startup-icon{
+    box-shadow:0 24px 70px rgba(0,0,0,.52),inset 0 1px rgba(255,255,255,.08);
+}
+
+/* Empty state */
+.empty{
+    animation:messageIn .3s var(--ease) both;
+}
+
+/* Prevent accidental selection while tapping game controls. */
+.game-card,
+.game-choice,
+.game-btn,
+.game-settings,
+.game-pill,
+.ttt,
+.memory-grid,
+.quickdraw-area,
+.target-area,
+.reaction-area,
+.trivia-area,
+.battleship-board,
+.hangman-board{
+    -webkit-user-select:none;
+    user-select:none;
+}
+
+/* Small phones */
+@media(max-width:600px){
+    .header{
+        padding-left:max(9px,env(safe-area-inset-left));
+        padding-right:max(9px,env(safe-area-inset-right));
+    }
+
+    .messages{
+        padding-left:max(9px,env(safe-area-inset-left));
+        padding-right:max(9px,env(safe-area-inset-right));
+    }
+
+    .message-content{
+        max-width:calc(100vw - 68px);
+    }
+
+    .game-card{
+        border-radius:14px;
+    }
+
+    .game-body{
+        padding:12px;
+    }
+
+    .game-info{
+        gap:5px;
+    }
+
+    .game-pill{
+        min-height:30px;
+    }
+
+    .game-actions{
+        gap:7px;
+    }
+
+    .game-actions .game-btn{
+        min-width:0;
+        flex:1 1 0;
+    }
+
+    .panel-header{
+        padding:14px;
+    }
+
+    .panel-body{
+        padding:12px;
+    }
+}
+
+@media(max-width:380px){
+    .message{
+        gap:8px;
+        padding-left:6px;
+        padding-right:6px;
+    }
+
+    .avatar,
+    .profile-avatar{
+        width:36px;
+        height:36px;
+        flex-basis:36px;
+    }
+
+    .message-content{
+        max-width:calc(100vw - 56px);
+    }
+
+    .game-choice{
+        min-height:84px;
+        padding:11px;
+    }
+}
+
+/* Landscape phones / short viewports */
+@media(max-height:560px) and (orientation:landscape){
+    .header{height:48px;min-height:48px;}
+    .messages{padding-top:7px;padding-bottom:7px;}
+    .composer{padding-top:5px;padding-bottom:max(5px,env(safe-area-inset-bottom));}
+    .panel{max-height:calc(100dvh - 10px);}
+    .panel-header{padding:10px 12px;}
+    .panel-body{padding:10px 12px;}
+}
+
+/* Motion remains smooth, but respects accessibility settings. */
+@media(prefers-reduced-motion:reduce){
+    .message,.game-message,.empty{animation:none!important;}
+}
+
+@keyframes gameIn{
+    from{opacity:0;transform:translateY(7px) scale(.992)}
+    to{opacity:1;transform:none}
+}
+
+.panel-help,.confirm-text{
+    color:#929aa5;
+    line-height:1.55;
+}
+
+.panel-help{
+    margin-top:0;
+}
