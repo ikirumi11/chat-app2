@@ -1445,4 +1445,409 @@ async function stopGameOnExit(game){
 
                     body:
                         JSON.stringify({
-                            game_server
+                            game_server:true,
+                            game_id:game.id,
+                            channel:CHANNEL,
+                            device_id:deviceId
+                        }),
+
+                    keepalive:true
+                }
+            );
+
+        }catch{}
+
+        return;
+    }
+
+
+    // Normal player leaving.
+
+    stoppedGames.add(
+        game.id
+    );
+
+    try{
+
+        await fetch(
+            API_URL,
+            {
+                method:"POST",
+
+                headers:{
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body:
+                    JSON.stringify({
+                        game_server:true,
+                        game_action:"leave",
+                        game_id:game.id,
+                        channel:CHANNEL,
+                        device_id:deviceId
+                    }),
+
+                keepalive:true
+            }
+        );
+
+    }catch{}
+}
+
+
+async function publishGameAndCleanup(
+    oldGame,
+    newGame
+){
+
+    if(
+        !oldGame?.id ||
+        stoppedGames.has(oldGame.id)
+    ){
+        return;
+    }
+
+    if(
+        newGame.status==="finished" ||
+        newGame.status==="forcequit"
+    ){
+
+        await forceEndGame(
+            oldGame
+        );
+
+        return;
+    }
+
+
+    // Never publish a new state after game stopped.
+
+    if(
+        stoppedGames.has(
+            oldGame.id
+        )
+    ){
+        return;
+    }
+
+    await writeGameState(
+        newGame
+    );
+
+
+    if(
+        oldGame.messageId &&
+        !stoppedGames.has(oldGame.id)
+    ){
+
+        try{
+
+            await apiDelete({
+                game_server:true,
+                id:oldGame.messageId,
+                device_id:oldGame.hostDeviceId
+            });
+
+        }catch{}
+    }
+
+    await loadMessages();
+}
+
+
+async function removeGameMessages(game){
+
+    if(!game?.id){
+        return;
+    }
+
+    stoppedGames.add(
+        game.id
+    );
+
+    hideGameImmediately(
+        game
+    );
+
+    try{
+
+        await apiDelete({
+            game_server:true,
+            game_id:game.id,
+            device_id:game.hostDeviceId
+        });
+
+    }catch{}
+}
+
+
+async function deleteStateMessage(game){
+
+    if(!game?.messageId){
+        return;
+    }
+
+    try{
+
+        await apiDelete({
+            game_server:true,
+            id:game.messageId,
+            device_id:game.hostDeviceId
+        });
+
+    }catch{}
+}
+
+
+/*
+ * Leaving the site removes the current player from every game.
+ * If the player is the host, the whole game is stopped.
+ */
+
+window.addEventListener(
+    "pagehide",
+    ()=>{
+        for(
+            const game of [...games]
+        ){
+
+            if(
+                game.players?.some(
+                    p=>p.deviceId===deviceId
+                )
+            ){
+
+                stopGameOnExit(
+                    game
+                );
+            }
+        }
+    }
+);
+
+
+/* =====================================================
+   REFRESH
+===================================================== */
+
+function restartRefresh(){
+
+    if(refreshTimer){
+        clearInterval(
+            refreshTimer
+        );
+    }
+
+    refreshTimer=
+        setInterval(
+            loadMessages,
+            500
+        );
+}
+
+
+/* =====================================================
+   CONFIRM
+===================================================== */
+
+function openConfirm(
+    title,
+    text,
+    callback
+){
+
+    confirmTitle.textContent=
+        title;
+
+    confirmText.textContent=
+        text;
+
+    confirmCallback=
+        callback;
+
+    confirmOverlay.classList.add(
+        "show"
+    );
+}
+
+
+confirmCancel.onclick=()=>{
+
+    confirmOverlay.classList.remove(
+        "show"
+    );
+
+    confirmCallback=null;
+};
+
+
+confirmYes.onclick=async()=>{
+
+    const callback=
+        confirmCallback;
+
+    confirmOverlay.classList.remove(
+        "show"
+    );
+
+    confirmCallback=null;
+
+    if(callback){
+
+        try{
+
+            await callback();
+
+        }catch(error){
+
+            alert(
+                error.message
+            );
+        }
+    }
+};
+
+
+/* =====================================================
+   REMOVE EVERYTHING
+===================================================== */
+
+removeEverything.onclick=()=>{
+
+    openConfirm(
+        "Remove everything?",
+        "This permanently removes every message from the chat.",
+        async()=>{
+
+            try{
+
+                await apiDelete({
+                    delete_all:true
+                });
+
+                currentMessages=[];
+                games=[];
+
+                renderedElements.clear();
+                renderedData.clear();
+
+                seenMessageIds.clear();
+                seenGameIds.clear();
+
+                renderMessages();
+
+            }catch(error){
+
+                alert(
+                    "Failed to wipe chat:\n\n"+
+                    error.message
+                );
+            }
+        }
+    );
+};
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function formatTime(date){
+
+    if(!date){
+        return "";
+    }
+
+    return new Date(
+        date
+    ).toLocaleTimeString(
+        [],
+        {
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
+}
+
+
+function escapeHtml(value){
+
+    return String(value)
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+}
+
+
+/* =====================================================
+   STARTUP ANIMATION
+===================================================== */
+
+function playStartupAnimation(){
+
+    const screen=
+        document.getElementById(
+            "startupScreen"
+        );
+
+    if(!screen){
+        return;
+    }
+
+    screen.classList.remove(
+        "hide"
+    );
+
+    clearTimeout(
+        window.__startupTimer
+    );
+
+    window.__startupTimer=
+        setTimeout(
+            ()=>{
+                screen.classList.add(
+                    "hide"
+                );
+            },
+            1150
+        );
+}
+
+window.addEventListener(
+    "pageshow",
+    playStartupAnimation
+);
+
+playStartupAnimation();
+
+
+/* =====================================================
+   START
+===================================================== */
+
+loadSettingsUI();
+applySettings();
+loadMessages();
