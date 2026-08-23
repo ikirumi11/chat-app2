@@ -58,7 +58,12 @@
 
     <div class="composer-box">
 
-        <button class="games-composer-btn" id="gamesComposerBtn" title="Games" aria-label="Games">🎮</button>
+        <button
+            class="games-composer-btn"
+            id="gamesComposerBtn"
+            title="Games"
+            aria-label="Games"
+        >🎮</button>
 
         <button
             class="attach-btn"
@@ -114,7 +119,9 @@
 </div>
 
 
-<!-- GAME CREATOR -->
+<!-- =====================================================
+     GAME CREATOR
+===================================================== -->
 
 <div
     class="overlay"
@@ -142,34 +149,51 @@ Choose a game to create a lobby. Others can join before you start.
 
 <div class="game-grid">
 
-<!-- Tic Tac Toe Games (2-3 players) -->
 
-<button class="game-choice" data-game="ttt3">
+<!-- =====================================================
+     TIC TAC TOE
+===================================================== -->
+
+<button
+    class="game-choice"
+    data-game="ttt3"
+>
     <strong>❌⭕ Tic-Tac-Toe 3x3</strong>
     <span>Get 3 in a row</span>
     <div class="game-players">2-3 players</div>
 </button>
 
-<button class="game-choice" data-game="ttt4">
+<button
+    class="game-choice"
+    data-game="ttt4"
+>
     <strong>❌⭕ Tic-Tac-Toe 4x4</strong>
     <span>Get 4 in a row</span>
     <div class="game-players">2-3 players</div>
 </button>
 
-<button class="game-choice" data-game="ttt5">
+<button
+    class="game-choice"
+    data-game="ttt5"
+>
     <strong>❌⭕ Tic-Tac-Toe 5x5</strong>
     <span>Get 5 in a row</span>
     <div class="game-players">2-3 players</div>
 </button>
 
-<button class="game-choice" data-game="ttt6">
+<button
+    class="game-choice"
+    data-game="ttt6"
+>
     <strong>❌⭕ Tic-Tac-Toe 6x6</strong>
     <span>Get 6 in a row</span>
     <div class="game-players">2-3 players</div>
 </button>
 
 
-<!-- Classic 2-player games -->
+<!-- =====================================================
+     CLASSIC 2-PLAYER GAMES
+===================================================== -->
 
 <div class="game-section-title">
     CLASSIC 2-PLAYER GAMES
@@ -179,6 +203,7 @@ Choose a game to create a lobby. Others can join before you start.
     class="game-choice game-choice-featured"
     data-game="hangman"
 >
+
     <strong>🔤 Hangman</strong>
 
     <span>
@@ -186,6 +211,7 @@ Choose a game to create a lobby. Others can join before you start.
     </span>
 
     <div class="game-details">
+
         <b>Players</b> · Minimum: 2 · Maximum: 2<br>
 
         One player creates the game and chooses the word.
@@ -194,17 +220,21 @@ Choose a game to create a lobby. Others can join before you start.
         the 6 attempts, and each letter can only be guessed once.
         Guess the entire word to win; run out of attempts and
         the word is revealed.
+
     </div>
 
     <div class="game-players">
         2 players
     </div>
+
 </button>
+
 
 <button
     class="game-choice game-choice-featured"
     data-game="battleship"
 >
+
     <strong>🚢 Battleship</strong>
 
     <span>
@@ -212,6 +242,7 @@ Choose a game to create a lobby. Others can join before you start.
     </span>
 
     <div class="game-details">
+
         <b>Players</b> · Minimum: 2 · Maximum: 2<br>
 
         Place Carrier 5, Battleship 4, Destroyer 3,
@@ -220,92 +251,137 @@ Choose a game to create a lobby. Others can join before you start.
         Take turns attacking coordinates:
         💥 HIT!, 🌊 MISS!, and 💥 SHIP SUNK!
         Destroy every enemy ship to win.
+
     </div>
 
     <div class="game-players">
         2 players
     </div>
+
 </button>
 
 
-<!-- Original Games -->
+<!-- =====================================================
+     ORIGINAL GAMES
+===================================================== -->
 
-<button class="game-choice" data-game="memory">
+<button
+    class="game-choice"
+    data-game="memory"
+>
     <strong>🧠 Memory Match</strong>
     <span>Flip cards and match pairs</span>
     <div class="game-players">2-6 players</div>
 </button>
 
-<button class="game-choice" data-game="quickdraw">
+<button
+    class="game-choice"
+    data-game="quickdraw"
+>
     <strong>🏁 Quick Draw</strong>
     <span>Click when DRAW! appears</span>
     <div class="game-players">2-6 players</div>
 </button>
 
-<button class="game-choice" data-game="coinflip">
+<button
+    class="game-choice"
+    data-game="coinflip"
+>
     <strong>🪙 Coin Flip Battle</strong>
     <span>Guess heads or tails</span>
     <div class="game-players">2-6 players</div>
 </button>
 
-<button class="game-choice" data-game="numberguess">
+<button
+    class="game-choice"
+    data-game="numberguess"
+>
     <strong>🔢 Number Guess</strong>
     <span>Guess the hidden number</span>
     <div class="game-players">2-6 players</div>
 </button>
 
-<button class="game-choice" data-game="target">
+<button
+    class="game-choice"
+    data-game="target"
+>
     <strong>🎯 Target Click</strong>
     <span>Click the target as fast as you can</span>
     <div class="game-players">2-6 players</div>
 </button>
 
-<button class="game-choice" data-game="reaction">
+<button
+    class="game-choice"
+    data-game="reaction"
+>
     <strong>⚡ Reaction Time</strong>
     <span>Click when the screen turns green</span>
     <div class="game-players">2-6 players</div>
 </button>
 
-<button class="game-choice" data-game="type">
+<button
+    class="game-choice"
+    data-game="type"
+>
     <strong>⌨️ Type Sentence</strong>
     <span>Type the sentence as fast as you can</span>
     <div class="game-players">2-6 players</div>
 </button>
 
-<button class="game-choice" data-game="boss">
+<button
+    class="game-choice"
+    data-game="boss"
+>
     <strong>👹 Boss Battle</strong>
     <span>Defeat the monster with 100M HP!</span>
     <div class="game-players">2-6 players</div>
 </button>
 
 
-<!-- 5 NEW GAMES -->
+<!-- =====================================================
+     NEW GAMES
+===================================================== -->
 
-<button class="game-choice" data-game="trivia">
+<button
+    class="game-choice"
+    data-game="trivia"
+>
     <strong>🧠 Trivia Quiz</strong>
     <span>Answer questions correctly</span>
     <div class="game-players">2-6 players</div>
 </button>
 
-<button class="game-choice" data-game="wordscramble">
+<button
+    class="game-choice"
+    data-game="wordscramble"
+>
     <strong>🔤 Word Scramble</strong>
     <span>Unscramble the letters</span>
     <div class="game-players">2-6 players</div>
 </button>
 
-<button class="game-choice" data-game="mathrace">
+<button
+    class="game-choice"
+    data-game="mathrace"
+>
     <strong>➗ Math Race</strong>
     <span>Solve math problems fast</span>
     <div class="game-players">2-6 players</div>
 </button>
 
-<button class="game-choice" data-game="ttttournament">
+<button
+    class="game-choice"
+    data-game="ttttournament"
+>
     <strong>🏆 Tic-Tac-Toe Tournament</strong>
     <span>Round-robin Tic-Tac-Toe</span>
     <div class="game-players">2-6 players</div>
 </button>
 
-<button class="game-choice" data-game="rpstournament">
+<button
+    class="game-choice"
+    data-game="rpstournament"
+>
     <strong>🏆 RPS Tournament</strong>
     <span>Rock Paper Scissors tournament</span>
     <div class="game-players">2-6 players</div>
@@ -318,7 +394,9 @@ Choose a game to create a lobby. Others can join before you start.
 </div>
 
 
-<!-- SETTINGS -->
+<!-- =====================================================
+     SETTINGS
+===================================================== -->
 
 <div
     class="overlay"
@@ -339,6 +417,11 @@ Choose a game to create a lobby. Others can join before you start.
 </div>
 
 <div class="panel-body">
+
+
+<!-- =====================================================
+     PROFILE
+===================================================== -->
 
 <div class="category open">
 
@@ -361,6 +444,7 @@ Choose a game to create a lobby. Others can join before you start.
 
 </div>
 
+
 <div class="setting">
 
 <label>Device ID</label>
@@ -373,8 +457,13 @@ Choose a game to create a lobby. Others can join before you start.
 </div>
 
 </div>
+
 </div>
 
+
+<!-- =====================================================
+     TEXT
+===================================================== -->
 
 <div class="category">
 
@@ -404,6 +493,7 @@ Choose a game to create a lobby. Others can join before you start.
 
 </div>
 
+
 <div class="setting">
 
 <label>Word spacing</label>
@@ -422,6 +512,7 @@ Choose a game to create a lobby. Others can join before you start.
 ></div>
 
 </div>
+
 
 <div class="setting">
 
@@ -444,8 +535,13 @@ Choose a game to create a lobby. Others can join before you start.
 </div>
 
 </div>
+
 </div>
 
+
+<!-- =====================================================
+     CHAT
+===================================================== -->
 
 <div class="category">
 
@@ -474,20 +570,28 @@ Choose a game to create a lobby. Others can join before you start.
 
 </div>
 
+
 <div class="setting">
 
 <label>Show timestamps</label>
 
 <select id="showTimestamps">
+
 <option value="true">On</option>
 <option value="false">Off</option>
+
 </select>
 
 </div>
 
 </div>
+
 </div>
 
+
+<!-- =====================================================
+     APPEARANCE
+===================================================== -->
 
 <div class="category">
 
@@ -520,6 +624,7 @@ Choose a game to create a lobby. Others can join before you start.
 
 </div>
 
+
 <div class="setting">
 
 <label>Corner roundness</label>
@@ -538,6 +643,7 @@ Choose a game to create a lobby. Others can join before you start.
 ></div>
 
 </div>
+
 
 <div class="setting">
 
@@ -560,8 +666,13 @@ Choose a game to create a lobby. Others can join before you start.
 </div>
 
 </div>
+
 </div>
 
+
+<!-- =====================================================
+     BEHAVIOR
+===================================================== -->
 
 <div class="category">
 
@@ -577,26 +688,36 @@ Choose a game to create a lobby. Others can join before you start.
 <label>Enter to send</label>
 
 <select id="enterToSend">
+
 <option value="true">On</option>
 <option value="false">Off</option>
+
 </select>
 
 </div>
+
 
 <div class="setting">
 
 <label>Auto-scroll</label>
 
 <select id="autoScroll">
+
 <option value="true">On</option>
 <option value="false">Off</option>
+
 </select>
 
 </div>
 
 </div>
+
 </div>
 
+
+<!-- =====================================================
+     SAVE
+===================================================== -->
 
 <button
     class="save-btn"
@@ -605,6 +726,10 @@ Choose a game to create a lobby. Others can join before you start.
 Save settings
 </button>
 
+
+<!-- =====================================================
+     DANGER ZONE
+===================================================== -->
 
 <div class="danger-zone">
 
@@ -627,11 +752,15 @@ Remove everything
 </div>
 
 </div>
+
 </div>
+
 </div>
 
 
-<!-- CONFIRM -->
+<!-- =====================================================
+     CONFIRMATION
+===================================================== -->
 
 <div
     class="overlay"
@@ -674,7 +803,9 @@ Confirm
 </div>
 
 </div>
+
 </div>
+
 </div>
 
 
