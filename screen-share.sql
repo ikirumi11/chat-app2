@@ -42,3 +42,12 @@ create policy screen_share_signals_all
     to anon, authenticated
     using (true)
     with check (true);
+
+
+-- Stream settings/description. Run these if the table already existed.
+alter table public.screen_share_sessions add column if not exists quality integer not null default 450;
+alter table public.screen_share_sessions add column if not exists fps integer not null default 15;
+alter table public.screen_share_sessions add column if not exists width integer not null default 800;
+alter table public.screen_share_sessions add column if not exists height integer not null default 450;
+alter table public.screen_share_sessions add column if not exists surface text not null default 'Screen / display';
+alter table public.screen_share_sessions add column if not exists source_label text not null default 'Shared display';
