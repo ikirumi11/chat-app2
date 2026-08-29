@@ -1,19 +1,18 @@
 export default async function handler(req,res){
   res.setHeader("Content-Type","application/json");res.setHeader("Access-Control-Allow-Origin","*");res.setHeader("Access-Control-Allow-Methods","GET,POST,OPTIONS");res.setHeader("Access-Control-Allow-Headers","Content-Type");
   if(req.method==="OPTIONS")return res.status(204).end();
-  const base="https://wlvbkdzcueqkknysisfw.supabase.co",key="sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL",headers={apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json",Accept:"application/json"},marker="__SCREEN_SHARE__",body=req.body||{},channel=String(body.channel||req.query?.channel||"general").trim().substring(0,32),deviceId=String(body.device_id||"").trim().substring(0,100),read=async r=>{try{return await r.json()}catch{return null}};
-  async function rows(){const r=await fetch(base+"/rest/v1/messages?select=id,message,device_id,created_at&channel=eq."+encodeURIComponent(channel)+"&username=eq."+encodeURIComponent(marker)+"&order=created_at.desc&limit=105",{headers}),d=await read(r);if(!r.ok)throw Error(JSON.stringify(d));return Array.isArray(d)?d:[]}
+  const base="https://wlvbkdzcueqkknysisfw.supabase.co",key="sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL",headers={apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json",Accept:"application/json"},marker="__SCREEN_SHARE__",MAX_BUFFER=5,body=req.body||{},channel=String(body.channel||req.query?.channel||"general").trim().substring(0,32),deviceId=String(body.device_id||"").trim().substring(0,100),read=async r=>{try{return await r.json()}catch{return null}};
+  async function rows(){const r=await fetch(base+"/rest/v1/messages?select=id,message,device_id,created_at&channel=eq."+encodeURIComponent(channel)+"&username=eq."+encodeURIComponent(marker)+"&order=created_at.desc&limit=10",{headers}),d=await read(r);if(!r.ok)throw Error(JSON.stringify(d));return Array.isArray(d)?d:[]}
   const parse=row=>{try{return {...JSON.parse(row.message||"{}"),id:row.id,deviceId:row.device_id,createdAt:row.created_at}}catch{return null}};
   const remove=async row=>{if(row)await fetch(base+"/rest/v1/messages?id=eq."+encodeURIComponent(row.id),{method:"DELETE",headers})};
-  const trim=async all=>{const frames=all.filter(r=>parse(r)?.type==="frame").sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));if(frames.length<=100)return;await Promise.all(frames.slice(100).map(remove))};
+  const trim=async all=>{const frames=all.filter(r=>parse(r)?.type==="frame").sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));if(frames.length<=MAX_BUFFER)return;await Promise.all(frames.slice(MAX_BUFFER).map(remove))};
   try{
     let all=await rows(),parsed=all.map(parse).filter(Boolean),control=parsed.find(x=>x.type==="control");
     if(req.method==="GET"){
       if(control&&Date.now()-(Number(control.updatedAt)||new Date(control.createdAt).getTime())>5000){await Promise.all(all.map(remove));return res.status(200).json({success:true,share:null,frame:null,bufferedFrames:0})}
       const frames=parsed.filter(x=>x.type==="frame").sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
-      // Return only the oldest buffered frame. With 100 frames stored, viewers are roughly
-      // 100 frames behind the host while receiving a small response every 100ms.
-      const delayed=frames.length>=100?frames[0]:null;
+      // Keep a tiny rolling buffer. Viewers consume the oldest frame, giving only ~5 frames of delay.
+      const delayed=frames.length>=MAX_BUFFER?frames[0]:null;
       return res.status(200).json({success:true,share:control||null,frame:delayed,bufferedFrames:frames.length})
     }
     if(!deviceId)return res.status(400).json({error:"Device ID is required."});
