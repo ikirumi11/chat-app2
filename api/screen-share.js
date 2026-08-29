@@ -10,15 +10,14 @@ export default async function handler(req,res){
   const read=async r=>{try{return await r.json()}catch{return null}};
   async function get(){const r=await fetch(`${URL}/rest/v1/messages?select=id,message,device_id,created_at&channel=eq.${encodeURIComponent(channel)}&username=eq.${encodeURIComponent(MARK)}&order=created_at.desc&limit=1`,{headers:H}),d=await read(r);if(!r.ok)throw Error(JSON.stringify(d));return d?.[0]||null}
   const parse=r=>{try{return r?JSON.parse(r.message||"{}"):null}catch{return null}};
-  async function patch(id,p){const r=await fetch(`${URL}/rest/v1/messages?id=eq.${encodeURIComponent(id)}&username=eq.${encodeURIComponent(MARK)}`,{method:"PATCH",headers:{...H,Prefer:"return=minimal"},body:JSON.stringify({message:JSON.stringify(p),edited:false})});if(!r.ok)throw Error(JSON.stringify(await read(r)))}
+  async function patch(id,p){const r=await fetch(`${URL}/rest/v1/messages?id=eq.${encodeURIComponent(id)}&username=eq.${encodeURIComponent(MARK)}`,{method:"PATCH",headers:{...H,Prefer:"return=minimal"},body:JSON.stringify({message:JSON.stringify(p),edited:true})});if(!r.ok)throw Error(JSON.stringify(await read(r)))}
   async function remove(r){if(r)await fetch(`${URL}/rest/v1/messages?id=eq.${encodeURIComponent(r.id)}&username=eq.${encodeURIComponent(MARK)}`,{method:"DELETE",headers:H})}
   try{
     const row=await get(),share=parse(row);
     if(req.method==="GET"){
       if(!share||share.type!=="screen-share")return res.status(200).json({ok:true,share:null,frame:null});
       const watching=req.query?.watch==="1";
-      // One current frame only. It is fetched from the screen-share message.
-      return res.status(200).json({ok:true,share:{id:row.id,type:share.type,state:share.state,host:share.host,deviceId:share.deviceId,quality:share.quality,fps:share.fps,frozen:!!share.frozen,updatedAt:share.updatedAt},frame:watching?share.frame:null});
+      return res.status(200).json({ok:true,share:{id:row.id,type:share.type,state:share.state,host:share.host,deviceId:share.deviceId,quality:share.quality,fps:share.fps,frozen:!!share.frozen,updatedAt:share.updatedAt,edited:true},frame:watching?share.frame:null});
     }
     if(req.method!=="POST")return res.status(405).json({ok:false,error:"Method not allowed."});
     if(!device)return res.status(400).json({ok:false,error:"Missing device ID."});
@@ -34,7 +33,6 @@ export default async function handler(req,res){
     if(action==="frame"){
       if(share.frozen)return res.status(204).end();
       if(typeof b.image!=="string"||!b.image.startsWith("data:image/"))return res.status(400).json({ok:false,error:"Invalid frame."});
-      // Replace the previous frame; never build up frame history in storage.
       share.frame=b.image;share.updatedAt=Date.now();await patch(row.id,share);return res.status(204).end();
     }
     if(action==="freeze"){share.frozen=!!b.frozen;share.updatedAt=Date.now();await patch(row.id,share);return res.status(204).end()}
