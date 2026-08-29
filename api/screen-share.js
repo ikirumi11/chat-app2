@@ -11,7 +11,7 @@ export default async function handler(req,res){
   async function get(){const r=await fetch(`${URL}/rest/v1/messages?select=id,message,device_id,created_at&channel=eq.${encodeURIComponent(channel)}&username=eq.${encodeURIComponent(MARK)}&order=created_at.desc&limit=1`,{headers:H});const d=await json(r);if(!r.ok)throw Error(JSON.stringify(d));return d?.[0]||null}
   const parse=r=>{try{return r?JSON.parse(r.message||'{}'):null}catch{return null}};
   async function patch(id,p){const r=await fetch(`${URL}/rest/v1/messages?id=eq.${encodeURIComponent(id)}&username=eq.${encodeURIComponent(MARK)}`,{method:'PATCH',headers:{...H,Prefer:'return=minimal'},body:JSON.stringify({message:JSON.stringify(p),edited:true})});if(!r.ok)throw Error(JSON.stringify(await json(r)))}
-  async function remove(r){if(r)await fetch(`${URL}/rest/v1/messages?id=eq.${encodeURIComponent(r.id)}&username=eq.${encodeURIComponent(MARK)}`,{method:'DELETE',headers:H})}
+  async function remove(r){if(r)await fetch(`${URL}/rest/v1/messages?id=eq.${encodeURIComponent(r.id)}&username=eq.${MARK}`,{method:'DELETE',headers:H})}
   try{
     const row=await get(),share=parse(row);
     if(req.method==='GET'){
