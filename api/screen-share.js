@@ -41,6 +41,8 @@ export default async function handler(req, res) {
         const body = req.body || {};
         const deviceId = String(body.device_id || "").trim().substring(0, 100);
         const username = String(body.username || "Screen Share").trim().substring(0, 24);
+        const quality = Math.min(450, Math.max(1, Number(body.quality || 450)));
+        const fps = Math.min(35, Math.max(1, Number(body.fps || 15)));
         const action = String(body.action || "").trim();
 
         if (!deviceId) {
@@ -64,7 +66,9 @@ export default async function handler(req, res) {
                     host_device_id: deviceId,
                     host_username: username,
                     started_at: new Date().toISOString(),
-                    heartbeat_at: new Date().toISOString()
+                    heartbeat_at: new Date().toISOString(),
+                    quality,
+                    fps
                 })
             });
             const data = await readJson(response);
@@ -82,6 +86,27 @@ export default async function handler(req, res) {
 
             const session = Array.isArray(data) ? data[0] : data;
             return res.status(200).json({ active: true, session });
+        }
+
+        if (action === "metadata") {
+            const response = await fetch(
+                base + "/rest/v1/screen_share_sessions?id=eq.global&host_device_id=eq." + encodeURIComponent(deviceId),
+                {
+                    method: "PATCH",
+                    headers: { ...headers, Prefer: "return=representation" },
+                    body: JSON.stringify({
+                        quality: Math.min(450, Math.max(1, Number(body.quality || 450))),
+                        fps: Math.min(35, Math.max(1, Number(body.fps || 15))),
+                        width: Math.max(1, Number(body.width || 800)),
+                        height: Math.min(450, Math.max(1, Number(body.height || 450))),
+                        surface: String(body.surface || "Screen / display").substring(0, 40),
+                        source_label: String(body.source_label || "Shared display").substring(0, 100)
+                    })
+                }
+            );
+            const data = await readJson(response);
+            if (!response.ok) return supabaseError(res, response, data);
+            return res.status(200).json({ active: Array.isArray(data) && data.length > 0, session: data?.[0] || null });
         }
 
         if (action === "heartbeat") {
@@ -153,7 +178,7 @@ export default async function handler(req, res) {
 
 async function getSession(base, headers) {
     const response = await fetch(
-        base + "/rest/v1/screen_share_sessions?id=eq.global&select=id,host_device_id,host_username,started_at,heartbeat_at&limit=1",
+        base + "/rest/v1/screen_share_sessions?id=eq.global&select=id,host_device_id,host_username,started_at,heartbeat_at,quality,fps,width,height,surface,source_label&limit=1",
         { method: "GET", headers }
     );
     const data = await readJson(response);
