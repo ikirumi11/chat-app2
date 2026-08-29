@@ -205,23 +205,53 @@ function updateScreenShareUi() {
     }
 }
 
+function bindScreenShareButton(button) {
+    if (!button || button.dataset.screenShareBound === "1") return;
+
+    button.dataset.screenShareBound = "1";
+    button.type = "button";
+    button.title = "Screen Share";
+    button.setAttribute("aria-label", "Screen Share");
+
+    button.addEventListener("click", async event => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        try {
+            if (screenShareRole === "host") {
+                await stopScreenShare();
+            } else if (screenShareRole === "viewer") {
+                // A viewer cannot start another share while one is active.
+                updateScreenShareUi();
+            } else {
+                openScreenShareSettings();
+            }
+        } catch (error) {
+            console.error("Screen share button error:", error);
+            alert(error?.message || "Could not open screen sharing.");
+        }
+    });
+}
+
 function addScreenShareButton() {
+    // The HTML already contains the button. The old implementation returned
+    // when it found that button, which meant it NEVER attached a click handler.
+    const existing = document.getElementById("screenShareHeaderBtn");
+    if (existing) {
+        bindScreenShareButton(existing);
+        return existing;
+    }
+
     const actions = document.querySelector(".header-actions");
-    if (!actions || document.getElementById("screenShareHeaderBtn")) return;
+    if (!actions) return null;
 
     const button = document.createElement("button");
     button.id = "screenShareHeaderBtn";
     button.className = "icon-btn screen-share-header-btn";
-    button.title = "Screen share";
-    button.setAttribute("aria-label", "Screen share");
     button.textContent = "🖥️";
-    button.onclick = async () => {
-        try {
-            if (screenShareRole === "host") await stopScreenShare();
-            else openScreenShareSettings();
-        } catch (error) { alert(error.message); }
-    };
     actions.insertBefore(button, actions.firstChild);
+    bindScreenShareButton(button);
+    return button;
 }
 
 async function startScreenShare() {
@@ -536,11 +566,19 @@ window.addEventListener("pagehide", () => {
     }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+function initScreenShare() {
     addScreenShareButton();
     ensureScreenShareUi();
     ensureScreenShareSettingsUi();
     updateScreenShareUi();
     screenSharePoll();
-    screenSharePollTimer = setInterval(screenSharePoll, SCREEN_SHARE_POLL_MS);
-});
+    if (!screenSharePollTimer) {
+        screenSharePollTimer = setInterval(screenSharePoll, SCREEN_SHARE_POLL_MS);
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initScreenShare, { once: true });
+} else {
+    initScreenShare();
+}
