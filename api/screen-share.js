@@ -1,20 +1,14 @@
 export default async function handler(req,res){
-  res.setHeader("Content-Type","application/json");
-  res.setHeader("Access-Control-Allow-Origin","*");
-  res.setHeader("Access-Control-Allow-Methods","GET,POST,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers","Content-Type");
+  res.setHeader("Content-Type","application/json");res.setHeader("Access-Control-Allow-Origin","*");res.setHeader("Access-Control-Allow-Methods","GET,POST,OPTIONS");res.setHeader("Access-Control-Allow-Headers","Content-Type");
   if(req.method==="OPTIONS")return res.status(200).end();
-  const base="https://wlvbkdzcueqkknysisfw.supabase.co",key="sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL";
-  const headers={apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json",Accept:"application/json"};
-  const marker="__SCREEN_SHARE__",body=req.body||{},channel=String(body.channel||req.query?.channel||"general").trim().substring(0,32),deviceId=String(body.device_id||"").trim().substring(0,100);
+  const base="https://wlvbkdzcueqkknysisfw.supabase.co",key="sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL",headers={apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json",Accept:"application/json"},marker="__SCREEN_SHARE__",body=req.body||{},channel=String(body.channel||req.query?.channel||"general").trim().substring(0,32),deviceId=String(body.device_id||"").trim().substring(0,100);
   const read=async r=>{try{return await r.json()}catch{return null}};
-  async function current(){const u=base+"/rest/v1/messages?select=id,message,device_id,created_at&channel=eq."+encodeURIComponent(channel)+"&username=eq."+encodeURIComponent(marker)+"&order=created_at.desc&limit=1",r=await fetch(u,{headers}),d=await read(r);if(!r.ok)throw Error(JSON.stringify(d));return Array.isArray(d)&&d.length?d[0]:null}
-  const state=row=>{try{return row?{...JSON.parse(row.message||"{}"),id:row.id,deviceId:row.device_id}:null}catch{return null}};
-  async function remove(row){if(!row)return;await fetch(base+"/rest/v1/messages?id=eq."+encodeURIComponent(row.id),{method:"DELETE",headers})}
+  async function current(){const r=await fetch(base+"/rest/v1/messages?select=id,message,device_id,created_at&channel=eq."+encodeURIComponent(channel)+"&username=eq."+encodeURIComponent(marker)+"&order=created_at.desc&limit=1",{headers}),d=await read(r);if(!r.ok)throw Error(JSON.stringify(d));return Array.isArray(d)&&d.length?d[0]:null}
+  const state=row=>{try{return row?{...JSON.parse(row.message||"{}"),id:row.id,deviceId:row.device_id}:null}catch{return null}},remove=async row=>{if(row)await fetch(base+"/rest/v1/messages?id=eq."+encodeURIComponent(row.id),{method:"DELETE",headers})};
   try{
     let row=await current(),s=state(row);
-    // A frame/share record is disposable: if nobody has refreshed it for 1 second, remove it.
-    if(row&&s&&Date.now()-(Number(s.updatedAt)||new Date(row.created_at).getTime())>1000){await remove(row);row=null;s=null}
+    // The share record itself is kept alive by the host heartbeat. Frames are replaced, not accumulated.
+    if(row&&s&&Date.now()-(Number(s.updatedAt)||new Date(row.created_at).getTime())>3000){await remove(row);row=null;s=null}
     if(req.method==="GET")return res.status(200).json({success:true,share:s});
     if(!deviceId)return res.status(400).json({error:"Device ID is required."});
     if(req.method!=="POST")return res.status(405).json({error:"Method not allowed."});
@@ -28,8 +22,11 @@ export default async function handler(req,res){
     }
     if(!row||row.device_id!==deviceId)return res.status(409).json({success:false,error:"You are not the screen-share host."});
     s=state(row);
-    if(action==="frame"){if(!s.frozen&&typeof body.image==="string"){s.image=body.image;s.updatedAt=Date.now()}}
-    else if(action==="freeze"){s.frozen=Boolean(body.frozen);s.updatedAt=Date.now()}
+    if(action==="frame"){
+      if(!s.frozen&&typeof body.image==="string"){s.image=body.image;s.updatedAt=Date.now();}
+      else s.updatedAt=Date.now();
+    }else if(action==="heartbeat"){s.updatedAt=Date.now();}
+    else if(action==="freeze"){s.frozen=Boolean(body.frozen);s.updatedAt=Date.now();}
     else if(action==="stop"){await remove(row);return res.status(200).json({success:true,stopped:true})}
     else return res.status(400).json({error:"Unknown screen-share action."});
     const r=await fetch(base+"/rest/v1/messages?id=eq."+encodeURIComponent(row.id)+"&device_id=eq."+encodeURIComponent(deviceId),{method:"PATCH",headers:{...headers,Prefer:"return=representation"},body:JSON.stringify({message:JSON.stringify(s)})}),d=await read(r);if(!r.ok)return res.status(r.status).json({error:d});return res.status(200).json({success:true,share:state(Array.isArray(d)?d[0]:row)})
