@@ -1614,3 +1614,57 @@ textarea{
                                         object-fit:contain;
                                     }
                                 
+/* =====================================================
+   SCREEN SHARE
+===================================================== */
+.screen-share-widget{
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    z-index:9000;
+    width:min(330px,calc(100vw - 36px));
+    padding:10px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    box-shadow:0 12px 40px rgba(0,0,0,.45);
+    display:none;
+}
+.screen-share-widget.show{display:block;}
+.screen-share-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:8px;
+}
+.screen-share-top strong{display:block;font-size:14px;}
+.screen-share-top span{display:block;margin-top:2px;color:var(--muted);font-size:11px;}
+.screen-share-close{
+    width:30px;height:30px;border:1px solid var(--border);border-radius:8px;
+    background:var(--panel2);color:var(--text);
+}
+.screen-share-video{
+    display:block;
+    width:100%;
+    aspect-ratio:16/9;
+    object-fit:contain;
+    background:#050607;
+    border:1px solid var(--border);
+    border-radius:10px;
+}
+.screen-share-actions{display:flex;gap:7px;margin-top:8px;}
+.screen-share-actions button{
+    flex:1;min-height:34px;border:1px solid var(--border);border-radius:9px;
+    background:var(--panel2);color:var(--text);padding:0 10px;
+}
+.screen-share-main-btn{font-weight:700;}
+.screen-share-stop-btn{color:var(--danger)!important;}
+.screen-share-header-btn{position:relative;}
+.screen-share-header-btn::after{
+    content:"";position:absolute;right:6px;top:6px;width:6px;height:6px;border-radius:50%;
+    background:transparent;
+}
+@media(max-width:600px){
+    .screen-share-widget{right:9px;bottom:9px;width:min(300px,calc(100vw - 18px));}
+}
