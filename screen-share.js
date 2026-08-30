@@ -16,7 +16,36 @@ selQ.value=q;selF.value=f;const open=x=>x.classList.add('show'),close=x=>x.class
 async function api(action,extra={}){const r=await fetch(API,{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,channel:channel(),device_id:device(),username:user(),share_id:sid,mode:'screen-share',peer_id:peer?.id,quality:q,fps:f,audio,...extra})});let d={};try{d=await r.json()}catch{}if(!r.ok)throw Error(d.error||`Screen-share error (${r.status})`);return d}
 async function liveInfo(){const r=await fetch(API+'?channel='+encodeURIComponent(channel())+'&_='+Date.now(),{cache:'no-store'});if(!r.ok)return null;return r.json()}
 function loadPeer(){return new Promise((ok,no)=>{if(window.Peer)return ok();const s=document.createElement('script');s.src='https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js';s.onload=ok;s.onerror=()=>no(Error('Could not load PeerJS.'));document.head.appendChild(s)})}
-function makePeer(){return new Promise((ok,no)=>{if(peer&&!peer.destroyed&&peer.open)return ok(peer.id);if(peer){try{peer.destroy()}catch{}peer=null}peer=new Peer({debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}]}});let done=false,t=setTimeout(()=>{if(!done){done=true;no(Error('Peer connection timed out.'))}},20000);peer.on('open',id=>{if(done)return;done=true;clearTimeout(t);ok(id)});peer.on('error',e=>{if(done)return;done=true;clearTimeout(t);no(e)});peer.on('disconnected',()=>{try{peer.reconnect()}catch{}});peer.on('call',call=>{if(sharing&&stream){try{call.answer(stream);calls.set(call.peer,call);call.on('close',()=>calls.delete(call.peer));call.on('error',()=>calls.delete(call.peer))}catch{try{call.close()}catch{}}}else{try{call.close()}catch{}}})})}
+function makePeer(){return new Promise((ok,no)=>{if(peer&&!peer.destroyed&&peer.open)return ok(peer.id);if(peer){try{peer.destroy()}catch{}peer=null}peer=new Peer({debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}]}});let done=false,t=setTimeout(()=>{if(!done){done=true;no(Error('Peer connection timed out.'))}},20000);peer.on('open',id=>{if(done)return;done=true;clearTimeout(t);ok(id)});peer.on('error',e=>{if(done)return;done=true;clearTimeout(t);no(e)});peer.on('disconnected',()=>{try{peer.reconnect()}catch{}});peer.on('call',call=>{if(sharing&&stream){try{call.answer(stream);configureScreenShareSenderFPS(call);calls.set(call.peer,call);call.on('close',()=>calls.delete(call.peer));call.on('error',()=>calls.delete(call.peer))}catch{try{call.close()}catch{}}}else{try{call.close()}catch{}}})})}
+async function configureScreenShareSenderFPS(call){
+const target=Math.max(1,Math.min(144,Number(f)||30));
+const apply=async()=>{
+  try{
+    const pc=call?.peerConnection;
+    if(!pc)return false;
+    const senders=pc.getSenders?.()||[];
+    let changed=false;
+    for(const sender of senders){
+      if(sender.track?.kind!=='video')continue;
+      try{sender.track.contentHint='motion'}catch{}
+      const p=sender.getParameters();
+      if(!p||!p.encodings?.length)continue;
+      for(const enc of p.encodings){
+        enc.maxFramerate=target;
+        if('priority' in enc)enc.priority='high';
+      }
+      try{p.degradationPreference='maintain-framerate'}catch{}
+      try{await sender.setParameters(p);changed=true}catch{}
+    }
+    return changed;
+  }catch{return false}
+};
+for(let i=0;i<40;i++){
+  if(await apply())return;
+  await new Promise(r=>setTimeout(r,100));
+}
+}
+
 function makeViewerStream(){const c=document.createElement('canvas');c.width=2;c.height=2;const x=c.getContext('2d');x.fillStyle='#000';x.fillRect(0,0,2,2);const s=c.captureStream(1);s.getVideoTracks().forEach(t=>t.enabled=false);try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();const gain=audioCtx.createGain();gain.gain.value=0;const osc=audioCtx.createOscillator();osc.frequency.value=20;const dest=audioCtx.createMediaStreamDestination();osc.connect(gain);gain.connect(dest);osc.start();const at=dest.stream.getAudioTracks()[0];if(at)s.addTrack(at)}catch{}return s}
 function showAudioState(s){const a=s?.getAudioTracks?.()||[];if(a.length){state.textContent='Live • Audio received';audioBtn.classList.remove('show')}else{state.textContent='Live • No audio track received';audioBtn.classList.remove('show')}}
 function setRemote(s){if(!s)return;video.srcObject=s;video.muted=false;video.volume=1;video.style.display='block';wait.style.display='none';showAudioState(s);video.play().then(()=>audioBtn.classList.remove('show')).catch(()=>{state.textContent=(s.getAudioTracks?.().length?'Live • Click Enable audio':'Live • No audio track received');audioBtn.classList.toggle('show',!!s.getAudioTracks?.().length)});if(s.getAudioTracks?.().length){s.getAudioTracks().forEach(t=>{t.onended=()=>{if(watching)state.textContent='Live • Audio stopped by browser/host'}})} }
