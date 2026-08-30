@@ -2,8 +2,9 @@
 *{box-sizing:border-box}
 
 /* Message action UI support */
-.message{position:relative;overflow:visible}
-.message-content{position:relative;min-width:0;padding-right:48px}
-.chat-ui-three-dots,.chat-message-actions{position:absolute!important;right:4px!important;top:4px!important;z-index:100000!important;display:block!important;visibility:visible!important;opacity:1!important}
-.chat-ui-three-dots button,.chat-message-more{width:38px!important;height:38px!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;margin:0!important;border:1px solid var(--border)!important;border-radius:8px!important;background:var(--panel2)!important;color:var(--text)!important;font-size:23px!important;line-height:1!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important}
-@media(max-width:600px){.message-content{padding-right:52px}.chat-ui-three-dots,.chat-message-actions{right:3px!important;top:3px!important}.chat-ui-three-dots button,.chat-message-more{width:42px!important;height:42px!important;font-size:25px!important}}
+.message{position:relative;overflow:visible;min-width:0}
+.message-content{position:relative;min-width:0;padding-right:52px}
+.chat-ui-three-dots,.chat-message-actions{position:absolute!important;right:4px!important;top:4px!important;z-index:100000!important;display:flex!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
+.chat-ui-three-dots button,.chat-message-more{appearance:none!important;-webkit-appearance:none!important;width:38px!important;height:38px!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;margin:0!important;border:1px solid var(--border)!important;border-radius:8px!important;background:var(--panel2)!important;color:var(--text)!important;font-size:23px!important;font-weight:700!important;line-height:1!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;cursor:pointer!important}
+.chat-ui-three-dots button:active,.chat-message-more:active{transform:scale(.94)!important}
+@media(max-width:600px){.message-content{padding-right:58px}.chat-ui-three-dots,.chat-message-actions{right:3px!important;top:3px!important}.chat-ui-three-dots button,.chat-message-more{width:44px!important;height:44px!important;font-size:27px!important}}
