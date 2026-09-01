@@ -1,0 +1,1 @@
+(()=>{const b=window.ChatMultiplayerGames.tictac;if(b)window.ChatMultiplayerGames.register({...b,id:'ttt6',name:'Tic-Tac-Toe 6×6'});})();
