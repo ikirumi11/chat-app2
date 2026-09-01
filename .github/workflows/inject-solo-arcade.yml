@@ -1,4 +1,4 @@
-name: Load Solo Arcade
+name: Load Expanded Games
 
 on:
   push:
@@ -9,28 +9,27 @@ permissions:
 
 jobs:
   inject:
-    if: ${{ !contains(github.event.head_commit.message, '[solo-arcade-injected]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[games-browser-injected]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Add Solo Arcade script
+      - name: Add game scripts
         shell: python
         run: |
           from pathlib import Path
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
-          marker = '<script src="games-plus.js"></script>'
-          if marker not in s:
-              if '</body>' not in s:
-                  raise SystemExit('index.html has no closing body tag')
-              s = s.replace('</body>', marker + '\n</body>', 1)
-              p.write_text(s, encoding='utf-8')
-          else:
-              print('Solo Arcade already loaded')
+          for src in ['games-plus.js','games-browser.js']:
+              marker = f'<script src="{src}"></script>'
+              if marker not in s:
+                  if '</body>' not in s:
+                      raise SystemExit('index.html has no closing body tag')
+                  s = s.replace('</body>', marker + '\n</body>', 1)
+          p.write_text(s, encoding='utf-8')
       - name: Commit injection
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git diff --cached --quiet || git commit -m 'Load Solo Arcade [solo-arcade-injected]'
+          git diff --cached --quiet || git commit -m 'Load expanded games browser [games-browser-injected]'
           git push
