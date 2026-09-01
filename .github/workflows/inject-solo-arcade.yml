@@ -9,27 +9,28 @@ permissions:
 
 jobs:
   inject:
-    if: ${{ !contains(github.event.head_commit.message, '[games-browser-injected]') }}
+    if: ${{ !contains(github.event.head_commit.message, '[games-loader-injected]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Add game scripts
+      - name: Add reliable games loader
         shell: python
         run: |
           from pathlib import Path
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
-          for src in ['games-plus.js','games-browser.js']:
-              marker = f'<script src="{src}"></script>'
-              if marker not in s:
-                  if '</body>' not in s:
-                      raise SystemExit('index.html has no closing body tag')
-                  s = s.replace('</body>', marker + '\n</body>', 1)
-          p.write_text(s, encoding='utf-8')
+          marker = '<script src="games-loader.js?v=20260901"></script>'
+          if marker not in s:
+              if '</body>' not in s:
+                  raise SystemExit('index.html has no closing body tag')
+              s = s.replace('</body>', marker + '\n</body>', 1)
+              p.write_text(s, encoding='utf-8')
+          else:
+              print('Games loader already installed')
       - name: Commit injection
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git diff --cached --quiet || git commit -m 'Load expanded games browser [games-browser-injected]'
+          git diff --cached --quiet || git commit -m 'Install reliable Games tab loader [games-loader-injected]'
           git push
