@@ -1,0 +1,6 @@
+(()=>{'use strict';
+const UPDATE='2.4.0';
+function hardReload(){const u=new URL(location.href);u.searchParams.set('hardReload',Date.now());location.replace(u.toString())}
+function install(){if(document.getElementById('hardReloadSiteBtn'))return;const b=document.createElement('button');b.id='hardReloadSiteBtn';b.type='button';b.textContent='↻ Hard Reload Site';b.title='Reload the site and fetch fresh files';b.style.cssText='position:fixed;right:14px;bottom:14px;z-index:100000;border:1px solid #ffffff22;background:#202630;color:#fff;border-radius:9px;padding:9px 13px;cursor:pointer;box-shadow:0 5px 20px #0006';b.onclick=hardReload;document.body.appendChild(b);const badge=document.createElement('div');badge.id='siteUpdateNumber';badge.textContent='Update '+UPDATE;badge.style.cssText='position:fixed;left:14px;bottom:14px;z-index:99999;border:1px solid #ffffff18;background:#151922;color:#aeb7c4;border-radius:8px;padding:6px 9px;font:12px system-ui';document.body.appendChild(badge)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();window.ChatAppUpdate={version:UPDATE,hardReload};
+})();
