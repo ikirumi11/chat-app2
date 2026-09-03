@@ -1,1 +1,0 @@
-(()=>{'use strict';/* Old optional chat extras intentionally disabled. Core chat, games, whiteboard and screen sharing remain unchanged. */})();
