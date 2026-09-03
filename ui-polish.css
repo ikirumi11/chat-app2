@@ -1,0 +1,76 @@
+:root{
+  --ui-shadow:0 18px 60px rgba(0,0,0,.32);
+  --ui-ease:cubic-bezier(.22,1,.36,1);
+}
+
+/* Modern layered surfaces */
+.header,.composer{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:color-mix(in srgb,var(--panel) 88%,transparent);}
+.header{box-shadow:0 1px 0 rgba(255,255,255,.025),0 8px 30px rgba(0,0,0,.12);}
+.logo-icon,.icon-btn,.composer-box,.game-choice,.game-card,.panel,.game-btn,.message-file{transition:transform .2s var(--ui-ease),border-color .2s ease,background .2s ease,box-shadow .2s ease,opacity .2s ease;}
+.icon-btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 8px 24px rgba(0,0,0,.2);}
+.icon-btn:active,.game-btn:active,.send-btn:active,.game-choice:active{transform:scale(.96);}
+
+/* Message entrance */
+.message{animation:messageIn .34s var(--ui-ease) both;transform-origin:left center;}
+.message:nth-child(2){animation-delay:.025s}.message:nth-child(3){animation-delay:.05s}.message:nth-child(4){animation-delay:.075s}.message:nth-child(5){animation-delay:.1s}
+@keyframes messageIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
+.message:hover .avatar{transform:scale(1.04);}
+.message-file:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.18);}
+
+/* Game cards */
+.game-message{animation:cardIn .42s var(--ui-ease) both;}
+@keyframes cardIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+.game-card{box-shadow:var(--ui-shadow);}
+.game-card:hover{border-color:#3a414c;box-shadow:0 22px 70px rgba(0,0,0,.38);}
+.game-choice{overflow:hidden;}
+.game-choice:hover{transform:translateY(-3px);border-color:#454d58;box-shadow:0 14px 34px rgba(0,0,0,.22);}
+.game-choice::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent,rgba(255,255,255,.045),transparent);transform:translateX(-120%);transition:transform .6s ease;pointer-events:none;}
+.game-choice:hover::after{transform:translateX(120%);}
+
+/* Composer */
+.composer-box:focus-within{border-color:#4b535f;box-shadow:0 0 0 3px rgba(255,255,255,.035),0 10px 35px rgba(0,0,0,.18);}
+.send-btn{transition:transform .18s var(--ui-ease),filter .18s ease,box-shadow .18s ease;}
+.send-btn:hover{transform:translateY(-2px);filter:brightness(1.06);box-shadow:0 8px 22px rgba(0,0,0,.22);}
+
+/* Overlay open/close animation */
+.overlay{opacity:0;pointer-events:none;transition:opacity .22s ease;}
+.overlay.show{opacity:1;pointer-events:auto;}
+.overlay.show .panel{animation:panelOpen .34s var(--ui-ease) both;}
+.overlay.closing{opacity:0;pointer-events:none;}
+.overlay.closing .panel{animation:panelClose .2s ease both;}
+@keyframes panelOpen{from{opacity:0;transform:translateY(22px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes panelClose{from{opacity:1;transform:none}to{opacity:0;transform:translateY(10px) scale(.98)}}
+
+/* Settings categories */
+.category{transition:background .2s ease,border-color .2s ease,transform .2s var(--ui-ease);}
+.category-title{transition:background .2s ease;padding-top:14px!important;padding-bottom:14px!important;}
+.category-title:hover{background:rgba(255,255,255,.025);}
+.category.open .category-body{animation:settingsDrop .28s var(--ui-ease) both;}
+@keyframes settingsDrop{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:none}}
+.setting{animation:settingIn .3s var(--ui-ease) both;}
+@keyframes settingIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+
+/* Inputs */
+input,textarea,select{transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;}
+input:focus,textarea:focus,select:focus{outline:none;box-shadow:0 0 0 3px rgba(255,255,255,.045);}
+
+/* Game settings */
+.game-settings-btn{transition:transform .18s var(--ui-ease),background .18s ease,color .18s ease;}
+.game-settings-btn:hover{transform:rotate(12deg) scale(1.08);}
+.game-settings-row,.game-setting-row{transition:transform .18s var(--ui-ease),border-color .18s ease,background .18s ease;}
+.game-setting-row:hover{transform:translateX(3px);border-color:#454c56;}
+.game-settings-dialog.show .game-settings-panel{animation:panelOpen .34s var(--ui-ease) both;}
+.game-settings-toast{animation:toastIn .35s var(--ui-ease) both!important;}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px) scale(.94)}to{opacity:1;transform:none}}
+
+/* Scrollbar */
+.messages::-webkit-scrollbar,.panel::-webkit-scrollbar{width:9px}.messages::-webkit-scrollbar-thumb,.panel::-webkit-scrollbar-thumb{background:#303640;border-radius:20px;border:2px solid transparent;background-clip:padding-box}.messages::-webkit-scrollbar-thumb:hover,.panel::-webkit-scrollbar-thumb:hover{background:#424a56;background-clip:padding-box}
+
+/* Startup */
+#startupScreen{transition:opacity .45s ease,visibility .45s ease;}
+#startupScreen .startup-inner{animation:startupIn .65s var(--ui-ease) both;}
+@keyframes startupIn{from{opacity:0;transform:translateY(18px) scale(.95)}to{opacity:1;transform:none}}
+#startupScreen.is-hiding{opacity:0;visibility:hidden;}
+
+/* Reduced motion */
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
