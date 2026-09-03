@@ -1,0 +1,124 @@
+/* YouTube Together: one host controls playback, everyone follows the host clock. */
+(() => {
+  'use strict';
+
+  const API='/api/messages';
+  const CHANNEL='general';
+  const PREFIX='__YOUTUBE_TOGETHER__:';
+  const POLL_MS=500;
+  const HEARTBEAT_MS=1000;
+  const SYNC_TOLERANCE=0.5;
+  let deviceId=localStorage.getItem('chat_device_id')||'';
+  let username=()=>window.settings?.username||localStorage.getItem('chat_username')||'User';
+  let pollTimer=null, heartbeatTimer=null, state=null, messageId=null, player=null, playerReady=false, host=false, suppress=false;
+  let lastSystemState='';
+
+  const css=document.createElement('style');
+  css.textContent=`
+    .yt-card{position:relative;text-align:left;border:1px solid #30343c;background:linear-gradient(145deg,#211d2b,#15171b);color:#fff;border-radius:15px;padding:17px;cursor:pointer;min-height:145px;transition:transform .16s,border-color .16s,box-shadow .16s}.yt-card:hover{transform:translateY(-2px);border-color:#7460ff;box-shadow:0 10px 30px rgba(0,0,0,.25)}.yt-icon{font-size:30px}.yt-name{display:block;font-size:16px;font-weight:800;margin-top:9px}.yt-desc{display:block;color:#969eaa;font-size:12px;line-height:1.45;margin-top:5px}.yt-players{display:inline-block;margin-top:12px;padding:4px 8px;border-radius:7px;background:#252932;color:#b8bec8;font-size:11px}
+    .yt-overlay{z-index:12000}.yt-panel{width:min(900px,94vw);max-height:90vh;overflow:auto}.yt-url{width:100%;box-sizing:border-box;padding:11px;border-radius:9px;border:1px solid #444b57;background:#15181d;color:#fff}.yt-stage{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden}.yt-player{width:100%;height:100%}.yt-cover{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#090a0d;color:#fff;text-align:center;padding:20px}.yt-info{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin:10px 0;color:#aeb5c0;font-size:13px}.yt-host-controls{display:flex;gap:8px;flex-wrap:wrap}.yt-host-controls button{border:0;border-radius:9px;padding:9px 13px;background:#6654e8;color:#fff;cursor:pointer}.yt-host-controls button.danger{background:#a63f4b}.yt-viewer-note{padding:10px;border-radius:9px;background:#ffffff08;color:#aeb5c0;font-size:12px}.yt-sync-dot{font-weight:800}.yt-time{font-variant-numeric:tabular-nums}
+  `;
+  document.head.appendChild(css);
+
+  function esc(s){return String(s).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+  function getDevice(){if(deviceId)return deviceId;deviceId=crypto.randomUUID?crypto.randomUUID():'yt-'+Date.now()+'-'+Math.random();localStorage.setItem('chat_device_id',deviceId);return deviceId;}
+  function formatTime(v){v=Math.max(0,Math.floor(Number(v)||0));const m=Math.floor(v/60),s=String(v%60).padStart(2,'0');return `${m}:${s}`;}
+  function parseVideoId(input){
+    const raw=String(input||'').trim();
+    if(/^[A-Za-z0-9_-]{6,20}$/.test(raw))return raw;
+    try{const u=new URL(raw);if(u.hostname.includes('youtu.be'))return u.pathname.slice(1).split('/')[0];if(u.hostname.includes('youtube.com'))return u.searchParams.get('v')||u.pathname.match(/\/embed\/([^/]+)/)?.[1]||u.pathname.match(/\/shorts\/([^/]+)/)?.[1]||'';}catch{}
+    return '';
+  }
+  async function api(body,method='POST'){
+    const r=await fetch(API,{method,cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});let d={};try{d=await r.json()}catch{}if(!r.ok)throw Error(d.error||`Server error (${r.status})`);return d;
+  }
+  async function getMessages(){
+    const r=await fetch(`${API}?channel=${encodeURIComponent(CHANNEL)}&_yt=${Date.now()}`,{cache:'no-store'});if(!r.ok)return[];const d=await r.json();return Array.isArray(d.messages)?d.messages:[];
+  }
+  function findState(messages){
+    for(let i=messages.length-1;i>=0;i--){const m=messages[i];if(typeof m.message!=='string'||!m.message.startsWith(PREFIX))continue;try{return {row:m,data:JSON.parse(m.message.slice(PREFIX.length))};}catch{}}
+    return null;
+  }
+  async function writeState(next,existingId){
+    const message=PREFIX+JSON.stringify(next);
+    if(existingId){return api({id:existingId,device_id:getDevice(),game_server:true,game_state:message},'PATCH');}
+    return api({game_server:true,game_action:'write',channel:CHANNEL,device_id:getDevice(),username:username(),message});
+  }
+  async function systemMessage(text){
+    try{await api({username:'System',channel:CHANNEL,device_id:getDevice(),message:`🎬 YouTube Together — ${text}`});}catch(e){console.warn('YouTube system message:',e);}}
+
+  function loadYTApi(){
+    if(window.YT?.Player)return Promise.resolve();
+    if(window.__ytTogetherPromise)return window.__ytTogetherPromise;
+    window.__ytTogetherPromise=new Promise((resolve,reject)=>{
+      const old=window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady=()=>{if(typeof old==='function')old();resolve();};
+      const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>reject(Error('Could not load YouTube.'));document.head.appendChild(s);
+    });
+    return window.__ytTogetherPromise;
+  }
+
+  function buildModal(){
+    const o=document.createElement('div');o.className='overlay yt-overlay';o.style.display='flex';
+    o.innerHTML=`<div class="panel yt-panel"><div class="panel-header"><h2>🎬 YouTube Together</h2><button class="icon-btn yt-close">×</button></div><div class="panel-body"><div class="yt-stage"><div id="ytPlayer" class="yt-player"></div><div class="yt-cover" id="ytCover">Enter a YouTube video to start a shared watch session.</div></div><div class="yt-info"><span id="ytRole">Not connected</span><span class="yt-time" id="ytTime">0:00</span><span class="yt-sync-dot" id="ytSync">● Waiting</span></div><div id="ytHostSetup"><input id="ytUrl" class="yt-url" placeholder="Paste a YouTube URL or video ID"><div class="game-toolbar"><button id="ytStart">Host this video</button></div></div><div id="ytHostControls" class="yt-host-controls" style="display:none"><button id="ytPlay">▶ Play</button><button id="ytPause">⏸ Pause</button><button id="ytBack">↩ -10s</button><button id="ytForward">+10s ↪</button><button id="ytStop" class="danger">Stop session</button></div><div id="ytViewerNote" class="yt-viewer-note" style="display:none">The host controls playback. Your video automatically follows the host within ${SYNC_TOLERANCE.toFixed(1)} seconds.</div></div></div>`;
+    document.body.appendChild(o);return o;
+  }
+
+  async function startHost(url,modal){
+    const videoId=parseVideoId(url);if(!videoId){alert('Enter a valid YouTube URL or video ID.');return;}
+    host=true;state={type:'youtube-together',version:1,hostDeviceId:getDevice(),host:username(),videoId,playing:false,position:0,sentAt:Date.now(),startedAt:Date.now()};
+    const r=await writeState(state,null);messageId=r?.game?.id||r?.message?.id||r?.id||null;
+    if(!messageId){const found=findState(await getMessages());messageId=found?.row?.id||null;}
+    await setupPlayer(videoId,modal,true);await systemMessage(`Host started a video • time ${formatTime(0)}`);startLoops();
+  }
+
+  async function joinState(found,modal){
+    if(!found?.data?.videoId)return;
+    host=found.data.hostDeviceId===getDevice();state=found.data;messageId=found.row.id||null;
+    await setupPlayer(state.videoId,modal,host);startLoops();
+  }
+
+  async function setupPlayer(videoId,modal,isHost){
+    await loadYTApi();
+    if(player){try{player.destroy()}catch{}player=null;playerReady=false;}
+    player=new YT.Player('ytPlayer',{videoId,width:'100%',height:'100%',playerVars:{autoplay:0,controls:isHost?1:0,rel:0,playsinline:1,iv_load_policy:3},events:{onReady:()=>{playerReady=true;applyState(true);},onStateChange:e=>{if(!host||suppress||!playerReady)return;const p=e.data===YT.PlayerState.PLAYING, paused=e.data===YT.PlayerState.PAUSED||e.data===YT.PlayerState.ENDED;if(p||paused){publishPlayback(p,paused&&e.data===YT.PlayerState.ENDED?0:player.getCurrentTime(),true).catch(()=>{});}}}});
+    modal.querySelector('#ytCover').style.display='none';modal.querySelector('#ytRole').textContent=isHost?`👑 Host: ${username()}`:`👀 Watching ${esc(state?.host||'host')}`;modal.querySelector('#ytHostSetup').style.display=isHost?'none':'none';modal.querySelector('#ytHostControls').style.display=isHost?'flex':'none';modal.querySelector('#ytViewerNote').style.display=isHost?'none':'block';
+  }
+
+  async function publishPlayback(playing,position,announce){
+    if(!host||!state||!messageId)return;state.playing=!!playing;state.position=Math.max(0,Number(position)||0);state.sentAt=Date.now();const next={...state};try{await writeState(next,messageId);if(announce){const label=playing?'▶ Playing':'⏸ Paused';await systemMessage(`${label} • ${formatTime(state.position)}`);lastSystemState=label+':'+Math.floor(state.position);}}catch(e){console.warn('YouTube state write:',e);}}
+
+  function targetPosition(s){let p=Number(s.position)||0;if(s.playing)p+=(Date.now()-Number(s.sentAt||Date.now()))/1000;return Math.max(0,p);}
+  function applyState(force){
+    if(!playerReady||!state||!player)return;const target=targetPosition(state);let current=Number(player.getCurrentTime?.()||0),diff=target-current;
+    if(force||Math.abs(diff)>SYNC_TOLERANCE){suppress=true;try{player.seekTo(target,true);if(state.playing)player.playVideo();else player.pauseVideo();}catch{}setTimeout(()=>suppress=false,150);}
+    else if(state.playing&&player.getPlayerState()!==YT.PlayerState.PLAYING){suppress=true;player.playVideo();setTimeout(()=>suppress=false,150);}
+    else if(!state.playing&&player.getPlayerState()===YT.PlayerState.PLAYING){suppress=true;player.pauseVideo();setTimeout(()=>suppress=false,150);}
+  }
+  async function poll(){
+    try{const found=findState(await getMessages());if(!found){if(state&&!host)stopLocal('Session ended.');return;}if(!state||found.row.id!==messageId||found.data.videoId!==state.videoId){if(host&&messageId===found.row.id)return;state=found.data;messageId=found.row.id;host=state.hostDeviceId===getDevice();if(playerReady&&player&&state.videoId)await setupPlayer(state.videoId,modalRef,host);}else state=found.data;if(playerReady)applyState(false);updateTime();}catch(e){console.warn('YouTube Together poll:',e);}}
+  function updateTime(){if(!modalRef)return;const t=state?(host&&playerReady?player.getCurrentTime():targetPosition(state)):0;modalRef.querySelector('#ytTime').textContent=formatTime(t);modalRef.querySelector('#ytSync').textContent=state?'● Synced':'● Waiting';}
+  function startLoops(){clearInterval(pollTimer);clearInterval(heartbeatTimer);pollTimer=setInterval(poll,POLL_MS);if(host)heartbeatTimer=setInterval(()=>{if(playerReady&&state)publishPlayback(state.playing,player.getCurrentTime(),false)},HEARTBEAT_MS);}
+  function stopLoops(){clearInterval(pollTimer);clearInterval(heartbeatTimer);pollTimer=null;heartbeatTimer=null;}
+  async function stopHost(){if(!host||!messageId)return;try{await api({game_server:true,game_action:'stop',channel:CHANNEL,device_id:getDevice(),game_id:messageId});}catch(e){console.warn(e)}stopLocal('Session ended.');}
+  function stopLocal(note){stopLoops();if(player){try{player.destroy()}catch{}player=null;}playerReady=false;state=null;messageId=null;host=false;if(modalRef){modalRef.querySelector('#ytCover').style.display='flex';modalRef.querySelector('#ytHostSetup').style.display='block';modalRef.querySelector('#ytHostControls').style.display='none';modalRef.querySelector('#ytViewerNote').style.display='none';modalRef.querySelector('#ytRole').textContent=note||'Not connected';modalRef.querySelector('#ytTime').textContent='0:00';modalRef.querySelector('#ytSync').textContent='● Waiting';}}
+
+  let modalRef=null;
+  function openModal(){
+    if(modalRef)return;modalRef=buildModal();modalRef.querySelector('.yt-close').onclick=()=>{if(host)stopHost().catch(()=>{});else stopLocal();modalRef.remove();modalRef=null;};
+    modalRef.querySelector('#ytStart').onclick=()=>startHost(modalRef.querySelector('#ytUrl').value,modalRef).catch(e=>alert(e.message));
+    modalRef.querySelector('#ytPlay').onclick=()=>publishPlayback(true,player?.getCurrentTime?.()||0,true);
+    modalRef.querySelector('#ytPause').onclick=()=>publishPlayback(false,player?.getCurrentTime?.()||0,true);
+    modalRef.querySelector('#ytBack').onclick=()=>{const p=Math.max(0,(player?.getCurrentTime?.()||0)-10);if(player){suppress=true;player.seekTo(p,true);setTimeout(()=>suppress=false,100);}publishPlayback(state?.playing||false,p,true);};
+    modalRef.querySelector('#ytForward').onclick=()=>{const p=(player?.getCurrentTime?.()||0)+10;if(player){suppress=true;player.seekTo(p,true);setTimeout(()=>suppress=false,100);}publishPlayback(state?.playing||false,p,true);};
+    modalRef.querySelector('#ytStop').onclick=()=>stopHost();
+    getMessages().then(findState).then(found=>{if(found)joinState(found,modalRef).catch(e=>console.warn(e));else modalRef.querySelector('#ytCover').style.display='flex';});
+  }
+
+  function addCard(){
+    const grid=document.querySelector('#gamesOverlay .game-grid');if(!grid||grid.querySelector('.yt-card'))return false;
+    const card=document.createElement('button');card.type='button';card.className='yt-card game-choice';card.dataset.game='youtube-together';card.innerHTML='<span class="yt-icon">🎬</span><span class="yt-name">YouTube Together</span><span class="yt-desc">Host a YouTube video and keep everyone synchronized.</span><span class="yt-players">Host + viewers</span>';card.onclick=e=>{e.preventDefault();e.stopImmediatePropagation();openModal();};grid.appendChild(card);return true;
+  }
+  const waitForGames=setInterval(()=>{if(addCard())clearInterval(waitForGames);},100);
+  if(document.readyState!=='loading')addCard();else document.addEventListener('DOMContentLoaded',addCard,{once:true});
+})();
