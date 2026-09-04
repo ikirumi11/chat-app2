@@ -3,7 +3,9 @@
   'use strict';
   const DB_NAME = 'chat-app2-local';
   const STORE = 'messages';
+  const FALLBACK_KEY = 'chat-app2-local-message-journal-v2';
   const MAX_LOCAL_MESSAGES = 2000;
+  const MAX_FALLBACK_MESSAGES = 300;
   const PUBLIC_CHANNEL = 'public';
   const PUBLIC_PEER_ID = 'chat2-public';
   const GAME_PREFIX = '__CHAT_GAME_STATE__:';
@@ -16,10 +18,14 @@
   let hostPeerId = PUBLIC_PEER_ID;
 
   function jsonResponse(obj, status = 200) { return new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json' } }); }
+  function reportLocalSave(ok, error = null, message = null) {
+    window.dispatchEvent(new CustomEvent('chat:local-save-status', { detail: { ok, error, message } }));
+  }
   function openDb() {
     if (dbPromise) return dbPromise;
     dbPromise = new Promise((resolve, reject) => {
-      const req = indexedDB.open(DB_NAME, 2);
+      let req;
+      try { req = indexedDB.open(DB_NAME, 2); } catch (error) { reject(error); return; }
       req.onupgradeneeded = () => {
         const db = req.result;
         if (!db.objectStoreNames.contains(STORE)) {
@@ -28,38 +34,91 @@
           store.createIndex('created_at', 'created_at', { unique: false });
         }
       };
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
+      req.onsuccess = () => {
+        const db = req.result;
+        db.onversionchange = () => db.close();
+        resolve(db);
+      };
+      req.onerror = () => reject(req.error || new Error('IndexedDB could not be opened.'));
+      req.onblocked = () => reject(new Error('IndexedDB is blocked by another page.'));
     });
     return dbPromise;
   }
+  function readFallback() {
+    try {
+      const raw = localStorage.getItem(FALLBACK_KEY);
+      const list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch { return []; }
+  }
+  function writeFallback(messages) {
+    try {
+      const clean = messages.filter(m => m && m.id && !localDeleted.has(m.id)).slice(-MAX_FALLBACK_MESSAGES);
+      localStorage.setItem(FALLBACK_KEY, JSON.stringify(clean));
+      return true;
+    } catch { return false; }
+  }
+  function fallbackPut(message) {
+    const list = readFallback();
+    const index = list.findIndex(m => m.id === message.id);
+    if (index >= 0) list[index] = message;
+    else list.push(message);
+    return writeFallback(list);
+  }
   async function putMessage(message) {
-    const db = await openDb();
-    await new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, 'readwrite');
-      tx.objectStore(STORE).put({ ...message, room: PUBLIC_CHANNEL, channel: PUBLIC_CHANNEL, p2p: true });
-      tx.oncomplete = resolve;
-      tx.onerror = () => reject(tx.error);
-    });
-    trimMessages().catch(() => {});
+    const value = { ...message, room: PUBLIC_CHANNEL, channel: PUBLIC_CHANNEL, p2p: true };
+    try {
+      const db = await openDb();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).put(value);
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error || new Error('IndexedDB write failed.'));
+        tx.onabort = () => reject(tx.error || new Error('IndexedDB transaction aborted.'));
+      });
+      trimMessages().catch(() => {});
+      reportLocalSave(true, null, value);
+      return true;
+    } catch (error) {
+      const fallbackOk = fallbackPut(value);
+      reportLocalSave(fallbackOk, fallbackOk ? null : error, value);
+      if (!fallbackOk) throw error;
+      return true;
+    }
   }
   async function deleteMessage(id) {
-    const db = await openDb();
-    await new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, 'readwrite');
-      tx.objectStore(STORE).delete(id);
-      tx.oncomplete = resolve;
-      tx.onerror = () => reject(tx.error);
-    });
+    try {
+      const db = await openDb();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        tx.objectStore(STORE).delete(id);
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error || new Error('IndexedDB delete failed.'));
+      });
+    } catch {}
+    const list = readFallback().filter(m => m.id !== id);
+    writeFallback(list);
   }
   async function getMessages() {
-    const db = await openDb();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, 'readonly');
-      const req = tx.objectStore(STORE).getAll();
-      req.onsuccess = () => resolve(req.result.filter(m => m.room === PUBLIC_CHANNEL && !localDeleted.has(m.id)).sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
-      req.onerror = () => reject(req.error);
-    });
+    let indexed = [];
+    try {
+      const db = await openDb();
+      indexed = await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readonly');
+        const req = tx.objectStore(STORE).getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => reject(req.error || new Error('IndexedDB read failed.'));
+      });
+    } catch {}
+
+    const fallback = readFallback();
+    const merged = new Map();
+    for (const m of [...fallback, ...indexed]) {
+      if (m?.id && !localDeleted.has(m.id)) merged.set(m.id, m);
+    }
+    return [...merged.values()]
+      .filter(m => m.room === PUBLIC_CHANNEL || m.channel === PUBLIC_CHANNEL)
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
   }
   async function trimMessages() {
     const all = await getMessages();
@@ -159,7 +218,13 @@
   async function localPost(body) {
     const message = { id: body.id || ('p2p-' + crypto.randomUUID()), username: String(body.username || '').slice(0, 24), channel: PUBLIC_CHANNEL, message: String(body.message || '').slice(0, 20000), image: body.image || null, files: Array.isArray(body.files) ? body.files : [], device_id: String(body.device_id || localStorage.getItem('chat_device_id') || ''), edited: false, created_at: body.created_at || new Date().toISOString(), invisible_to_others: body.invisible_to_others === true, game_message: body.game_message === true };
     if (!message.username || (!message.message && !message.image && !message.files.length)) return jsonResponse({ error: 'Message, image, or files are required.' }, 400);
-    await putMessage(message);
+    try {
+      await putMessage(message);
+    } catch (error) {
+      const code = 'LOCAL-' + Math.random().toString(36).slice(2, 9).toUpperCase();
+      reportLocalSave(false, { code, name: error?.name, message: error?.message }, message);
+      return jsonResponse({ error: `Could not save message locally. Error code: ${code}` }, 500);
+    }
     if (!message.invisible_to_others) broadcast({ type: 'message', channel: PUBLIC_CHANNEL, message });
     window.dispatchEvent(new CustomEvent('chat:p2p-message', { detail: message }));
     return jsonResponse({ success: true, message });
