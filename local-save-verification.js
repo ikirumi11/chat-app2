@@ -1,6 +1,6 @@
 /*
- * Ensures normal chat writes contain an immutable profile snapshot and are
- * compatible with the local parent storage bridge.
+ * Ensures normal chat writes contain an immutable profile snapshot and
+ * exposes the simple local-device Save/Load API supplied by the HTML loader.
  */
 (() => {
   'use strict';
@@ -98,19 +98,52 @@
     return response;
   };
 
-  // Public helper for code that wants to explicitly store a normal app value.
-  // The parent bridge is preferred; localStorage remains the fallback.
+  // Simple Save/Load API.
+  // The HTML loader handles the actual device storage.
+  // Outside the loader, localStorage is used as a fallback.
   window.__chat2LocalSave = async (key, value) => {
+    const name = String(key);
+
     if (window.__googleSitesStorage?.available?.()) {
       try {
-        await window.__googleSitesStorage.set(key, value);
+        await window.__googleSitesStorage.set(name, value);
         return { ok: true, backend: 'parent-local' };
       } catch (error) {
         console.warn('[Chat2] Parent local save failed, using localStorage:', error);
       }
     }
 
-    localStorage.setItem(String(key), typeof value === 'string' ? value : JSON.stringify(value));
+    localStorage.setItem(name, typeof value === 'string' ? value : JSON.stringify(value));
     return { ok: true, backend: 'localStorage' };
+  };
+
+  window.__chat2LocalLoad = async key => {
+    const name = String(key);
+
+    if (window.__googleSitesStorage?.available?.()) {
+      try {
+        return await window.__googleSitesStorage.get(name);
+      } catch (error) {
+        console.warn('[Chat2] Parent local load failed, using localStorage:', error);
+      }
+    }
+
+    const raw = localStorage.getItem(name);
+    if (raw === null) return null;
+    try { return JSON.parse(raw); } catch (_) { return raw; }
+  };
+
+  // Same friendly names for new code.
+  window.ChatLocal = window.ChatLocal || {
+    save: window.__chat2LocalSave,
+    load: window.__chat2LocalLoad,
+    remove: async key => {
+      const name = String(key);
+      if (window.__googleSitesStorage?.available?.()) {
+        try { return await window.__googleSitesStorage.remove(name); } catch (_) {}
+      }
+      localStorage.removeItem(name);
+      return true;
+    }
   };
 })();
