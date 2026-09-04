@@ -1,13 +1,20 @@
-/* Adds immutable profile snapshots to every normal local chat message. */
+/*
+ * Ensures normal chat writes contain an immutable profile snapshot and are
+ * compatible with the local parent storage bridge.
+ */
 (() => {
   'use strict';
+
   const API_PATH = '/api/messages';
   const originalFetch = window.fetch.bind(window);
 
   function addProfileSnapshot(body) {
     if (!body || body.game_server === true || body.profile_snapshot) return body;
 
-    const deviceId = String(body.device_id || localStorage.getItem('chat_device_id') || '');
+    const deviceId = String(
+      body.device_id || localStorage.getItem('chat_device_id') || ''
+    );
+
     let snapshot = null;
 
     try {
@@ -20,7 +27,7 @@
           updatedAt: Number(profile.updatedAt || Date.now())
         };
       }
-    } catch {}
+    } catch (_) {}
 
     if (!snapshot) {
       snapshot = {
@@ -42,13 +49,11 @@
     if (!prepared?.profile_snapshot || !window.__chatP2P?.putMessage) return;
 
     let data = null;
-    try { data = await response.clone().json(); } catch {}
+    try { data = await response.clone().json(); } catch (_) {}
+
     const saved = data?.message;
     if (!saved?.id) return;
 
-    // p2p-chat intentionally builds a safe message object. Put the immutable
-    // profile snapshot back onto that exact saved record so refreshes keep the
-    // name/PFP that existed when the message was sent.
     const withSnapshot = {
       ...saved,
       profile_snapshot: prepared.profile_snapshot,
@@ -61,7 +66,9 @@
 
   window.fetch = async function(input, init = {}) {
     const url = typeof input === 'string' ? input : (input?.url || '');
-    const method = String(init.method || (typeof input !== 'string' ? input.method : 'GET') || 'GET').toUpperCase();
+    const method = String(
+      init.method || (typeof input !== 'string' ? input.method : 'GET') || 'GET'
+    ).toUpperCase();
 
     if (!url.includes(API_PATH) || method !== 'POST') {
       return originalFetch(input, init);
@@ -69,7 +76,7 @@
 
     let body = {};
     if (init.body) {
-      try { body = JSON.parse(init.body); } catch {}
+      try { body = JSON.parse(init.body); } catch (_) {}
     }
 
     if (body.game_server === true) return originalFetch(input, init);
@@ -84,10 +91,26 @@
       try {
         await restoreSnapshotIntoLocalMessage(response, prepared);
       } catch (error) {
-        console.warn('Could not attach immutable profile snapshot:', error);
+        console.warn('[Chat2] Could not attach immutable profile snapshot:', error);
       }
     }
 
     return response;
+  };
+
+  // Public helper for code that wants to explicitly store a normal app value.
+  // The parent bridge is preferred; localStorage remains the fallback.
+  window.__chat2LocalSave = async (key, value) => {
+    if (window.__googleSitesStorage?.available?.()) {
+      try {
+        await window.__googleSitesStorage.set(key, value);
+        return { ok: true, backend: 'parent-local' };
+      } catch (error) {
+        console.warn('[Chat2] Parent local save failed, using localStorage:', error);
+      }
+    }
+
+    localStorage.setItem(String(key), typeof value === 'string' ? value : JSON.stringify(value));
+    return { ok: true, backend: 'localStorage' };
   };
 })();
