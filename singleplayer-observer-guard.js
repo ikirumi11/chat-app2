@@ -1,1 +1,0 @@
-(()=>{'use strict';const NativeMO=window.MutationObserver;window.MutationObserver=function(){return{observe(){},disconnect(){},takeRecords(){return[]}}};window.MutationObserver.prototype=NativeMO?.prototype||{};})();
