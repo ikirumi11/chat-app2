@@ -1,33 +1,25 @@
-/* P2P CHAT LAYER — normal chat messages are local + WebRTC only. */
+/* P2P CHAT LAYER — one shared Public Chat, normal messages are local + WebRTC only. */
 (() => {
   'use strict';
   const DB_NAME = 'chat-app2-local';
   const STORE = 'messages';
   const MAX_LOCAL_MESSAGES = 2000;
+  const PUBLIC_CHANNEL = 'public';
+  const PUBLIC_PEER_ID = 'chat2-public';
   const originalFetch = window.fetch.bind(window);
-  const params = new URLSearchParams(location.search);
-  const suppliedRoom = params.get('room');
-  const savedRoom = localStorage.getItem('chat_p2p_room');
-  const room = sanitizeRoom(suppliedRoom || savedRoom || randomRoom());
-  localStorage.setItem('chat_p2p_room', room);
-  const deletedKey = 'chat-p2p-deleted:' + room;
-  const localDeleted = new Set(JSON.parse(localStorage.getItem(deletedKey) || '[]'));
+  const connections = new Map();
+  const localDeleted = new Set(JSON.parse(localStorage.getItem('chat-p2p-deleted:public') || '[]'));
   let dbPromise = null;
   let peer = null;
   let isHost = false;
-  let hostPeerId = null;
-  const connections = new Map();
+  let hostPeerId = PUBLIC_PEER_ID;
 
-  function randomRoom() { return Math.random().toString(36).slice(2, 8).toUpperCase(); }
-  function sanitizeRoom(v) { return String(v).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 32) || randomRoom(); }
-  function peerIdForRoom(r) { return 'chat2-' + r.toLowerCase(); }
   function jsonResponse(obj, status = 200) { return new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json' } }); }
-  function esc(s) { return String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;'); }
 
   function openDb() {
     if (dbPromise) return dbPromise;
     dbPromise = new Promise((resolve, reject) => {
-      const req = indexedDB.open(DB_NAME, 1);
+      const req = indexedDB.open(DB_NAME, 2);
       req.onupgradeneeded = () => {
         const db = req.result;
         if (!db.objectStoreNames.contains(STORE)) {
@@ -46,7 +38,7 @@
     const db = await openDb();
     await new Promise((resolve, reject) => {
       const tx = db.transaction(STORE, 'readwrite');
-      tx.objectStore(STORE).put({ ...message, room, p2p: true });
+      tx.objectStore(STORE).put({ ...message, room: PUBLIC_CHANNEL, channel: PUBLIC_CHANNEL, p2p: true });
       tx.oncomplete = resolve;
       tx.onerror = () => reject(tx.error);
     });
@@ -68,7 +60,7 @@
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE, 'readonly');
       const req = tx.objectStore(STORE).getAll();
-      req.onsuccess = () => resolve(req.result.filter(m => m.room === room && !localDeleted.has(m.id)).sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+      req.onsuccess = () => resolve(req.result.filter(m => m.room === PUBLIC_CHANNEL && !localDeleted.has(m.id)).sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
       req.onerror = () => reject(req.error);
     });
   }
@@ -79,7 +71,8 @@
     for (const m of all.slice(0, all.length - MAX_LOCAL_MESSAGES)) await deleteMessage(m.id);
   }
 
-  function saveDeleted() { localStorage.setItem(deletedKey, JSON.stringify([...localDeleted].slice(-5000))); }
+  function saveDeleted() { localStorage.setItem('chat-p2p-deleted:public', JSON.stringify([...localDeleted].slice(-5000))); }
+
   function broadcast(packet, exceptPeer = null) {
     for (const [id, conn] of connections) {
       if (id === exceptPeer || !conn.open) continue;
@@ -90,14 +83,14 @@
   async function receiveMessage(message, exceptPeer = null) {
     if (!message || !message.id || localDeleted.has(message.id)) return;
     await putMessage(message);
-    broadcast({ type: 'message', room, message }, exceptPeer);
+    broadcast({ type: 'message', channel: PUBLIC_CHANNEL, message }, exceptPeer);
     window.dispatchEvent(new CustomEvent('chat:p2p-message', { detail: message }));
   }
 
   async function receivePacket(packet, fromPeer) {
-    if (!packet || packet.room !== room) return;
+    if (!packet || packet.channel !== PUBLIC_CHANNEL) return;
     if (packet.type === 'hello') {
-      try { connections.get(fromPeer)?.send({ type: 'hello-ack', room }); } catch {}
+      try { connections.get(fromPeer)?.send({ type: 'hello-ack', channel: PUBLIC_CHANNEL }); } catch {}
       return;
     }
     if (packet.type === 'message') return receiveMessage(packet.message, fromPeer);
@@ -106,13 +99,7 @@
       window.dispatchEvent(new CustomEvent('chat:p2p-delete', { detail: { id: packet.id } }));
       return;
     }
-    if (packet.type === 'delete-all') {
-      const all = await getMessages();
-      for (const m of all) { localDeleted.add(m.id); await deleteMessage(m.id); }
-      saveDeleted();
-      window.dispatchEvent(new CustomEvent('chat:p2p-clear'));
-      return;
-    }
+    // Delete-all is intentionally NOT synchronized. It is local to the device.
     if (packet.type === 'edit' && packet.message) {
       await putMessage(packet.message);
       window.dispatchEvent(new CustomEvent('chat:p2p-edit', { detail: packet.message }));
@@ -123,7 +110,7 @@
     if (!conn) return;
     connections.set(conn.peer, conn);
     conn.on('open', () => {
-      try { conn.send({ type: 'hello', room }); } catch {}
+      try { conn.send({ type: 'hello', channel: PUBLIC_CHANNEL }); } catch {}
       updateStatus();
     });
     conn.on('data', packet => receivePacket(packet, conn.peer).catch(console.error));
@@ -131,26 +118,25 @@
     conn.on('error', () => { connections.delete(conn.peer); updateStatus(); });
   }
 
-  function connectToHost() {
+  function connectToPublicHost() {
     if (!peer || isHost || !hostPeerId) return;
     const conn = peer.connect(hostPeerId, { reliable: true, serialization: 'json' });
     setupConnection(conn);
   }
 
-  function startAsGuest(hostId) {
+  function startAsGuest() {
     try { if (peer && !peer.destroyed) peer.destroy(); } catch {}
     isHost = false;
-    hostPeerId = hostId;
+    hostPeerId = PUBLIC_PEER_ID;
     peer = new Peer({ debug: 0 });
-    peer.on('open', () => { updateStatus(); connectToHost(); });
+    peer.on('open', () => { updateStatus(); connectToPublicHost(); });
     peer.on('connection', setupConnection);
-    peer.on('error', error => updateStatus(error?.type === 'peer-unavailable' ? 'Lobby host is offline' : 'P2P error'));
+    peer.on('error', error => updateStatus(error?.type === 'peer-unavailable' ? 'Public Chat host is offline' : 'P2P error'));
   }
 
   function startPeer() {
     if (!window.Peer) { setTimeout(startPeer, 100); return; }
-    const wantedId = peerIdForRoom(room);
-    peer = new Peer(wantedId, { debug: 0 });
+    peer = new Peer(PUBLIC_PEER_ID, { debug: 0 });
     peer.on('open', id => {
       isHost = true;
       hostPeerId = id;
@@ -158,23 +144,19 @@
     });
     peer.on('connection', setupConnection);
     peer.on('error', error => {
-      if (error?.type === 'unavailable-id') startAsGuest(wantedId);
+      if (error?.type === 'unavailable-id') startAsGuest();
       else updateStatus('Signaling unavailable');
     });
   }
 
-  function shareUrl() { return location.origin + location.pathname + '?room=' + encodeURIComponent(room); }
-
   function updateStatus(error = '') {
     const el = document.getElementById('p2pStatus');
     if (!el) return;
-    el.innerHTML = `<b>P2P Lobby</b><span>Room: <code>${esc(room)}</code></span><span>${esc(error || (isHost ? 'Hosting' : 'Connected'))} · ${connections.size} peer${connections.size === 1 ? '' : 's'}</span><button id="p2pCopy">Copy lobby link</button>`;
-    const copy = document.getElementById('p2pCopy');
-    if (copy) copy.onclick = async () => {
-      try { await navigator.clipboard.writeText(shareUrl()); copy.textContent = 'Copied!'; }
-      catch { prompt('Copy lobby link:', shareUrl()); }
-      setTimeout(() => { if (copy) copy.textContent = 'Copy lobby link'; }, 1200);
-    };
+    el.innerHTML = `<b>Public Chat</b><span>${escapeHtml(error || (isHost ? 'Public host' : 'Connected'))} · ${connections.size} peer${connections.size === 1 ? '' : 's'}</span>`;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
   }
 
   function injectUi() {
@@ -186,7 +168,7 @@
     box.className = 'p2p-status';
     if (actions) actions.prepend(box); else header.appendChild(box);
     const style = document.createElement('style');
-    style.textContent = `.p2p-status{display:flex;align-items:center;gap:8px;font-size:12px;color:#aeb7c3;margin-right:8px}.p2p-status code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:6px}.p2p-status button{border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:inherit;border-radius:7px;padding:5px 8px;cursor:pointer}@media(max-width:700px){.p2p-status span:nth-child(2){display:none}.p2p-status{max-width:145px;overflow:hidden}.p2p-status button{font-size:11px}}`;
+    style.textContent = `.p2p-status{display:flex;align-items:center;gap:8px;font-size:12px;color:#aeb7c3;margin-right:8px}.p2p-status b{color:inherit}.p2p-status span{white-space:nowrap}@media(max-width:700px){.p2p-status span{max-width:150px;overflow:hidden;text-overflow:ellipsis}}`;
     document.head.appendChild(style);
     updateStatus();
   }
@@ -195,7 +177,7 @@
     const message = {
       id: body.id || ('p2p-' + crypto.randomUUID()),
       username: String(body.username || '').slice(0, 24),
-      channel: room,
+      channel: PUBLIC_CHANNEL,
       message: String(body.message || '').slice(0, 20000),
       image: body.image || null,
       files: Array.isArray(body.files) ? body.files : [],
@@ -205,7 +187,7 @@
     };
     if (!message.username || (!message.message && !message.image && !message.files.length)) return jsonResponse({ error: 'Message, image, or files are required.' }, 400);
     await putMessage(message);
-    broadcast({ type: 'message', room, message });
+    broadcast({ type: 'message', channel: PUBLIC_CHANNEL, message });
     window.dispatchEvent(new CustomEvent('chat:p2p-message', { detail: message }));
     return jsonResponse({ success: true, message });
   }
@@ -215,13 +197,13 @@
       const all = await getMessages();
       for (const m of all) { localDeleted.add(m.id); await deleteMessage(m.id); }
       saveDeleted();
-      broadcast({ type: 'delete-all', room });
+      // Never broadcast this: Remove everything is local-only.
       window.dispatchEvent(new CustomEvent('chat:p2p-clear'));
       return jsonResponse({ success: true });
     }
     if (!body.id) return jsonResponse({ success: true });
     localDeleted.add(body.id); saveDeleted(); await deleteMessage(body.id);
-    broadcast({ type: 'delete', room, id: body.id });
+    broadcast({ type: 'delete', channel: PUBLIC_CHANNEL, id: body.id });
     window.dispatchEvent(new CustomEvent('chat:p2p-delete', { detail: { id: body.id } }));
     return jsonResponse({ success: true });
   }
@@ -231,9 +213,9 @@
     const all = await getMessages();
     const old = all.find(m => m.id === body.id);
     if (!old) return jsonResponse({ error: 'Message not found.' }, 404);
-    const updated = { ...old, message: body.message !== undefined ? String(body.message).slice(0, 20000) : old.message, image: body.image !== undefined ? body.image : old.image, files: body.files !== undefined ? body.files : old.files, edited: true };
+    const updated = { ...old, channel: PUBLIC_CHANNEL, room: PUBLIC_CHANNEL, message: body.message !== undefined ? String(body.message).slice(0, 20000) : old.message, image: body.image !== undefined ? body.image : old.image, files: body.files !== undefined ? body.files : old.files, edited: true };
     await putMessage(updated);
-    broadcast({ type: 'edit', room, message: updated });
+    broadcast({ type: 'edit', channel: PUBLIC_CHANNEL, message: updated });
     window.dispatchEvent(new CustomEvent('chat:p2p-edit', { detail: updated }));
     return jsonResponse({ success: true, message: updated });
   }
@@ -247,7 +229,7 @@
 
     if (method === 'GET') {
       const u = new URL(url, location.href);
-      u.searchParams.set('channel', room);
+      u.searchParams.set('channel', PUBLIC_CHANNEL);
       let gameMessages = [];
       try {
         const serverResponse = await originalFetch(u.toString(), init);
@@ -259,7 +241,7 @@
     }
 
     if (body.game_server === true) {
-      body.channel = room;
+      body.channel = PUBLIC_CHANNEL;
       return originalFetch(input, { ...init, body: JSON.stringify(body) });
     }
     if (method === 'POST') return localPost(body);
@@ -268,10 +250,11 @@
     return originalFetch(input, init);
   };
 
-  window.__chatP2P = { room, getShareUrl: shareUrl, connections };
+  window.__chatP2P = { channel: PUBLIC_CHANNEL, peerId: PUBLIC_PEER_ID, connections };
 
   document.addEventListener('DOMContentLoaded', () => {
     if (!localStorage.getItem('chat_device_id')) localStorage.setItem('chat_device_id', crypto.randomUUID());
+    localStorage.removeItem('chat_p2p_room');
     injectUi();
     startPeer();
   });
