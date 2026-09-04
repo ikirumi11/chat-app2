@@ -1,16 +1,13 @@
 /*
- * Chat App 2 <-> parent/local-loader storage bridge.
+ * Chat App 2 local-device storage bridge.
  *
- * The normal Chat App code can keep using /api/messages. When the app is
- * running inside the local GitHub-copy HTML loader, this file transparently
- * sends storage/message requests to the parent. The parent stores the data
- * locally on that device and can return it to the app later.
+ * The GitHub site remains the real app. When it is loaded by the local-copy
+ * HTML loader, ChatLocal.save/load talks to the parent loader and the parent
+ * stores the data only on this device.
  *
- * Protocol:
- *   source: __CHAT2_STORAGE__
- *   kind: request | response
- *
- * If there is no compatible parent, the normal network API is left alone.
+ * Existing __googleSitesStorage methods are kept for compatibility with the
+ * chat/P2P code. Normal /api/messages calls are redirected to the same local
+ * device store while game-server messages may still use the real backend.
  */
 (() => {
   'use strict';
@@ -32,7 +29,7 @@
 
   function request(op, key = null, value = undefined) {
     if (!available()) {
-      return Promise.reject(Object.assign(new Error('Local parent bridge is not available'), {
+      return Promise.reject(Object.assign(new Error('Local Save/Load parent is not available'), {
         name: 'Chat2BridgeUnavailable',
         code: 'GS-NO-PARENT'
       }));
@@ -113,6 +110,17 @@
   window.__googleSitesStorage = api;
   window.__chat2LocalBridge = api;
 
+  // Simple API requested by the local-copy HTML loader.
+  // Example: await ChatLocal.save('myKey', { hello: 'world' });
+  //          const value = await ChatLocal.load('myKey');
+  window.ChatLocal = {
+    save: async (key, value) => api.set(String(key), value),
+    load: async key => api.get(String(key)),
+    remove: async key => api.remove(String(key))
+  };
+  window.__chat2LocalSave = window.ChatLocal.save;
+  window.__chat2LocalLoad = window.ChatLocal.load;
+
   const originalFetch = window.fetch.bind(window);
 
   function jsonResponse(payload, status = 200) {
@@ -149,7 +157,6 @@
       if (method === 'GET') {
         let serverMessages = [];
 
-        // Game/server state remains server-backed when a backend is configured.
         try {
           const serverResponse = await originalFetch(input, init);
           if (serverResponse.ok) {
@@ -207,7 +214,6 @@
     return originalFetch(input, init);
   };
 
-  // P2P code can mirror messages directly without going through /api/messages.
   window.addEventListener('chat:p2p-message', event => {
     const message = event.detail;
     if (!message?.id || !available()) return;
@@ -216,7 +222,6 @@
     );
   });
 
-  // Let the parent know the app bridge is alive. No data is sent here.
   if (available()) {
     try {
       window.parent.postMessage({
