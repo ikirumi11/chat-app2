@@ -99,6 +99,10 @@
       await putMessage(packet.message);
       window.dispatchEvent(new CustomEvent('chat:p2p-edit', { detail: packet.message }));
     }
+    if (packet.type === 'sheet:election' && packet.selectedPeerId) {
+      window.dispatchEvent(new CustomEvent('chat:sheet-election', { detail: { selectedPeerId: packet.selectedPeerId, round: packet.round || 0, fromPeer } }));
+      return;
+    }
   }
   function setupConnection(conn) {
     if (!conn) return;
@@ -188,6 +192,22 @@
     if (method === 'PATCH') return localPatch(body);
     return originalFetch(input, init);
   };
-  window.__chatP2P = { channel: PUBLIC_CHANNEL, peerId: PUBLIC_PEER_ID, connections };
+  window.__chatP2P = {
+    channel: PUBLIC_CHANNEL,
+    peerId: PUBLIC_PEER_ID,
+    connections,
+    getMessages,
+    putMessage,
+    deleteMessage,
+    broadcast,
+    getSelfPeerId: () => peer?.id || '',
+    getConnectedPeerIds: () => [...connections.entries()].filter(([, conn]) => conn.open).map(([id]) => id),
+    isHost: () => isHost,
+    sendPacket: (packet, peerId = null) => {
+      const p = { ...packet, channel: PUBLIC_CHANNEL };
+      if (peerId) { const conn = connections.get(peerId); if (conn?.open) { try { conn.send(p); return true; } catch {} } return false; }
+      broadcast(p); return true;
+    }
+  };
   document.addEventListener('DOMContentLoaded', () => { if (!localStorage.getItem('chat_device_id')) localStorage.setItem('chat_device_id', crypto.randomUUID()); localStorage.removeItem('chat_p2p_room'); injectUi(); startPeer(); });
 })();
