@@ -1,28 +1,11 @@
 /* GAME MESSAGE MODE
-   Game state stays server-synchronized so multiplayer games keep working.
-   The game state is tagged as a user message instead of a system message.
-   games.js already recognizes __CHAT_GAME_STATE__: and keeps these out of
-   the ordinary chat-message list, so the state is invisible as a normal chat
-   message while the game UI remains visible to players.
+   Multiplayer games are retired. Old game-state messages may still exist on
+   the server, but they are never shown as playable game cards anymore.
+   The new singleplayer-games.js file owns the Games UI and uses local bots.
 */
 (() => {
-  const GAME_PREFIX = '__CHAT_GAME_STATE__:';
-  const originalWrite = window.writeGameState;
-  if (typeof originalWrite !== 'function') return;
-
-  window.writeGameState = async function(game) {
-    if (!game?.id) return false;
-
-    const payload = GAME_PREFIX + JSON.stringify(game);
-    await window.apiPost({
-      game_server: true,
-      game_state: true,
-      username: '__USER__',
-      channel: 'public',
-      message: payload,
-      device_id: game.hostDeviceId
-    });
-
-    return true;
-  };
+  const style = document.createElement('style');
+  style.id = 'no-multiplayer-games-style';
+  style.textContent = '.game-message{display:none!important}';
+  document.head.appendChild(style);
 })();
