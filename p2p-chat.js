@@ -68,9 +68,7 @@
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE, 'readonly');
       const req = tx.objectStore(STORE).getAll();
-      req.onsuccess = () => resolve(req.result
-        .filter(m => m.room === room && !localDeleted.has(m.id))
-        .sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+      req.onsuccess = () => resolve(req.result.filter(m => m.room === room && !localDeleted.has(m.id)).sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
       req.onerror = () => reject(req.error);
     });
   }
@@ -139,6 +137,16 @@
     setupConnection(conn);
   }
 
+  function startAsGuest(hostId) {
+    try { if (peer && !peer.destroyed) peer.destroy(); } catch {}
+    isHost = false;
+    hostPeerId = hostId;
+    peer = new Peer({ debug: 0 });
+    peer.on('open', () => { updateStatus(); connectToHost(); });
+    peer.on('connection', setupConnection);
+    peer.on('error', error => updateStatus(error?.type === 'peer-unavailable' ? 'Lobby host is offline' : 'P2P error'));
+  }
+
   function startPeer() {
     if (!window.Peer) { setTimeout(startPeer, 100); return; }
     const wantedId = peerIdForRoom(room);
@@ -150,14 +158,8 @@
     });
     peer.on('connection', setupConnection);
     peer.on('error', error => {
-      if (error?.type === 'unavailable-id') {
-        isHost = false;
-        hostPeerId = wantedId;
-        updateStatus();
-        connectToHost();
-      } else {
-        updateStatus('Signaling unavailable');
-      }
+      if (error?.type === 'unavailable-id') startAsGuest(wantedId);
+      else updateStatus('Signaling unavailable');
     });
   }
 
@@ -236,8 +238,6 @@
     return jsonResponse({ success: true, message: updated });
   }
 
-  // Replace only normal chat API traffic. Game-server traffic still uses the API,
-  // but its channel is changed to this lobby so game state is not shared globally.
   window.fetch = async function(input, init = {}) {
     const url = typeof input === 'string' ? input : (input?.url || '');
     const method = (init.method || input?.method || 'GET').toUpperCase();
@@ -248,17 +248,19 @@
     if (method === 'GET') {
       const u = new URL(url, location.href);
       u.searchParams.set('channel', room);
-      const serverResponse = await originalFetch(u.toString(), init);
       let gameMessages = [];
-      try { const data = await serverResponse.clone().json(); gameMessages = (data.messages || []).filter(m => m.username === '__GAME_SERVER__'); } catch {}
+      try {
+        const serverResponse = await originalFetch(u.toString(), init);
+        const data = await serverResponse.clone().json();
+        gameMessages = (data.messages || []).filter(m => m.username === '__GAME_SERVER__');
+      } catch {}
       const localMessages = await getMessages();
       return jsonResponse({ success: true, messages: [...gameMessages, ...localMessages].sort((a, b) => new Date(a.created_at) - new Date(b.created_at)) });
     }
 
     if (body.game_server === true) {
       body.channel = room;
-      const nextInit = { ...init, body: JSON.stringify(body) };
-      return originalFetch(input, nextInit);
+      return originalFetch(input, { ...init, body: JSON.stringify(body) });
     }
     if (method === 'POST') return localPost(body);
     if (method === 'DELETE') return localDelete(body);
