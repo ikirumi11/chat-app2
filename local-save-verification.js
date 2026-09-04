@@ -1,20 +1,13 @@
-/*
- * Ensures normal chat writes contain an immutable profile snapshot and
- * exposes the simple local-device Save/Load API supplied by the HTML loader.
- */
+/* Adds immutable profile snapshots to every normal local chat message. */
 (() => {
   'use strict';
-
   const API_PATH = '/api/messages';
   const originalFetch = window.fetch.bind(window);
 
   function addProfileSnapshot(body) {
     if (!body || body.game_server === true || body.profile_snapshot) return body;
 
-    const deviceId = String(
-      body.device_id || localStorage.getItem('chat_device_id') || ''
-    );
-
+    const deviceId = String(body.device_id || localStorage.getItem('chat_device_id') || '');
     let snapshot = null;
 
     try {
@@ -27,7 +20,7 @@
           updatedAt: Number(profile.updatedAt || Date.now())
         };
       }
-    } catch (_) {}
+    } catch {}
 
     if (!snapshot) {
       snapshot = {
@@ -49,11 +42,13 @@
     if (!prepared?.profile_snapshot || !window.__chatP2P?.putMessage) return;
 
     let data = null;
-    try { data = await response.clone().json(); } catch (_) {}
-
+    try { data = await response.clone().json(); } catch {}
     const saved = data?.message;
     if (!saved?.id) return;
 
+    // p2p-chat intentionally builds a safe message object. Put the immutable
+    // profile snapshot back onto that exact saved record so refreshes keep the
+    // name/PFP that existed when the message was sent.
     const withSnapshot = {
       ...saved,
       profile_snapshot: prepared.profile_snapshot,
@@ -66,9 +61,7 @@
 
   window.fetch = async function(input, init = {}) {
     const url = typeof input === 'string' ? input : (input?.url || '');
-    const method = String(
-      init.method || (typeof input !== 'string' ? input.method : 'GET') || 'GET'
-    ).toUpperCase();
+    const method = String(init.method || (typeof input !== 'string' ? input.method : 'GET') || 'GET').toUpperCase();
 
     if (!url.includes(API_PATH) || method !== 'POST') {
       return originalFetch(input, init);
@@ -76,7 +69,7 @@
 
     let body = {};
     if (init.body) {
-      try { body = JSON.parse(init.body); } catch (_) {}
+      try { body = JSON.parse(init.body); } catch {}
     }
 
     if (body.game_server === true) return originalFetch(input, init);
@@ -91,59 +84,10 @@
       try {
         await restoreSnapshotIntoLocalMessage(response, prepared);
       } catch (error) {
-        console.warn('[Chat2] Could not attach immutable profile snapshot:', error);
+        console.warn('Could not attach immutable profile snapshot:', error);
       }
     }
 
     return response;
-  };
-
-  // Simple Save/Load API.
-  // The HTML loader handles the actual device storage.
-  // Outside the loader, localStorage is used as a fallback.
-  window.__chat2LocalSave = async (key, value) => {
-    const name = String(key);
-
-    if (window.__googleSitesStorage?.available?.()) {
-      try {
-        await window.__googleSitesStorage.set(name, value);
-        return { ok: true, backend: 'parent-local' };
-      } catch (error) {
-        console.warn('[Chat2] Parent local save failed, using localStorage:', error);
-      }
-    }
-
-    localStorage.setItem(name, typeof value === 'string' ? value : JSON.stringify(value));
-    return { ok: true, backend: 'localStorage' };
-  };
-
-  window.__chat2LocalLoad = async key => {
-    const name = String(key);
-
-    if (window.__googleSitesStorage?.available?.()) {
-      try {
-        return await window.__googleSitesStorage.get(name);
-      } catch (error) {
-        console.warn('[Chat2] Parent local load failed, using localStorage:', error);
-      }
-    }
-
-    const raw = localStorage.getItem(name);
-    if (raw === null) return null;
-    try { return JSON.parse(raw); } catch (_) { return raw; }
-  };
-
-  // Same friendly names for new code.
-  window.ChatLocal = window.ChatLocal || {
-    save: window.__chat2LocalSave,
-    load: window.__chat2LocalLoad,
-    remove: async key => {
-      const name = String(key);
-      if (window.__googleSitesStorage?.available?.()) {
-        try { return await window.__googleSitesStorage.remove(name); } catch (_) {}
-      }
-      localStorage.removeItem(name);
-      return true;
-    }
   };
 })();
