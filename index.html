@@ -33,15 +33,13 @@
   const btn=document.getElementById('screenShareBtn');
   if(!btn)return;
   btn.addEventListener('click',function(){
-    const openCard=()=>{
-      const card=document.querySelector('.ss-card');
-      if(card){card.click();return true}
-      return false;
-    };
-    if(openCard())return;
+    if(typeof window.openScreenShare==='function'){window.openScreenShare();return;}
     let tries=0;
     const timer=setInterval(()=>{
-      if(openCard()||++tries>=30)clearInterval(timer);
+      if(typeof window.openScreenShare==='function'){clearInterval(timer);window.openScreenShare();return;}
+      const card=document.querySelector('.ss-card');
+      if(card){clearInterval(timer);card.click();return;}
+      if(++tries>=40)clearInterval(timer);
     },100);
   });
 })();
