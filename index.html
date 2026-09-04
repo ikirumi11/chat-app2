@@ -7,11 +7,15 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="ui-polish.css">
 <link rel="stylesheet" href="ui-animations.css">
+<style>
+/* Screen Share is opened from the TV button, not the Games menu. */
+#gamesOverlay .ss-card{display:none!important}
+</style>
 </head>
 <body>
 <div id="startupScreen" aria-hidden="true"><div class="startup-inner"><div class="startup-icon">🎮</div><h1 class="startup-title">Game Chat</h1><div class="startup-subtitle">Connecting to your games...</div><div class="startup-loader"></div></div></div>
 <div class="app">
-<header class="header"><div class="logo"><div class="logo-icon">🎮</div><span>Game Chat</span><span class="channel"># public</span></div><div class="header-actions"><button class="icon-btn" id="gamesBtn" title="Games" aria-label="Games">🎮</button><button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings">⚙</button></div></header>
+<header class="header"><div class="logo"><div class="logo-icon">🎮</div><span>Game Chat</span><span class="channel"># public</span></div><div class="header-actions"><button class="icon-btn" id="screenShareBtn" title="Live TV / Screen Share" aria-label="Live TV / Screen Share">📺</button><button class="icon-btn" id="gamesBtn" title="Games" aria-label="Games">🎮</button><button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings">⚙</button></div></header>
 <main class="messages" id="messages"></main>
 <div class="composer"><div class="composer-box"><button class="games-composer-btn" id="gamesComposerBtn" title="Games" aria-label="Games">🎮</button><button class="attach-btn" id="attachBtn" title="Attach files">📎</button><button class="attach-btn voice-btn" id="voiceBtn" title="Record voice message" aria-label="Record voice message">🎙️</button><input type="file" id="fileInput" accept="image/*,video/*,*/*" multiple style="display:none"><div class="file-preview" id="filePreview"></div><div class="voice-recording-status" id="voiceStatus"><span class="voice-dot"></span><span id="voiceStatusText">Recording 0:00</span></div><textarea id="messageInput" rows="1" placeholder="Message Public Chat · "></textarea><button class="send-btn" id="sendBtn">Send</button></div></div></div>
 <div class="overlay" id="gamesOverlay"><div class="panel"><div class="panel-header"><h2>🎮 Games</h2><button class="icon-btn" id="closeGames">×</button></div><div class="panel-body"><p style="color:#929aa5;line-height:1.5">All games are single-player. You play against local bots.</p><div class="game-grid"></div></div></div></div>
@@ -24,4 +28,22 @@
 <script src="local-save-state.js"></script>
 <script src="p2p-compat.js"></script>
 <script src="games.js"></script><script src="app.js"></script><script src="game-message-mode.js"></script><script src="games-ui.js"></script><script src="game-settings.js"></script><script src="chat-features.js"></script><script src="global-background.js"></script><script src="solo-player-fix.js"></script><script src="profile-cache.js"></script><script src="singleplayer-games.js"></script><script src="game-settings-persistence.js"></script><script src="screen-share.js"></script><script src="ui-animations.js"></script>
+<script>
+(function(){
+  const btn=document.getElementById('screenShareBtn');
+  if(!btn)return;
+  btn.addEventListener('click',function(){
+    const openCard=()=>{
+      const card=document.querySelector('.ss-card');
+      if(card){card.click();return true}
+      return false;
+    };
+    if(openCard())return;
+    let tries=0;
+    const timer=setInterval(()=>{
+      if(openCard()||++tries>=30)clearInterval(timer);
+    },100);
+  });
+})();
+</script>
 </body></html>
