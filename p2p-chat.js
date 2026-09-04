@@ -6,6 +6,7 @@
   const MAX_LOCAL_MESSAGES = 2000;
   const PUBLIC_CHANNEL = 'public';
   const PUBLIC_PEER_ID = 'chat2-public';
+  const GAME_PREFIX = '__CHAT_GAME_STATE__:';
   const originalFetch = window.fetch.bind(window);
   const connections = new Map();
   const localDeleted = new Set(JSON.parse(localStorage.getItem('chat-p2p-deleted:public') || '[]'));
@@ -99,7 +100,6 @@
       window.dispatchEvent(new CustomEvent('chat:p2p-delete', { detail: { id: packet.id } }));
       return;
     }
-    // Delete-all is intentionally NOT synchronized. It is local to the device.
     if (packet.type === 'edit' && packet.message) {
       await putMessage(packet.message);
       window.dispatchEvent(new CustomEvent('chat:p2p-edit', { detail: packet.message }));
@@ -152,7 +152,9 @@
   function updateStatus(error = '') {
     const el = document.getElementById('p2pStatus');
     if (!el) return;
-    el.innerHTML = `<b>Public Chat</b><span>${escapeHtml(error || (isHost ? 'Public host' : 'Connected'))} · ${connections.size} peer${connections.size === 1 ? '' : 's'}</span>`;
+    const hasOpenPeer = [...connections.values()].some(conn => conn.open);
+    const state = error || (hasOpenPeer ? 'Connected' : (peer ? 'Not connected' : 'Loading…'));
+    el.innerHTML = `<b>Public Chat</b><span>${escapeHtml(state)} · ${connections.size} peer${connections.size === 1 ? '' : 's'}</span>`;
   }
 
   function escapeHtml(s) {
@@ -183,11 +185,13 @@
       files: Array.isArray(body.files) ? body.files : [],
       device_id: String(body.device_id || localStorage.getItem('chat_device_id') || ''),
       edited: false,
-      created_at: body.created_at || new Date().toISOString()
+      created_at: body.created_at || new Date().toISOString(),
+      invisible_to_others: body.invisible_to_others === true,
+      game_message: body.game_message === true
     };
     if (!message.username || (!message.message && !message.image && !message.files.length)) return jsonResponse({ error: 'Message, image, or files are required.' }, 400);
     await putMessage(message);
-    broadcast({ type: 'message', channel: PUBLIC_CHANNEL, message });
+    if (!message.invisible_to_others) broadcast({ type: 'message', channel: PUBLIC_CHANNEL, message });
     window.dispatchEvent(new CustomEvent('chat:p2p-message', { detail: message }));
     return jsonResponse({ success: true, message });
   }
@@ -197,7 +201,6 @@
       const all = await getMessages();
       for (const m of all) { localDeleted.add(m.id); await deleteMessage(m.id); }
       saveDeleted();
-      // Never broadcast this: Remove everything is local-only.
       window.dispatchEvent(new CustomEvent('chat:p2p-clear'));
       return jsonResponse({ success: true });
     }
@@ -234,7 +237,7 @@
       try {
         const serverResponse = await originalFetch(u.toString(), init);
         const data = await serverResponse.clone().json();
-        gameMessages = (data.messages || []).filter(m => m.username === '__GAME_SERVER__');
+        gameMessages = (data.messages || []).filter(m => m.username === '__GAME_SERVER__' || m.game_state === true || (typeof m.message === 'string' && m.message.startsWith(GAME_PREFIX)));
       } catch {}
       const localMessages = await getMessages();
       return jsonResponse({ success: true, messages: [...gameMessages, ...localMessages].sort((a, b) => new Date(a.created_at) - new Date(b.created_at)) });
