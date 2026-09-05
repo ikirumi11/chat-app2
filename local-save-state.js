@@ -1,23 +1,219 @@
-/* Strong local-save verification + device-aware proof/location UI. */
+/* Chat App 2 — custom local save location. */
 (()=>{'use strict';
-const DB='chat-app2-permanent-local',STORE='messages',LEGACY='chat-app2-local';let dbp=null,lastVerified=null;const originalFetch=window.fetch.bind(window);
+const FILE_NAME='chat-app2-local-data.json';
+let dirHandle=null;
+let data={messages:[],updated_at:null};
+const originalFetch=window.fetch.bind(window);
+
 const esc=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
-function db(){if(dbp)return dbp;dbp=new Promise((res,rej)=>{let r;try{r=indexedDB.open(DB,1)}catch(e){rej(e);return}r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(STORE)){const s=r.result.createObjectStore(STORE,{keyPath:'id'});s.createIndex('created_at','created_at',{unique:false})}};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error||Error('IndexedDB kunne ikke åpnes.'))});return dbp}
-async function all(){const d=await db();return new Promise((res,rej)=>{const r=d.transaction(STORE,'readonly').objectStore(STORE).getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error||Error('Kunne ikke lese lagring.'))})}
-async function put(m){if(!m?.id)throw Error('Meldingen mangler ID.');const d=await db();await new Promise((res,rej)=>{const t=d.transaction(STORE,'readwrite');t.objectStore(STORE).put({...m,permanent_local:true});t.oncomplete=res;t.onerror=()=>rej(t.error||Error('Skriving til enheten feilet.'));t.onabort=()=>rej(t.error||Error('Skriving ble avbrutt.'))});return true}
-async function del(id){const d=await db();await new Promise((res,rej)=>{const t=d.transaction(STORE,'readwrite');t.objectStore(STORE).delete(id);t.oncomplete=res;t.onerror=()=>rej(t.error)})}
-function status(text,type='check'){let e=document.getElementById('localSaveStatus');if(!e){e=document.createElement('button');e.id='localSaveStatus';e.type='button';e.style.cssText='position:fixed;top:7px;left:8px;z-index:100000;font:600 11px/1.2 system-ui,sans-serif;background:transparent;border:0;padding:0;cursor:pointer;white-space:nowrap';document.body.appendChild(e);e.onclick=info}e.textContent=text;e.style.color=type==='ok'?'#9fddb4':type==='bad'?'#ff9fa9':'#aeb7c3'}
-async function verify(m){const rows=await all();if(!rows.some(x=>x?.id===m?.id))throw Error('Read-back verification fant ikke meldingen i enhetslagringen.');lastVerified=m;status(`Lagring: ✓ Lagret på enheten · ${rows.length} lagret`,'ok');return true}
-async function selfTest(){const id='__save_test__'+Date.now()+Math.random();await put({id,storage_test:true,created_at:new Date().toISOString()});const ok=(await all()).some(x=>x.id===id);await del(id);if(!ok)throw Error('Lagringens selvtest feilet.')}
-function browserInfo(){const ua=navigator.userAgent||'',android=/Android/i.test(ua),iphone=/iPhone|iPad|iPod/i.test(ua),windows=/Windows/i.test(ua),mac=/Macintosh|Mac OS X/i.test(ua)&&!iphone,linux=/Linux/i.test(ua)&&!android,edge=/Edg\//i.test(ua),operagx=/OPR\//i.test(ua),firefox=/Firefox\//i.test(ua),safari=/Safari\//i.test(ua)&&!(/Chrome|CriOS|Edg|OPR|Firefox/i.test(ua)),chrome=/Chrome\//i.test(ua)||/CriOS\//i.test(ua);let device=android?'Android-telefon/nettbrett':iphone?'iPhone/iPad':windows?'Windows-PC':mac?'Mac':linux?'Linux-PC':'Denne enheten';let browser=edge?'Microsoft Edge':operagx?'Opera GX':firefox?'Firefox':safari?'Safari':chrome?'Google Chrome':'nettleseren';let url=edge?'edge://settings/siteData':operagx?'opera://settings/content/siteData':firefox?'about:preferences#privacy':chrome?'chrome://settings/content/siteData':null;return{device,browser,url,mobile:android||iphone,android,iphone,windows,mac,linux,edge,operagx,firefox,safari,chrome}}
-function locationText(){const b=browserInfo();if(b.mobile)return `På ${b.device} ligger chatten i <b>nettleserens IndexedDB</b>. Dette er intern nettleserlagring, ikke en vanlig fil i Filer/Files. Knappen «Hvordan finne det» viser trinnene for ${b.browser}.`;return `På ${b.device} ligger chatten i <b>nettleserens IndexedDB</b>. Det finnes derfor ikke én vanlig Chat App 2-fil som kan åpnes fra Filutforsker/Finder. «Hvordan finne det» viser både nettlesertrinn og den tekniske lagringsmappen.`}
-function diskPath(b){if(b.windows&&b.edge)return `%LOCALAPPDATA%\\Microsoft\\Edge\\User Data\\Default\\IndexedDB\\`;if(b.windows&&b.operagx)return `%APPDATA%\\Opera Software\\Opera GX Stable\\Default\\IndexedDB\\`;if(b.windows&&b.chrome)return `%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\IndexedDB\\`;if(b.windows&&b.firefox)return `%APPDATA%\\Mozilla\\Firefox\\Profiles\\<profil>\\storage\\default\\`;if(b.mac&&b.edge)return `~/Library/Application Support/Microsoft Edge/Default/IndexedDB/`;if(b.mac&&b.operagx)return `~/Library/Application Support/com.operasoftware.OperaGX/Default/IndexedDB/`;if(b.mac&&b.chrome)return `~/Library/Application Support/Google/Chrome/Default/IndexedDB/`;if(b.mac&&b.firefox)return `~/Library/Application Support/Firefox/Profiles/<profil>/storage/default/`;return null}
-async function info(){try{const rows=await all(),b=browserInfo();let p=document.getElementById('localSaveInfo');if(!p){p=document.createElement('div');p.id='localSaveInfo';p.style.cssText='position:fixed;top:30px;left:8px;z-index:100001;width:min(560px,calc(100vw - 16px));padding:12px;border-radius:12px;background:#151a21;border:1px solid #343d49;box-shadow:0 12px 40px rgba(0,0,0,.35);color:#dce3eb;font:12px/1.5 system-ui,sans-serif;max-height:calc(100vh - 45px);overflow:auto';document.body.appendChild(p)}p.innerHTML=`<b>Bevis på lokal lagring</b><br><br><b>Status:</b> Verifisert<br><b>Enhet:</b> ${esc(b.device)}<br><b>Nettleser:</b> ${esc(b.browser)}<br><b>Lagring:</b> IndexedDB på denne enheten<br><b>Database:</b> ${DB}<br><b>Objektlager:</b> ${STORE}<br><b>Lagrede meldinger:</b> ${rows.length}<br><b>Sist verifisert:</b> ${esc(lastVerified?.id||'Ingen ennå')}<br><br><span style="color:#9fddb4">«Lagret» vises bare etter vellykket skriving OG at meldingen er lest tilbake fra enhetslagringen.</span><br><br><button id="openSaveLocation">📂 Åpne lagringssted</button> <button id="showFileLocation">📍 Hvordan finne det</button> <button id="runSaveTest">🧪 Test lagring</button> <button id="closeSaveInfo">Lukk</button><div id="saveLocationText" style="margin-top:10px;color:#c8d0da"></div><p style="color:#9da5b0">${locationText()}</p>`;p.querySelector('#closeSaveInfo').onclick=()=>p.remove();p.querySelector('#openSaveLocation').onclick=openLocation;p.querySelector('#showFileLocation').onclick=()=>showFileLocation(false);p.querySelector('#runSaveTest').onclick=async()=>{const x=p.querySelector('#runSaveTest');x.disabled=true;try{await selfTest();x.textContent='✓ Test bestått'}catch(e){x.textContent='✕ Test feilet';console.error(e)}setTimeout(()=>{x.disabled=false;x.textContent='🧪 Test lagring'},1500)}}catch(e){status('Lagring: ✕ Feil','bad')}}
-function openLocation(){const b=browserInfo();if(b.url){try{const w=window.open(b.url,'_blank');if(w)return}catch{}}showFileLocation(true)}
-function showFileLocation(auto=false){const b=browserInfo(),el=document.getElementById('saveLocationText');if(!el)return;if(b.mobile){el.innerHTML=`<b>📱 ${esc(b.device)} — ${esc(b.browser)}</b><br><br><b>1. Finn nettleseren</b><br>Åpne ${esc(b.browser)} på telefonen/nettbrettet.<br><br><b>2. Åpne innstillinger</b><br>Trykk menyen → <b>Innstillinger</b>.<br><br><b>3. Finn nettstedslagring</b><br>Se etter <b>Nettstedsinnstillinger</b>, <b>Nettstedsdata</b>, <b>Lagring</b> eller <b>Site data</b>.<br><br><b>4. Finn Chat App 2</b><br>Velg nettstedet som kjører Chat App 2.<br><br><b>5. Hva ligger der?</b><br><b>IndexedDB → ${DB} → ${STORE}</b>.<br><br><b>📁 Viktig om Filer/Files</b><br>Dette er ikke en vanlig fil i Android Filer eller iOS Files. Nettleseren lagrer databasen inne i sin egen app-lagring. En nettside kan normalt ikke åpne denne databasen som en fil.<br><br>${auto?'Direkte åpning av nettleserens lagringsside ble blokkert, så trinnene vises automatisk her.':''}`;return}const path=diskPath(b);let browserSteps='';if(b.edge)browserSteps=`<b>Microsoft Edge — steg for steg</b><br>1. Trykk «Åpne lagringssted».<br>2. Edge åpner nettstedslagring.<br>3. Søk etter domenet/nettstedet som Chat App 2 kjører på.<br>4. Du kan se at nettstedet bruker lagring. Selve IndexedDB-innholdet er beskyttet av Edge.<br><br>`;else if(b.operagx)browserSteps=`<b>Opera GX — steg for steg</b><br>1. Trykk «Åpne lagringssted».<br>2. Opera GX åpner nettstedets lagringsside.<br>3. Finn domenet/nettstedet som Chat App 2 kjører på.<br>4. Se nettstedets lagring. Selve IndexedDB-innholdet er beskyttet av Opera GX.<br><br>`;else if(b.chrome)browserSteps=`<b>Google Chrome — steg for steg</b><br>1. Trykk «Åpne lagringssted».<br>2. Chrome åpner nettstedets lagringsside.<br>3. Finn domenet/nettstedet som Chat App 2 kjører på.<br>4. Se nettstedets lagring. Selve IndexedDB-innholdet er beskyttet av Chrome.<br><br>`;else if(b.firefox)browserSteps=`<b>Firefox — steg for steg</b><br>1. Trykk «Åpne lagringssted».<br>2. Firefox åpner personvern-/nettstedslagring.<br>3. Finn nettstedet som Chat App 2 kjører på.<br>4. Firefox lagrer IndexedDB i profilen sin.<br><br>`;else browserSteps=`<b>${esc(b.browser)} — steg for steg</b><br>1. Åpne nettleserens innstillinger.<br>2. Finn nettstedslagring/nettstedsdata.<br>3. Finn nettstedet som Chat App 2 kjører på.<br><br>`;el.innerHTML=`<b>💻 ${esc(b.device)} — ${esc(b.browser)}</b><br><br>${browserSteps}<b>📦 Det som faktisk lagres</b><br><b>IndexedDB → ${DB} → ${STORE}</b><br><br><b>📁 Teknisk filplassering på PC</b><br>${path?`<code style="display:block;padding:8px;background:#0d1117;border-radius:8px;overflow:auto">${esc(path)}</code><br><b>Steg:</b><br>1. Åpne Filutforsker/Finder.<br>2. Lim inn banen over i adressefeltet.<br>3. Trykk Enter.<br>4. Åpne <b>IndexedDB</b> og se nettleserens lagringsdata.<br>5. Ikke flytt, slett eller rediger disse filene manuelt — nettleseren bruker interne databaser og filer som kan endres automatisk.<br><br>`:'Denne nettleseren/PC-en bruker en lagringsplass som ikke har en trygg, fast filbane som nettsiden kan vite på forhånd.<br><br>'}<b>⚠️ Viktig</b><br>Filplasseringen over er nettleserens tekniske lagring, ikke en vanlig «Chat App 2.html»-fil. Det sikreste er å bruke nettleserens egen nettstedslagring. <b>IndexedDB → ${DB} → ${STORE}</b> er databasen og objektlageret som appen bruker.<br><br>${auto?'Direkte åpning av nettleserens lagringsside ble blokkert, så fullstendige trinn vises her.':''}`}
-async function migrate(){try{if(!window.__chatP2P?.getMessages)return;const old=await window.__chatP2P.getMessages(),rows=await all(),ids=new Set(rows.map(x=>x.id));for(const m of old)if(m?.id&&!ids.has(m.id))await put(m)}catch(e){console.warn('Migrering:',e)}}
-window.fetch=async function(input,init={}){const url=typeof input==='string'?input:(input?.url||'');const method=String(init.method||(typeof input!=='string'?input.method:'GET')||'GET').toUpperCase();if(!url.includes('/api/messages'))return originalFetch(input,init);let body={};if(init.body){try{body=JSON.parse(init.body)}catch{}}if(body.game_server===true)return originalFetch(input,init);if(method==='GET'){try{const r=await originalFetch(input,init),d=await r.clone().json(),local=await all(),games=Array.isArray(d?.messages)?d.messages.filter(m=>m?.username==='__GAME_SERVER__'||m?.game_state===true||(typeof m?.message==='string'&&m.message.startsWith('__CHAT_GAME_STATE__:'))):[];return new Response(JSON.stringify({...d,success:true,messages:[...games,...local].sort((a,b)=>new Date(a.created_at||0)-new Date(b.created_at||0))}),{status:r.status,headers:{'Content-Type':'application/json'}})}catch{return originalFetch(input,init)}}if(method==='POST'||method==='PATCH'||method==='DELETE'){if(method!=='DELETE')status('Lagring: Kontrollerer…');try{const r=await originalFetch(input,init);if(!r.ok){if(method!=='DELETE')status(`Lagring: ✕ Feil (HTTP ${r.status})`,'bad');return r}let d=null;try{d=await r.clone().json()}catch{}const m=d?.message||body;if(method!=='DELETE'&&m?.id){await put(m);await verify(m)}if(method==='DELETE'){if(body.delete_all){const x=await db();const t=x.transaction(STORE,'readwrite');t.objectStore(STORE).clear()}else if(body.id)await del(body.id)}return r}catch(e){if(method!=='DELETE')status('Lagring: ✕ Feil','bad');throw e}}return originalFetch(input,init)};
-window.addEventListener('chat:p2p-message',e=>{const m=e.detail;if(!m?.id)return;put(m).then(()=>verify(m)).catch(()=>status('Lagring: ✕ Feil','bad'))});
-async function start(){status('Lagring: Kontrollerer…');try{await migrate();await selfTest();const rows=await all();if(rows.length){lastVerified=rows[rows.length-1];status(`Lagring: ✓ Lagret på enheten · ${rows.length} lagret`,'ok')}else status('Lagring: ✓ Enhetslagring klar · 0 lagret','ok')}catch(e){console.error(e);status('Lagring: ✕ Feil','bad')}}
+
+function status(text,ok=false){
+  let e=document.getElementById('customSaveStatus');
+  if(!e){
+    e=document.createElement('button');
+    e.id='customSaveStatus';
+    e.type='button';
+    e.style.cssText='position:fixed;top:7px;left:8px;z-index:100000;font:600 11px/1.2 system-ui,sans-serif;background:transparent;border:0;padding:0;cursor:pointer;white-space:nowrap';
+    document.body.appendChild(e);
+    e.onclick=openPanel;
+  }
+  e.textContent=text;
+  e.style.color=ok?'#9fddb4':'#ff9fa9';
+}
+
+function valid(){return !!dirHandle}
+
+async function permission(){
+  if(!dirHandle)return false;
+  try{
+    if(dirHandle.queryPermission){
+      let p=await dirHandle.queryPermission({mode:'readwrite'});
+      if(p==='granted')return true;
+      p=await dirHandle.requestPermission({mode:'readwrite'});
+      return p==='granted';
+    }
+    return true;
+  }catch{return false}
+}
+
+async function writeFile(){
+  if(!valid())throw Error('Ingen lagringsplass er valgt.');
+  if(!(await permission()))throw Error('Tilgang til valgt lagringsplass mangler.');
+  const file=await dirHandle.getFileHandle(FILE_NAME,{create:true});
+  const writable=await file.createWritable();
+  data.updated_at=new Date().toISOString();
+  await writable.write(JSON.stringify(data,null,2));
+  await writable.close();
+}
+
+async function readFile(){
+  if(!valid())return false;
+  if(!(await permission()))return false;
+  try{
+    const file=await dirHandle.getFileHandle(FILE_NAME,{create:false});
+    const text=await (await file.getFile()).text();
+    const parsed=JSON.parse(text);
+    if(parsed&&Array.isArray(parsed.messages))data={...data,...parsed,messages:parsed.messages};
+    return true;
+  }catch(e){
+    if(e?.name==='NotFoundError')return true;
+    throw e;
+  }
+}
+
+async function chooseLocation(){
+  if(!window.showDirectoryPicker){
+    status('Lagring: ❌ Ugyldig – nettleseren støtter ikke valg av mappe');
+    alert('Denne nettleseren støtter ikke egendefinert lagringsmappe. Bruk en nettleser med File System Access API, for eksempel Edge eller Chrome på PC.');
+    return false;
+  }
+  try{
+    const chosen=await window.showDirectoryPicker({mode:'readwrite'});
+    dirHandle=chosen;
+    if(!(await permission()))throw Error('Tilgang til mappen ble ikke godkjent.');
+    await readFile();
+    await writeFile();
+    await saveHandle();
+    status(`Lagring: ✓ Valgt mappe · ${data.messages.length} lagret`,'ok');
+    return true;
+  }catch(e){
+    status('Lagring: ❌ Ugyldig – ingen lagringsplass valgt');
+    return false;
+  }
+}
+
+async function saveHandle(){
+  try{
+    const d=await new Promise((res,rej)=>{const r=indexedDB.open('chat-app2-save-location',1);r.onupgradeneeded=()=>r.result.createObjectStore('settings',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+    await new Promise((res,rej)=>{const t=d.transaction('settings','readwrite');t.objectStore('settings').put({id:'directory',handle:dirHandle});t.oncomplete=res;t.onerror=()=>rej(t.error)});
+  }catch{}
+}
+
+async function loadHandle(){
+  try{
+    const d=await new Promise((res,rej)=>{const r=indexedDB.open('chat-app2-save-location',1);r.onupgradeneeded=()=>r.result.createObjectStore('settings',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+    const row=await new Promise((res,rej)=>{const r=d.transaction('settings','readonly').objectStore('settings').get('directory');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+    if(row?.handle){dirHandle=row.handle;if(await permission()){await readFile();return true;}}
+  }catch{}
+  return false;
+}
+
+async function saveMessage(m){
+  if(!m?.id)throw Error('Meldingen mangler ID.');
+  if(!valid())throw Error('Ingen lagringsplass er valgt.');
+  const i=data.messages.findIndex(x=>x?.id===m.id);
+  if(i>=0)data.messages[i]=m;else data.messages.push(m);
+  await writeFile();
+  return true;
+}
+
+async function deleteMessage(id){
+  if(!valid())throw Error('Ingen lagringsplass er valgt.');
+  data.messages=data.messages.filter(m=>m?.id!==id);
+  await writeFile();
+}
+
+function panelHtml(){
+  const supported=!!window.showDirectoryPicker;
+  return `<b>💾 Egendefinert lagringsplass</b><br><br><b>Status:</b> ${valid()?'✓ Gyldig lagringsplass valgt':'❌ Ugyldig – ingen lagringsplass valgt'}<br><b>Fil:</b> ${FILE_NAME}<br><b>Lagrede meldinger:</b> ${data.messages.length}<br><br><span style="color:#c8d0da">Du velger selv mappen. Chat App 2 lagrer lokal chat-data som <b>${FILE_NAME}</b> i akkurat den mappen.</span><br><br>${supported?'<button id="chooseCustomSave">📁 Velg lagringsmappe</button>':'<span style="color:#ff9fa9">Denne nettleseren støtter ikke valg av egendefinert mappe.</span>'} <button id="testCustomSave">🧪 Test</button> <button id="closeCustomSave">Lukk</button><div id="customSaveDetails" style="margin-top:10px;color:#c8d0da"></div>`;
+}
+
+async function openPanel(){
+  let p=document.getElementById('customSaveInfo');
+  if(p)p.remove();
+  p=document.createElement('div');
+  p.id='customSaveInfo';
+  p.style.cssText='position:fixed;top:30px;left:8px;z-index:100001;width:min(560px,calc(100vw - 16px));padding:12px;border-radius:12px;background:#151a21;border:1px solid #343d49;box-shadow:0 12px 40px rgba(0,0,0,.35);color:#dce3eb;font:12px/1.5 system-ui,sans-serif;max-height:calc(100vh - 45px);overflow:auto';
+  p.innerHTML=panelHtml();
+  document.body.appendChild(p);
+  p.querySelector('#closeCustomSave')?.addEventListener('click',()=>p.remove());
+  p.querySelector('#chooseCustomSave')?.addEventListener('click',async()=>{await chooseLocation();if(document.body.contains(p)){p.innerHTML=panelHtml();p.querySelector('#closeCustomSave')?.addEventListener('click',()=>p.remove());p.querySelector('#chooseCustomSave')?.addEventListener('click',chooseLocation);p.querySelector('#testCustomSave')?.addEventListener('click',testSave)}});
+  p.querySelector('#testCustomSave')?.addEventListener('click',testSave);
+}
+
+async function testSave(){
+  if(!valid()){status('Lagring: ❌ Ugyldig – velg lagringsplass først');return;}
+  try{
+    await writeFile();
+    status(`Lagring: ✓ Lagret · ${data.messages.length} lagret`,'ok');
+    alert(`Lagringstest bestått. Filen er skrevet til den valgte mappen:\n${FILE_NAME}`);
+  }catch(e){
+    status('Lagring: ❌ Ugyldig – kunne ikke skrive til valgt plass');
+  }
+}
+
+window.ChatApp2LocalSave={
+  chooseLocation,
+  hasLocation:()=>valid(),
+  save:async(name,value)=>{
+    if(!valid())throw Error('Ingen lagringsplass er valgt.');
+    if(!data.app)data.app={};
+    data.app[name]=value;
+    await writeFile();
+  },
+  load:(name)=>data.app?.[name],
+  getMessages:()=>data.messages.slice()
+};
+
+window.fetch=async function(input,init={}){
+  const url=typeof input==='string'?input:(input?.url||'');
+  const method=String(init.method||(typeof input!=='string'?input.method:'GET')||'GET').toUpperCase();
+  if(!url.includes('/api/messages'))return originalFetch(input,init);
+  let body={};
+  if(init.body){try{body=JSON.parse(init.body)}catch{}}
+  if(body.game_server===true)return originalFetch(input,init);
+
+  if(method==='GET'){
+    if(!valid()){
+      status('Lagring: ❌ Ugyldig – velg lagringsplass');
+      const r=await originalFetch(input,init);
+      try{
+        const d=await r.clone().json();
+        const games=Array.isArray(d?.messages)?d.messages.filter(m=>m?.username==='__GAME_SERVER__'||m?.game_state===true||(typeof m?.message==='string'&&m.message.startsWith('__CHAT_GAME_STATE__:'))):[];
+        return new Response(JSON.stringify({...d,success:true,messages:games}),{status:r.status,headers:{'Content-Type':'application/json'}});
+      }catch{return r}
+    }
+    try{
+      await readFile();
+      const r=await originalFetch(input,init),d=await r.clone().json();
+      const games=Array.isArray(d?.messages)?d.messages.filter(m=>m?.username==='__GAME_SERVER__'||m?.game_state===true||(typeof m?.message==='string'&&m.message.startsWith('__CHAT_GAME_STATE__:'))):[];
+      return new Response(JSON.stringify({...d,success:true,messages:[...games,...data.messages].sort((a,b)=>new Date(a.created_at||0)-new Date(b.created_at||0))}),{status:r.status,headers:{'Content-Type':'application/json'}});
+    }catch{return originalFetch(input,init)}
+  }
+
+  if(method==='POST'||method==='PATCH'||method==='DELETE'){
+    if(method!=='DELETE'&&!valid()){
+      status('Lagring: ❌ Ugyldig – velg lagringsplass');
+      throw Error('Chat App 2: Ingen egendefinert lagringsplass er valgt. Velg en mappe før du sender.');
+    }
+    try{
+      const r=await originalFetch(input,init);
+      if(!r.ok){if(method!=='DELETE')status(`Lagring: ❌ Ugyldig – server HTTP ${r.status}`);return r}
+      let d=null;try{d=await r.clone().json()}catch{}
+      const m=d?.message||body;
+      if(method!=='DELETE'&&m?.id){await saveMessage(m);status(`Lagring: ✓ Lagret · ${data.messages.length} lagret`,'ok')}
+      if(method==='DELETE'){
+        if(body.delete_all){data.messages=[];if(valid())await writeFile()}
+        else if(body.id)await deleteMessage(body.id);
+      }
+      return r;
+    }catch(e){if(method!=='DELETE')status('Lagring: ❌ Ugyldig – kunne ikke lagre');throw e}
+  }
+  return originalFetch(input,init);
+};
+
+window.addEventListener('chat:p2p-message',async e=>{
+  const m=e.detail;
+  if(!m?.id)return;
+  if(!valid()){status('Lagring: ❌ Ugyldig – velg lagringsplass');return;}
+  try{await saveMessage(m);status(`Lagring: ✓ Lagret · ${data.messages.length} lagret`,'ok')}catch{status('Lagring: ❌ Ugyldig – kunne ikke lagre')}
+});
+
+async function start(){
+  status('Lagring: ❌ Ugyldig – ingen lagringsplass valgt');
+  await loadHandle();
+  if(valid())status(`Lagring: ✓ Valgt mappe · ${data.messages.length} lagret`,'ok');
+}
+
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
