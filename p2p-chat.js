@@ -17,6 +17,8 @@
   let isHost = false;
   let hostPeerId = PUBLIC_PEER_ID;
   let publicRetryTimer = null;
+  let migrationTimer = null;
+  let migrationInProgress = false;
 
   function jsonResponse(obj, status = 200) { return new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json' } }); }
   function reportLocalSave(ok, error = null, message = null) { window.dispatchEvent(new CustomEvent('chat:local-save-status', { detail: { ok, error, message } })); }
@@ -66,59 +68,185 @@
   async function trimMessages() { const all = await getMessages(); if (all.length <= MAX_LOCAL_MESSAGES) return; for (const m of all.slice(0, all.length - MAX_LOCAL_MESSAGES)) await deleteMessage(m.id); }
   function saveDeleted() { localStorage.setItem('chat-p2p-deleted:public', JSON.stringify([...localDeleted].slice(-5000))); }
   function broadcast(packet, exceptPeer = null) { for (const [id, conn] of connections) { if (id === exceptPeer || !conn.open) continue; try { conn.send(packet); } catch {} } }
-  async function receiveMessage(message, exceptPeer = null) { if (!message || !message.id || localDeleted.has(message.id)) return; await putMessage(message); broadcast({ type: 'message', channel: PUBLIC_CHANNEL, message }, exceptPeer); window.dispatchEvent(new CustomEvent('chat:p2p-message', { detail: message })); }
+
+  // The host tells every guest about the other guests. This creates a small mesh so
+  // the guests can still see each other if the current host disappears.
+  function announcePeerList() {
+    if (!isHost) return;
+    const peerIds = [peer?.id, ...connections.keys()].filter(Boolean).filter((id, i, a) => a.indexOf(id) === i);
+    broadcast({ type: 'host:peer-list', channel: PUBLIC_CHANNEL, peerIds });
+  }
+
+  function connectToPeer(peerId) {
+    if (!peer || !peerId || peerId === peer.id || peerId === PUBLIC_PEER_ID) return;
+    const existing = connections.get(peerId);
+    if (existing && !existing.destroyed) return;
+    try { setupConnection(peer.connect(peerId, { reliable: true, serialization: 'json' })); } catch {}
+  }
+
+  function scheduleHostMigration(reason = 'Host disconnected') {
+    if (isHost || migrationInProgress) return;
+    clearTimeout(migrationTimer);
+    migrationTimer = setTimeout(() => attemptHostMigration(reason), 250 + Math.floor(Math.random() * 500));
+  }
+
+  function attemptHostMigration(reason) {
+    if (isHost || migrationInProgress || !peer || peer.destroyed) return;
+    const connectedIds = [...connections.values()]
+      .filter(conn => conn.open && conn.peer && conn.peer !== PUBLIC_PEER_ID)
+      .map(conn => conn.peer);
+    const candidates = [...new Set([peer.id, ...connectedIds].filter(Boolean))].sort();
+    if (!candidates.length) return;
+    const selected = candidates[0];
+
+    // Everyone deterministically chooses the same next host. Only that peer
+    // attempts to claim the well-known public PeerJS ID.
+    if (peer.id === selected) {
+      migrationInProgress = true;
+      clearInterval(publicRetryTimer);
+      updateStatus('Becoming host…');
+      try { peer.destroy(); } catch {}
+      setTimeout(() => becomeHostAfterMigration(reason), 350);
+    } else {
+      updateStatus('Host disconnected · waiting for new host…');
+      hostPeerId = PUBLIC_PEER_ID;
+      startPublicRetry(450);
+    }
+  }
+
+  function becomeHostAfterMigration(reason) {
+    try {
+      peer = new Peer(PUBLIC_PEER_ID, { debug: 0 });
+      peer.on('open', id => {
+        isHost = true;
+        migrationInProgress = false;
+        hostPeerId = id;
+        clearInterval(publicRetryTimer);
+        updateStatus('Host · Public Chat');
+        window.dispatchEvent(new CustomEvent('chat:p2p-host-changed', { detail: { host: true, reason } }));
+        announcePeerList();
+      });
+      peer.on('connection', setupConnection);
+      peer.on('error', error => {
+        if (error?.type === 'unavailable-id') {
+          migrationInProgress = false;
+          isHost = false;
+          startAsGuest();
+        } else {
+          migrationInProgress = false;
+          updateStatus('Host migration error');
+          setTimeout(() => scheduleHostMigration('Host migration retry'), 700);
+        }
+      });
+    } catch {
+      migrationInProgress = false;
+      startAsGuest();
+    }
+  }
+
+  async function receiveMessage(message, exceptPeer = null) {
+    if (!message || !message.id || localDeleted.has(message.id)) return;
+    await putMessage(message);
+    broadcast({ type: 'message', channel: PUBLIC_CHANNEL, message }, exceptPeer);
+    window.dispatchEvent(new CustomEvent('chat:p2p-message', { detail: message }));
+  }
+
   async function receivePacket(packet, fromPeer) {
     if (!packet || packet.channel !== PUBLIC_CHANNEL) return;
     if (typeof packet.type === 'string' && packet.type.startsWith('screen:')) { window.dispatchEvent(new CustomEvent('chat:screen-signal', { detail: { packet, fromPeer } })); return; }
-    if (packet.type === 'hello') { try { connections.get(fromPeer)?.send({ type: 'hello-ack', channel: PUBLIC_CHANNEL }); } catch {} return; }
+    if (packet.type === 'hello') {
+      try { connections.get(fromPeer)?.send({ type: 'hello-ack', channel: PUBLIC_CHANNEL }); } catch {}
+      if (isHost) { announcePeerList(); }
+      return;
+    }
+    if (packet.type === 'hello-ack') return;
+    if (packet.type === 'host:peer-list' && Array.isArray(packet.peerIds)) {
+      for (const id of packet.peerIds) connectToPeer(id);
+      return;
+    }
+    if (packet.type === 'host:migrate') { scheduleHostMigration('Host migration requested'); return; }
     if (packet.type === 'message') return receiveMessage(packet.message, fromPeer);
-    if (packet.type === 'delete' && packet.id) { localDeleted.add(packet.id); saveDeleted(); await deleteMessage(packet.id); window.dispatchEvent(new CustomEvent('chat:p2p-delete', { detail: { id: packet.id } })); return; }
-    if (packet.type === 'edit' && packet.message) { await putMessage(packet.message); window.dispatchEvent(new CustomEvent('chat:p2p-edit', { detail: packet.message })); }
+    if (packet.type === 'delete' && packet.id) { localDeleted.add(packet.id); saveDeleted(); await deleteMessage(packet.id); broadcast(packet, fromPeer); window.dispatchEvent(new CustomEvent('chat:p2p-delete', { detail: { id: packet.id } })); return; }
+    if (packet.type === 'edit' && packet.message) { await putMessage(packet.message); broadcast(packet, fromPeer); window.dispatchEvent(new CustomEvent('chat:p2p-edit', { detail: packet.message })); }
     if (packet.type === 'sheet:election' && packet.selectedPeerId) window.dispatchEvent(new CustomEvent('chat:sheet-election', { detail: { selectedPeerId: packet.selectedPeerId, round: packet.round || 0, fromPeer } }));
   }
+
   function setupConnection(conn) {
     if (!conn) return;
+    const old = connections.get(conn.peer);
+    if (old && old !== conn && !old.destroyed) return;
     connections.set(conn.peer, conn);
-    conn.on('open', () => { try { conn.send({ type: 'hello', channel: PUBLIC_CHANNEL }); } catch {} updateStatus(); window.dispatchEvent(new CustomEvent('chat:p2p-connection', { detail: { peer: conn.peer, connection: conn, open: true } })); });
+    conn.on('open', () => {
+      try { conn.send({ type: 'hello', channel: PUBLIC_CHANNEL }); } catch {}
+      if (isHost) announcePeerList();
+      updateStatus();
+      window.dispatchEvent(new CustomEvent('chat:p2p-connection', { detail: { peer: conn.peer, connection: conn, open: true } }));
+    });
     conn.on('data', packet => receivePacket(packet, conn.peer).catch(console.error));
-    conn.on('close', () => { connections.delete(conn.peer); updateStatus(); window.dispatchEvent(new CustomEvent('chat:p2p-connection', { detail: { peer: conn.peer, connection: conn, open: false } })); });
-    conn.on('error', () => { connections.delete(conn.peer); updateStatus(); window.dispatchEvent(new CustomEvent('chat:p2p-connection', { detail: { peer: conn.peer, connection: conn, open: false, error: true } })); });
+    const connectionLost = () => {
+      const wasOpen = connections.get(conn.peer) === conn;
+      if (wasOpen) connections.delete(conn.peer);
+      updateStatus();
+      window.dispatchEvent(new CustomEvent('chat:p2p-connection', { detail: { peer: conn.peer, connection: conn, open: false } }));
+      if (isHost) announcePeerList();
+      if (!isHost && conn.peer === PUBLIC_PEER_ID) scheduleHostMigration('Public host disconnected');
+    };
+    conn.on('close', connectionLost);
+    conn.on('error', connectionLost);
   }
+
   function connectToPublicHost() {
-    if (!peer || isHost || !hostPeerId) return;
+    if (!peer || isHost || !hostPeerId || migrationInProgress) return;
     if ([...connections.values()].some(conn => conn.open || !conn.destroyed)) return;
     const conn = peer.connect(hostPeerId, { reliable: true, serialization: 'json' });
     setupConnection(conn);
   }
-  function startPublicRetry() {
+
+  function startPublicRetry(interval = 500) {
     clearInterval(publicRetryTimer);
     publicRetryTimer = setInterval(() => {
-      if (isHost) return;
+      if (isHost || migrationInProgress) return;
       if ([...connections.values()].some(conn => conn.open)) { updateStatus(); return; }
       connectToPublicHost();
       updateStatus('Connecting…');
-    }, 500);
+    }, interval);
     connectToPublicHost();
   }
+
   function startAsGuest() {
     try { if (peer && !peer.destroyed) peer.destroy(); } catch {}
-    isHost = false; hostPeerId = PUBLIC_PEER_ID;
+    isHost = false; hostPeerId = PUBLIC_PEER_ID; migrationInProgress = false;
     peer = new Peer({ debug: 0 });
     peer.on('open', () => { updateStatus(); startPublicRetry(); });
     peer.on('connection', setupConnection);
-    peer.on('error', error => updateStatus(error?.type === 'peer-unavailable' ? 'Public Chat host is offline' : 'P2P error'));
+    peer.on('error', error => {
+      if (error?.type === 'peer-unavailable') updateStatus('Public Chat host is offline');
+      else updateStatus('P2P error');
+    });
   }
+
   function startPeer() {
     if (!window.Peer) { setTimeout(startPeer, 100); return; }
     peer = new Peer(PUBLIC_PEER_ID, { debug: 0 });
-    peer.on('open', id => { isHost = true; hostPeerId = id; clearInterval(publicRetryTimer); updateStatus(); });
+    peer.on('open', id => { isHost = true; hostPeerId = id; clearInterval(publicRetryTimer); updateStatus(); announcePeerList(); });
     peer.on('connection', setupConnection);
-    peer.on('error', error => { if (error?.type === 'unavailable-id') startAsGuest(); else updateStatus('Signaling unavailable'); });
+    peer.on('error', error => {
+      if (error?.type === 'unavailable-id') startAsGuest();
+      else updateStatus('Signaling unavailable');
+    });
+    peer.on('disconnected', () => {
+      if (isHost) { updateStatus('P2P signaling disconnected'); }
+      else scheduleHostMigration('Host signaling disconnected');
+    });
+    peer.on('close', () => {
+      if (!isHost) scheduleHostMigration('Host connection closed');
+    });
   }
+
   function updateStatus(error = '') {
     const el = document.getElementById('p2pStatus'); if (!el) return;
     const hasOpenPeer = [...connections.values()].some(conn => conn.open);
-    const state = error || (hasOpenPeer ? 'Connected' : (peer ? 'Not connected' : 'Loading…'));
+    const state = error || (isHost ? 'Host · Public Chat' : (hasOpenPeer ? 'Connected' : (peer ? 'Not connected' : 'Loading…')));
     el.innerHTML = `<b>Public Chat</b><span>${escapeHtml(state)} · ${connections.size} peer${connections.size === 1 ? '' : 's'}</span>`;
   }
   function escapeHtml(s) { return String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;'); }
@@ -134,7 +262,7 @@
     if (!message.invisible_to_others) broadcast({ type: 'message', channel: PUBLIC_CHANNEL, message }); window.dispatchEvent(new CustomEvent('chat:p2p-message', { detail: message })); return jsonResponse({ success: true, message });
   }
   async function localDelete(body) {
-    if (body.delete_all) { const all = await getMessages(); for (const m of all) { localDeleted.add(m.id); await deleteMessage(m.id); } saveDeleted(); window.dispatchEvent(new CustomEvent('chat:p2p-clear')); return jsonResponse({ success: true }); }
+    if (body.delete_all) { const all = await getMessages(); for (const m of all) { localDeleted.add(m.id); await deleteMessage(m.id); } saveDeleted(); broadcast({ type: 'delete-all', channel: PUBLIC_CHANNEL }); window.dispatchEvent(new CustomEvent('chat:p2p-clear')); return jsonResponse({ success: true }); }
     if (!body.id) return jsonResponse({ success: true }); localDeleted.add(body.id); saveDeleted(); await deleteMessage(body.id); broadcast({ type: 'delete', channel: PUBLIC_CHANNEL, id: body.id }); window.dispatchEvent(new CustomEvent('chat:p2p-delete', { detail: { id: body.id } })); return jsonResponse({ success: true });
   }
   async function localPatch(body) {
