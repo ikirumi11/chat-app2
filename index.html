@@ -20,8 +20,9 @@
 <div class="overlay" id="confirmOverlay"><div class="panel"><div class="panel-header"><h2 id="confirmTitle">Confirm</h2></div><div class="panel-body"><p id="confirmText" style="color:#9da5b0;line-height:1.5"></p><div class="game-actions"><button class="game-btn" id="confirmCancel">Cancel</button><button class="game-btn danger" id="confirmYes">Confirm</button></div></div></div></div>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="p2p-chat.js"></script>
+<script src="p2p-background-save.js"></script>
 <script src="p2p-compat.js"></script>
-<script src="games.js"></script><script src="app.js"></script><script src="game-message-mode.js"></script><script src="games-ui.js"></script><script src="game-settings.js"></script><script src="chat-features.js"></script><script src="global-background.js"></script><script src="solo-player-fix.js"></script><script src="singleplayer-games.js"></script><script src="game-settings-persistence.js"></script><script src="screen-share.js"></script><script src="ui-animations.js"></script>
+<script src="games.js"></script><script src="app.js"></script><script src="game-message-mode.js"></script><script src="games-ui.js"></script><script src="game-settings.js"></script><script src="chat-features.js"></script><script src="global-background.js"></script><script src="solo-player-fix.js"></script><script src="singleplayer-games.js"></script><script src="screen-share.js"></script><script src="ui-animations.js"></script>
 <script>
 (function(){const btn=document.getElementById('screenShareBtn');if(!btn)return;btn.addEventListener('click',function(){if(typeof window.openScreenShare==='function'){window.openScreenShare();return;}let tries=0;const timer=setInterval(()=>{if(typeof window.openScreenShare==='function'){clearInterval(timer);window.openScreenShare();return;}const card=document.querySelector('.ss-card');if(card){clearInterval(timer);card.click();return;}if(++tries>=40)clearInterval(timer);},100);});})();
 </script>
