@@ -1,16 +1,246 @@
-/* Persistent device profile login. Server profile data is authoritative; localStorage is a persistent local cache. */
+/* Persistent device profile login.
+   Log In starts the Supabase connection, waits one second, then resolves the saved profile by device ID.
+   Supabase is authoritative; localStorage is the local cache.
+*/
 (() => {
   'use strict';
-  const DEVICE_KEY='chat_device_id',NAME_KEY='chat_username',PFP_KEY='chat_profile_picture_url',LOGGED_IN_KEY='chat_profile_logged_in';
-  function getDeviceId(){let id=localStorage.getItem(DEVICE_KEY);if(!id){id=crypto.randomUUID?crypto.randomUUID():`device-${Date.now()}-${Math.random().toString(36).slice(2)}`;localStorage.setItem(DEVICE_KEY,id)}return id}
-  function saveLocalProfile(p){if(!p)return;if(p.username)localStorage.setItem(NAME_KEY,String(p.username).slice(0,24));if(p.pfp_url)localStorage.setItem(PFP_KEY,p.pfp_url);else localStorage.removeItem(PFP_KEY);localStorage.setItem(LOGGED_IN_KEY,'true')}
-  function applyProfile(p){if(!p)return;window.chatSupabaseProfile=p;saveLocalProfile(p);const n=document.getElementById('usernameInput'),v=document.getElementById('profilePicturePreview'),d=document.getElementById('deviceIdInput');if(n&&p.username!=null)n.value=p.username;if(v){v.src=p.pfp_url||'';v.style.display=p.pfp_url?'':'none'}if(d)d.value=p.device_id||getDeviceId();window.dispatchEvent(new CustomEvent('chat:profile-updated',{detail:p}))}
-  function finish(p){applyProfile(p);document.getElementById('profileLoginGate')?.remove();window.dispatchEvent(new CustomEvent('chat:profile-login',{detail:p}))}
-  async function waitForApi(timeout=20000){const start=Date.now();while(Date.now()-start<timeout){const api=window.chatSupabaseApi;if(api?.loadProfileForDevice&&api?.saveProfileForDevice&&api?.waitForConfirmedConnection){if(await api.waitForConfirmedConnection(2000))return api}await new Promise(r=>setTimeout(r,100))}throw new Error('Supabase is not confirmed connected yet.')}
-  function addStyle(){if(document.getElementById('profile-login-style'))return;const s=document.createElement('style');s.id='profile-login-style';s.textContent='#profileLoginGate{position:fixed;inset:0;z-index:50000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(8,10,14,.98);font-family:Inter,Arial,sans-serif}#profileLoginGate .pl-card{width:min(440px,94vw);padding:30px;border:1px solid rgba(255,255,255,.1);border-radius:24px;background:#181b22;box-shadow:0 25px 90px rgba(0,0,0,.55)}#profileLoginGate h1{margin:0 0 8px;color:#fff;font-size:29px}#profileLoginGate p{margin:0 0 20px;color:#9da5b0;line-height:1.5}.pl-preview{width:96px;height:96px;border-radius:50%;object-fit:cover;background:#303641;border:2px solid rgba(255,255,255,.12);display:block;margin:0 auto 20px}.pl-label{display:block;margin:14px 0 7px;color:#c8ced7;font-size:13px;font-weight:700}.pl-input{width:100%;padding:12px 13px;border:1px solid #3a414c;border-radius:11px;background:#15181d;color:#fff;outline:none;font:inherit}.pl-device{font:11px ui-monospace,Consolas,monospace;color:#8f98a5;word-break:break-all;background:#111419;border:1px solid #292e36;border-radius:10px;padding:10px}.pl-login{width:100%;margin-top:20px;padding:13px;border:0;border-radius:12px;background:#6654e8;color:#fff;font-weight:800;font-size:15px;cursor:pointer}.pl-login:disabled{opacity:.55;cursor:wait}.pl-status{min-height:18px;margin-top:10px;text-align:center;color:#929aa5;font-size:12px}';document.head.appendChild(s)}
-  function buildGate(id){const g=document.createElement('div');g.id='profileLoginGate';g.innerHTML='<div class="pl-card"><h1>Your Profile</h1><p>Connecting to the server first. Saved account information is checked only after the connection is confirmed.</p><img class="pl-preview" id="plPreview" alt="Profile picture preview"><label class="pl-label">Name</label><input class="pl-input" id="plName" maxlength="24" placeholder="Your name"><label class="pl-label">Device ID</label><div class="pl-device" id="plDevice"></div><label class="pl-label">Profile picture</label><input class="pl-input" id="plPfp" type="file" accept="image/*"><button class="pl-login" id="plLogin" type="button">Log In</button><div class="pl-status" id="plStatus">Connecting to server…</div></div>';document.body.appendChild(g);const n=g.querySelector('#plName'),f=g.querySelector('#plPfp'),v=g.querySelector('#plPreview'),d=g.querySelector('#plDevice'),b=g.querySelector('#plLogin'),st=g.querySelector('#plStatus');n.value=localStorage.getItem(NAME_KEY)||'';v.src=localStorage.getItem(PFP_KEY)||'';d.textContent=id;f.addEventListener('change',()=>{const x=f.files?.[0];if(x)v.src=URL.createObjectURL(x)});return{name:n,file:f,login:b,status:st}}
-  async function refresh(api,id){const p=await api.loadProfileForDevice(id);if(p?.username){applyProfile(p);return p}return null}
-  async function saveLogin(ui,id){const username=ui.name.value.trim().slice(0,24);if(!username){ui.status.textContent='Enter a name first.';ui.name.focus();return}ui.login.disabled=true;ui.status.textContent='Saving profile…';try{const api=await waitForApi();const saved=await api.saveProfileForDevice({device_id:id,username,file:ui.file.files?.[0]||null});finish(saved)}catch(e){console.error('[Profile] Login failed:',e);ui.status.textContent='Could not save the profile to the server.';ui.login.disabled=false}}
-  async function init(){addStyle();const id=getDeviceId();let api;try{if(window.chatServerStartupReady)await window.chatServerStartupReady;api=await waitForApi()}catch(e){console.warn('[Profile] Waiting for confirmed Supabase connection:',e)}if(!api){const ui=buildGate(id);ui.login.disabled=true;const retry=async()=>{try{api=await waitForApi();const p=await refresh(api,id);if(p?.username){finish(p);return}ui.status.textContent='Server connected — create your profile and press Log In.';ui.login.disabled=false}catch{setTimeout(retry,1000)}};retry();ui.login.addEventListener('click',()=>saveLogin(ui,id));return}const server=await refresh(api,id).catch(()=>null);if(server?.username){finish(server);return}const cachedName=localStorage.getItem(NAME_KEY);if(cachedName){finish({device_id:id,username:cachedName,pfp_url:localStorage.getItem(PFP_KEY)||null,local_cache:true});return}const ui=buildGate(id);ui.status.textContent='Server connected — create your profile and press Log In.';ui.login.disabled=false;ui.login.addEventListener('click',()=>saveLogin(ui,id))}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+
+  const DEVICE_KEY = 'chat_device_id';
+  const NAME_KEY = 'chat_username';
+  const PFP_KEY = 'chat_profile_picture_url';
+  const LOGGED_IN_KEY = 'chat_profile_logged_in';
+
+  const getDeviceId = () => String(localStorage.getItem(DEVICE_KEY) || '').trim();
+
+  function ensureDeviceId() {
+    let id = getDeviceId();
+    if (!id) {
+      id = crypto.randomUUID ? crypto.randomUUID() : `device-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      localStorage.setItem(DEVICE_KEY, id);
+    }
+    return id;
+  }
+
+  function saveLocalProfile(profile) {
+    if (!profile) return;
+    localStorage.setItem(NAME_KEY, String(profile.username || 'Anonymous').slice(0, 24));
+    if (profile.pfp_url) localStorage.setItem(PFP_KEY, profile.pfp_url);
+    else localStorage.removeItem(PFP_KEY);
+    localStorage.setItem(LOGGED_IN_KEY, 'true');
+  }
+
+  function applyProfile(profile) {
+    if (!profile) return;
+    window.chatSupabaseProfile = profile;
+    saveLocalProfile(profile);
+
+    const name = document.getElementById('usernameInput');
+    const preview = document.getElementById('profilePicturePreview');
+    const device = document.getElementById('deviceIdInput');
+
+    if (name && profile.username != null) name.value = profile.username;
+    if (preview) {
+      preview.src = profile.pfp_url || '';
+      preview.style.display = profile.pfp_url ? '' : 'none';
+    }
+    if (device) device.value = profile.device_id || getDeviceId();
+
+    window.dispatchEvent(new CustomEvent('chat:profile-updated', { detail: profile }));
+  }
+
+  function finish(profile) {
+    applyProfile(profile);
+    document.getElementById('profileLoginGate')?.remove();
+    window.dispatchEvent(new CustomEvent('chat:profile-login', { detail: profile }));
+  }
+
+  function addStyle() {
+    if (document.getElementById('profile-login-style')) return;
+    const style = document.createElement('style');
+    style.id = 'profile-login-style';
+    style.textContent = `
+      #profileLoginGate{position:fixed;inset:0;z-index:50000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(8,10,14,.98);font-family:Inter,Arial,sans-serif}
+      #profileLoginGate .pl-card{width:min(440px,94vw);padding:30px;border:1px solid rgba(255,255,255,.1);border-radius:24px;background:#181b22;box-shadow:0 25px 90px rgba(0,0,0,.55)}
+      #profileLoginGate h1{margin:0 0 8px;color:#fff;font-size:29px}
+      #profileLoginGate p{margin:0 0 20px;color:#9da5b0;line-height:1.5}
+      .pl-preview{width:96px;height:96px;border-radius:50%;object-fit:cover;background:#303641;border:2px solid rgba(255,255,255,.12);display:block;margin:0 auto 20px}
+      .pl-label{display:block;margin:14px 0 7px;color:#c8ced7;font-size:13px;font-weight:700}
+      .pl-input{width:100%;padding:12px 13px;border:1px solid #3a414c;border-radius:11px;background:#15181d;color:#fff;outline:none;font:inherit}
+      .pl-device{font:11px ui-monospace,Consolas,monospace;color:#8f98a5;word-break:break-all;background:#111419;border:1px solid #292e36;border-radius:10px;padding:10px}
+      .pl-login{width:100%;margin-top:20px;padding:13px;border:0;border-radius:12px;background:#6654e8;color:#fff;font-weight:800;font-size:15px;cursor:pointer}
+      .pl-login:disabled{opacity:.55;cursor:wait}
+      .pl-status{min-height:18px;margin-top:10px;text-align:center;color:#929aa5;font-size:12px}
+    `;
+    document.head.appendChild(style);
+  }
+
+  function buildGate() {
+    const gate = document.createElement('div');
+    gate.id = 'profileLoginGate';
+    gate.innerHTML = `
+      <div class="pl-card">
+        <h1>Your Profile</h1>
+        <p>Enter your current profile information, then press Log In. The app will connect to Supabase, wait one second, find this device, and restore the saved profile if one exists.</p>
+        <img class="pl-preview" id="plPreview" alt="Profile picture preview">
+        <label class="pl-label">Name</label>
+        <input class="pl-input" id="plName" maxlength="24" placeholder="Your name">
+        <label class="pl-label">Device ID</label>
+        <div class="pl-device" id="plDevice">Created after Log In is pressed</div>
+        <label class="pl-label">Profile picture</label>
+        <input class="pl-input" id="plPfp" type="file" accept="image/*">
+        <button class="pl-login" id="plLogin" type="button">Log In</button>
+        <div class="pl-status" id="plStatus">Ready — press Log In to connect.</div>
+      </div>`;
+
+    document.body.appendChild(gate);
+
+    const name = gate.querySelector('#plName');
+    const file = gate.querySelector('#plPfp');
+    const preview = gate.querySelector('#plPreview');
+    const device = gate.querySelector('#plDevice');
+    const login = gate.querySelector('#plLogin');
+    const status = gate.querySelector('#plStatus');
+
+    name.value = localStorage.getItem(NAME_KEY) || '';
+    preview.src = localStorage.getItem(PFP_KEY) || '';
+    preview.style.display = preview.src ? '' : 'none';
+
+    file.addEventListener('change', () => {
+      const selected = file.files?.[0];
+      if (!selected) return;
+      preview.src = URL.createObjectURL(selected);
+      preview.style.display = '';
+    });
+
+    return { name, file, preview, device, login, status };
+  }
+
+  async function waitForApi(timeout = 20000) {
+    const start = Date.now();
+    while (Date.now() - start < timeout) {
+      const api = window.chatSupabaseApi;
+      if (api?.connectToSupabase && api?.loadProfileForDevice && api?.saveProfileForDevice) return api;
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    throw new Error('Supabase code was not loaded.');
+  }
+
+  async function connectAndFindProfile(id, status) {
+    const api = await waitForApi();
+    status.textContent = 'Connecting to Supabase…';
+
+    const connected = await api.connectToSupabase(20000);
+    if (!connected) throw new Error('Supabase did not reach a confirmed connection.');
+
+    status.textContent = 'Connected. Waiting 1 second before checking this device…';
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Device ID is obtained only now, after the requested one-second delay.
+    const deviceId = ensureDeviceId();
+    status.textContent = 'Finding your saved profile…';
+
+    const saved = await api.loadProfileForDevice(deviceId);
+    return { api, deviceId, saved };
+  }
+
+  async function login(ui) {
+    const currentUsername = ui.name.value.trim().slice(0, 24);
+    if (!currentUsername) {
+      ui.status.textContent = 'Enter a name first.';
+      ui.name.focus();
+      return;
+    }
+
+    ui.login.disabled = true;
+    // Immediately keep the current entered name visible while the server lookup runs.
+    ui.name.value = currentUsername;
+    ui.status.textContent = 'Starting server connection…';
+
+    try {
+      const provisionalPfpFile = ui.file.files?.[0] || null;
+      const result = await connectAndFindProfile(null, ui.status);
+      const { api, deviceId, saved } = result;
+      ui.device.textContent = deviceId;
+
+      let finalProfile;
+      if (saved) {
+        // Server profile wins. Restore its saved username and PFP in the UI first.
+        finalProfile = saved;
+        applyProfile(saved);
+        ui.status.textContent = 'Saved profile found. Restoring username and profile picture…';
+
+        // Re-save the server profile so the local/server state is synchronized.
+        finalProfile = await api.saveProfileForDevice({
+          device_id: deviceId,
+          username: saved.username,
+          pfp_url: saved.pfp_url || null
+        });
+      } else {
+        // First login for this device: save the current login-page values.
+        ui.status.textContent = 'No saved profile found. Creating your profile…';
+        finalProfile = await api.saveProfileForDevice({
+          device_id: deviceId,
+          username: currentUsername,
+          file: provisionalPfpFile
+        });
+      }
+
+      // Server result is authoritative. Save it locally and apply it everywhere.
+      applyProfile(finalProfile);
+      saveLocalProfile(finalProfile);
+      finish(finalProfile);
+    } catch (error) {
+      console.error('[Profile] Login failed:', error);
+      ui.status.textContent = `Login failed: ${error?.message || 'Could not connect to Supabase.'}`;
+      ui.login.disabled = false;
+    }
+  }
+
+  function bindSettingsSave() {
+    const saveButton = document.getElementById('saveSettings');
+    if (!saveButton || saveButton.dataset.supabaseProfileBound === '1') return;
+    saveButton.dataset.supabaseProfileBound = '1';
+
+    saveButton.addEventListener('click', async () => {
+      const api = window.chatSupabaseApi;
+      const deviceId = getDeviceId();
+      const name = document.getElementById('usernameInput')?.value?.trim() || localStorage.getItem(NAME_KEY) || 'Anonymous';
+      const pfpInput = document.getElementById('profilePictureInput');
+      const file = pfpInput?.files?.[0] || null;
+      if (!api?.connectToSupabase || !deviceId) return;
+
+      try {
+        const connected = await api.connectToSupabase(20000);
+        if (!connected) throw new Error('Supabase is not connected.');
+        const saved = await api.saveProfileForDevice({ device_id: deviceId, username: name, file });
+        applyProfile(saved);
+        saveLocalProfile(saved);
+      } catch (error) {
+        console.error('[Profile] Settings save failed:', error);
+      }
+    }, true);
+  }
+
+  async function init() {
+    addStyle();
+    bindSettingsSave();
+
+    // Do not connect or query Supabase automatically on page startup.
+    // Log In is the action that starts the connection and account lookup.
+    const id = getDeviceId();
+    if (id) {
+      const cachedName = localStorage.getItem(NAME_KEY);
+      if (cachedName) {
+        const cached = { device_id: id, username: cachedName, pfp_url: localStorage.getItem(PFP_KEY) || null, local_cache: true };
+        // Show the cached profile in the existing app fields, but do not treat it as server-confirmed.
+        applyProfile(cached);
+      }
+    }
+
+    const ui = buildGate();
+    ui.login.addEventListener('click', () => login(ui));
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
+  else init();
 })();
