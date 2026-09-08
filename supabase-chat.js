@@ -43,6 +43,13 @@
     return (data || []).reverse().map(normalize);
   }
 
+  async function loadAndEmitMessages() {
+    const messages = await loadMessages(500);
+    messages.forEach(message => emit('chat:message', message));
+    emit('chat:supabase-history', { messages });
+    return messages;
+  }
+
   async function insertMessage(body) {
     const profile = window.chatSupabaseProfile || {};
     const deviceId = String(body.device_id || getDeviceId()).trim();
@@ -91,6 +98,7 @@
     if (body?.game_server) return originalFetch(input, init);
     const method = String(init.method || input?.method || 'GET').toUpperCase();
     try {
+      if (!supabaseConnected) return json({ error: 'Supabase is not connected yet.' }, 503);
       if (method === 'GET') return json({ messages: await loadMessages(500) });
       if (method === 'POST') return insertMessage(body);
       if (method === 'PATCH') return patchMessage(body);
@@ -149,72 +157,85 @@
     if (deviceInput) deviceInput.value = profile.device_id || getDeviceId();
   }
 
-  const connectionWaiters = [];
   let supabaseConnected = false;
-  let lastRealtimeStatus = 'CONNECTING';
-  let resolveConnection;
-  let connectionPromise = new Promise(resolve => { resolveConnection = resolve; });
+  let connectionPromise = null;
+  let resolveConnection = null;
+  let rejectConnection = null;
+  let realtimeChannel = null;
+  let historyLoaded = false;
+  let connecting = false;
+
+  function resetConnectionPromise() {
+    connectionPromise = new Promise((resolve, reject) => { resolveConnection = resolve; rejectConnection = reject; });
+  }
+  resetConnectionPromise();
 
   async function waitForConfirmedConnection(timeout = 15000) {
     if (supabaseConnected) return true;
+    if (!connectionPromise) resetConnectionPromise();
     return Promise.race([
-      connectionPromise.then(() => true),
+      connectionPromise.then(() => true).catch(() => false),
       new Promise(resolve => setTimeout(() => resolve(false), timeout))
     ]);
   }
 
-  async function initDeviceProfile() {
-    const deviceId = getDeviceId();
-    if (!deviceId) return;
-    // Profile lookup happens only after Supabase Realtime has confirmed SUBSCRIBED.
-    const connected = await waitForConfirmedConnection();
-    if (!connected) {
-      console.warn('[Supabase] Not confirmed connected yet; profile lookup will wait for reconnection.');
-      return;
+  function createRealtimeChannel() {
+    if (realtimeChannel) {
+      try { client.removeChannel(realtimeChannel); } catch {}
     }
-    try {
-      const profile = await loadProfileForDevice(deviceId);
-      if (profile) applyProfileToUI(profile);
-    } catch (error) { console.error('[Supabase] Could not load device profile:', error); }
-
-    const usernameInput = document.getElementById('usernameInput');
-    const pfpInput = document.getElementById('profilePictureInput');
-    const saveButton = document.getElementById('saveSettings');
-    if (pfpInput) pfpInput.addEventListener('change', () => { const file = pfpInput.files?.[0]; if (file) window.__pendingSupabaseProfileFile = file; });
-    if (saveButton) saveButton.addEventListener('click', async () => {
-      try {
-        await saveProfileForDevice({ device_id: deviceId, username: usernameInput?.value || localStorage.getItem('chat_username') || 'Anonymous', file: window.__pendingSupabaseProfileFile || null });
-        window.__pendingSupabaseProfileFile = null;
-      } catch (error) { console.error('[Supabase] Could not save device profile:', error); }
-    }, true);
+    realtimeChannel = client.channel('public-chat-messages')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: TABLE, filter: `channel=eq.${CHANNEL}` }, payload => emit('chat:message', normalize(payload.new)))
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: TABLE, filter: `channel=eq.${CHANNEL}` }, payload => emit('chat:message-edit', normalize(payload.new)))
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: TABLE, filter: `channel=eq.${CHANNEL}` }, payload => emit('chat:message-delete', { id: payload.old?.id }))
+      .subscribe(status => {
+        emit('chat:supabase-status', { status });
+        if (status === 'SUBSCRIBED') {
+          supabaseConnected = true;
+          connecting = false;
+          resolveConnection?.(true);
+          console.log('[Supabase] Confirmed connected.');
+          if (!historyLoaded) {
+            historyLoaded = true;
+            loadAndEmitMessages().catch(error => {
+              historyLoaded = false;
+              console.error('[Supabase] Could not load Public Chat history:', error);
+              emit('chat:supabase-status', { status: 'ERROR', error });
+            });
+          }
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+          supabaseConnected = false;
+          connecting = false;
+          resetConnectionPromise();
+          setTimeout(() => { if (!supabaseConnected) connectToSupabase().catch(() => {}); }, 1000);
+        }
+      });
+    window.chatSupabaseRealtime = realtimeChannel;
+    return realtimeChannel;
   }
 
-  window.chatSupabaseApi = { client, loadMessages, loadProfileForDevice, saveProfileForDevice, uploadProfilePicture, upsertProfile: profile => saveProfileForDevice(profile), getDeviceId, waitForConfirmedConnection };
+  async function connectToSupabase(timeout = 15000) {
+    if (supabaseConnected) return true;
+    if (connecting) return waitForConfirmedConnection(timeout);
+    connecting = true;
+    resetConnectionPromise();
+    createRealtimeChannel();
+    emit('chat:supabase-status', { status: 'CONNECTING' });
+    return waitForConfirmedConnection(timeout);
+  }
 
-  const realtimeChannel = client.channel('public-chat-messages')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: TABLE, filter: `channel=eq.${CHANNEL}` }, payload => emit('chat:message', normalize(payload.new)))
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: TABLE, filter: `channel=eq.${CHANNEL}` }, payload => emit('chat:message-edit', normalize(payload.new)))
-    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: TABLE, filter: `channel=eq.${CHANNEL}` }, payload => emit('chat:message-delete', { id: payload.old?.id }))
-    .subscribe(status => {
-      lastRealtimeStatus = status;
-      emit('chat:supabase-status', { status });
-      if (status === 'SUBSCRIBED') {
-        supabaseConnected = true;
-        resolveConnection(true);
-        console.log('[Supabase] Confirmed connected.');
-        // Only after confirmed connection do we fetch account/profile information.
-        initDeviceProfile().catch(() => {});
-      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
-        supabaseConnected = false;
-        connectionPromise = new Promise(resolve => { resolveConnection = resolve; });
-        setTimeout(() => realtimeChannel.subscribe(), 1500);
-      }
-    });
+  window.chatSupabaseApi = {
+    client,
+    connectToSupabase,
+    waitForConfirmedConnection,
+    loadMessages,
+    loadProfileForDevice,
+    saveProfileForDevice,
+    uploadProfilePicture,
+    upsertProfile: profile => saveProfileForDevice(profile),
+    getDeviceId,
+    applyProfileToUI
+  };
 
-  window.chatSupabaseRealtime = realtimeChannel;
-
-  // Connect immediately when this code starts. No profile/account lookup is performed before connection is confirmed.
-  loadMessages().then(messages => { messages.forEach(message => emit('chat:message', message)); emit('chat:supabase-history', { messages }); }).catch(error => { console.error('[Supabase] Could not load Public Chat history:', error); emit('chat:supabase-status', { status: 'ERROR', error }); });
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => {}, { once: true });
+  // The client is created when the script starts, but the actual server connection is started explicitly by Log In.
+  emit('chat:supabase-status', { status: 'IDLE' });
 })();
