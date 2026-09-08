@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   restore:
-    if: github.sha == '30fd35f875498da94fd2d7c5e04c5a4862048bf3'
+    if: github.event.before == '30fd35f875498da94fd2d7c5e04c5a4862048bf3'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
