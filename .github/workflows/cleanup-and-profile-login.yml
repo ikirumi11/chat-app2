@@ -1,6 +1,7 @@
 name: Cleanup and Profile Login
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
 
 permissions:
   contents: write
@@ -23,131 +24,16 @@ jobs:
           s = s.replace('<script src="screen-share.js"></script>', '')
           s = s.replace('<script src="draw-app.js"></script>', '')
           s = re.sub(r'<script>\s*\(function\(\)\{const btn=document\.getElementById\(\'screenShareBtn\'\).*?</script>', '', s, count=1, flags=re.S)
-          s = s.replace('<script src="supabase-chat.js"></script>', '<script src="supabase-chat.js"></script><script src="profile-login.js"></script>')
+          if '<script src="profile-login.js"></script>' not in s:
+              s = s.replace('<script src="supabase-chat.js"></script>', '<script src="supabase-chat.js"></script><script src="profile-login.js"></script>')
           p.write_text(s, encoding='utf-8')
           PY
 
-          cat > profile-login.js <<'EOF'
-          /* Profile login gate: the chat stays behind this screen until the user logs in. */
-          (() => {
-            'use strict';
-            const DEVICE_KEY = 'chat_device_id';
-            const NAME_KEY = 'chat_username';
-            const PFP_KEY = 'chat_profile_picture_url';
-            const waitFor = (fn, ms = 10000) => new Promise(resolve => {
-              const started = Date.now();
-              const tick = () => {
-                if (fn()) return resolve(true);
-                if (Date.now() - started >= ms) return resolve(false);
-                setTimeout(tick, 50);
-              };
-              tick();
-            });
-
-            function ensureDeviceId() {
-              let id = localStorage.getItem(DEVICE_KEY);
-              if (!id) {
-                id = (crypto.randomUUID ? crypto.randomUUID() : 'device-' + Date.now() + '-' + Math.random().toString(36).slice(2));
-                localStorage.setItem(DEVICE_KEY, id);
-              }
-              return id;
-            }
-
-            function css() {
-              if (document.getElementById('profile-login-style')) return;
-              const s = document.createElement('style');
-              s.id = 'profile-login-style';
-              s.textContent = `
-                #profileLoginGate{position:fixed;inset:0;z-index:50000;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 50% 20%,rgba(92,75,210,.22),transparent 45%),rgba(8,10,14,.98);font-family:Inter,Arial,sans-serif}
-                #profileLoginGate .pl-card{width:min(440px,94vw);padding:28px;border:1px solid rgba(255,255,255,.1);border-radius:22px;background:rgba(24,27,34,.98);box-shadow:0 24px 80px rgba(0,0,0,.55)}
-                #profileLoginGate h1{margin:0 0 8px;font-size:28px;color:#fff} #profileLoginGate p{margin:0 0 22px;color:#9da5b0;line-height:1.5}
-                .pl-preview{width:92px;height:92px;border-radius:50%;object-fit:cover;background:#303641;border:2px solid rgba(255,255,255,.12);display:block;margin:0 auto 18px}
-                .pl-label{display:block;color:#c8ced7;font-size:13px;font-weight:700;margin:14px 0 7px}.pl-input{width:100%;padding:12px 13px;border:1px solid #3a414c;border-radius:11px;background:#15181d;color:#fff;outline:none;font:inherit}.pl-input:focus{border-color:#7464ed}
-                .pl-login{width:100%;margin-top:20px;padding:13px 16px;border:0;border-radius:12px;background:#6654e8;color:#fff;font-weight:800;font-size:15px;cursor:pointer}.pl-login:hover{filter:brightness(1.08)}.pl-login:disabled{opacity:.55;cursor:wait}
-                .pl-status{min-height:18px;margin-top:10px;text-align:center;color:#929aa5;font-size:12px}
-              `;
-              document.head.appendChild(s);
-            }
-
-            async function getSavedProfile(deviceId) {
-              try {
-                if (window.chatSupabaseApi?.loadProfileForDevice) return await window.chatSupabaseApi.loadProfileForDevice(deviceId);
-              } catch (e) { console.warn('[Profile] Could not load saved profile:', e); }
-              return null;
-            }
-
-            function build(profile) {
-              css();
-              const old = document.getElementById('profileLoginGate');
-              if (old) old.remove();
-              const gate = document.createElement('div');
-              gate.id = 'profileLoginGate';
-              gate.innerHTML = `
-                <div class="pl-card">
-                  <h1>Your Profile</h1>
-                  <p>Choose your name and profile picture, then press <b>Log In</b> to enter Public Chat.</p>
-                  <img class="pl-preview" id="plPreview" alt="Profile picture preview">
-                  <label class="pl-label" for="plName">Name</label>
-                  <input class="pl-input" id="plName" maxlength="24" autocomplete="nickname" placeholder="Your name">
-                  <label class="pl-label" for="plPfp">Profile picture</label>
-                  <input class="pl-input" id="plPfp" type="file" accept="image/*">
-                  <button class="pl-login" id="plLogin" type="button">Log In</button>
-                  <div class="pl-status" id="plStatus"></div>
-                </div>`;
-              document.body.appendChild(gate);
-
-              const name = gate.querySelector('#plName');
-              const pfp = gate.querySelector('#plPfp');
-              const preview = gate.querySelector('#plPreview');
-              const login = gate.querySelector('#plLogin');
-              const status = gate.querySelector('#plStatus');
-              name.value = profile?.username || localStorage.getItem(NAME_KEY) || '';
-              const savedPfp = profile?.pfp_url || localStorage.getItem(PFP_KEY) || '';
-              if (savedPfp) preview.src = savedPfp;
-              else preview.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="92" height="92"><rect width="100%" height="100%" fill="#303641"/><text x="50%" y="55%" text-anchor="middle" font-size="40" fill="#9da5b0">👤</text></svg>');
-              pfp.onchange = () => { const file = pfp.files?.[0]; if (file) preview.src = URL.createObjectURL(file); };
-
-              login.onclick = async () => {
-                const username = name.value.trim().slice(0,24);
-                if (!username) { status.textContent = 'Enter a name first.'; name.focus(); return; }
-                login.disabled = true; status.textContent = 'Logging in…';
-                try {
-                  const deviceId = ensureDeviceId();
-                  if (!window.chatSupabaseApi?.saveProfileForDevice) throw new Error('Server connection is not ready.');
-                  const saved = await window.chatSupabaseApi.saveProfileForDevice({device_id:deviceId, username, file:pfp.files?.[0] || null});
-                  localStorage.setItem(NAME_KEY, saved.username || username);
-                  if (saved.pfp_url) localStorage.setItem(PFP_KEY, saved.pfp_url);
-                  window.chatSupabaseProfile = saved;
-                  document.getElementById('usernameInput')?.setAttribute('value', saved.username || username);
-                  if (document.getElementById('usernameInput')) document.getElementById('usernameInput').value = saved.username || username;
-                  const settingsPreview = document.getElementById('profilePicturePreview');
-                  if (settingsPreview && saved.pfp_url) { settingsPreview.src = saved.pfp_url; settingsPreview.style.display = ''; }
-                  gate.remove();
-                  window.dispatchEvent(new CustomEvent('chat:profile-login', {detail:saved}));
-                } catch (e) {
-                  console.error('[Profile] Login failed:', e);
-                  status.textContent = 'Could not log in: ' + (e?.message || 'Unknown error');
-                  login.disabled = false;
-                }
-              };
-              setTimeout(() => name.focus(), 50);
-            }
-
-            async function init() {
-              const deviceId = ensureDeviceId();
-              const ok = await waitFor(() => !!window.chatSupabaseApi, 12000);
-              if (!ok) return;
-              const profile = await getSavedProfile(deviceId);
-              build(profile);
-            }
-
-            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, {once:true});
-            else init();
-          })();
-          EOF
-
+          git rm -f .github/workflows/cleanup-and-profile-login.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html profile-login.js
           git commit -m "Remove draw and screen share and add profile login" || true
+          git add -A
+          git commit -m "Remove temporary update workflow" || true
           git push
