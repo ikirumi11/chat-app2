@@ -1,5 +1,6 @@
 /* Persistent device profile login.
-   One browser keeps one device ID in localStorage and uses that ID to find the same Supabase profile.
+   The browser keeps one Device ID and uses it to find the same Supabase profile.
+   Server profile data is authoritative; localStorage is a persistent local cache.
 */
 (() => {
   'use strict';
@@ -44,14 +45,47 @@
     );
   }
 
-  function finish(profile) {
-    if (profile?.username) localStorage.setItem(NAME_KEY, profile.username);
-    if (profile?.pfp_url) localStorage.setItem(PFP_KEY, profile.pfp_url);
+  function saveLocalProfile(profile) {
+    if (!profile) return;
+    if (profile.username) localStorage.setItem(NAME_KEY, String(profile.username).slice(0, 24));
+    if (profile.pfp_url) localStorage.setItem(PFP_KEY, profile.pfp_url);
     else localStorage.removeItem(PFP_KEY);
     localStorage.setItem(LOGGED_IN_KEY, 'true');
+  }
+
+  function applyProfile(profile) {
+    if (!profile) return;
     window.chatSupabaseProfile = profile;
+    saveLocalProfile(profile);
+
+    const usernameInput = document.getElementById('usernameInput');
+    const preview = document.getElementById('profilePicturePreview');
+    const deviceInput = document.getElementById('deviceIdInput');
+    if (usernameInput && profile.username != null) usernameInput.value = profile.username;
+    if (preview) {
+      preview.src = profile.pfp_url || avatar();
+      preview.style.display = '';
+    }
+    if (deviceInput) deviceInput.value = profile.device_id || getDeviceId();
+
+    window.dispatchEvent(new CustomEvent('chat:profile-updated', { detail: profile }));
+  }
+
+  function finish(profile) {
+    applyProfile(profile);
     document.getElementById('profileLoginGate')?.remove();
     window.dispatchEvent(new CustomEvent('chat:profile-login', { detail: profile }));
+  }
+
+  function localProfile(deviceId) {
+    const username = String(localStorage.getItem(NAME_KEY) || '').trim();
+    if (!username) return null;
+    return {
+      device_id: deviceId,
+      username,
+      pfp_url: localStorage.getItem(PFP_KEY) || null,
+      local_cache: true
+    };
   }
 
   function waitForApi(timeout = 10000) {
@@ -78,7 +112,7 @@
     gate.innerHTML = `
       <div class="pl-card">
         <h1>Your Profile</h1>
-        <p>This browser has its own persistent Device ID. Your profile and messages are linked to it, so reopening or refreshing this page keeps you as the same user.</p>
+        <p>Log in once. This browser keeps your Device ID and profile locally, while the server stores the same profile for future connections.</p>
         <img class="pl-preview" id="plPreview" alt="Profile picture preview">
         <label class="pl-label">Name</label>
         <input class="pl-input" id="plName" maxlength="24" placeholder="Your name" autocomplete="nickname">
@@ -111,37 +145,70 @@
     return { gate, name, file, login, status };
   }
 
+  async function refreshFromServer(api, deviceId) {
+    try {
+      const serverProfile = await api.loadProfileForDevice(deviceId);
+      if (serverProfile?.username) {
+        // Server is authoritative. Replace the local cached name/PFP with server values.
+        applyProfile(serverProfile);
+        return serverProfile;
+      }
+    } catch (error) {
+      console.warn('[Profile] Server profile refresh failed:', error);
+    }
+    return null;
+  }
+
   async function init() {
     addStyle();
     const deviceId = getDeviceId();
-    let api;
+    const cached = localProfile(deviceId);
 
+    let api;
     try {
       if (window.chatServerStartupReady) await window.chatServerStartupReady;
       api = await waitForApi();
-      const profile = await api.loadProfileForDevice(deviceId);
-      if (profile?.username) {
-        finish(profile);
+    } catch (error) {
+      console.warn('[Profile] Supabase API startup wait failed:', error);
+    }
+
+    // Existing local profile means the user is already logged in on this browser.
+    // Do not make them enter the profile again just because the server is temporarily slow.
+    if (cached) {
+      finish(cached);
+      if (api) {
+        refreshFromServer(api, deviceId).catch(() => {});
+      }
+      return;
+    }
+
+    // First login: the server must be checked before asking for a new profile.
+    if (api) {
+      const serverProfile = await refreshFromServer(api, deviceId);
+      if (serverProfile?.username) {
+        finish(serverProfile);
         return;
       }
-    } catch (error) {
-      console.warn('[Profile] Automatic profile lookup failed:', error);
     }
 
     const ui = buildGate(deviceId);
     const { name, file, login, status } = ui;
 
-    try {
-      api = api || await waitForApi();
-      status.textContent = 'Connected — log in to enter Public Chat.';
+    if (api) {
+      status.textContent = 'Connected — create your profile and log in.';
       login.disabled = false;
-    } catch (error) {
+    } else {
       status.textContent = 'Server connection is unavailable. Retrying…';
       login.disabled = true;
       setTimeout(async () => {
         try {
           api = await waitForApi();
-          status.textContent = 'Connected — log in to enter Public Chat.';
+          const serverProfile = await refreshFromServer(api, deviceId);
+          if (serverProfile?.username) {
+            finish(serverProfile);
+            return;
+          }
+          status.textContent = 'Connected — create your profile and log in.';
           login.disabled = false;
         } catch {}
       }, 1500);
@@ -156,7 +223,7 @@
       }
 
       login.disabled = true;
-      status.textContent = 'Saving your profile…';
+      status.textContent = 'Saving profile to server…';
 
       try {
         api = api || await waitForApi();
@@ -165,10 +232,13 @@
           username,
           file: file.files?.[0] || null
         });
+
+        // The profile returned by Supabase is the profile we use everywhere.
+        // Save it locally immediately so the next startup does not ask again.
         finish(saved);
       } catch (error) {
         console.error('[Profile] Login failed:', error);
-        status.textContent = 'Could not save the profile. Check the server connection and try again.';
+        status.textContent = 'Could not save the profile to the server. Nothing was logged in.';
         login.disabled = false;
       }
     });
