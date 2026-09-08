@@ -9,6 +9,7 @@
   const CHANNEL = 'general';
   const TABLE = 'messages';
   const PUBLIC_CHANNEL = 'public';
+  const PROFILE_BUCKET = 'profile-pictures';
   const originalFetch = window.fetch.bind(window);
 
   if (!window.supabase?.createClient) {
@@ -66,12 +67,13 @@
   }
 
   async function insertMessage(body) {
+    const profile = window.chatSupabaseProfile || {};
     const message = {
       id: uuid(body.id),
       channel: CHANNEL,
       device_id: String(body.device_id || localStorage.getItem('chat_device_id') || ''),
-      username: String(body.username || localStorage.getItem('chat_username') || 'Anonymous').slice(0, 24),
-      pfp_url: body.pfp_url || body.profile_picture || null,
+      username: String(body.username || profile.username || localStorage.getItem('chat_username') || 'Anonymous').slice(0, 24),
+      pfp_url: body.pfp_url || body.profile_picture || profile.pfp_url || null,
       message: String(body.message || '').slice(0, 20000),
       image: body.image || null,
       files: Array.isArray(body.files) ? body.files : [],
@@ -152,6 +154,147 @@
     }
   };
 
+  async function loadProfileForDevice(deviceId) {
+    if (!deviceId) return null;
+
+    const { data, error } = await client
+      .from('profiles')
+      .select('id,device_id,username,pfp_url,created_at,updated_at')
+      .eq('device_id', deviceId)
+      .maybeSingle();
+
+    if (error) {
+      console.error('[Supabase] profile load failed:', error);
+      return null;
+    }
+
+    if (data) {
+      window.chatSupabaseProfile = data;
+      if (data.username != null) localStorage.setItem('chat_username', data.username);
+      if (data.pfp_url) localStorage.setItem('chat_profile_picture_url', data.pfp_url);
+      emit('chat:profile-loaded', data);
+    }
+    return data || null;
+  }
+
+  async function uploadProfilePicture(file, deviceId) {
+    if (!file || !deviceId) return null;
+
+    const safeExt = (file.name?.split('.').pop() || 'png')
+      .toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 8) || 'png';
+    const path = `${deviceId}/${crypto.randomUUID()}.${safeExt}`;
+
+    const { error: uploadError } = await client.storage
+      .from(PROFILE_BUCKET)
+      .upload(path, file, { upsert: true, contentType: file.type || undefined, cacheControl: '3600' });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = client.storage.from(PROFILE_BUCKET).getPublicUrl(path);
+    return data?.publicUrl || null;
+  }
+
+  async function saveProfileForDevice(profile = {}) {
+    const deviceId = String(profile.device_id || localStorage.getItem('chat_device_id') || '').trim();
+    if (!deviceId) throw new Error('Device ID is missing.');
+
+    const existing = window.chatSupabaseProfile || {};
+    const username = String(profile.username ?? localStorage.getItem('chat_username') ?? existing.username ?? 'Anonymous').trim().slice(0, 24) || 'Anonymous';
+    let pfpUrl = profile.pfp_url !== undefined ? profile.pfp_url : (existing.pfp_url || localStorage.getItem('chat_profile_picture_url') || null);
+
+    if (profile.file instanceof File) {
+      pfpUrl = await uploadProfilePicture(profile.file, deviceId);
+    }
+
+    const row = {
+      id: existing.id || uuid(),
+      device_id: deviceId,
+      username,
+      pfp_url: pfpUrl || null,
+      updated_at: new Date().toISOString()
+    };
+
+    const { data, error } = await client
+      .from('profiles')
+      .upsert(row, { onConflict: 'device_id' })
+      .select('*')
+      .single();
+
+    if (error) throw error;
+
+    window.chatSupabaseProfile = data;
+    localStorage.setItem('chat_username', data.username || 'Anonymous');
+    if (data.pfp_url) localStorage.setItem('chat_profile_picture_url', data.pfp_url);
+    else localStorage.removeItem('chat_profile_picture_url');
+    emit('chat:profile-saved', data);
+    return data;
+  }
+
+  function applyProfileToUI(profile) {
+    if (!profile) return;
+    const usernameInput = document.getElementById('usernameInput');
+    const preview = document.getElementById('profilePicturePreview');
+    if (usernameInput && profile.username != null) usernameInput.value = profile.username;
+    if (preview && profile.pfp_url) {
+      preview.src = profile.pfp_url;
+      preview.style.display = '';
+    }
+  }
+
+  async function initDeviceProfile() {
+    const deviceId = localStorage.getItem('chat_device_id');
+    if (!deviceId) return;
+
+    const profile = await loadProfileForDevice(deviceId);
+    if (profile) applyProfileToUI(profile);
+
+    const usernameInput = document.getElementById('usernameInput');
+    const pfpInput = document.getElementById('profilePictureInput');
+    const saveButton = document.getElementById('saveSettings');
+
+    // The actual settings UI remains in app.js. These listeners only sync the profile to Supabase.
+    if (pfpInput) {
+      pfpInput.addEventListener('change', () => {
+        const file = pfpInput.files?.[0];
+        if (file) window.__pendingSupabaseProfileFile = file;
+      });
+    }
+
+    if (saveButton) {
+      saveButton.addEventListener('click', async () => {
+        try {
+          await saveProfileForDevice({
+            device_id: deviceId,
+            username: usernameInput?.value || localStorage.getItem('chat_username') || 'Anonymous',
+            file: window.__pendingSupabaseProfileFile || null
+          });
+          window.__pendingSupabaseProfileFile = null;
+        } catch (error) {
+          console.error('[Supabase] Could not save device profile:', error);
+        }
+      }, true);
+    }
+
+    // Keep the profile correct if another part of the app changes the username.
+    let lastUsername = localStorage.getItem('chat_username') || '';
+    setInterval(() => {
+      const currentUsername = localStorage.getItem('chat_username') || '';
+      if (currentUsername !== lastUsername) {
+        lastUsername = currentUsername;
+        saveProfileForDevice({ device_id: deviceId, username: currentUsername }).catch(() => {});
+      }
+    }, 1000);
+  }
+
+  window.chatSupabaseApi = {
+    client,
+    loadMessages,
+    loadProfileForDevice,
+    saveProfileForDevice,
+    uploadProfilePicture,
+    upsertProfile: async profile => saveProfileForDevice(profile)
+  };
+
   const realtimeChannel = client
     .channel('public-chat-messages')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: TABLE, filter: `channel=eq.${CHANNEL}` }, payload => {
@@ -180,19 +323,11 @@
     window.dispatchEvent(new CustomEvent('chat:supabase-status', { detail: { status: 'ERROR', error } }));
   });
 
-  // Expose small helpers for profile integrations and debugging.
-  window.chatSupabaseApi = {
-    client,
-    loadMessages,
-    upsertProfile: async profile => {
-      const row = {
-        id: uuid(profile?.id),
-        device_id: String(profile?.device_id || localStorage.getItem('chat_device_id') || ''),
-        username: String(profile?.username || 'Anonymous').slice(0, 24),
-        pfp_url: profile?.pfp_url || null,
-        updated_at: new Date().toISOString()
-      };
-      return client.from('profiles').upsert(row, { onConflict: 'device_id' }).select('*').single();
-    }
-  };
+  // Profile loading is intentionally keyed ONLY by this browser's persistent device ID.
+  // A different device ID gets a different profiles row.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => initDeviceProfile(), { once: true });
+  } else {
+    initDeviceProfile();
+  }
 })();
