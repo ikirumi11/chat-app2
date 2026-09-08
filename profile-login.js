@@ -53,21 +53,25 @@
     localStorage.setItem(LOGGED_IN_KEY, 'true');
   }
 
-  function applyProfile(profile) {
+  function syncSettings(profile) {
     if (!profile) return;
-    window.chatSupabaseProfile = profile;
-    saveLocalProfile(profile);
-
     const usernameInput = document.getElementById('usernameInput');
     const preview = document.getElementById('profilePicturePreview');
     const deviceInput = document.getElementById('deviceIdInput');
+
     if (usernameInput && profile.username != null) usernameInput.value = profile.username;
     if (preview) {
       preview.src = profile.pfp_url || avatar();
       preview.style.display = '';
     }
     if (deviceInput) deviceInput.value = profile.device_id || getDeviceId();
+  }
 
+  function applyProfile(profile) {
+    if (!profile) return;
+    window.chatSupabaseProfile = profile;
+    saveLocalProfile(profile);
+    syncSettings(profile);
     window.dispatchEvent(new CustomEvent('chat:profile-updated', { detail: profile }));
   }
 
@@ -149,7 +153,6 @@
     try {
       const serverProfile = await api.loadProfileForDevice(deviceId);
       if (serverProfile?.username) {
-        // Server is authoritative. Replace the local cached name/PFP with server values.
         applyProfile(serverProfile);
         return serverProfile;
       }
@@ -159,10 +162,23 @@
     return null;
   }
 
+  async function fastSaveSettings(profile) {
+    // Login immediately updates the existing Settings fields, then performs the
+    // same save action used by Settings so the UI and saved profile stay synced.
+    syncSettings(profile);
+    const saveButton = document.getElementById('saveSettings');
+    if (saveButton) {
+      try {
+        saveButton.click();
+      } catch (error) {
+        console.warn('[Profile] Fast Settings save failed:', error);
+      }
+    }
+  }
+
   async function init() {
     addStyle();
     const deviceId = getDeviceId();
-    const cached = localProfile(deviceId);
 
     let api;
     try {
@@ -172,21 +188,18 @@
       console.warn('[Profile] Supabase API startup wait failed:', error);
     }
 
-    // Existing local profile means the user is already logged in on this browser.
-    // Do not make them enter the profile again just because the server is temporarily slow.
+    const cached = localProfile(deviceId);
     if (cached) {
       finish(cached);
-      if (api) {
-        refreshFromServer(api, deviceId).catch(() => {});
-      }
+      if (api) refreshFromServer(api, deviceId).catch(() => {});
       return;
     }
 
-    // First login: the server must be checked before asking for a new profile.
     if (api) {
       const serverProfile = await refreshFromServer(api, deviceId);
       if (serverProfile?.username) {
         finish(serverProfile);
+        await fastSaveSettings(serverProfile);
         return;
       }
     }
@@ -206,6 +219,7 @@
           const serverProfile = await refreshFromServer(api, deviceId);
           if (serverProfile?.username) {
             finish(serverProfile);
+            await fastSaveSettings(serverProfile);
             return;
           }
           status.textContent = 'Connected — create your profile and log in.';
@@ -233,9 +247,10 @@
           file: file.files?.[0] || null
         });
 
-        // The profile returned by Supabase is the profile we use everywhere.
-        // Save it locally immediately so the next startup does not ask again.
+        // Put the logged-in profile directly into the normal Settings fields
+        // and trigger the Settings save for a fast local/UI synchronization.
         finish(saved);
+        await fastSaveSettings(saved);
       } catch (error) {
         console.error('[Profile] Login failed:', error);
         status.textContent = 'Could not save the profile to the server. Nothing was logged in.';
