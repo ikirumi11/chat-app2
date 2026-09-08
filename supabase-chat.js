@@ -1,5 +1,6 @@
 /* Supabase-backed shared Public Chat.
-   Supabase is authoritative for shared chat/profile data.
+   The server connection is started explicitly by Log In / Save Settings.
+   Account lookup is never performed before the connection is confirmed.
 */
 (() => {
   'use strict';
@@ -160,13 +161,12 @@
   let supabaseConnected = false;
   let connectionPromise = null;
   let resolveConnection = null;
-  let rejectConnection = null;
   let realtimeChannel = null;
   let historyLoaded = false;
   let connecting = false;
 
   function resetConnectionPromise() {
-    connectionPromise = new Promise((resolve, reject) => { resolveConnection = resolve; rejectConnection = reject; });
+    connectionPromise = new Promise(resolve => { resolveConnection = resolve; });
   }
   resetConnectionPromise();
 
@@ -174,7 +174,7 @@
     if (supabaseConnected) return true;
     if (!connectionPromise) resetConnectionPromise();
     return Promise.race([
-      connectionPromise.then(() => true).catch(() => false),
+      connectionPromise.then(() => true),
       new Promise(resolve => setTimeout(() => resolve(false), timeout))
     ]);
   }
@@ -195,9 +195,7 @@
           resolveConnection?.(true);
           console.log('[Supabase] Confirmed connected.');
           if (!historyLoaded) {
-            historyLoaded = true;
-            loadAndEmitMessages().catch(error => {
-              historyLoaded = false;
+            loadAndEmitMessages().then(() => { historyLoaded = true; }).catch(error => {
               console.error('[Supabase] Could not load Public Chat history:', error);
               emit('chat:supabase-status', { status: 'ERROR', error });
             });
@@ -205,12 +203,13 @@
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
           supabaseConnected = false;
           connecting = false;
+          historyLoaded = false;
           resetConnectionPromise();
+          realtimeChannel = null;
           setTimeout(() => { if (!supabaseConnected) connectToSupabase().catch(() => {}); }, 1000);
         }
       });
     window.chatSupabaseRealtime = realtimeChannel;
-    return realtimeChannel;
   }
 
   async function connectToSupabase(timeout = 15000) {
@@ -236,6 +235,6 @@
     applyProfileToUI
   };
 
-  // The client is created when the script starts, but the actual server connection is started explicitly by Log In.
+  // Creating the client does not connect to the server. Log In / Save Settings calls connectToSupabase().
   emit('chat:supabase-status', { status: 'IDLE' });
 })();
