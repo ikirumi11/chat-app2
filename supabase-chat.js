@@ -1,5 +1,6 @@
 /* Supabase-backed shared Public Chat.
-   Uses the browser-safe publishable key only. The service_role key must never be put here.
+   Supabase is authoritative for shared chat/profile data.
+   The publishable key is browser-safe; never put a service_role key here.
 */
 (() => {
   'use strict';
@@ -34,6 +35,8 @@
       ? s : crypto.randomUUID();
   };
 
+  const getDeviceId = () => String(localStorage.getItem('chat_device_id') || '').trim();
+
   const normalize = row => ({
     ...row,
     id: String(row.id),
@@ -48,13 +51,6 @@
 
   const emit = (name, detail) => window.dispatchEvent(new CustomEvent(name, { detail }));
 
-  async function saveLocal(message) {
-    try {
-      if (typeof window.p2pCacheSave === 'function') await window.p2pCacheSave(message);
-      else emit('chat:p2p-message', message);
-    } catch {}
-  }
-
   async function loadMessages(limit = 500) {
     const { data, error } = await client
       .from(TABLE)
@@ -68,10 +64,11 @@
 
   async function insertMessage(body) {
     const profile = window.chatSupabaseProfile || {};
+    const deviceId = String(body.device_id || getDeviceId()).trim();
     const message = {
       id: uuid(body.id),
       channel: CHANNEL,
-      device_id: String(body.device_id || localStorage.getItem('chat_device_id') || ''),
+      device_id: deviceId,
       username: String(body.username || profile.username || localStorage.getItem('chat_username') || 'Anonymous').slice(0, 24),
       pfp_url: body.pfp_url || body.profile_picture || profile.pfp_url || null,
       message: String(body.message || '').slice(0, 20000),
@@ -93,12 +90,15 @@
     }
 
     const saved = normalize(data);
-    emit('chat:p2p-message', saved);
+    emit('chat:message', saved);
     return json({ success: true, message: saved });
   }
 
   async function patchMessage(body) {
     if (!body?.id) return json({ error: 'Message ID required.' }, 400);
+    const deviceId = String(body.device_id || getDeviceId()).trim();
+    if (!deviceId) return json({ error: 'Device ID required.' }, 400);
+
     const id = uuid(body.id);
     const changes = {
       message: String(body.message || '').slice(0, 20000),
@@ -107,10 +107,18 @@
       edited: true,
       updated_at: new Date().toISOString()
     };
-    const { data, error } = await client.from(TABLE).update(changes).eq('id', id).select('*').single();
+
+    const { data, error } = await client
+      .from(TABLE)
+      .update(changes)
+      .eq('id', id)
+      .eq('device_id', deviceId)
+      .select('*')
+      .single();
+
     if (error) return json({ error: error.message }, 400);
     const message = normalize(data);
-    emit('chat:p2p-edit', message);
+    emit('chat:message-edit', message);
     return json({ success: true, message });
   }
 
@@ -118,14 +126,23 @@
     if (body?.delete_all) {
       const { error } = await client.from(TABLE).delete().eq('channel', CHANNEL);
       if (error) return json({ error: error.message }, 400);
-      emit('chat:p2p-clear');
+      emit('chat:messages-clear');
       return json({ success: true });
     }
+
     if (!body?.id) return json({ error: 'Message ID required.' }, 400);
+    const deviceId = String(body.device_id || getDeviceId()).trim();
+    if (!deviceId) return json({ error: 'Device ID required.' }, 400);
+
     const id = uuid(body.id);
-    const { error } = await client.from(TABLE).delete().eq('id', id);
+    const { error } = await client
+      .from(TABLE)
+      .delete()
+      .eq('id', id)
+      .eq('device_id', deviceId);
+
     if (error) return json({ error: error.message }, 400);
-    emit('chat:p2p-delete', { id });
+    emit('chat:message-delete', { id });
     return json({ success: true });
   }
 
@@ -138,7 +155,6 @@
       try { body = typeof init.body === 'string' ? JSON.parse(init.body) : init.body; } catch {}
     }
 
-    // Game-server state is still handled by the existing game/P2P layer.
     if (body?.game_server) return originalFetch(input, init);
 
     const method = String(init.method || input?.method || 'GET').toUpperCase();
@@ -155,23 +171,25 @@
   };
 
   async function loadProfileForDevice(deviceId) {
-    if (!deviceId) return null;
+    const id = String(deviceId || getDeviceId()).trim();
+    if (!id) return null;
 
     const { data, error } = await client
       .from('profiles')
       .select('id,device_id,username,pfp_url,created_at,updated_at')
-      .eq('device_id', deviceId)
+      .eq('device_id', id)
       .maybeSingle();
 
     if (error) {
       console.error('[Supabase] profile load failed:', error);
-      return null;
+      throw error;
     }
 
     if (data) {
       window.chatSupabaseProfile = data;
       if (data.username != null) localStorage.setItem('chat_username', data.username);
       if (data.pfp_url) localStorage.setItem('chat_profile_picture_url', data.pfp_url);
+      else localStorage.removeItem('chat_profile_picture_url');
       emit('chat:profile-loaded', data);
     }
     return data || null;
@@ -186,7 +204,11 @@
 
     const { error: uploadError } = await client.storage
       .from(PROFILE_BUCKET)
-      .upload(path, file, { upsert: true, contentType: file.type || undefined, cacheControl: '3600' });
+      .upload(path, file, {
+        upsert: true,
+        contentType: file.type || undefined,
+        cacheControl: '3600'
+      });
 
     if (uploadError) throw uploadError;
 
@@ -195,12 +217,17 @@
   }
 
   async function saveProfileForDevice(profile = {}) {
-    const deviceId = String(profile.device_id || localStorage.getItem('chat_device_id') || '').trim();
+    const deviceId = String(profile.device_id || getDeviceId()).trim();
     if (!deviceId) throw new Error('Device ID is missing.');
 
     const existing = window.chatSupabaseProfile || {};
-    const username = String(profile.username ?? localStorage.getItem('chat_username') ?? existing.username ?? 'Anonymous').trim().slice(0, 24) || 'Anonymous';
-    let pfpUrl = profile.pfp_url !== undefined ? profile.pfp_url : (existing.pfp_url || localStorage.getItem('chat_profile_picture_url') || null);
+    const username = String(
+      profile.username ?? localStorage.getItem('chat_username') ?? existing.username ?? 'Anonymous'
+    ).trim().slice(0, 24) || 'Anonymous';
+
+    let pfpUrl = profile.pfp_url !== undefined
+      ? profile.pfp_url
+      : (existing.pfp_url || localStorage.getItem('chat_profile_picture_url') || null);
 
     if (profile.file instanceof File) {
       pfpUrl = await uploadProfilePicture(profile.file, deviceId);
@@ -234,25 +261,30 @@
     if (!profile) return;
     const usernameInput = document.getElementById('usernameInput');
     const preview = document.getElementById('profilePicturePreview');
+    const deviceInput = document.getElementById('deviceIdInput');
     if (usernameInput && profile.username != null) usernameInput.value = profile.username;
     if (preview && profile.pfp_url) {
       preview.src = profile.pfp_url;
       preview.style.display = '';
     }
+    if (deviceInput) deviceInput.value = profile.device_id || getDeviceId();
   }
 
   async function initDeviceProfile() {
-    const deviceId = localStorage.getItem('chat_device_id');
+    const deviceId = getDeviceId();
     if (!deviceId) return;
 
-    const profile = await loadProfileForDevice(deviceId);
-    if (profile) applyProfileToUI(profile);
+    try {
+      const profile = await loadProfileForDevice(deviceId);
+      if (profile) applyProfileToUI(profile);
+    } catch (error) {
+      console.error('[Supabase] Could not load device profile:', error);
+    }
 
     const usernameInput = document.getElementById('usernameInput');
     const pfpInput = document.getElementById('profilePictureInput');
     const saveButton = document.getElementById('saveSettings');
 
-    // The actual settings UI remains in app.js. These listeners only sync the profile to Supabase.
     if (pfpInput) {
       pfpInput.addEventListener('change', () => {
         const file = pfpInput.files?.[0];
@@ -275,7 +307,6 @@
       }, true);
     }
 
-    // Keep the profile correct if another part of the app changes the username.
     let lastUsername = localStorage.getItem('chat_username') || '';
     setInterval(() => {
       const currentUsername = localStorage.getItem('chat_username') || '';
@@ -292,20 +323,26 @@
     loadProfileForDevice,
     saveProfileForDevice,
     uploadProfilePicture,
-    upsertProfile: async profile => saveProfileForDevice(profile)
+    upsertProfile: profile => saveProfileForDevice(profile),
+    getDeviceId
   };
 
   const realtimeChannel = client
     .channel('public-chat-messages')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: TABLE, filter: `channel=eq.${CHANNEL}` }, payload => {
-      const message = normalize(payload.new);
-      emit('chat:p2p-message', message);
+    .on('postgres_changes', {
+      event: 'INSERT', schema: 'public', table: TABLE, filter: `channel=eq.${CHANNEL}`
+    }, payload => {
+      emit('chat:message', normalize(payload.new));
     })
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: TABLE, filter: `channel=eq.${CHANNEL}` }, payload => {
-      emit('chat:p2p-edit', normalize(payload.new));
+    .on('postgres_changes', {
+      event: 'UPDATE', schema: 'public', table: TABLE, filter: `channel=eq.${CHANNEL}`
+    }, payload => {
+      emit('chat:message-edit', normalize(payload.new));
     })
-    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: TABLE, filter: `channel=eq.${CHANNEL}` }, payload => {
-      emit('chat:p2p-delete', { id: payload.old?.id });
+    .on('postgres_changes', {
+      event: 'DELETE', schema: 'public', table: TABLE, filter: `channel=eq.${CHANNEL}`
+    }, payload => {
+      emit('chat:message-delete', { id: payload.old?.id });
     })
     .subscribe(status => {
       window.dispatchEvent(new CustomEvent('chat:supabase-status', { detail: { status } }));
@@ -314,19 +351,17 @@
 
   window.chatSupabaseRealtime = realtimeChannel;
 
-  // Keep the existing local-cache/UI event system working while Supabase is authoritative.
+  // Startup connects by reading server state. No dummy message is sent as a connection test.
   loadMessages().then(messages => {
-    messages.forEach(message => emit('chat:p2p-message', message));
+    messages.forEach(message => emit('chat:message', message));
     window.dispatchEvent(new CustomEvent('chat:supabase-history', { detail: { messages } }));
   }).catch(error => {
     console.error('[Supabase] Could not load Public Chat history:', error);
     window.dispatchEvent(new CustomEvent('chat:supabase-status', { detail: { status: 'ERROR', error } }));
   });
 
-  // Profile loading is intentionally keyed ONLY by this browser's persistent device ID.
-  // A different device ID gets a different profiles row.
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => initDeviceProfile(), { once: true });
+    document.addEventListener('DOMContentLoaded', initDeviceProfile, { once: true });
   } else {
     initDeviceProfile();
   }
