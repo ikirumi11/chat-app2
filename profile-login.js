@@ -1,6 +1,6 @@
 /* Persistent device profile login.
-   Log In starts the Supabase connection, waits one second, then resolves the saved profile by device ID.
-   Supabase is authoritative; localStorage is the local cache.
+   Log In connects first, waits one second, confirms the chat/messages area is visible,
+   then gets the device ID and restores/saves the server profile.
 */
 (() => {
   'use strict';
@@ -67,8 +67,7 @@
       .pl-label{display:block;margin:14px 0 7px;color:#c8ced7;font-size:13px;font-weight:700}
       .pl-input{width:100%;padding:12px 13px;border:1px solid #3a414c;border-radius:11px;background:#15181d;color:#fff;outline:none;font:inherit}
       .pl-device{font:11px ui-monospace,Consolas,monospace;color:#8f98a5;word-break:break-all;background:#111419;border:1px solid #292e36;border-radius:10px;padding:10px}
-      .pl-login{width:100%;margin-top:20px;padding:13px;border:0;border-radius:12px;background:#6654e8;color:#fff;font-weight:800;font-size:15px;cursor:pointer}
-      .pl-login:disabled{opacity:.55;cursor:wait}
+      .pl-login{width:100%;margin-top:20px;padding:13px;border:0;border-radius:12px;background:#6654e8;color:#fff;font-weight:800;font-size:15px;cursor:pointer}.pl-login:disabled{opacity:.55;cursor:wait}
       .pl-status{min-height:18px;margin-top:10px;text-align:center;color:#929aa5;font-size:12px}
     `;
     document.head.appendChild(style);
@@ -80,7 +79,7 @@
     gate.innerHTML = `
       <div class="pl-card">
         <h1>Your Profile</h1>
-        <p>Enter your current profile information, then press Log In. The app will connect to Supabase, wait one second, find this device, and restore the saved profile if one exists.</p>
+        <p>Enter your current profile information, then press Log In.</p>
         <img class="pl-preview" id="plPreview" alt="Profile picture preview">
         <label class="pl-label">Name</label>
         <input class="pl-input" id="plName" maxlength="24" placeholder="Your name">
@@ -125,19 +124,43 @@
     throw new Error('Supabase code was not loaded.');
   }
 
-  async function connectAndFindProfile(id, status) {
+  function messagesAreaIsVisible() {
+    const messages = document.getElementById('messages');
+    if (!messages) return false;
+    const style = getComputedStyle(messages);
+    const rect = messages.getBoundingClientRect();
+    return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+  }
+
+  async function waitForMessagesVisible(timeout = 10000) {
+    const start = Date.now();
+    while (Date.now() - start < timeout) {
+      if (messagesAreaIsVisible()) return true;
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    return false;
+  }
+
+  async function connectThenWaitAndFindProfile(ui) {
     const api = await waitForApi();
-    status.textContent = 'Connecting to Supabase…';
+    ui.status.textContent = 'Connecting to server…';
 
     const connected = await api.connectToSupabase(20000);
     if (!connected) throw new Error('Supabase did not reach a confirmed connection.');
 
-    status.textContent = 'Connected. Waiting 1 second before checking this device…';
+    // Exact requested timing: Log In -> wait 1 second -> check that the messages area is visible.
+    ui.status.textContent = 'Connected. Waiting 1 second…';
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Device ID is obtained only now, after the requested one-second delay.
+    ui.status.textContent = 'Checking Public Chat…';
+    const visible = await waitForMessagesVisible(10000);
+    if (!visible) throw new Error('Public Chat messages area is not visible yet.');
+
+    ui.status.textContent = 'Public Chat is visible. Finding your saved account…';
+
+    // Only after the requested one-second wait and visible-chat check do we obtain/use the device ID.
     const deviceId = ensureDeviceId();
-    status.textContent = 'Finding your saved profile…';
+    ui.device.textContent = deviceId;
 
     const saved = await api.loadProfileForDevice(deviceId);
     return { api, deviceId, saved };
@@ -152,32 +175,28 @@
     }
 
     ui.login.disabled = true;
-    // Immediately keep the current entered name visible while the server lookup runs.
     ui.name.value = currentUsername;
     ui.status.textContent = 'Starting server connection…';
 
     try {
       const provisionalPfpFile = ui.file.files?.[0] || null;
-      const result = await connectAndFindProfile(null, ui.status);
-      const { api, deviceId, saved } = result;
-      ui.device.textContent = deviceId;
+      const { api, deviceId, saved } = await connectThenWaitAndFindProfile(ui);
 
       let finalProfile;
       if (saved) {
-        // Server profile wins. Restore its saved username and PFP in the UI first.
-        finalProfile = saved;
+        // Existing server account is authoritative. Replace the current name/PFP with the saved values.
         applyProfile(saved);
-        ui.status.textContent = 'Saved profile found. Restoring username and profile picture…';
+        ui.status.textContent = 'Saved account found. Restoring it…';
 
-        // Re-save the server profile so the local/server state is synchronized.
+        // Save the restored server profile again so server/local state is synchronized.
         finalProfile = await api.saveProfileForDevice({
           device_id: deviceId,
           username: saved.username,
           pfp_url: saved.pfp_url || null
         });
       } else {
-        // First login for this device: save the current login-page values.
-        ui.status.textContent = 'No saved profile found. Creating your profile…';
+        // New device: save the current login-page values to the server.
+        ui.status.textContent = 'No saved account found. Saving this profile…';
         finalProfile = await api.saveProfileForDevice({
           device_id: deviceId,
           username: currentUsername,
@@ -185,7 +204,7 @@
         });
       }
 
-      // Server result is authoritative. Save it locally and apply it everywhere.
+      // Final server response is authoritative and is also persisted locally.
       applyProfile(finalProfile);
       saveLocalProfile(finalProfile);
       finish(finalProfile);
@@ -221,19 +240,22 @@
     }, true);
   }
 
-  async function init() {
+  function init() {
     addStyle();
     bindSettingsSave();
 
-    // Do not connect or query Supabase automatically on page startup.
-    // Log In is the action that starts the connection and account lookup.
+    // No Supabase connection or account lookup occurs automatically here.
+    // The cached profile may be displayed locally, but Log In performs the server lookup.
     const id = getDeviceId();
     if (id) {
       const cachedName = localStorage.getItem(NAME_KEY);
       if (cachedName) {
-        const cached = { device_id: id, username: cachedName, pfp_url: localStorage.getItem(PFP_KEY) || null, local_cache: true };
-        // Show the cached profile in the existing app fields, but do not treat it as server-confirmed.
-        applyProfile(cached);
+        applyProfile({
+          device_id: id,
+          username: cachedName,
+          pfp_url: localStorage.getItem(PFP_KEY) || null,
+          local_cache: true
+        });
       }
     }
 
