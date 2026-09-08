@@ -8,7 +8,7 @@ export default async function handler(req,res){
   try{
     const b=req.body||{}, id=String(b.id||'').trim(), deviceId=String(b.device_id||'').trim(), action=String(b.action||'').trim();
     if(!id||!deviceId||!['edit','delete'].includes(action))return res.status(400).json({error:'Invalid message action.'});
-    const base='https://wlvbkdzcueqkknysisfw.supabase.co',key='sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL';
+    const base='https://iecpzrqvvuyghybchpva.supabase.co',key='sb_publishable_Vess5sv1LAkxmZuxXZHa5Q_Vf6Qs-Se';
     const headers={apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json',Accept:'application/json'};
     const ownerR=await fetch(base+'/rest/v1/messages?select=id,device_id,username&limit=1&id=eq.'+encodeURIComponent(id),{headers}),owner=await ownerR.json();
     if(!ownerR.ok)return res.status(500).json({error:'Could not verify message.'});
