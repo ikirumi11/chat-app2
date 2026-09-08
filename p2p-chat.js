@@ -1,4 +1,4 @@
-/* FAST P2P CHAT — no local message storage and no chat server persistence. Refresh = empty chat. */
+/* FAST P2P CHAT — messages travel peer-to-peer; local persistence is handled by p2p-background-save.js. */
 (() => {
   'use strict';
 
@@ -9,6 +9,7 @@
   let isHost = false;
   let hostPeerId = PUBLIC_PEER_ID;
   let retryTimer = null;
+  let signalingRetryTimer = null;
   let migrationTimer = null;
   let migrating = false;
 
@@ -37,7 +38,7 @@
     const connected = [...connections.values()].some(c => c.open);
     const state = error || (isHost
       ? 'Host · Public Chat'
-      : (connected ? 'Connected' : (peer ? 'Not connected' : 'Loading…')));
+      : (connected ? 'Connected' : (peer ? 'Reconnecting…' : 'Loading…')));
     el.innerHTML = `<b>Public Chat</b><span>${escapeHtml(state)} · ${connections.size} peer${connections.size === 1 ? '' : 's'}</span>`;
   }
 
@@ -50,7 +51,7 @@
   }
 
   function connectToPeer(peerId) {
-    if (!peer || !peerId || peerId === peer.id || peerId === PUBLIC_PEER_ID) return;
+    if (!peer || peer.destroyed || !peerId || peerId === peer.id || peerId === PUBLIC_PEER_ID) return;
     const old = connections.get(peerId);
     if (old && !old.destroyed) return;
     try { setupConnection(peer.connect(peerId, { reliable: true, serialization: 'json' })); } catch {}
@@ -74,13 +75,14 @@
     conn.on('data', packet => receivePacket(packet, conn.peer));
 
     const lost = () => {
-      if (connections.get(conn.peer) === conn) connections.delete(conn.peer);
+      if (connections.get(conn.peer) !== conn) return;
+      connections.delete(conn.peer);
       updateStatus();
       window.dispatchEvent(new CustomEvent('chat:p2p-connection', {
         detail: { peer: conn.peer, connection: conn, open: false }
       }));
       if (isHost) announcePeers();
-      if (!isHost && conn.peer === PUBLIC_PEER_ID) scheduleMigration('Public host disconnected');
+      if (!isHost) startRetry(350);
     };
 
     conn.on('close', lost);
@@ -88,15 +90,16 @@
   }
 
   function connectToPublicHost() {
-    if (!peer || isHost || migrating) return;
-    if ([...connections.values()].some(c => c.open || !c.destroyed)) return;
+    if (!peer || peer.destroyed || isHost || migrating) return;
+    const existing = connections.get(hostPeerId);
+    if (existing && !existing.destroyed) return;
     try { setupConnection(peer.connect(hostPeerId, { reliable: true, serialization: 'json' })); } catch {}
   }
 
   function startRetry(interval = 350) {
     clearInterval(retryTimer);
     retryTimer = setInterval(() => {
-      if (isHost || migrating) return;
+      if (isHost || migrating || !peer || peer.destroyed) return;
       if ([...connections.values()].some(c => c.open)) {
         updateStatus();
         return;
@@ -107,8 +110,25 @@
     connectToPublicHost();
   }
 
+  function startSignalingReconnect() {
+    clearInterval(signalingRetryTimer);
+    signalingRetryTimer = setInterval(() => {
+      if (!peer || peer.destroyed || migrating) return;
+      if (peer.disconnected) {
+        updateStatus('Reconnecting P2P…');
+        try { peer.reconnect(); } catch {}
+      } else {
+        clearInterval(signalingRetryTimer);
+      }
+    }, 1000);
+  }
+
   function becomeGuest() {
+    clearInterval(retryTimer);
+    clearInterval(signalingRetryTimer);
     try { if (peer && !peer.destroyed) peer.destroy(); } catch {}
+    for (const conn of connections.values()) { try { conn.close(); } catch {} }
+    connections.clear();
     isHost = false;
     hostPeerId = PUBLIC_PEER_ID;
     migrating = false;
@@ -116,8 +136,16 @@
     peer.on('open', () => { updateStatus(); startRetry(); });
     peer.on('connection', setupConnection);
     peer.on('error', error => {
-      if (error?.type === 'peer-unavailable') updateStatus('Public Chat host is offline');
-      else updateStatus('P2P error');
+      if (error?.type === 'peer-unavailable') {
+        updateStatus('Public Chat host is offline');
+        startRetry(700);
+      } else {
+        updateStatus('P2P error · retrying');
+      }
+    });
+    peer.on('disconnected', () => {
+      updateStatus('Reconnecting P2P…');
+      startSignalingReconnect();
     });
   }
 
@@ -157,6 +185,10 @@
             migrating = false;
             if (error?.type === 'unavailable-id') becomeGuest();
             else scheduleMigration('Host migration retry');
+          });
+          peer.on('disconnected', () => {
+            updateStatus('Reconnecting P2P…');
+            startSignalingReconnect();
           });
         } catch { migrating = false; becomeGuest(); }
       }, 250);
@@ -281,23 +313,23 @@
       isHost = true;
       hostPeerId = id;
       clearInterval(retryTimer);
+      clearInterval(signalingRetryTimer);
       updateStatus();
       announcePeers();
     });
     peer.on('connection', setupConnection);
     peer.on('error', error => {
       if (error?.type === 'unavailable-id') becomeGuest();
-      else updateStatus('Signaling unavailable');
+      else updateStatus('Signaling unavailable · retrying');
     });
     peer.on('disconnected', () => {
-      if (isHost) updateStatus('P2P signaling disconnected');
-      else scheduleMigration('Host signaling disconnected');
+      updateStatus('Reconnecting P2P…');
+      startSignalingReconnect();
     });
     peer.on('close', () => { if (!isHost) scheduleMigration('Host connection closed'); });
   }
 
-  // Keep the app's existing /api/messages interface, but make it memory/network-only.
-  // Nothing is written to localStorage, IndexedDB, ShareAllFiles, Google Sites, or any chat server.
+  // Keep the app's /api/messages interface while all chat delivery remains P2P.
   const originalFetch = window.fetch.bind(window);
   window.fetch = async function(input, init = {}) {
     const url = typeof input === 'string' ? input : (input?.url || '');
