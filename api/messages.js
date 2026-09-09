@@ -1,22 +1,17 @@
 /*
  * Chat App 2 - Google Apps Script API adapter
- * Fast polling + optimized requests to the newest Apps Script backend.
+ * Stable 1-second polling + startup-safe loading.
  */
 (() => {
     "use strict";
 
     const SERVER_URL = "https://script.google.com/macros/s/AKfycbzIQrF4QfSh6MVdSEFNMpINunLXIbOFtxFfbWm7_h8NwOWj-DYFqtKDMqwRuBEXHWZb/exec";
     const ORIGINAL_FETCH = window.fetch.bind(window);
-    const FAST_REFRESH_MS = 250;
+    const FAST_REFRESH_MS = 1000;
     const inflightGets = new Map();
 
-    // app.js reads this setting when it starts. Set it here because this file
-    // loads before app.js and therefore controls the polling interval.
     try {
-        const current = Number(localStorage.getItem("chat_refreshRate"));
-        if (!Number.isFinite(current) || current > FAST_REFRESH_MS) {
-            localStorage.setItem("chat_refreshRate", String(FAST_REFRESH_MS));
-        }
+        localStorage.setItem("chat_refreshRate", String(FAST_REFRESH_MS));
     } catch (_) {}
 
     function jsonResponse(body, status = 200) {
@@ -44,8 +39,7 @@
             method,
             cache: "no-store",
             redirect: "follow",
-            credentials: "omit",
-            priority: "high"
+            credentials: "omit"
         };
 
         if (method !== "GET") {
@@ -62,7 +56,10 @@
         try {
             data = text ? JSON.parse(text) : {};
         } catch {
-            data = { message: text };
+            data = {
+                ok: false,
+                error: text || "Invalid server response."
+            };
         }
 
         return { response, data };
@@ -72,13 +69,9 @@
         if (!message || typeof message !== "object") return message;
 
         let files = message.files;
-
         if (typeof files === "string") {
-            try {
-                files = JSON.parse(files);
-            } catch {
-                files = [];
-            }
+            try { files = JSON.parse(files); }
+            catch { files = []; }
         }
 
         return {
@@ -87,93 +80,114 @@
         };
     }
 
+    async function getMessages(channel) {
+        channel = String(channel || "general").trim().substring(0, 32) || "general";
+
+        if (inflightGets.has(channel)) {
+            return inflightGets.get(channel);
+        }
+
+        const request = (async () => {
+            const { response, data } = await serverRequest(
+                "GET",
+                {},
+                { channel }
+            );
+
+            if (!response.ok || data?.ok === false) {
+                throw new Error(
+                    data?.error ||
+                    data?.message ||
+                    "Could not connect to the chat server."
+                );
+            }
+
+            return {
+                success: true,
+                messages: Array.isArray(data.messages)
+                    ? data.messages.map(normalizeMessage)
+                    : []
+            };
+        })();
+
+        inflightGets.set(channel, request);
+
+        try {
+            return await request;
+        } finally {
+            if (inflightGets.get(channel) === request) {
+                inflightGets.delete(channel);
+            }
+        }
+    }
+
     async function handleMessages(method, options, url) {
         const body = await readBody(options);
 
         if (method === "GET") {
-            const channel = String(
-                url.searchParams.get("channel") || "general"
-            ).trim().substring(0, 32);
-
-            // Prevent duplicate overlapping reads from hammering the Sheet.
-            // If two UI systems ask for the same channel simultaneously,
-            // they share the same Apps Script request.
-            if (inflightGets.has(channel)) {
-                return inflightGets.get(channel);
-            }
-
-            const request = (async () => {
-                const { response, data } = await serverRequest(
-                    "GET",
-                    {},
-                    { channel }
-                );
-
-                if (!response.ok || data?.ok === false) {
-                    return jsonResponse({
-                        error:
-                            data?.error ||
-                            data?.message ||
-                            "Server request failed.",
-                        details: data
-                    }, response.status || 500);
-                }
-
-                return jsonResponse({
-                    success: true,
-                    messages: Array.isArray(data.messages)
-                        ? data.messages.map(normalizeMessage)
-                        : []
-                });
-            })();
-
-            inflightGets.set(channel, request);
+            const channel =
+                url.searchParams.get("channel") || "general";
 
             try {
-                return await request;
-            } finally {
-                if (inflightGets.get(channel) === request) {
-                    inflightGets.delete(channel);
-                }
+                return jsonResponse(await getMessages(channel));
+            } catch (error) {
+                // Do not make a failed first request permanently block startup.
+                // app.js can retry on its next 1-second refresh.
+                return jsonResponse({
+                    success: false,
+                    messages: [],
+                    error: error?.message || "Could not connect to the chat server."
+                }, 200);
             }
         }
 
         if (method === "POST") {
-            const { response, data } = await serverRequest("POST", {
-                ...body,
-                username: String(body.username || "")
-                    .trim()
-                    .substring(0, 24),
-                channel: String(body.channel || "general")
-                    .trim()
-                    .substring(0, 32),
-                message: String(body.message || "")
-                    .trim()
-                    .substring(0, 20000),
-                image: body.image || null,
-                files: Array.isArray(body.files) ? body.files : [],
-                device_id: String(body.device_id || "")
-                    .trim()
-                    .substring(0, 100)
-            });
+            try {
+                const { response, data } = await serverRequest("POST", {
+                    ...body,
+                    username: String(body.username || "Anonymous")
+                        .trim().substring(0, 24),
+                    channel: String(body.channel || "general")
+                        .trim().substring(0, 32),
+                    message: String(body.message || "")
+                        .trim().substring(0, 20000),
+                    image: body.image || null,
+                    files: Array.isArray(body.files) ? body.files : [],
+                    device_id: String(body.device_id || "")
+                        .trim().substring(0, 100)
+                });
 
-            return jsonResponse(data, response.status || 200);
+                return jsonResponse(data, response.status || 200);
+            } catch (error) {
+                return jsonResponse({
+                    ok: false,
+                    error: error?.message || "Could not send message."
+                }, 200);
+            }
         }
 
         if (method === "PATCH") {
-            const { response, data } = await serverRequest(
-                "POST",
-                { action: "edit", ...body }
-            );
-            return jsonResponse(data, response.status || 200);
+            try {
+                const { response, data } = await serverRequest(
+                    "POST",
+                    { action: "edit", ...body }
+                );
+                return jsonResponse(data, response.status || 200);
+            } catch (error) {
+                return jsonResponse({ ok: false, error: error?.message || "Could not edit message." }, 200);
+            }
         }
 
         if (method === "DELETE") {
-            const { response, data } = await serverRequest(
-                "POST",
-                { action: "delete", ...body }
-            );
-            return jsonResponse(data, response.status || 200);
+            try {
+                const { response, data } = await serverRequest(
+                    "POST",
+                    { action: "delete", ...body }
+                );
+                return jsonResponse(data, response.status || 200);
+            } catch (error) {
+                return jsonResponse({ ok: false, error: error?.message || "Could not delete message." }, 200);
+            }
         }
 
         return jsonResponse({ error: "Method not allowed." }, 405);
@@ -184,9 +198,16 @@
             return jsonResponse({ error: "Method not allowed." }, 405);
         }
 
-        const body = await readBody(options);
-        const { response, data } = await serverRequest("POST", body);
-        return jsonResponse(data, response.status || 200);
+        try {
+            const body = await readBody(options);
+            const { response, data } = await serverRequest("POST", body);
+            return jsonResponse(data, response.status || 200);
+        } catch (error) {
+            return jsonResponse({
+                ok: false,
+                error: error?.message || "Could not connect to the chat server."
+            }, 200);
+        }
     }
 
     window.fetch = async function(input, options = {}) {
@@ -196,7 +217,6 @@
                 : input?.url || "";
 
         let url;
-
         try {
             url = new URL(requestUrl, window.location.href);
         } catch {
@@ -215,10 +235,10 @@
                 return await handleMessages(method, options, url);
             } catch (error) {
                 return jsonResponse({
-                    error:
-                        error?.message ||
-                        "Could not connect to the chat server."
-                }, 500);
+                    success: false,
+                    messages: [],
+                    error: error?.message || "Could not connect to the chat server."
+                }, 200);
             }
         }
 
@@ -227,10 +247,9 @@
                 return await handleMessageActions(method, options);
             } catch (error) {
                 return jsonResponse({
-                    error:
-                        error?.message ||
-                        "Could not connect to the chat server."
-                }, 500);
+                    ok: false,
+                    error: error?.message || "Could not connect to the chat server."
+                }, 200);
             }
         }
 
