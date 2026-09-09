@@ -1,15 +1,13 @@
 /*
- * Chat App 2 - Google Apps Script API adapter
- * Near-instant Google Sheets chat sync.
+ * Chat App 2 - P2P chat adapter
  *
- * Strategy:
- *  - First load gets the full recent message list once.
- *  - After that, the client checks ONLY the newest message very frequently.
- *  - If the newest message changed, it downloads the full recent list.
- *  - Cached data is returned immediately so the UI never waits for Sheets.
- *  - Chat refresh interval is reduced from 500ms to 100ms without changing
- *    other 500ms timers such as voice-recording timers.
- *  - Sending refreshes the local cache immediately when the server returns data.
+ * Live chat messages travel over WebRTC RTCDataChannels between users.
+ * Google Apps Script / Sheets is used only for:
+ *   1. loading old saved messages when the chat starts
+ *   2. WebRTC signaling (finding peers / exchanging offers)
+ *   3. periodically saving unsaved messages to Sheets
+ *
+ * The normal chat POST path never sends a chat message to Google Sheets.
  */
 (() => {
     "use strict";
@@ -18,72 +16,29 @@
     const ORIGINAL_FETCH = window.fetch.bind(window);
     const ORIGINAL_SET_INTERVAL = window.setInterval.bind(window);
 
-    const RETRY_MS = 750;
+    const CHANNEL = "general";
+    const SAVE_INTERVAL_MS = 10000;
+    const PEER_REFRESH_MS = 2500;
     const REQUEST_TIMEOUT_MS = 10000;
+    const CACHE_KEY = "chat_messages_p2p_v1_" + CHANNEL;
+    const DEVICE_KEY = "chat_device_id";
+    const MAX_MESSAGES = 100;
 
-    // 100ms UI refresh. The server probe is slightly slower so we do not
-    // hammer Google Apps Script unnecessarily.
-    const APP_REFRESH_MS = 100;
-    const LATEST_CHECK_MS = 150;
+    const peers = new Map();
+    let pendingSave = new Map();
+    let localMessages = [];
+    let loadedOldMessages = false;
+    let initialLoadPromise = null;
+    let saveTimer = null;
+    let countdownTimer = null;
+    let nextSaveAt = Date.now() + SAVE_INTERVAL_MS;
+    let peerTimer = null;
+    let signalingBusy = false;
 
-    const CACHE_KEY_PREFIX = "chat_messages_cache_v3_";
-    const CACHE_MAX_AGE_MS = 5 * 60 * 1000;
-
-    const inflightGets = new Map();
-    const inflightLatest = new Map();
-    const lastFullRefresh = new Map();
-    const latestWatchers = new Map();
-
-    function installFastRefreshTimer() {
-        // app.js uses setInterval(loadMessages, 500). Replace ONLY that timer.
-        // This avoids changing unrelated 500ms timers in the application.
-        if (window.__CHAT_FAST_INTERVAL_PATCHED__) return;
-        window.__CHAT_FAST_INTERVAL_PATCHED__ = true;
-
-        window.setInterval = function(callback, delay, ...args) {
-            let actualDelay = delay;
-
-            if (
-                delay === 500 &&
-                typeof callback === "function" &&
-                callback.name === "loadMessages"
-            ) {
-                actualDelay = APP_REFRESH_MS;
-            }
-
-            return ORIGINAL_SET_INTERVAL(callback, actualDelay, ...args);
-        };
-    }
-
-    function installConnectionUI() {
-        if (!document.body || document.getElementById("chatConnectionLoader")) return;
-
-        if (!document.getElementById("chatConnectionLoaderStyle")) {
-            const style = document.createElement("style");
-            style.id = "chatConnectionLoaderStyle";
-            style.textContent = `
-                #chatConnectionLoader{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .15s ease}
-                #chatConnectionLoader.show{opacity:1}
-                #chatConnectionLoader .chat-loader-box{display:flex;align-items:center;gap:12px;padding:12px 18px;border-radius:14px;background:rgba(20,20,20,.94);border:1px solid rgba(255,255,255,.12);box-shadow:0 10px 35px rgba(0,0,0,.35);color:#fff;font:14px Arial,sans-serif}
-                #chatConnectionLoader .chat-spinner{width:20px;height:20px;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:chatConnectionSpin .7s linear infinite}
-                @keyframes chatConnectionSpin{to{transform:rotate(360deg)}}
-            `;
-            document.head.appendChild(style);
-        }
-
-        const loader = document.createElement("div");
-        loader.id = "chatConnectionLoader";
-        loader.innerHTML = '<div class="chat-loader-box"><div class="chat-spinner"></div><span id="chatConnectionText">Connecting...</span></div>';
-        document.body.appendChild(loader);
-    }
-
-    function setConnecting(visible, text) {
-        installConnectionUI();
-        const loader = document.getElementById("chatConnectionLoader");
-        const label = document.getElementById("chatConnectionText");
-        if (!loader) return;
-        if (label) label.textContent = text || "Connecting...";
-        loader.classList.toggle("show", visible);
+    let deviceId = localStorage.getItem(DEVICE_KEY);
+    if (!deviceId) {
+        deviceId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+        localStorage.setItem(DEVICE_KEY, deviceId);
     }
 
     function jsonResponse(body, status = 200) {
@@ -98,16 +53,6 @@
         try { return JSON.parse(options.body); } catch { return {}; }
     }
 
-    async function fetchWithTimeout(url, options) {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-        try {
-            return await ORIGINAL_FETCH(url, { ...options, signal: controller.signal });
-        } finally {
-            clearTimeout(timer);
-        }
-    }
-
     async function serverRequest(method, payload = {}, query = {}) {
         const params = new URLSearchParams();
         Object.entries(query).forEach(([key, value]) => {
@@ -115,302 +60,450 @@
         });
 
         const url = SERVER_URL + (params.toString() ? "?" + params.toString() : "");
-        const options = {
-            method,
-            cache: "no-store",
-            redirect: "follow",
-            credentials: "omit"
-        };
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-        if (method !== "GET") {
-            options.headers = { "Content-Type": "text/plain;charset=utf-8" };
-            options.body = JSON.stringify(payload);
+        try {
+            const options = {
+                method,
+                cache: "no-store",
+                redirect: "follow",
+                credentials: "omit",
+                signal: controller.signal
+            };
+
+            if (method !== "GET") {
+                options.headers = { "Content-Type": "text/plain;charset=utf-8" };
+                options.body = JSON.stringify(payload);
+            }
+
+            const response = await ORIGINAL_FETCH(url, options);
+            const text = await response.text();
+            let data = {};
+            try { data = text ? JSON.parse(text) : {}; }
+            catch { data = { ok: false, error: text || "Invalid server response." }; }
+            return { response, data };
+        } finally {
+            clearTimeout(timeout);
         }
-
-        const response = await fetchWithTimeout(url, options);
-        const text = await response.text();
-        let data = {};
-        try { data = text ? JSON.parse(text) : {}; }
-        catch { data = { ok: false, error: text || "Invalid server response." }; }
-        return { response, data };
     }
 
     function normalizeMessage(message) {
-        if (!message || typeof message !== "object") return message;
+        if (!message || typeof message !== "object") return null;
         let files = message.files;
         if (typeof files === "string") {
             try { files = JSON.parse(files); } catch { files = []; }
         }
-        return { ...message, files: Array.isArray(files) ? files : [] };
+        return {
+            ...message,
+            id: String(message.id || message.messageId || (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2))),
+            channel: String(message.channel || CHANNEL),
+            username: String(message.username || "Anonymous"),
+            message: String(message.message || ""),
+            files: Array.isArray(files) ? files : []
+        };
     }
 
-    function cacheKey(channel) {
-        return CACHE_KEY_PREFIX + encodeURIComponent(channel);
+    function messageId(message) {
+        return String(message?.id || message?.messageId || "");
     }
 
-    function readCachedMessages(channel) {
+    function sortMessages(messages) {
+        return messages.sort((a, b) => {
+            const at = new Date(a?.timestamp || a?.time || a?.createdAt || 0).getTime() || 0;
+            const bt = new Date(b?.timestamp || b?.time || b?.createdAt || 0).getTime() || 0;
+            return at - bt;
+        });
+    }
+
+    function writeLocalCache() {
         try {
-            const raw = localStorage.getItem(cacheKey(channel));
+            localStorage.setItem(CACHE_KEY, JSON.stringify({
+                time: Date.now(),
+                messages: localMessages.slice(-MAX_MESSAGES)
+            }));
+        } catch (_) {}
+    }
+
+    function readLocalCache() {
+        try {
+            const raw = localStorage.getItem(CACHE_KEY);
             if (!raw) return null;
-
-            const cached = JSON.parse(raw);
-            if (!cached || !Array.isArray(cached.messages)) return null;
-
-            if (Date.now() - Number(cached.time || 0) > CACHE_MAX_AGE_MS) return null;
-
-            return cached.messages.map(normalizeMessage);
+            const data = JSON.parse(raw);
+            if (!Array.isArray(data?.messages)) return null;
+            return data.messages.map(normalizeMessage).filter(Boolean);
         } catch (_) {
             return null;
         }
     }
 
-    function writeCachedMessages(channel, messages) {
-        try {
-            localStorage.setItem(cacheKey(channel), JSON.stringify({
-                time: Date.now(),
-                messages
-            }));
-        } catch (_) {}
-    }
+    function mergeMessages(messages, markForSave = false) {
+        let changed = false;
+        const byId = new Map(localMessages.map(m => [messageId(m), m]));
 
-    function getMessageSignature(message) {
-        if (!message || typeof message !== "object") return "";
-
-        return String(
-            message.id ??
-            message.messageId ??
-            message.timestamp ??
-            message.time ??
-            message.createdAt ??
-            message.created_at ??
-            JSON.stringify(message)
-        );
-    }
-
-    function getNewestCachedMessage(channel) {
-        const messages = readCachedMessages(channel);
-        if (!messages || !messages.length) return null;
-        return messages[messages.length - 1];
-    }
-
-    async function fetchFreshMessages(channel, showLoader) {
-        if (inflightGets.has(channel)) return inflightGets.get(channel);
-
-        const request = (async () => {
-            let firstAttempt = true;
-
-            while (true) {
-                if (showLoader) {
-                    setConnecting(true, firstAttempt ? "Connecting..." : "Reconnecting...");
-                }
-
-                try {
-                    const { response, data } = await serverRequest("GET", {}, {
-                        channel,
-                        limit: 100
-                    });
-
-                    if (!response.ok || data?.ok === false || data?.success === false) {
-                        throw new Error(data?.error || data?.message || "Server did not return a valid response.");
-                    }
-
-                    const messages = Array.isArray(data.messages)
-                        ? data.messages.map(normalizeMessage)
-                        : [];
-
-                    writeCachedMessages(channel, messages);
-                    lastFullRefresh.set(channel, Date.now());
-
-                    if (showLoader) setConnecting(false);
-
-                    return {
-                        success: true,
-                        messages
-                    };
-                } catch (_) {
-                    if (!showLoader) return null;
-
-                    setConnecting(true, "Reconnecting...");
-                    await new Promise(resolve => setTimeout(resolve, RETRY_MS));
-                    firstAttempt = false;
-                }
+        for (const raw of messages || []) {
+            const message = normalizeMessage(raw);
+            if (!message || message.channel !== CHANNEL || !messageId(message)) continue;
+            const id = messageId(message);
+            if (!byId.has(id)) {
+                byId.set(id, message);
+                changed = true;
+                if (markForSave) pendingSave.set(id, message);
             }
-        })();
+        }
 
-        inflightGets.set(channel, request);
+        if (changed) {
+            localMessages = sortMessages(Array.from(byId.values())).slice(-MAX_MESSAGES);
+            writeLocalCache();
+        }
+        return changed;
+    }
 
-        try {
-            return await request;
-        } finally {
-            if (inflightGets.get(channel) === request) inflightGets.delete(channel);
+    function makeMessage(body) {
+        return normalizeMessage({
+            id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2),
+            timestamp: new Date().toISOString(),
+            username: String(body.username || "Anonymous").trim().substring(0, 24),
+            message: String(body.message || "").trim().substring(0, 20000),
+            image: body.image || null,
+            files: Array.isArray(body.files) ? body.files : [],
+            channel: CHANNEL,
+            device_id: deviceId
+        });
+    }
+
+    function ensureSaveUI() {
+        if (document.getElementById("chatSaveCountdown")) return;
+
+        const style = document.createElement("style");
+        style.id = "chatSaveCountdownStyle";
+        style.textContent = `
+            #chatSaveCountdown{display:inline-flex;align-items:center;margin-left:10px;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);color:#aeb7c3;font:12px Arial,sans-serif;white-space:nowrap}
+            #chatSaveCountdown.saving{color:#fff;background:rgba(255,255,255,.13)}
+        `;
+        document.head.appendChild(style);
+
+        const channel = document.querySelector(".header .channel");
+        if (channel) {
+            const badge = document.createElement("span");
+            badge.id = "chatSaveCountdown";
+            badge.textContent = "Saving in 10s";
+            channel.appendChild(badge);
         }
     }
 
-    async function probeNewest(channel) {
-        if (inflightLatest.has(channel)) return inflightLatest.get(channel);
-
-        const request = (async () => {
-            try {
-                // IMPORTANT: only ask Google Sheets for ONE row during normal polling.
-                // The Apps Script backend already supports limit=1.
-                const { response, data } = await serverRequest("GET", {}, {
-                    channel,
-                    limit: 1
-                });
-
-                if (!response.ok || data?.ok === false || data?.success === false) {
-                    return false;
-                }
-
-                const newest = Array.isArray(data.messages) && data.messages.length
-                    ? normalizeMessage(data.messages[data.messages.length - 1])
-                    : null;
-
-                const cachedNewest = getNewestCachedMessage(channel);
-                const serverSignature = getMessageSignature(newest);
-                const cachedSignature = getMessageSignature(cachedNewest);
-
-                // If the newest message changed, download the full recent list once.
-                if (serverSignature !== cachedSignature) {
-                    await fetchFreshMessages(channel, false);
-                    return true;
-                }
-
-                return false;
-            } catch (_) {
-                // Normal background probes must never make the UI say "Connecting".
-                return false;
-            }
-        })();
-
-        inflightLatest.set(channel, request);
-
-        try {
-            return await request;
-        } finally {
-            if (inflightLatest.get(channel) === request) inflightLatest.delete(channel);
-        }
+    function updateSaveCountdown(text, saving = false) {
+        ensureSaveUI();
+        const el = document.getElementById("chatSaveCountdown");
+        if (!el) return;
+        el.textContent = text;
+        el.classList.toggle("saving", saving);
     }
 
-    function startLatestWatcher(channel) {
-        if (latestWatchers.has(channel)) return;
-
-        const timer = ORIGINAL_SET_INTERVAL(() => {
-            // Do not spend requests while the page is hidden.
-            if (document.hidden) return;
-            probeNewest(channel).catch(() => {});
-        }, LATEST_CHECK_MS);
-
-        latestWatchers.set(channel, timer);
+    function startSaveCountdown() {
+        nextSaveAt = Date.now() + SAVE_INTERVAL_MS;
+        if (countdownTimer) clearInterval(countdownTimer);
+        countdownTimer = ORIGINAL_SET_INTERVAL(() => {
+            const remaining = Math.max(0, nextSaveAt - Date.now());
+            const seconds = Math.ceil(remaining / 1000);
+            updateSaveCountdown(remaining <= 0 ? "Saving..." : `Saving in ${seconds}s`, remaining <= 0);
+        }, 250);
+        updateSaveCountdown("Saving in 10s");
     }
 
-    async function getMessagesFast(channel) {
-        channel = String(channel || "general").trim().substring(0, 32) || "general";
-
-        const cached = readCachedMessages(channel);
-
-        // Existing chat: return instantly. The newest-message watcher updates the
-        // local cache in the background whenever another user sends something.
-        if (cached) {
-            startLatestWatcher(channel);
-            return {
-                success: true,
-                messages: cached
-            };
+    async function savePendingMessages() {
+        if (!pendingSave.size) {
+            startSaveCountdown();
+            return;
         }
 
-        // First load: get the complete recent history. Keep retrying forever if
-        // the backend is temporarily unavailable.
-        const result = await fetchFreshMessages(channel, true);
-        startLatestWatcher(channel);
-        return result;
-    }
+        const batch = Array.from(pendingSave.values()).slice(0, 100);
+        if (!batch.length) return;
 
-    function updateLocalCacheFromPost(channel, data) {
+        updateSaveCountdown("Saving...", true);
+
         try {
-            if (Array.isArray(data?.messages)) {
-                writeCachedMessages(channel, data.messages.map(normalizeMessage));
-                return;
-            }
-
-            const possible = data?.message || data?.newMessage || data?.createdMessage;
-            if (!possible || typeof possible !== "object") return;
-
-            const current = readCachedMessages(channel) || [];
-            const message = normalizeMessage(possible);
-            const id = getMessageSignature(message);
-
-            if (id && current.some(item => getMessageSignature(item) === id)) return;
-
-            current.push(message);
-            current.sort((a, b) => {
-                const at = new Date(a?.timestamp || a?.time || a?.createdAt || 0).getTime() || 0;
-                const bt = new Date(b?.timestamp || b?.time || b?.createdAt || 0).getTime() || 0;
-                return at - bt;
+            const { response, data } = await serverRequest("POST", {
+                action: "save_batch",
+                channel: CHANNEL,
+                device_id: deviceId,
+                messages: batch
             });
 
-            writeCachedMessages(channel, current.slice(-100));
-        } catch (_) {}
+            if (!response.ok || data?.ok === false) throw new Error(data?.error || "Save failed");
+
+            for (const message of batch) {
+                const id = messageId(message);
+                if (id) pendingSave.delete(id);
+            }
+        } catch (error) {
+            console.warn("P2P chat cloud save failed; will retry:", error);
+        }
+
+        startSaveCountdown();
+    }
+
+    function startSaveLoop() {
+        if (saveTimer) clearInterval(saveTimer);
+        startSaveCountdown();
+        saveTimer = ORIGINAL_SET_INTERVAL(savePendingMessages, SAVE_INTERVAL_MS);
+    }
+
+    function broadcast(packet, exceptPeerId = "") {
+        const text = JSON.stringify(packet);
+        for (const [id, peer] of peers) {
+            if (id === exceptPeerId) continue;
+            if (peer.channel?.readyState === "open") {
+                try { peer.channel.send(text); } catch (_) {}
+            }
+        }
+    }
+
+    function setupDataChannel(peerId, channel) {
+        const peer = peers.get(peerId);
+        if (!peer) return;
+        peer.channel = channel;
+
+        channel.onopen = () => {
+            channel.send(JSON.stringify({
+                type: "hello",
+                from: deviceId,
+                messages: localMessages.slice(-MAX_MESSAGES)
+            }));
+        };
+
+        channel.onmessage = event => {
+            try {
+                const packet = JSON.parse(event.data);
+                if (packet.type === "chat_message") {
+                    const changed = mergeMessages([packet.message], true);
+                    if (changed) broadcast(packet, peerId);
+                } else if (packet.type === "chat_sync") {
+                    const changed = mergeMessages(packet.messages || [], true);
+                    if (changed) broadcast(packet, peerId);
+                } else if (packet.type === "hello") {
+                    const changed = mergeMessages(packet.messages || [], true);
+                    if (changed) {
+                        try {
+                            channel.send(JSON.stringify({
+                                type: "chat_sync",
+                                from: deviceId,
+                                messages: localMessages.slice(-MAX_MESSAGES)
+                            }));
+                        } catch (_) {}
+                    }
+                }
+            } catch (_) {}
+        };
+
+        channel.onclose = () => {
+            if (peer.channel === channel) peer.channel = null;
+        };
+    }
+
+    function createPeer(peerId) {
+        let peer = peers.get(peerId);
+        if (peer?.pc) return peer;
+
+        const pc = new RTCPeerConnection({
+            iceServers: [
+                { urls: "stun:stun.l.google.com:19302" },
+                { urls: "stun:stun1.l.google.com:19302" }
+            ]
+        });
+
+        peer = { id: peerId, pc, channel: null, createdAt: Date.now() };
+        peers.set(peerId, peer);
+
+        pc.ondatachannel = event => setupDataChannel(peerId, event.channel);
+        pc.onconnectionstatechange = () => {
+            if (["failed", "closed", "disconnected"].includes(pc.connectionState)) {
+                setTimeout(() => {
+                    const current = peers.get(peerId);
+                    if (current?.pc === pc) {
+                        try { pc.close(); } catch (_) {}
+                        peers.delete(peerId);
+                    }
+                }, 5000);
+            }
+        };
+
+        return peer;
+    }
+
+    async function createOffer(peerId) {
+        if (peerId === deviceId) return;
+        const peer = createPeer(peerId);
+        if (peer.channel) return;
+
+        const channel = peer.pc.createDataChannel("chat", { ordered: true });
+        setupDataChannel(peerId, channel);
+
+        const offer = await peer.pc.createOffer();
+        await peer.pc.setLocalDescription(offer);
+        await waitForIceComplete(peer.pc);
+
+        await serverRequest("POST", {
+            action: "signal_push",
+            to: peerId,
+            from: deviceId,
+            signal: { type: "offer", sdp: peer.pc.localDescription }
+        });
+    }
+
+    async function handleSignal(signal) {
+        const from = String(signal?.from || "");
+        const payload = signal?.signal;
+        if (!from || from === deviceId || !payload) return;
+
+        const peer = createPeer(from);
+
+        if (payload.type === "offer") {
+            await peer.pc.setRemoteDescription(payload.sdp);
+            const answer = await peer.pc.createAnswer();
+            await peer.pc.setLocalDescription(answer);
+            await waitForIceComplete(peer.pc);
+
+            await serverRequest("POST", {
+                action: "signal_push",
+                to: from,
+                from: deviceId,
+                signal: { type: "answer", sdp: peer.pc.localDescription }
+            });
+        } else if (payload.type === "answer") {
+            if (peer.pc.signalingState === "have-local-offer") {
+                await peer.pc.setRemoteDescription(payload.sdp);
+            }
+        }
+    }
+
+    function waitForIceComplete(pc) {
+        if (pc.iceGatheringState === "complete") return Promise.resolve();
+        return new Promise(resolve => {
+            const timeout = setTimeout(resolve, 5000);
+            const done = () => {
+                if (pc.iceGatheringState === "complete") {
+                    clearTimeout(timeout);
+                    pc.removeEventListener("icegatheringstatechange", done);
+                    resolve();
+                }
+            };
+            pc.addEventListener("icegatheringstatechange", done);
+        });
+    }
+
+    async function signalingTick() {
+        if (signalingBusy || document.hidden) return;
+        signalingBusy = true;
+        try {
+            await serverRequest("POST", { action: "register_peer", peer_id: deviceId, channel: CHANNEL });
+
+            const peersResult = await serverRequest("GET", {}, {
+                action: "get_peers",
+                channel: CHANNEL,
+                peer_id: deviceId
+            });
+
+            if (peersResult.data?.peers) {
+                for (const remote of peersResult.data.peers) {
+                    const remoteId = String(remote.peer_id || "");
+                    if (!remoteId || remoteId === deviceId) continue;
+                    if (!peers.has(remoteId) && deviceId < remoteId) createOffer(remoteId).catch(() => {});
+                }
+            }
+
+            const signals = await serverRequest("GET", {}, { action: "signal_pull", peer_id: deviceId });
+            for (const signal of (signals.data?.signals || [])) handleSignal(signal).catch(() => {});
+        } catch (_) {
+            // Silent background reconnect.
+        } finally {
+            signalingBusy = false;
+        }
+    }
+
+    function startSignaling() {
+        if (peerTimer) clearInterval(peerTimer);
+        signalingTick();
+        peerTimer = ORIGINAL_SET_INTERVAL(signalingTick, PEER_REFRESH_MS);
+    }
+
+    async function loadOldMessages() {
+        if (loadedOldMessages) return localMessages;
+        if (initialLoadPromise) return initialLoadPromise;
+
+        initialLoadPromise = (async () => {
+            const cached = readLocalCache();
+            if (cached?.length) localMessages = sortMessages(cached).slice(-MAX_MESSAGES);
+
+            try {
+                const { response, data } = await serverRequest("GET", {}, { channel: CHANNEL, limit: 100 });
+                if (response.ok && data?.ok !== false && Array.isArray(data.messages)) {
+                    mergeMessages(data.messages, false);
+                    localMessages = sortMessages(localMessages).slice(-MAX_MESSAGES);
+                    writeLocalCache();
+                }
+            } catch (_) {}
+
+            loadedOldMessages = true;
+            return localMessages;
+        })();
+
+        return initialLoadPromise;
+    }
+
+    async function getMessages() {
+        await loadOldMessages();
+        startSignaling();
+        return { success: true, messages: localMessages.slice(-MAX_MESSAGES) };
+    }
+
+    async function sendP2PMessage(body) {
+        const message = makeMessage(body);
+        mergeMessages([message], false);
+        pendingSave.set(messageId(message), message);
+        writeLocalCache();
+
+        broadcast({ type: "chat_message", from: deviceId, message });
+
+        return {
+            success: true,
+            message,
+            messages: localMessages.slice(-MAX_MESSAGES),
+            p2p: true
+        };
     }
 
     async function handleMessages(method, options, url) {
         const body = await readBody(options);
 
-        if (method === "GET") {
-            const channel = url.searchParams.get("channel") || "general";
-            return jsonResponse(await getMessagesFast(channel));
-        }
+        if (method === "GET") return jsonResponse(await getMessages());
 
         if (method === "POST") {
+            // Game state/actions continue using Apps Script. Ordinary chat does not.
+            if (body.game_server || body.game_action || body.action === "edit" || body.action === "delete") {
+                try {
+                    const { response, data } = await serverRequest("POST", body);
+                    return jsonResponse(data, response.status || 200);
+                } catch (error) {
+                    return jsonResponse({ ok: false, error: error?.message || "Server request failed." }, 200);
+                }
+            }
+            return jsonResponse(await sendP2PMessage(body));
+        }
+
+        if (method === "PATCH" || method === "DELETE") {
             try {
                 const { response, data } = await serverRequest("POST", {
-                    ...body,
-                    username: String(body.username || "Anonymous").trim().substring(0, 24),
-                    channel: String(body.channel || "general").trim().substring(0, 32),
-                    message: String(body.message || "").trim().substring(0, 20000),
-                    image: body.image || null,
-                    files: Array.isArray(body.files) ? body.files : [],
-                    device_id: String(body.device_id || "").trim().substring(0, 100)
+                    action: method === "PATCH" ? "edit" : "delete",
+                    ...body
                 });
-
-                const channel = String(body.channel || "general").trim().substring(0, 32) || "general";
-
-                // Make the just-sent data available to the UI immediately when
-                // the server includes the created message in its response.
-                updateLocalCacheFromPost(channel, data);
-                lastFullRefresh.delete(channel);
-
-                // Also start a non-blocking full refresh so the cache becomes
-                // authoritative immediately after the write completes.
-                fetchFreshMessages(channel, false).catch(() => {});
-
                 return jsonResponse(data, response.status || 200);
             } catch (error) {
-                return jsonResponse({ ok: false, error: error?.message || "Could not send message." }, 200);
+                return jsonResponse({ ok: false, error: error?.message || "Server request failed." }, 200);
             }
         }
 
-        if (method === "PATCH") {
-            try {
-                const { response, data } = await serverRequest("POST", { action: "edit", ...body });
-                lastFullRefresh.delete(String(body.channel || "general"));
-                return jsonResponse(data, response.status || 200);
-            } catch (error) {
-                return jsonResponse({ ok: false, error: error?.message || "Could not edit message." }, 200);
-            }
-        }
-
-        if (method === "DELETE") {
-            try {
-                const { response, data } = await serverRequest("POST", { action: "delete", ...body });
-                lastFullRefresh.delete(String(body.channel || "general"));
-                return jsonResponse(data, response.status || 200);
-            } catch (error) {
-                return jsonResponse({ ok: false, error: error?.message || "Could not delete message." }, 200);
-            }
-        }
-
-        return jsonResponse({ error: "Method not allowed." }, 405);
+        return jsonResponse({ ok: false, error: "Method not allowed." }, 405);
     }
 
     async function handleMessageActions(method, options) {
@@ -418,10 +511,9 @@
         try {
             const body = await readBody(options);
             const { response, data } = await serverRequest("POST", body);
-            lastFullRefresh.delete(String(body.channel || "general"));
             return jsonResponse(data, response.status || 200);
         } catch (error) {
-            return jsonResponse({ ok: false, error: error?.message || "Could not connect to the chat server." }, 200);
+            return jsonResponse({ ok: false, error: error?.message || "Could not connect to the server." }, 200);
         }
     }
 
@@ -434,20 +526,22 @@
         const method = String(options.method || input?.method || "GET").toUpperCase();
         const path = url.pathname.replace(/\/+$/, "") || "/";
 
-        if (path === "/api/messages") return await handleMessages(method, options, url);
-        if (path === "/api/message-actions") return await handleMessageActions(method, options);
+        if (path === "/api/messages") return handleMessages(method, options, url);
+        if (path === "/api/message-actions") return handleMessageActions(method, options);
         return ORIGINAL_FETCH(input, options);
     };
 
     window.CHAT_APP_SERVER_URL = SERVER_URL;
-    window.CHAT_APP_FAST_REFRESH_MS = APP_REFRESH_MS;
-    window.CHAT_APP_LATEST_CHECK_MS = LATEST_CHECK_MS;
+    window.CHAT_APP_P2P_ENABLED = true;
+    window.CHAT_APP_P2P_SAVE_INTERVAL = SAVE_INTERVAL_MS;
 
-    installFastRefreshTimer();
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ensureSaveUI, { once: true });
+    else ensureSaveUI();
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", installConnectionUI, { once: true });
-    } else {
-        installConnectionUI();
-    }
+    window.addEventListener("beforeunload", () => {
+        if (pendingSave.size) savePendingMessages();
+        serverRequest("POST", { action: "unregister_peer", peer_id: deviceId, channel: CHANNEL }).catch(() => {});
+    });
+
+    startSaveLoop();
 })();
