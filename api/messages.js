@@ -5,7 +5,7 @@
 (() => {
     "use strict";
 
-    const SERVER_URL = "https://script.google.com/macros/s/AKfycbx0Z1BDwXguKHt1GXtGONAWlhgSVNQ_icYl3_LQCAw70sRiM6JY0CotzKh3w41Ocj-ZTA/exec";
+    const SERVER_URL = "https://script.google.com/macros/s/AKfycbykbMElbo8Twb--mOMgfI7cKkzPq65t-m4yHL9HSxSJ90oYnBl1pDWWEG1Sr3I8ZTm6/exec";
     const ORIGINAL_FETCH = window.fetch.bind(window);
 
     function jsonResponse(body, status = 200) {
@@ -73,12 +73,8 @@
         }
 
         if (method === "POST") {
-            if (body.game_server === true) {
-                const { response, data } = await serverRequest("POST", body);
-                return jsonResponse(data, response.status || 200);
-            }
-
             const { response, data } = await serverRequest("POST", {
+                ...body,
                 username: String(body.username || "").trim().substring(0, 24),
                 channel: String(body.channel || "general").trim().substring(0, 32),
                 message: String(body.message || "").trim().substring(0, 20000),
@@ -91,7 +87,7 @@
 
         if (method === "PATCH") {
             const { response, data } = await serverRequest("POST", {
-                action: body.game_server ? "game_edit" : "edit",
+                action: "edit",
                 ...body
             });
             return jsonResponse(data, response.status || 200);
@@ -99,7 +95,7 @@
 
         if (method === "DELETE") {
             const { response, data } = await serverRequest("POST", {
-                action: body.game_server ? "game_delete" : "delete",
+                action: "delete",
                 ...body
             });
             return jsonResponse(data, response.status || 200);
