@@ -1,11 +1,11 @@
 /*
  * Chat App 2 - Google Apps Script API adapter
- * Uses the deployed Google Apps Script web app as the backend.
+ * Uses the newest deployed Google Apps Script web app as the backend.
  */
 (() => {
     "use strict";
 
-    const SERVER_URL = "https://script.google.com/macros/s/AKfycbykbMElbo8Twb--mOMgfI7cKkzPq65t-m4yHL9HSxSJ90oYnBl1pDWWEG1Sr3I8ZTm6/exec";
+    const SERVER_URL = "https://script.google.com/macros/s/AKfycbzIQrF4QfSh6MVdSEFNMpINunLXIbOFtxFfbWm7_h8NwOWj-DYFqtKDMqwRuBEXHWZb/exec";
     const ORIGINAL_FETCH = window.fetch.bind(window);
 
     function jsonResponse(body, status = 200) {
@@ -27,11 +27,7 @@
         });
 
         const url = SERVER_URL + (params.toString() ? "?" + params.toString() : "");
-        const options = {
-            method,
-            cache: "no-store",
-            redirect: "follow"
-        };
+        const options = { method, cache: "no-store", redirect: "follow" };
 
         if (method !== "GET") {
             options.headers = { "Content-Type": "text/plain;charset=utf-8" };
@@ -48,13 +44,10 @@
     function normalizeMessage(message) {
         if (!message || typeof message !== "object") return message;
         let files = message.files;
-        if (typeof files === "string") {
+        if (typeof files === "string') {
             try { files = JSON.parse(files); } catch { files = []; }
         }
-        return {
-            ...message,
-            files: Array.isArray(files) ? files : []
-        };
+        return { ...message, files: Array.isArray(files) ? files : [] };
     }
 
     async function handleMessages(method, options, url) {
@@ -66,10 +59,7 @@
             if (!response.ok || data?.ok === false) {
                 return jsonResponse({ error: data?.error || data?.message || "Server request failed.", details: data }, response.status || 500);
             }
-            return jsonResponse({
-                success: true,
-                messages: Array.isArray(data.messages) ? data.messages.map(normalizeMessage) : []
-            });
+            return jsonResponse({ success: true, messages: Array.isArray(data.messages) ? data.messages.map(normalizeMessage) : [] });
         }
 
         if (method === "POST") {
@@ -86,18 +76,12 @@
         }
 
         if (method === "PATCH") {
-            const { response, data } = await serverRequest("POST", {
-                action: "edit",
-                ...body
-            });
+            const { response, data } = await serverRequest("POST", { action: "edit", ...body });
             return jsonResponse(data, response.status || 200);
         }
 
         if (method === "DELETE") {
-            const { response, data } = await serverRequest("POST", {
-                action: "delete",
-                ...body
-            });
+            const { response, data } = await serverRequest("POST", { action: "delete", ...body });
             return jsonResponse(data, response.status || 200);
         }
 
