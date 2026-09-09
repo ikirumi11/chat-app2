@@ -1,4 +1,4 @@
-/* Local Chat Background — stored only on this device/browser */
+/* Global Local Chat Background — stored only on this device/browser */
 (() => {
   'use strict';
 
@@ -13,13 +13,38 @@
       style.id = 'local-chat-background-style';
       document.head.appendChild(style);
     }
+
     const safe = String(url || '')
       .replace(/\\/g, '\\\\')
       .replace(/"/g, '\\"')
       .replace(/</g, '%3C');
-    style.textContent = safe
-      ? `.messages{background-image:linear-gradient(rgba(7,10,15,.34),rgba(7,10,15,.34)),url("${safe}") !important;background-size:cover !important;background-position:center !important;background-repeat:no-repeat !important;background-attachment:fixed !important;}`
-      : '.messages{background-image:none !important;}';
+
+    if (safe) {
+      style.textContent = `
+        html, body { min-height:100%; }
+        body {
+          background-image:linear-gradient(rgba(7,10,15,.42),rgba(7,10,15,.42)),url("${safe}") !important;
+          background-size:cover !important;
+          background-position:center !important;
+          background-repeat:no-repeat !important;
+          background-attachment:fixed !important;
+        }
+        body > .app {
+          background:transparent !important;
+        }
+        .app > .header,
+        .app > .messages,
+        .app > .composer {
+          background-color:rgba(7,10,15,.30) !important;
+        }
+        .app > .messages {
+          background-image:none !important;
+          background-attachment:initial !important;
+        }
+      `;
+    } else {
+      style.textContent = '';
+    }
   }
 
   function resizeImage(file) {
@@ -66,7 +91,7 @@
     try {
       localStorage.setItem(KEY, data);
       applyBackground(data);
-      status.textContent = '✓ Local background saved on this device.';
+      status.textContent = '✓ Global local background saved on this device.';
     } catch (_) {
       status.textContent = '✕ Browser storage is full. Try a smaller image.';
     }
@@ -86,17 +111,17 @@
     category.className = 'category';
     category.id = 'localBackgroundSetting';
     category.innerHTML = `
-      <button class="category-title" type="button"><span>🌄 Local Chat Background</span><span>⌄</span></button>
+      <button class="category-title" type="button"><span>🌄 Global Chat Background</span><span>⌄</span></button>
       <div class="category-body">
         <div class="setting">
           <label>Background image file</label>
           <input id="localBackgroundFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
           <small style="color:#89919d;display:block;margin-top:6px">This background is private to this browser/device. It is never uploaded.</small>
-          <img id="localBackgroundPreview" style="display:none;width:100%;height:140px;object-fit:cover;border-radius:12px;margin-top:10px;border:1px solid #343a44" alt="Local background preview">
+          <img id="localBackgroundPreview" style="display:none;width:100%;height:140px;object-fit:cover;border-radius:12px;margin-top:10px;border:1px solid #343a44" alt="Global background preview">
         </div>
         <div class="setting">
-          <button class="save-btn" id="saveLocalBackground" disabled>Save Local Background</button>
-          <button class="game-btn" id="clearLocalBackground" style="margin-top:8px;width:100%">Remove Local Background</button>
+          <button class="save-btn" id="saveLocalBackground" disabled>Save Global Background</button>
+          <button class="game-btn" id="clearLocalBackground" style="margin-top:8px;width:100%">Remove Global Background</button>
           <div id="localBackgroundStatus" style="color:#929aa5;font-size:12px;margin-top:9px;min-height:18px"></div>
         </div>
       </div>`;
@@ -119,7 +144,7 @@
         status.textContent = '✕ Please choose an image file.';
         return;
       }
-      status.textContent = 'Preparing local image…';
+      status.textContent = 'Preparing global local image…';
       try {
         selected = await resizeImage(file);
         preview.src = selected;
