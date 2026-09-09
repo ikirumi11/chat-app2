@@ -1,23 +1,59 @@
 /*
  * Chat App 2 - Google Apps Script API adapter
- * Fast Google Sheets backend connection.
- * Cached messages are shown immediately when available.
- * Background refresh keeps the chat current without blocking the UI.
+ * Near-instant Google Sheets chat sync.
+ *
+ * Strategy:
+ *  - First load gets the full recent message list once.
+ *  - After that, the client checks ONLY the newest message very frequently.
+ *  - If the newest message changed, it downloads the full recent list.
+ *  - Cached data is returned immediately so the UI never waits for Sheets.
+ *  - Chat refresh interval is reduced from 500ms to 100ms without changing
+ *    other 500ms timers such as voice-recording timers.
+ *  - Sending refreshes the local cache immediately when the server returns data.
  */
 (() => {
     "use strict";
 
     const SERVER_URL = "https://script.google.com/macros/s/AKfycbzIQrF4QfSh6MVdSEFNMpINunLXIbOFtxFfbWm7_h8NwOWj-DYFqtKDMqwRuBEXHWZb/exec";
     const ORIGINAL_FETCH = window.fetch.bind(window);
+    const ORIGINAL_SET_INTERVAL = window.setInterval.bind(window);
 
     const RETRY_MS = 750;
     const REQUEST_TIMEOUT_MS = 10000;
-    const CACHE_KEY_PREFIX = "chat_messages_cache_v2_";
-    const CACHE_MAX_AGE_MS = 30000;
-    const BACKGROUND_REFRESH_MS = 400;
+
+    // 100ms UI refresh. The server probe is slightly slower so we do not
+    // hammer Google Apps Script unnecessarily.
+    const APP_REFRESH_MS = 100;
+    const LATEST_CHECK_MS = 150;
+
+    const CACHE_KEY_PREFIX = "chat_messages_cache_v3_";
+    const CACHE_MAX_AGE_MS = 5 * 60 * 1000;
 
     const inflightGets = new Map();
-    const lastRefresh = new Map();
+    const inflightLatest = new Map();
+    const lastFullRefresh = new Map();
+    const latestWatchers = new Map();
+
+    function installFastRefreshTimer() {
+        // app.js uses setInterval(loadMessages, 500). Replace ONLY that timer.
+        // This avoids changing unrelated 500ms timers in the application.
+        if (window.__CHAT_FAST_INTERVAL_PATCHED__) return;
+        window.__CHAT_FAST_INTERVAL_PATCHED__ = true;
+
+        window.setInterval = function(callback, delay, ...args) {
+            let actualDelay = delay;
+
+            if (
+                delay === 500 &&
+                typeof callback === "function" &&
+                callback.name === "loadMessages"
+            ) {
+                actualDelay = APP_REFRESH_MS;
+            }
+
+            return ORIGINAL_SET_INTERVAL(callback, actualDelay, ...args);
+        };
+    }
 
     function installConnectionUI() {
         if (!document.body || document.getElementById("chatConnectionLoader")) return;
@@ -116,9 +152,12 @@
         try {
             const raw = localStorage.getItem(cacheKey(channel));
             if (!raw) return null;
+
             const cached = JSON.parse(raw);
             if (!cached || !Array.isArray(cached.messages)) return null;
+
             if (Date.now() - Number(cached.time || 0) > CACHE_MAX_AGE_MS) return null;
+
             return cached.messages.map(normalizeMessage);
         } catch (_) {
             return null;
@@ -132,6 +171,26 @@
                 messages
             }));
         } catch (_) {}
+    }
+
+    function getMessageSignature(message) {
+        if (!message || typeof message !== "object") return "";
+
+        return String(
+            message.id ??
+            message.messageId ??
+            message.timestamp ??
+            message.time ??
+            message.createdAt ??
+            message.created_at ??
+            JSON.stringify(message)
+        );
+    }
+
+    function getNewestCachedMessage(channel) {
+        const messages = readCachedMessages(channel);
+        if (!messages || !messages.length) return null;
+        return messages[messages.length - 1];
     }
 
     async function fetchFreshMessages(channel, showLoader) {
@@ -160,7 +219,7 @@
                         : [];
 
                     writeCachedMessages(channel, messages);
-                    lastRefresh.set(channel, Date.now());
+                    lastFullRefresh.set(channel, Date.now());
 
                     if (showLoader) setConnecting(false);
 
@@ -187,12 +246,62 @@
         }
     }
 
-    function refreshInBackground(channel) {
-        const now = Date.now();
-        const previous = lastRefresh.get(channel) || 0;
-        if (now - previous < BACKGROUND_REFRESH_MS) return;
-        if (inflightGets.has(channel)) return;
-        fetchFreshMessages(channel, false).catch(() => {});
+    async function probeNewest(channel) {
+        if (inflightLatest.has(channel)) return inflightLatest.get(channel);
+
+        const request = (async () => {
+            try {
+                // IMPORTANT: only ask Google Sheets for ONE row during normal polling.
+                // The Apps Script backend already supports limit=1.
+                const { response, data } = await serverRequest("GET", {}, {
+                    channel,
+                    limit: 1
+                });
+
+                if (!response.ok || data?.ok === false || data?.success === false) {
+                    return false;
+                }
+
+                const newest = Array.isArray(data.messages) && data.messages.length
+                    ? normalizeMessage(data.messages[data.messages.length - 1])
+                    : null;
+
+                const cachedNewest = getNewestCachedMessage(channel);
+                const serverSignature = getMessageSignature(newest);
+                const cachedSignature = getMessageSignature(cachedNewest);
+
+                // If the newest message changed, download the full recent list once.
+                if (serverSignature !== cachedSignature) {
+                    await fetchFreshMessages(channel, false);
+                    return true;
+                }
+
+                return false;
+            } catch (_) {
+                // Normal background probes must never make the UI say "Connecting".
+                return false;
+            }
+        })();
+
+        inflightLatest.set(channel, request);
+
+        try {
+            return await request;
+        } finally {
+            if (inflightLatest.get(channel) === request) inflightLatest.delete(channel);
+        }
+    }
+
+    function startLatestWatcher(channel) {
+        if (latestWatchers.has(channel)) return;
+
+        const timer = ORIGINAL_SET_INTERVAL(() => {
+            // Do not spend requests while the page is hidden.
+            if (document.hidden) return;
+            probeNewest(channel).catch(() => {});
+        }, LATEST_CHECK_MS);
+
+        latestWatchers.set(channel, timer);
     }
 
     async function getMessagesFast(channel) {
@@ -200,18 +309,48 @@
 
         const cached = readCachedMessages(channel);
 
-        // If we already have messages, return them immediately.
-        // A fresh request runs separately so the UI is never blocked by Google Sheets.
+        // Existing chat: return instantly. The newest-message watcher updates the
+        // local cache in the background whenever another user sends something.
         if (cached) {
-            refreshInBackground(channel);
+            startLatestWatcher(channel);
             return {
                 success: true,
                 messages: cached
             };
         }
 
-        // First ever load: keep trying until a real response arrives.
-        return await fetchFreshMessages(channel, true);
+        // First load: get the complete recent history. Keep retrying forever if
+        // the backend is temporarily unavailable.
+        const result = await fetchFreshMessages(channel, true);
+        startLatestWatcher(channel);
+        return result;
+    }
+
+    function updateLocalCacheFromPost(channel, data) {
+        try {
+            if (Array.isArray(data?.messages)) {
+                writeCachedMessages(channel, data.messages.map(normalizeMessage));
+                return;
+            }
+
+            const possible = data?.message || data?.newMessage || data?.createdMessage;
+            if (!possible || typeof possible !== "object") return;
+
+            const current = readCachedMessages(channel) || [];
+            const message = normalizeMessage(possible);
+            const id = getMessageSignature(message);
+
+            if (id && current.some(item => getMessageSignature(item) === id)) return;
+
+            current.push(message);
+            current.sort((a, b) => {
+                const at = new Date(a?.timestamp || a?.time || a?.createdAt || 0).getTime() || 0;
+                const bt = new Date(b?.timestamp || b?.time || b?.createdAt || 0).getTime() || 0;
+                return at - bt;
+            });
+
+            writeCachedMessages(channel, current.slice(-100));
+        } catch (_) {}
     }
 
     async function handleMessages(method, options, url) {
@@ -235,7 +374,15 @@
                 });
 
                 const channel = String(body.channel || "general").trim().substring(0, 32) || "general";
-                lastRefresh.delete(channel);
+
+                // Make the just-sent data available to the UI immediately when
+                // the server includes the created message in its response.
+                updateLocalCacheFromPost(channel, data);
+                lastFullRefresh.delete(channel);
+
+                // Also start a non-blocking full refresh so the cache becomes
+                // authoritative immediately after the write completes.
+                fetchFreshMessages(channel, false).catch(() => {});
 
                 return jsonResponse(data, response.status || 200);
             } catch (error) {
@@ -246,7 +393,7 @@
         if (method === "PATCH") {
             try {
                 const { response, data } = await serverRequest("POST", { action: "edit", ...body });
-                lastRefresh.delete(String(body.channel || "general"));
+                lastFullRefresh.delete(String(body.channel || "general"));
                 return jsonResponse(data, response.status || 200);
             } catch (error) {
                 return jsonResponse({ ok: false, error: error?.message || "Could not edit message." }, 200);
@@ -256,7 +403,7 @@
         if (method === "DELETE") {
             try {
                 const { response, data } = await serverRequest("POST", { action: "delete", ...body });
-                lastRefresh.delete(String(body.channel || "general"));
+                lastFullRefresh.delete(String(body.channel || "general"));
                 return jsonResponse(data, response.status || 200);
             } catch (error) {
                 return jsonResponse({ ok: false, error: error?.message || "Could not delete message." }, 200);
@@ -271,7 +418,7 @@
         try {
             const body = await readBody(options);
             const { response, data } = await serverRequest("POST", body);
-            lastRefresh.delete(String(body.channel || "general"));
+            lastFullRefresh.delete(String(body.channel || "general"));
             return jsonResponse(data, response.status || 200);
         } catch (error) {
             return jsonResponse({ ok: false, error: error?.message || "Could not connect to the chat server." }, 200);
@@ -293,7 +440,10 @@
     };
 
     window.CHAT_APP_SERVER_URL = SERVER_URL;
-    window.CHAT_APP_FAST_REFRESH_MS = BACKGROUND_REFRESH_MS;
+    window.CHAT_APP_FAST_REFRESH_MS = APP_REFRESH_MS;
+    window.CHAT_APP_LATEST_CHECK_MS = LATEST_CHECK_MS;
+
+    installFastRefreshTimer();
 
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", installConnectionUI, { once: true });
