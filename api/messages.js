@@ -31,7 +31,8 @@
     let initialLoadPromise = null;
     let saveTimer = null;
     let countdownTimer = null;
-    let nextSaveAt = Date.now() + SAVE_INTERVAL_MS;
+    let nextSaveAt = 0;
+    let sheetConnected = false;
     let peerTimer = null;
     let signalingBusy = false;
 
@@ -187,7 +188,7 @@
         if (channel) {
             const badge = document.createElement("span");
             badge.id = "chatSaveCountdown";
-            badge.textContent = "Saving in 10s";
+            badge.textContent = "Connecting to messages...";
             channel.appendChild(badge);
         }
     }
@@ -200,18 +201,35 @@
         el.classList.toggle("saving", saving);
     }
 
+    function getNextGlobalSaveTime() {
+        const now = Date.now();
+        return Math.ceil((now + 1) / SAVE_INTERVAL_MS) * SAVE_INTERVAL_MS;
+    }
+
     function startSaveCountdown() {
-        nextSaveAt = Date.now() + SAVE_INTERVAL_MS;
+        if (!sheetConnected) return;
+
+        nextSaveAt = getNextGlobalSaveTime();
+
         if (countdownTimer) clearInterval(countdownTimer);
         countdownTimer = ORIGINAL_SET_INTERVAL(() => {
+            if (!sheetConnected) {
+                updateSaveCountdown("Connecting to messages...");
+                return;
+            }
+
             const remaining = Math.max(0, nextSaveAt - Date.now());
             const seconds = Math.ceil(remaining / 1000);
             updateSaveCountdown(remaining <= 0 ? "Saving..." : `Saving in ${seconds}s`, remaining <= 0);
         }, 250);
-        updateSaveCountdown("Saving in 10s");
+
+        const remaining = Math.max(0, nextSaveAt - Date.now());
+        updateSaveCountdown(`Saving in ${Math.ceil(remaining / 1000)}s`);
     }
 
     async function savePendingMessages() {
+        if (!sheetConnected) return;
+
         if (!pendingSave.size) {
             startSaveCountdown();
             return;
@@ -244,9 +262,12 @@
     }
 
     function startSaveLoop() {
+        if (!sheetConnected) return;
         if (saveTimer) clearInterval(saveTimer);
         startSaveCountdown();
-        saveTimer = ORIGINAL_SET_INTERVAL(savePendingMessages, SAVE_INTERVAL_MS);
+        saveTimer = ORIGINAL_SET_INTERVAL(() => {
+            if (Date.now() >= nextSaveAt) savePendingMessages();
+        }, 250);
     }
 
     function broadcast(packet, exceptPeerId = "") {
@@ -438,17 +459,29 @@
             try {
                 const { response, data } = await serverRequest("GET", {}, { channel: CHANNEL, limit: 100 });
                 if (response.ok && data?.ok !== false && Array.isArray(data.messages)) {
+                    sheetConnected = true;
                     mergeMessages(data.messages, false);
                     localMessages = sortMessages(localMessages).slice(-MAX_MESSAGES);
                     writeLocalCache();
+                    loadedOldMessages = true;
+                    startSaveLoop();
                 }
-            } catch (_) {}
+            } catch (_) {
+                sheetConnected = false;
+            }
 
-            loadedOldMessages = true;
+            if (!sheetConnected) {
+                updateSaveCountdown("Waiting for messages...");
+            }
+
             return localMessages;
         })();
 
-        return initialLoadPromise;
+        try {
+            return await initialLoadPromise;
+        } finally {
+            initialLoadPromise = null;
+        }
     }
 
     async function getMessages() {
@@ -539,9 +572,7 @@
     else ensureSaveUI();
 
     window.addEventListener("beforeunload", () => {
-        if (pendingSave.size) savePendingMessages();
+        if (pendingSave.size && sheetConnected) savePendingMessages();
         serverRequest("POST", { action: "unregister_peer", peer_id: deviceId, channel: CHANNEL }).catch(() => {});
     });
-
-    startSaveLoop();
 })();
