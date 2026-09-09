@@ -1,10 +1,10 @@
-/* Global Chat Background — stored on the server for everyone */
+/* Global Chat Background — Google Apps Script backend */
 (() => {
   'use strict';
 
-  const API = '/api/global-background';
-  const MAX_DIM = 1800;
-  const MAX_BYTES = 1400 * 1024;
+  const SERVER = 'https://script.google.com/macros/s/AKfycbx0Z1BDwXguKHt1GXtGONAWlhgSVNQ_icYl3_LQCAw70sRiM6JY0CotzKh3w41Ocj-ZTA/exec';
+  const MAX_DIM = 900;
+  const MAX_BYTES = 30000;
 
   function applyBackground(url) {
     let style = document.getElementById('global-chat-background-style');
@@ -13,39 +13,28 @@
       style.id = 'global-chat-background-style';
       document.head.appendChild(style);
     }
-
-    const safe = String(url || '')
-      .replace(/\\/g, '\\\\')
-      .replace(/"/g, '\\"')
-      .replace(/</g, '%3C');
-
+    const safe = String(url || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/</g, '%3C');
     style.textContent = safe ? `
       html, body { min-height:100%; }
-      body {
-        background-image:linear-gradient(rgba(7,10,15,.42),rgba(7,10,15,.42)),url("${safe}") !important;
-        background-size:cover !important;
-        background-position:center !important;
-        background-repeat:no-repeat !important;
-        background-attachment:fixed !important;
-      }
+      body { background-image:linear-gradient(rgba(7,10,15,.42),rgba(7,10,15,.42)),url("${safe}") !important; background-size:cover !important; background-position:center !important; background-repeat:no-repeat !important; background-attachment:fixed !important; }
       body > .app { background:transparent !important; }
-      .app > .header,
-      .app > .messages,
-      .app > .composer { background-color:rgba(7,10,15,.30) !important; }
-      .app > .messages { background-image:none !important; background-attachment:initial !important; }
+      .app > .header, .app > .messages, .app > .composer { background-color:rgba(7,10,15,.30) !important; }
+      .app > .messages { background-image:none !important; }
     ` : '';
   }
 
-  async function request(method, body) {
-    const response = await fetch(API, {
+  async function request(action, body = {}) {
+    const method = action === 'background' ? 'GET' : 'POST';
+    const url = method === 'GET' ? SERVER + '?action=background' : SERVER;
+    const response = await fetch(url, {
       method,
-      headers: body ? { 'Content-Type': 'application/json' } : undefined,
-      body: body ? JSON.stringify(body) : undefined,
+      headers: method === 'POST' ? { 'Content-Type': 'text/plain;charset=utf-8' } : undefined,
+      body: method === 'POST' ? JSON.stringify({ action, ...body }) : undefined,
       cache: 'no-store'
     });
     let data = {};
     try { data = await response.json(); } catch (_) {}
-    if (!response.ok) throw new Error(data.error || `Background request failed (${response.status})`);
+    if (!response.ok || data.ok === false) throw new Error(data.error || data.message || `Background request failed (${response.status})`);
     return data;
   }
 
@@ -58,21 +47,20 @@
         img.onerror = () => reject(new Error('Could not decode that image.'));
         img.onload = () => {
           const scale = Math.min(1, MAX_DIM / img.width, MAX_DIM / img.height);
-          const w = Math.max(1, Math.round(img.width * scale));
-          const h = Math.max(1, Math.round(img.height * scale));
           const canvas = document.createElement('canvas');
-          canvas.width = w; canvas.height = h;
+          canvas.width = Math.max(1, Math.round(img.width * scale));
+          canvas.height = Math.max(1, Math.round(img.height * scale));
           const ctx = canvas.getContext('2d');
           if (!ctx) return reject(new Error('Canvas is unavailable.'));
-          ctx.drawImage(img, 0, 0, w, h);
-          let quality = 0.84;
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          let quality = 0.72;
           let data = canvas.toDataURL('image/jpeg', quality);
-          while (data.length > MAX_BYTES * 1.37 && quality > 0.42) {
+          while (data.length > MAX_BYTES && quality > 0.25) {
             quality -= 0.06;
             data = canvas.toDataURL('image/jpeg', quality);
           }
-          if (data.length > MAX_BYTES * 1.37) reject(new Error('Image is too large after compression.'));
-          else resolve(data);
+          if (data.length > MAX_BYTES) return reject(new Error('Image is still too large. Choose a smaller image.'));
+          resolve(data);
         };
         img.src = reader.result;
       };
@@ -82,7 +70,7 @@
 
   async function loadServerBackground() {
     try {
-      const data = await request('GET');
+      const data = await request('background');
       applyBackground(data.url || '');
     } catch (error) {
       console.warn('Global background could not be loaded:', error);
@@ -90,37 +78,17 @@
   }
 
   function setup() {
-    const panel = document.querySelector('#settingsOverlay .panel-body');
-    if (!panel || document.getElementById('globalBackgroundSetting')) return;
+    const category = document.getElementById('globalBackgroundSetting');
+    if (!category || category.dataset.gsBackgroundReady === '1') return;
+    category.dataset.gsBackgroundReady = '1';
 
-    const category = document.createElement('div');
-    category.className = 'category';
-    category.id = 'globalBackgroundSetting';
-    category.innerHTML = `
-      <button class="category-title" type="button"><span>🌄 Global Chat Background</span><span>⌄</span></button>
-      <div class="category-body">
-        <div class="setting">
-          <label>Background image for everyone</label>
-          <input id="globalBackgroundFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
-          <small style="color:#89919d;display:block;margin-top:6px">Saved on the server. Everyone who opens the chat will see the current background.</small>
-          <img id="globalBackgroundPreview" style="display:none;width:100%;height:140px;object-fit:cover;border-radius:12px;margin-top:10px;border:1px solid #343a44" alt="Global background preview">
-        </div>
-        <div class="setting">
-          <button class="save-btn" id="saveGlobalBackground" disabled>Save for Everyone</button>
-          <button class="game-btn" id="clearGlobalBackground" style="margin-top:8px;width:100%">Remove Global Background</button>
-          <div id="globalBackgroundStatus" style="color:#929aa5;font-size:12px;margin-top:9px;min-height:18px"></div>
-        </div>
-      </div>`;
-
-    const appearance = [...panel.querySelectorAll('.category')]
-      .find(x => x.querySelector('.category-title')?.textContent.includes('Appearance'));
-    if (appearance) appearance.after(category); else panel.prepend(category);
-
-    category.querySelector('.category-title').onclick = () => category.classList.toggle('open');
     const input = category.querySelector('#globalBackgroundFile');
     const preview = category.querySelector('#globalBackgroundPreview');
     const saveBtn = category.querySelector('#saveGlobalBackground');
+    const clearBtn = category.querySelector('#clearGlobalBackground');
     const status = category.querySelector('#globalBackgroundStatus');
+    if (!input || !preview || !saveBtn || !clearBtn || !status) return;
+
     let selected = null;
 
     input.onchange = async () => {
@@ -144,9 +112,9 @@
     saveBtn.onclick = async () => {
       if (!selected) return;
       saveBtn.disabled = true;
-      status.textContent = 'Uploading and saving…';
+      status.textContent = 'Saving…';
       try {
-        const data = await request('POST', { url: selected });
+        const data = await request('background', { url: selected });
         applyBackground(data.url || selected);
         status.textContent = '✓ Global background saved for everyone.';
       } catch (error) {
@@ -156,10 +124,10 @@
       }
     };
 
-    category.querySelector('#clearGlobalBackground').onclick = async () => {
+    clearBtn.onclick = async () => {
       status.textContent = 'Removing…';
       try {
-        await request('DELETE');
+        await request('clear_background');
         applyBackground('');
         preview.style.display = 'none';
         selected = null;
