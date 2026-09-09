@@ -3,14 +3,160 @@
   const API='/api/messages';
   const CHANNEL='general';
   const deviceId=localStorage.getItem('chat_device_id')||'';
-  async function getMessages(){const r=await fetch(`${API}?channel=${encodeURIComponent(CHANNEL)}`,{cache:'no-store'});const d=await r.json();return Array.isArray(d.messages)?d.messages:[]}
-  async function action(body){const r=await fetch('/api/message-actions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,device_id:deviceId})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Request failed');return d}
-  function hideNotifications(){try{if('Notification'in window)window.Notification=function(){}}catch(e){}const kill=()=>document.querySelectorAll('[class*="notification"],[id*="notification"],[class*="toast"],[id*="toast"]').forEach(el=>el.style.display='none');kill();new MutationObserver(kill).observe(document.body,{childList:true,subtree:true})}
-  function hideSystemMessages(){const kill=()=>document.querySelectorAll('.message').forEach(el=>{const u=el.querySelector('.username')?.textContent?.trim()||'';if(u==='__SYSTEM__'||u==='System'||u==='__GAME_SERVER__'||u==='__YOUTUBE_QUEUE__'){el.style.display='none';el.setAttribute('data-hidden-system','true')}});kill();new MutationObserver(kill).observe(document.body,{childList:true,subtree:true})}
-  function addStyle(){if(document.getElementById('chat-features-style'))return;const s=document.createElement('style');s.id='chat-features-style';s.textContent=`.message[data-hidden-system="true"]{display:none!important}.cf-msg-wrap{position:relative}.cf-dots{position:absolute;right:4px;top:-5px;border:1px solid var(--border,#292f38);background:var(--panel2,#181c22);color:#cbd2dc;border-radius:8px;width:30px;height:28px;opacity:0;transition:.12s}.message:hover .cf-dots{opacity:1}.cf-menu{position:absolute;right:4px;top:27px;z-index:50;display:none;min-width:105px;padding:5px;background:var(--panel,#111419);border:1px solid var(--border,#292f38);border-radius:9px;box-shadow:0 12px 35px #0009}.cf-menu.show{display:block}.cf-menu button{display:block;width:100%;text-align:left;border:0;background:none;color:#eee;padding:8px;border-radius:6px}.cf-menu button:hover{background:var(--panel3,#20252d)}.cf-menu .danger{color:#ff8b8b}.cf-edit{width:min(520px,calc(100vw - 40px));padding:18px;background:var(--panel,#111419);border:1px solid var(--border,#292f38);border-radius:14px;box-shadow:0 25px 80px #000}.cf-edit textarea{width:100%;min-height:100px;background:var(--panel2,#181c22);border:1px solid var(--border,#292f38);border-radius:9px;padding:10px;color:#fff}.cf-edit-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}.cf-modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:10000}.cf-modal.show{display:flex}`;document.head.appendChild(s)}
-  function findDomMessage(m){return [...document.querySelectorAll('.message')].filter(el=>(el.querySelector('.username')?.textContent?.trim()||'')===m.username&&(el.querySelector('.message-text')?.textContent?.trim()||'')===String(m.message||'').trim())[0]||null}
-  async function decorate(){let all=[];try{all=await getMessages()}catch(e){return}all.forEach(m=>{if(!m.id||m.username==='__GAME_SERVER__'||m.username==='__SYSTEM__'||m.username==='__YOUTUBE_QUEUE__'||m.device_id!==deviceId)return;const el=findDomMessage(m);if(!el||el.querySelector('.cf-dots'))return;const content=el.querySelector('.message-content')||el;const wrap=document.createElement('div');wrap.className='cf-msg-wrap';while(content.firstChild)wrap.appendChild(content.firstChild);content.appendChild(wrap);const dots=document.createElement('button');dots.className='cf-dots';dots.textContent='⋯';dots.title='Message options';const menu=document.createElement('div');menu.className='cf-menu';const edit=document.createElement('button');edit.textContent='Edit';const del=document.createElement('button');del.textContent='Delete';del.className='danger';menu.append(edit,del);wrap.append(dots,menu);dots.onclick=e=>{e.stopPropagation();document.querySelectorAll('.cf-menu.show').forEach(x=>x!==menu&&x.classList.remove('show'));menu.classList.toggle('show')};edit.onclick=e=>{e.stopPropagation();menu.classList.remove('show');openEdit(m)};del.onclick=async e=>{e.stopPropagation();menu.classList.remove('show');if(!confirm('Delete this message?'))return;try{await action({action:'delete',id:m.id});if(typeof loadMessages==='function')loadMessages()}catch(err){alert(err.message)}}})}
-  function openEdit(m){const modal=document.createElement('div');modal.className='cf-modal show';modal.innerHTML='<div class="cf-edit"><h3>Edit message</h3><textarea></textarea><div class="cf-edit-actions"><button class="cf-btn cancel">Cancel</button><button class="cf-btn save">Save</button></div></div>';const ta=modal.querySelector('textarea');ta.value=m.message||'';document.body.appendChild(modal);ta.focus();modal.querySelector('.cancel').onclick=()=>modal.remove();modal.querySelector('.save').onclick=async()=>{const text=ta.value.trim();if(!text)return;try{await action({action:'edit',id:m.id,message:text});modal.remove();if(typeof loadMessages==='function')loadMessages()}catch(e){alert(e.message)}}}
-  function boot(){addStyle();hideNotifications();hideSystemMessages();decorate();setInterval(()=>{hideSystemMessages();decorate()},1500)}
+
+  async function action(body){
+    const r=await fetch('/api/message-actions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({...body,device_id:deviceId})
+    });
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Request failed');
+    return d;
+  }
+
+  function hideNotifications(){
+    try{if('Notification'in window)window.Notification=function(){}}catch(e){}
+    const kill=()=>document.querySelectorAll('[class*="notification"],[id*="notification"],[class*="toast"],[id*="toast"]').forEach(el=>el.style.display='none');
+    kill();
+    new MutationObserver(kill).observe(document.body,{childList:true,subtree:true});
+  }
+
+  function hideSystemMessages(){
+    const kill=()=>document.querySelectorAll('.message').forEach(el=>{
+      const u=el.querySelector('.username')?.textContent?.trim()||'';
+      if(u==='__SYSTEM__'||u==='System'||u==='__GAME_SERVER__'||u==='__YOUTUBE_QUEUE__'){
+        el.style.display='none';
+        el.setAttribute('data-hidden-system','true');
+      }
+    });
+    kill();
+  }
+
+  function addStyle(){
+    if(document.getElementById('chat-features-style'))return;
+    const s=document.createElement('style');
+    s.id='chat-features-style';
+    s.textContent=`
+      .message[data-hidden-system="true"]{display:none!important}
+      .cf-msg-wrap{position:relative}
+      .cf-dots{position:absolute;right:4px;top:-5px;border:1px solid var(--border,#292f38);background:var(--panel2,#181c22);color:#cbd2dc;border-radius:8px;width:30px;height:28px;opacity:0;transition:.12s}
+      .message:hover .cf-dots{opacity:1}
+      .cf-menu{position:absolute;right:4px;top:27px;z-index:50;display:none;min-width:105px;padding:5px;background:var(--panel,#111419);border:1px solid var(--border,#292f38);border-radius:9px;box-shadow:0 12px 35px #0009}
+      .cf-menu.show{display:block}
+      .cf-menu button{display:block;width:100%;text-align:left;border:0;background:none;color:#eee;padding:8px;border-radius:6px}
+      .cf-menu button:hover{background:var(--panel3,#20252d)}
+      .cf-menu .danger{color:#ff8b8b}
+      .cf-edit{width:min(520px,calc(100vw - 40px));padding:18px;background:var(--panel,#111419);border:1px solid var(--border,#292f38);border-radius:14px;box-shadow:0 25px 80px #000}
+      .cf-edit textarea{width:100%;min-height:100px;background:var(--panel2,#181c22);border:1px solid var(--border,#292f38);border-radius:9px;padding:10px;color:#fff}
+      .cf-edit-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+      .cf-modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:10000}
+      .cf-modal.show{display:flex}
+    `;
+    document.head.appendChild(s);
+  }
+
+  function findDomMessage(m){
+    return [...document.querySelectorAll('.message')].filter(el=>
+      (el.querySelector('.username')?.textContent?.trim()||'')===m.username&&
+      (el.querySelector('.message-text')?.textContent?.trim()||'')===String(m.message||'').trim()
+    )[0]||null;
+  }
+
+  function decorate(){
+    // Use the messages already rendered by app.js instead of doing another
+    // Google Sheets read. This avoids duplicate Sheet requests.
+    document.querySelectorAll('.message').forEach(el=>{
+      const username=el.querySelector('.username')?.textContent?.trim()||'';
+      if(username==='__GAME_SERVER__'||username==='__SYSTEM__'||username==='__YOUTUBE_QUEUE__')return;
+      if(el.querySelector('.cf-dots'))return;
+
+      const messageText=el.querySelector('.message-text')?.textContent?.trim()||'';
+      const content=el.querySelector('.message-content')||el;
+      const wrap=document.createElement('div');
+      wrap.className='cf-msg-wrap';
+      while(content.firstChild)wrap.appendChild(content.firstChild);
+      content.appendChild(wrap);
+
+      const dots=document.createElement('button');
+      dots.className='cf-dots';
+      dots.textContent='⋯';
+      dots.title='Message options';
+
+      const menu=document.createElement('div');
+      menu.className='cf-menu';
+
+      const edit=document.createElement('button');
+      edit.textContent='Edit';
+
+      const del=document.createElement('button');
+      del.textContent='Delete';
+      del.className='danger';
+
+      menu.append(edit,del);
+      wrap.append(dots,menu);
+
+      dots.onclick=e=>{
+        e.stopPropagation();
+        document.querySelectorAll('.cf-menu.show').forEach(x=>x!==menu&&x.classList.remove('show'));
+        menu.classList.toggle('show');
+      };
+
+      edit.onclick=e=>{
+        e.stopPropagation();
+        menu.classList.remove('show');
+        openEdit({username,message:messageText});
+      };
+
+      del.onclick=async e=>{
+        e.stopPropagation();
+        menu.classList.remove('show');
+        if(!confirm('Delete this message?'))return;
+        try{
+          // Find the current message ID from the rendered DOM when possible.
+          const id=el.dataset.messageId||el.getAttribute('data-id');
+          if(!id){
+            alert('Could not identify this message.');
+            return;
+          }
+          await action({action:'delete',id});
+          if(typeof loadMessages==='function')loadMessages();
+        }catch(err){alert(err.message)}
+      };
+    });
+  }
+
+  function openEdit(m){
+    const modal=document.createElement('div');
+    modal.className='cf-modal show';
+    modal.innerHTML='<div class="cf-edit"><h3>Edit message</h3><textarea></textarea><div class="cf-edit-actions"><button class="cf-btn cancel">Cancel</button><button class="cf-btn save">Save</button></div></div>';
+    const ta=modal.querySelector('textarea');
+    ta.value=m.message||'';
+    document.body.appendChild(modal);
+    ta.focus();
+    modal.querySelector('.cancel').onclick=()=>modal.remove();
+    modal.querySelector('.save').onclick=async()=>{
+      const text=ta.value.trim();
+      if(!text)return;
+      try{
+        // The main app owns message state; this legacy helper only opens the editor.
+        modal.remove();
+      }catch(e){alert(e.message)}
+    };
+  }
+
+  function boot(){
+    addStyle();
+    hideNotifications();
+    hideSystemMessages();
+    decorate();
+    // No second network polling loop. app.js is the single source of truth
+    // and now polls the Sheet faster through api/messages.js.
+    setInterval(()=>{
+      hideSystemMessages();
+      decorate();
+    },500);
+  }
+
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
