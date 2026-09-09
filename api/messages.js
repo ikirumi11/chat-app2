@@ -9,10 +9,7 @@
     const ORIGINAL_FETCH = window.fetch.bind(window);
 
     function jsonResponse(body, status = 200) {
-        return new Response(JSON.stringify(body), {
-            status,
-            headers: { "Content-Type": "application/json" }
-        });
+        return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
     }
 
     async function readBody(options) {
@@ -25,15 +22,12 @@
         Object.entries(query).forEach(([key, value]) => {
             if (value !== undefined && value !== null) params.set(key, String(value));
         });
-
         const url = SERVER_URL + (params.toString() ? "?" + params.toString() : "");
         const options = { method, cache: "no-store", redirect: "follow" };
-
         if (method !== "GET") {
             options.headers = { "Content-Type": "text/plain;charset=utf-8" };
             options.body = JSON.stringify(payload);
         }
-
         const response = await ORIGINAL_FETCH(url, options);
         const text = await response.text();
         let data = {};
@@ -44,7 +38,7 @@
     function normalizeMessage(message) {
         if (!message || typeof message !== "object") return message;
         let files = message.files;
-        if (typeof files === "string') {
+        if (typeof files === "string") {
             try { files = JSON.parse(files); } catch { files = []; }
         }
         return { ...message, files: Array.isArray(files) ? files : [] };
@@ -52,16 +46,12 @@
 
     async function handleMessages(method, options, url) {
         const body = await readBody(options);
-
         if (method === "GET") {
             const channel = String(url.searchParams.get("channel") || "general").trim().substring(0, 32);
             const { response, data } = await serverRequest("GET", {}, { channel });
-            if (!response.ok || data?.ok === false) {
-                return jsonResponse({ error: data?.error || data?.message || "Server request failed.", details: data }, response.status || 500);
-            }
+            if (!response.ok || data?.ok === false) return jsonResponse({ error: data?.error || data?.message || "Server request failed.", details: data }, response.status || 500);
             return jsonResponse({ success: true, messages: Array.isArray(data.messages) ? data.messages.map(normalizeMessage) : [] });
         }
-
         if (method === "POST") {
             const { response, data } = await serverRequest("POST", {
                 ...body,
@@ -74,17 +64,14 @@
             });
             return jsonResponse(data, response.status || 200);
         }
-
         if (method === "PATCH") {
             const { response, data } = await serverRequest("POST", { action: "edit", ...body });
             return jsonResponse(data, response.status || 200);
         }
-
         if (method === "DELETE") {
             const { response, data } = await serverRequest("POST", { action: "delete", ...body });
             return jsonResponse(data, response.status || 200);
         }
-
         return jsonResponse({ error: "Method not allowed." }, 405);
     }
 
@@ -99,20 +86,16 @@
         const requestUrl = typeof input === "string" ? input : input?.url || "";
         let url;
         try { url = new URL(requestUrl, window.location.href); } catch { return ORIGINAL_FETCH(input, options); }
-
         const method = String(options.method || input?.method || "GET").toUpperCase();
         const path = url.pathname.replace(/\/+$/, "") || "/";
-
         if (path === "/api/messages") {
             try { return await handleMessages(method, options, url); }
             catch (error) { return jsonResponse({ error: error?.message || "Could not connect to the chat server." }, 500); }
         }
-
         if (path === "/api/message-actions") {
             try { return await handleMessageActions(method, options); }
             catch (error) { return jsonResponse({ error: error?.message || "Could not connect to the chat server." }, 500); }
         }
-
         return ORIGINAL_FETCH(input, options);
     };
 
