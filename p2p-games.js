@@ -12,8 +12,8 @@
   const POLL_MS = 900;
 
   const myId = localStorage.getItem(DEVICE_KEY) || '';
-  const peerGames = new Map();       // gameId -> Map(peerId, RTCPeerConnection)
-  const p2pStates = new Map();       // gameId -> newest state received over P2P
+  const peerGames = new Map();
+  const p2pStates = new Map();
   const seenSignals = new Set();
   const sentOffers = new Set();
   let lastServerMessages = [];
@@ -68,6 +68,7 @@
   }
 
   function attachDataChannel(gameId, peerId, channel) {
+    setChannelReference(gameId, peerId, channel);
     channel.onopen = () => {
       channel.__p2pOpen = true;
       const state = p2pStates.get(gameId);
@@ -110,12 +111,7 @@
 
     pc.onicecandidate = event => {
       if (event.candidate) {
-        sendSignal({
-          kind: 'ice',
-          gameId: game.id,
-          to: peerId,
-          candidate: event.candidate
-        });
+        sendSignal({ kind: 'ice', gameId: game.id, to: peerId, candidate: event.candidate });
       }
     };
 
@@ -132,12 +128,7 @@
       attachDataChannel(game.id, peerId, channel);
       pc.createOffer()
         .then(offer => pc.setLocalDescription(offer))
-        .then(() => sendSignal({
-          kind: 'offer',
-          gameId: game.id,
-          to: peerId,
-          description: pc.localDescription
-        }))
+        .then(() => sendSignal({ kind: 'offer', gameId: game.id, to: peerId, description: pc.localDescription }))
         .catch(error => console.warn('P2P offer failed:', error));
     } else {
       pc.ondatachannel = event => attachDataChannel(game.id, peerId, event.channel);
@@ -162,12 +153,7 @@
         await pc.setRemoteDescription(signal.description);
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
-        await sendSignal({
-          kind: 'answer',
-          gameId: game.id,
-          to: signal.from,
-          description: pc.localDescription
-        });
+        await sendSignal({ kind: 'answer', gameId: game.id, to: signal.from, description: pc.localDescription });
       } catch (error) {
         console.warn('P2P answer failed:', error);
       }
@@ -193,16 +179,13 @@
 
   function ensureConnections(game) {
     if (!game?.id || !Array.isArray(game.players) || !myId) return;
-    const host = game.hostDeviceId;
-
-    if (host === myId) {
+    if (game.hostDeviceId === myId) {
       for (const player of game.players) {
         const peerId = player?.deviceId;
         if (!peerId || peerId === myId) continue;
         const key = `${game.id}:${peerId}`;
         const peers = gamePeers(game.id);
-        const pc = peers.get(peerId);
-        if (!pc && !sentOffers.has(key)) {
+        if (!peers.get(peerId) && !sentOffers.has(key)) {
           sentOffers.add(key);
           makePeer(game, peerId, true);
         }
@@ -214,15 +197,9 @@
     const peers = peerGames(gameId);
     for (const [peerId, pc] of peers) {
       if (peerId === exceptPeerId) continue;
-      const channels = [];
-      // Host-created channel is attached to pc; keep a private reference on it.
-      if (pc.__gameChannel) channels.push(pc.__gameChannel);
-      if (channels.length) {
-        for (const channel of channels) {
-          if (channel.readyState === 'open') {
-            try { channel.send(JSON.stringify({ kind: 'state', game })); } catch (_) {}
-          }
-        }
+      const channel = pc.__gameChannel;
+      if (channel?.readyState === 'open') {
+        try { channel.send(JSON.stringify({ kind: 'state', game })); } catch (_) {}
       }
     }
   }
@@ -233,9 +210,7 @@
   }
 
   function refreshGameUI() {
-    try {
-      if (typeof window.renderMessages === 'function') window.renderMessages(false);
-    } catch (_) {}
+    try { if (typeof window.renderMessages === 'function') window.renderMessages(false); } catch (_) {}
   }
 
   async function poll() {
@@ -268,13 +243,10 @@
     const state = clone(game);
     p2pStates.set(game.id, state);
 
-    for (const [peerId, pc] of peers) {
+    for (const pc of peers.values()) {
       const channel = pc.__gameChannel;
-      if (channel && channel.readyState === 'open') {
-        try {
-          channel.send(JSON.stringify({ kind: 'state', game: state }));
-          sent++;
-        } catch (_) {}
+      if (channel?.readyState === 'open') {
+        try { channel.send(JSON.stringify({ kind: 'state', game: state })); sent++; } catch (_) {}
       }
     }
 
@@ -283,8 +255,7 @@
   }
 
   function isReady(gameId) {
-    const peers = peerGames(gameId);
-    for (const pc of peers.values()) {
+    for (const pc of peerGames(gameId).values()) {
       if (pc.__gameChannel?.readyState === 'open') return true;
     }
     return false;
@@ -325,26 +296,11 @@
     }
   }
 
-  const originalMakePeer = makePeer;
-  // Keep the data-channel reference used by the broadcast path.
-  // This wrapper is installed after function creation so normal WebRTC setup stays unchanged.
-  const patchedMakePeer = function(game, peerId, initiator) {
-    const pc = originalMakePeer(game, peerId, initiator);
-    if (pc && initiator && pc.createDataChannel) {
-      // The channel is assigned by the patched createDataChannel below.
-    }
-    return pc;
-  };
-  void patchedMakePeer;
-
-  // Patch createDataChannel so every host channel is retained for fast broadcasts.
   const nativeCreate = RTCPeerConnection.prototype.createDataChannel;
   if (nativeCreate && !RTCPeerConnection.prototype.__chatP2PPatched) {
     RTCPeerConnection.prototype.createDataChannel = function(label, options) {
       const channel = nativeCreate.call(this, label, options);
-      if (label === 'game-state') {
-        this.__gameChannel = channel;
-      }
+      if (label === 'game-state') this.__gameChannel = channel;
       return channel;
     };
     Object.defineProperty(RTCPeerConnection.prototype, '__chatP2PPatched', { value: true });
@@ -361,9 +317,5 @@
     else boot();
   }
 
-  window.chatP2PGames = {
-    broadcast,
-    isReady,
-    states: p2pStates
-  };
+  window.chatP2PGames = { broadcast, isReady, states: p2pStates };
 })();
