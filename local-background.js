@@ -1,8 +1,8 @@
-/* Global Chat Background — Google Apps Script backend */
+/* Global Chat Background — newest Google Apps Script backend */
 (() => {
   'use strict';
 
-  const SERVER = 'https://script.google.com/macros/s/AKfycbykbMElbo8Twb--mOMgfI7cKkzPq65t-m4yHL9HSxSJ90oYnBl1pDWWEG1Sr3I8ZTm6/exec';
+  const SERVER = 'https://script.google.com/macros/s/AKfycbzIQrF4QfSh6MVdSEFNMpINunLXIbOFtxFfbWm7_h8NwOWj-DYFqtKDMqwRuBEXHWZb/exec';
   const MAX_DIM = 900;
   const MAX_BYTES = 30000;
 
@@ -14,13 +14,7 @@
       document.head.appendChild(style);
     }
     const safe = String(url || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/</g, '%3C');
-    style.textContent = safe ? `
-      html, body { min-height:100%; }
-      body { background-image:linear-gradient(rgba(7,10,15,.42),rgba(7,10,15,.42)),url("${safe}") !important; background-size:cover !important; background-position:center !important; background-repeat:no-repeat !important; background-attachment:fixed !important; }
-      body > .app { background:transparent !important; }
-      .app > .header, .app > .messages, .app > .composer { background-color:rgba(7,10,15,.30) !important; }
-      .app > .messages { background-image:none !important; }
-    ` : '';
+    style.textContent = safe ? `html,body{min-height:100%;}body{background-image:linear-gradient(rgba(7,10,15,.42),rgba(7,10,15,.42)),url("${safe}") !important;background-size:cover !important;background-position:center !important;background-repeat:no-repeat !important;background-attachment:fixed !important;}.app{background:transparent !important;}.app>.header,.app>.messages,.app>.composer{background-color:rgba(7,10,15,.30) !important;}.app>.messages{background-image:none !important;}` : '';
   }
 
   async function request(action, body = {}) {
@@ -55,10 +49,7 @@
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           let quality = 0.72;
           let data = canvas.toDataURL('image/jpeg', quality);
-          while (data.length > MAX_BYTES && quality > 0.25) {
-            quality -= 0.06;
-            data = canvas.toDataURL('image/jpeg', quality);
-          }
+          while (data.length > MAX_BYTES && quality > 0.25) { quality -= 0.06; data = canvas.toDataURL('image/jpeg', quality); }
           if (data.length > MAX_BYTES) return reject(new Error('Image is still too large. Choose a smaller image.'));
           resolve(data);
         };
@@ -69,80 +60,47 @@
   }
 
   async function loadServerBackground() {
-    try {
-      const data = await request('background');
-      applyBackground(data.url || '');
-    } catch (error) {
-      console.warn('Global background could not be loaded:', error);
-    }
+    try { const data = await request('background'); applyBackground(data.url || ''); }
+    catch (error) { console.warn('Global background could not be loaded:', error); }
   }
 
   function setup() {
     const category = document.getElementById('globalBackgroundSetting');
     if (!category || category.dataset.gsBackgroundReady === '1') return;
     category.dataset.gsBackgroundReady = '1';
-
     const input = category.querySelector('#globalBackgroundFile');
     const preview = category.querySelector('#globalBackgroundPreview');
     const saveBtn = category.querySelector('#saveGlobalBackground');
     const clearBtn = category.querySelector('#clearGlobalBackground');
     const status = category.querySelector('#globalBackgroundStatus');
     if (!input || !preview || !saveBtn || !clearBtn || !status) return;
-
     let selected = null;
-
     input.onchange = async () => {
       const file = input.files?.[0];
       if (!file) return;
       if (!file.type.startsWith('image/')) { status.textContent = '✕ Please choose an image file.'; return; }
       status.textContent = 'Preparing image…';
-      try {
-        selected = await resizeImage(file);
-        preview.src = selected;
-        preview.style.display = 'block';
-        saveBtn.disabled = false;
-        status.textContent = 'Ready to save for everyone.';
-      } catch (error) {
-        selected = null;
-        saveBtn.disabled = true;
-        status.textContent = '✕ ' + error.message;
-      }
+      try { selected = await resizeImage(file); preview.src = selected; preview.style.display = 'block'; saveBtn.disabled = false; status.textContent = 'Ready to save for everyone.'; }
+      catch (error) { selected = null; saveBtn.disabled = true; status.textContent = '✕ ' + error.message; }
     };
-
     saveBtn.onclick = async () => {
       if (!selected) return;
-      saveBtn.disabled = true;
-      status.textContent = 'Saving…';
-      try {
-        const data = await request('background', { url: selected });
-        applyBackground(data.url || selected);
-        status.textContent = '✓ Global background saved for everyone.';
-      } catch (error) {
-        status.textContent = '✕ ' + error.message;
-      } finally {
-        saveBtn.disabled = false;
-      }
+      saveBtn.disabled = true; status.textContent = 'Saving…';
+      try { const data = await request('background', { url: selected }); applyBackground(data.url || selected); status.textContent = '✓ Global background saved for everyone.'; }
+      catch (error) { status.textContent = '✕ ' + error.message; }
+      finally { saveBtn.disabled = false; }
     };
-
     clearBtn.onclick = async () => {
       status.textContent = 'Removing…';
-      try {
-        await request('clear_background');
-        applyBackground('');
-        preview.style.display = 'none';
-        selected = null;
-        saveBtn.disabled = true;
-        status.textContent = '✓ Global background removed for everyone.';
-      } catch (error) {
-        status.textContent = '✕ ' + error.message;
-      }
+      try { await request('clear_background'); applyBackground(''); preview.style.display = 'none'; selected = null; saveBtn.disabled = true; status.textContent = '✓ Global background removed for everyone.'; }
+      catch (error) { status.textContent = '✕ ' + error.message; }
     };
   }
 
   function boot() {
     loadServerBackground();
     setup();
-    new MutationObserver(setup).observe(document.documentElement, { childList:true, subtree:true });
+    new MutationObserver(setup).observe(document.documentElement, { childList: true, subtree: true });
   }
 
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', boot) : boot();
