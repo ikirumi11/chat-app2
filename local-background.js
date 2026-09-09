@@ -2,7 +2,7 @@
 (() => {
   'use strict';
 
-  const SERVER = 'https://script.google.com/macros/s/AKfycbx0Z1BDwXguKHt1GXtGONAWlhgSVNQ_icYl3_LQCAw70sRiM6JY0CotzKh3w41Ocj-ZTA/exec';
+  const SERVER = 'https://script.google.com/macros/s/AKfycbykbMElbo8Twb--mOMgfI7cKkzPq65t-m4yHL9HSxSJ90oYnBl1pDWWEG1Sr3I8ZTm6/exec';
   const MAX_DIM = 900;
   const MAX_BYTES = 30000;
 
