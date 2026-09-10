@@ -3,12 +3,11 @@
   'use strict';
 
   const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbziB6VM28VGG9xWpsKhOte-HmUN2Uu54fLSVf1KwiTyy81VxZ6NwlsBzklFN1cjIU1o/exec';
-  const CACHE_KEY = 'chatGlobalBackground.cache.v1';
+  const CACHE_KEY = 'chatGlobalBackground.cache.v2';
   const MAX_DIM = 1800;
   const MAX_BASE64_CHARS = 2_500_000;
 
   let selectedBackground = '';
-  let previewObjectUrl = '';
 
   function applyBackground(data) {
     let style = document.getElementById('global-chat-background-style');
@@ -38,6 +37,22 @@
   function readCachedBackground() {
     try { return localStorage.getItem(CACHE_KEY) || ''; }
     catch (_) { return ''; }
+  }
+
+  function parseResponse(response, fallbackText) {
+    return response.text().then(text => {
+      const trimmed = text.trim();
+      if (!trimmed) throw new Error(fallbackText || 'The background server returned an empty response.');
+
+      try {
+        return JSON.parse(trimmed);
+      } catch (_) {
+        if (/^<!doctype html/i.test(trimmed) || /^<html/i.test(trimmed) || trimmed.includes('<!DOCTYPE')) {
+          throw new Error('Google Apps Script returned an HTML page instead of JSON. Make sure the Web App is deployed as Execute as: Me and Who has access: Anyone, then redeploy it.');
+        }
+        throw new Error('The background server returned invalid JSON.');
+      }
+    });
   }
 
   function resizeImage(file) {
@@ -86,17 +101,19 @@
 
       const response = await fetch(`${BACKEND_URL}?action=getBackground&_=${Date.now()}`, {
         method: 'GET',
-        cache: 'no-store'
+        cache: 'no-store',
+        redirect: 'follow'
       });
 
-      if (!response.ok) throw new Error(`Server returned ${response.status}.`);
+      if (!response.ok) throw new Error(`Server returned HTTP ${response.status}.`);
 
-      const result = await response.json();
+      const result = await parseResponse(response);
       if (!result.success) throw new Error(result.error || 'Could not load background.');
 
       const background = result.background || '';
       cacheBackground(background);
       applyBackground(background);
+      updatePreview(background);
 
       if (statusElement) {
         statusElement.textContent = background
@@ -104,10 +121,9 @@
           : 'No global background has been set yet.';
       }
 
-      updatePreview(background);
       return background;
     } catch (error) {
-      if (statusElement) statusElement.textContent = '⚠ Could not reach the global background server. Using the last cached version.';
+      if (statusElement) statusElement.textContent = '⚠ ' + error.message + (cached ? ' Using the last cached background.' : '');
       return cached;
     }
   }
@@ -121,15 +137,13 @@
       const response = await fetch(BACKEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'saveBackground',
-          background: data
-        })
+        body: JSON.stringify({ action: 'saveBackground', background: data }),
+        redirect: 'follow'
       });
 
-      if (!response.ok) throw new Error(`Server returned ${response.status}.`);
+      if (!response.ok) throw new Error(`Server returned HTTP ${response.status}.`);
 
-      const result = await response.json();
+      const result = await parseResponse(response);
       if (!result.success) throw new Error(result.error || 'Could not save background.');
 
       cacheBackground(data);
@@ -151,11 +165,12 @@
       const response = await fetch(BACKEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'clearBackground' })
+        body: JSON.stringify({ action: 'clearBackground' }),
+        redirect: 'follow'
       });
 
-      if (!response.ok) throw new Error(`Server returned ${response.status}.`);
-      const result = await response.json();
+      if (!response.ok) throw new Error(`Server returned HTTP ${response.status}.`);
+      const result = await parseResponse(response);
       if (!result.success) throw new Error(result.error || 'Could not clear background.');
 
       cacheBackground('');
@@ -174,7 +189,6 @@
   function updatePreview(data) {
     const preview = document.getElementById('globalBackgroundPreview');
     if (!preview) return;
-
     if (data) {
       preview.src = data;
       preview.style.display = 'block';
@@ -204,7 +218,7 @@
         <div class="setting">
           <label>Choose a new background</label>
           <input id="globalBackgroundFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
-          <small style="color:#89919d;display:block;margin-top:6px">The selected image is compressed and sent to the shared Google Docs background server.</small>
+          <small style="color:#89919d;display:block;margin-top:6px">The selected image is compressed before being sent to the shared Google Docs background server.</small>
         </div>
         <div class="setting">
           <button class="save-btn" id="sendGlobalBackground" disabled>Send New Global Background</button>
@@ -285,21 +299,12 @@
   function boot() {
     const cached = readCachedBackground();
     if (cached) applyBackground(cached);
-
     setupSettings();
     loadGlobalBackground();
-
-    new MutationObserver(setupSettings).observe(document.documentElement, {
-      childList: true,
-      subtree: true
-    });
+    new MutationObserver(setupSettings).observe(document.documentElement, { childList: true, subtree: true });
   }
 
-  window.ChatGlobalBackground = {
-    load: loadGlobalBackground,
-    save: saveGlobalBackground,
-    clear: clearGlobalBackground
-  };
+  window.ChatGlobalBackground = { load: loadGlobalBackground, save: saveGlobalBackground, clear: clearGlobalBackground };
 
   document.readyState === 'loading'
     ? document.addEventListener('DOMContentLoaded', boot)
