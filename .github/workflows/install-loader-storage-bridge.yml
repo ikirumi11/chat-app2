@@ -15,21 +15,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Add storage bridge to loader
+      - name: Add storage bridge and storage menu to loader
         shell: python
         run: |
           from pathlib import Path
 
           path = Path('loader.html')
           text = path.read_text(encoding='utf-8')
-          marker = '<!-- CHAT APP LOADER STORAGE BRIDGE -->'
 
-          if marker not in text:
-              insertion = (
-                  '\n' + marker + '\n'
+          bridge_marker = '<!-- CHAT APP LOADER STORAGE BRIDGE -->'
+          menu_marker = '<!-- CHAT APP LOADER STORAGE MENU -->'
+
+          insertion = ''
+
+          if bridge_marker not in text:
+              insertion += (
+                  '\n' + bridge_marker + '\n'
                   '<script src="loader-storage-bridge.js"></script>\n'
               )
 
+          if menu_marker not in text:
+              insertion += (
+                  '\n' + menu_marker + '\n'
+                  '<script src="loader-storage-menu.js"></script>\n'
+              )
+
+          if insertion:
               if '</body>' not in text:
                   raise SystemExit('loader.html does not contain </body>')
 
@@ -42,8 +53,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add loader.html
           if git diff --cached --quiet; then
-            echo "Loader already contains the storage bridge."
+            echo "Loader already contains the storage bridge and storage menu."
             exit 0
           fi
-          git commit -m "Add loader storage bridge"
+          git commit -m "Add loader storage log menu"
           git push
