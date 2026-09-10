@@ -1,4 +1,4 @@
-/* Chat App 2 - Google Sheets history + live P2P chat */
+/* Chat App 2 - Google Sheets history + real live P2P chat */
 (() => {
     "use strict";
 
@@ -8,10 +8,10 @@
 
     const CHANNEL = "general";
     const MAX_MESSAGES = 500;
-    const PEER_REFRESH_MS = 750;
-    const SHEET_FALLBACK_MS = 1000;
+    const SIGNAL_MS = 500;
+    const SAVE_RETRY_MS = 1000;
     const REQUEST_TIMEOUT_MS = 8000;
-    const CACHE_KEY = "chat_messages_persistent_v4_" + CHANNEL;
+    const CACHE_KEY = "chat_messages_persistent_v5_" + CHANNEL;
     const DEVICE_KEY = "chat_device_id";
 
     const peers = new Map();
@@ -21,11 +21,11 @@
     let localMessages = [];
     let loaded = false;
     let loading = null;
-    let peerTimer = null;
-    let sheetTimer = null;
-    let signalingBusy = false;
+    let signalBusy = false;
     let sheetBusy = false;
     let newestSheetId = "";
+    let signalTimer = null;
+    let sheetTimer = null;
 
     let deviceId = localStorage.getItem(DEVICE_KEY);
     if (!deviceId) {
@@ -35,24 +35,27 @@
 
     const newId = () => crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
 
-    function response(body, status = 200) {
-        return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
+    function jsonResponse(body, status = 200) {
+        return new Response(JSON.stringify(body), {
+            status,
+            headers: { "Content-Type": "application/json" }
+        });
     }
 
-    async function bodyOf(options) {
+    async function readBody(options) {
         if (!options?.body || typeof options.body !== "string") return {};
         try { return JSON.parse(options.body); } catch (_) { return {}; }
     }
 
     async function server(method, payload = {}, query = {}) {
         const params = new URLSearchParams();
-        for (const [k, v] of Object.entries(query)) {
-            if (v !== undefined && v !== null) params.set(k, String(v));
+        for (const [key, value] of Object.entries(query)) {
+            if (value !== undefined && value !== null) params.set(key, String(value));
         }
 
-        const url = SERVER_URL + (params.toString() ? "?" + params : "");
+        const url = SERVER_URL + (params.toString() ? "?" + params.toString() : "");
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+        const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
         try {
             const options = {
@@ -75,7 +78,7 @@
             catch (_) { data = { ok: false, error: text }; }
             return { res, data };
         } finally {
-            clearTimeout(timer);
+            clearTimeout(timeout);
         }
     }
 
@@ -94,33 +97,38 @@
         return "Anonymous";
     }
 
-    function normalize(m) {
-        if (!m || typeof m !== "object") return null;
+    function normalize(message) {
+        if (!message || typeof message !== "object") return null;
 
-        let files = m.files;
+        let files = message.files;
         if (typeof files === "string") {
             try { files = JSON.parse(files); } catch (_) { files = []; }
         }
 
-        const message = String(m.message ?? "");
-        const username = String(m.username || m.name || "").trim() || localUsername();
+        const username = String(message.username || message.name || "").trim() || localUsername();
 
         return {
-            ...m,
-            id: String(m.id || m.messageId || newId()),
-            channel: String(m.channel || CHANNEL),
+            ...message,
+            id: String(message.id || message.messageId || newId()),
+            timestamp: message.timestamp || new Date().toISOString(),
+            channel: String(message.channel || CHANNEL),
             username: username.substring(0, 24),
-            message,
+            message: String(message.message ?? ""),
             files: Array.isArray(files) ? files : []
         };
     }
 
-    const idOf = m => String(m?.id || m?.messageId || "");
-    const timeOf = m => new Date(m?.timestamp || m?.time || m?.createdAt || 0).getTime() || 0;
+    const idOf = message => String(message?.id || message?.messageId || "");
+    const timeOf = message => new Date(message?.timestamp || message?.time || 0).getTime() || 0;
 
-    function isUsableMessage(m) {
-        if (!m || !idOf(m) || m.channel !== CHANNEL) return false;
-        return Boolean(String(m.message || "").trim() || m.image || (Array.isArray(m.files) && m.files.length) || m.type === "game");
+    function usable(message) {
+        if (!message || !idOf(message) || message.channel !== CHANNEL) return false;
+        return Boolean(
+            String(message.message || "").trim() ||
+            message.image ||
+            (Array.isArray(message.files) && message.files.length) ||
+            message.type === "game"
+        );
     }
 
     function cacheWrite() {
@@ -131,25 +139,22 @@
 
     function cacheRead() {
         try {
-            const list = JSON.parse(localStorage.getItem(CACHE_KEY) || "[]");
-            return Array.isArray(list)
-                ? list.map(normalize).filter(m => m && m.channel === CHANNEL && isUsableMessage(m))
-                : [];
+            const value = JSON.parse(localStorage.getItem(CACHE_KEY) || "[]");
+            return Array.isArray(value) ? value.map(normalize).filter(usable) : [];
         } catch (_) {
             return [];
         }
     }
 
-    function merge(list) {
-        const map = new Map(localMessages.map(m => [idOf(m), m]));
+    function merge(messages) {
+        const map = new Map(localMessages.map(message => [idOf(message), message]));
         let changed = false;
 
-        for (const raw of list || []) {
-            const m = normalize(raw);
-            if (!isUsableMessage(m)) continue;
-
-            if (!map.has(idOf(m))) {
-                map.set(idOf(m), m);
+        for (const raw of messages || []) {
+            const message = normalize(raw);
+            if (!usable(message)) continue;
+            if (!map.has(idOf(message))) {
+                map.set(idOf(message), message);
                 changed = true;
             }
         }
@@ -164,33 +169,31 @@
         return changed;
     }
 
-    // ------------------------------------------------------------
-    // GOOGLE SHEETS PERSISTENCE
-    // The client NEVER clears the sheet during normal chat syncing.
-    // Old Sheet messages are read-only history here.
-    // New messages are saved in the background.
-    // ------------------------------------------------------------
-    async function saveNow(message) {
-        const m = normalize(message);
-        if (!isUsableMessage(m)) return;
+    // ============================================================
+    // GOOGLE SHEETS = PERMANENT HISTORY + BACKGROUND SAVE ONLY
+    // ============================================================
 
-        const id = idOf(m);
-        pendingSave.set(id, m);
+    async function saveInBackground(message) {
+        const item = normalize(message);
+        if (!usable(item)) return;
+
+        const id = idOf(item);
+        if (sheetKnownIds.has(id)) return;
+        pendingSave.set(id, item);
 
         try {
-            const { res, data } = await server("POST", {
+            const result = await server("POST", {
                 action: "save_batch",
                 channel: CHANNEL,
                 device_id: deviceId,
-                messages: [m]
+                messages: [item]
             });
 
-            if (!res.ok || data?.ok === false) throw new Error(data?.error || "save failed");
-
+            if (!result.res.ok || result.data?.ok === false) throw new Error("save failed");
             pendingSave.delete(id);
             sheetKnownIds.add(id);
         } catch (_) {
-            // retrySaves() keeps the message until it is successfully saved
+            // Kept in pendingSave and retried automatically.
         }
     }
 
@@ -199,122 +202,119 @@
 
         const batch = Array.from(pendingSave.values()).slice(0, 25);
         try {
-            const { res, data } = await server("POST", {
+            const result = await server("POST", {
                 action: "save_batch",
                 channel: CHANNEL,
                 device_id: deviceId,
                 messages: batch
             });
 
-            if (!res.ok || data?.ok === false) throw new Error("save failed");
+            if (!result.res.ok || result.data?.ok === false) throw new Error("save failed");
 
-            for (const m of batch) {
-                pendingSave.delete(idOf(m));
-                sheetKnownIds.add(idOf(m));
+            for (const item of batch) {
+                pendingSave.delete(idOf(item));
+                sheetKnownIds.add(idOf(item));
             }
         } catch (_) {}
     }
 
-    ORIGINAL_SET_INTERVAL(retrySaves, 1500);
+    ORIGINAL_SET_INTERVAL(retrySaves, SAVE_RETRY_MS);
 
-    // ------------------------------------------------------------
-    // WEBRTC P2P LIVE CHAT
-    // Google Apps Script is only used for discovery/signaling/persistence.
-    // The actual live message packet travels over RTCDataChannel.
-    // ------------------------------------------------------------
-    function send(peer, packet) {
-        if (!peer?.channel || peer.channel.readyState !== "open") return false;
-        try {
-            peer.channel.send(JSON.stringify(packet));
-            return true;
-        } catch (_) {
-            return false;
+    // ============================================================
+    // REAL P2P LIVE CHAT
+    // The Sheet is NOT the live message transport.
+    // Only signaling/discovery uses Apps Script.
+    // ============================================================
+
+    function sendPacket(peer, packet) {
+        if (!peer) return false;
+
+        const text = JSON.stringify(packet);
+        if (peer.channel?.readyState === "open") {
+            try {
+                peer.channel.send(text);
+                return true;
+            } catch (_) {}
+        }
+
+        // IMPORTANT: do not lose a live message just because the connection
+        // is still opening. It is sent as soon as the P2P channel opens.
+        peer.outbox.push(text);
+        if (peer.outbox.length > 100) peer.outbox.splice(0, peer.outbox.length - 100);
+        return false;
+    }
+
+    function flushOutbox(peer) {
+        if (!peer?.channel || peer.channel.readyState !== "open") return;
+        while (peer.outbox.length) {
+            try {
+                peer.channel.send(peer.outbox.shift());
+            } catch (_) {
+                break;
+            }
         }
     }
 
-    function broadcast(packet, except = "") {
+    function broadcast(packet, exceptId = "") {
         for (const [id, peer] of peers) {
-            if (id !== except) send(peer, packet);
+            if (id !== exceptId) sendPacket(peer, packet);
         }
     }
 
-    function setupChannel(peerId, channel) {
+    function receiveLiveMessage(peerId, rawMessage) {
+        const message = normalize(rawMessage);
+        if (!usable(message)) return;
+
+        const existed = localMessages.some(item => idOf(item) === idOf(message));
+        const changed = merge([message]);
+
+        if (!existed && changed) {
+            // Forward through other connected peers as well.
+            broadcast({
+                type: "message",
+                from: deviceId,
+                message
+            }, peerId);
+        }
+
+        // If the sender had not managed to save yet, this peer also persists it.
+        // Old Sheet messages are already in sheetKnownIds and are never re-saved.
+        if (!sheetKnownIds.has(idOf(message))) saveInBackground(message);
+    }
+
+    function attachChannel(peerId, channel) {
         const peer = peers.get(peerId);
         if (!peer) return;
 
         peer.channel = channel;
+        channel.binaryType = "arraybuffer";
 
         channel.onopen = () => {
-            // Sync local state for live P2P. This does NOT automatically re-save
-            // Sheet history because sheetKnownIds already contains loaded history.
-            send(peer, {
-                type: "hello",
-                from: deviceId,
-                messages: localMessages.slice(-MAX_MESSAGES)
-            });
+            peer.connectedAt = Date.now();
+            flushOutbox(peer);
         };
 
         channel.onmessage = event => {
             try {
                 const packet = JSON.parse(event.data);
-
-                if (packet.type === "message") {
-                    const m = normalize(packet.message);
-                    if (!isUsableMessage(m)) return;
-
-                    const wasKnown = sheetKnownIds.has(idOf(m));
-                    if (merge([m])) {
-                        broadcast(packet, peerId);
-                    }
-
-                    // Only newly-created/not-yet-persisted messages are saved.
-                    if (!wasKnown) saveNow(m);
-                    return;
-                }
-
-                if (packet.type === "hello" || packet.type === "sync") {
-                    const incoming = Array.isArray(packet.messages) ? packet.messages : [];
-                    const newMessages = [];
-
-                    for (const raw of incoming) {
-                        const m = normalize(raw);
-                        if (!isUsableMessage(m)) continue;
-
-                        const id = idOf(m);
-                        const existed = localMessages.some(x => idOf(x) === id);
-                        const wasInSheet = sheetKnownIds.has(id);
-
-                        if (merge([m]) && !existed) newMessages.push(m);
-                        if (!wasInSheet && !pendingSave.has(id)) saveNow(m);
-                    }
-
-                    if (newMessages.length) {
-                        broadcast({
-                            type: "sync",
-                            from: deviceId,
-                            messages: newMessages
-                        }, peerId);
-                    }
-
-                    if (packet.type === "hello") {
-                        send(peer, {
-                            type: "sync",
-                            from: deviceId,
-                            messages: localMessages.slice(-MAX_MESSAGES)
-                        });
-                    }
-                }
+                if (packet?.type === "message") receiveLiveMessage(peerId, packet.message);
             } catch (_) {}
         };
+
+        channel.onerror = () => {};
 
         channel.onclose = () => {
             if (peer.channel === channel) peer.channel = null;
         };
     }
 
-    function makePeer(id) {
-        let peer = peers.get(id);
-        if (peer?.pc) return peer;
+    function createPeer(peerId) {
+        let peer = peers.get(peerId);
+        if (peer?.pc && !["closed", "failed"].includes(peer.pc.connectionState)) return peer;
+
+        if (peer?.pc) {
+            try { peer.pc.close(); } catch (_) {}
+        }
 
         const pc = new RTCPeerConnection({
             iceServers: [
@@ -324,90 +324,106 @@
         });
 
         peer = {
-            id,
+            id: peerId,
             pc,
             channel: null,
-            remoteSet: false,
-            ice: [],
-            offering: false
+            outbox: [],
+            remoteDescriptionSet: false,
+            pendingIce: [],
+            makingOffer: false
         };
 
-        peers.set(id, peer);
+        peers.set(peerId, peer);
 
-        pc.ondatachannel = event => setupChannel(id, event.channel);
+        pc.ondatachannel = event => attachChannel(peerId, event.channel);
 
         pc.onicecandidate = event => {
             if (!event.candidate) return;
             server("POST", {
                 action: "signal_push",
-                to: id,
+                to: peerId,
                 from: deviceId,
                 signal: { type: "ice", candidate: event.candidate }
             }).catch(() => {});
         };
 
+        pc.onicecandidateerror = () => {};
+
         pc.onconnectionstatechange = () => {
-            if (["failed", "closed"].includes(pc.connectionState)) {
+            const state = pc.connectionState;
+            if (state === "connected") {
+                window.dispatchEvent(new CustomEvent("chat-p2p-connected", { detail: { peerId } }));
+            }
+            if (state === "failed" || state === "closed") {
                 try { pc.close(); } catch (_) {}
-                if (peers.get(id)?.pc === pc) peers.delete(id);
+                if (peers.get(peerId)?.pc === pc) peers.delete(peerId);
+            }
+        };
+
+        pc.oniceconnectionstatechange = () => {
+            if (pc.iceConnectionState === "failed") {
+                try { pc.restartIce(); } catch (_) {}
             }
         };
 
         return peer;
     }
 
-    async function offer(id) {
-        const peer = makePeer(id);
-        if (peer.channel?.readyState === "open" || peer.offering) return;
+    async function makeOffer(peerId) {
+        const peer = createPeer(peerId);
+        if (peer.channel?.readyState === "open" || peer.makingOffer) return;
 
-        peer.offering = true;
+        peer.makingOffer = true;
         try {
-            setupChannel(id, peer.pc.createDataChannel("chat", { ordered: true }));
-            const offerDescription = await peer.pc.createOffer();
-            await peer.pc.setLocalDescription(offerDescription);
+            if (!peer.channel) {
+                attachChannel(peerId, peer.pc.createDataChannel("chat", { ordered: true }));
+            }
+
+            const offer = await peer.pc.createOffer();
+            await peer.pc.setLocalDescription(offer);
 
             await server("POST", {
                 action: "signal_push",
-                to: id,
+                to: peerId,
                 from: deviceId,
                 signal: { type: "offer", sdp: peer.pc.localDescription }
             });
         } catch (_) {
             try { peer.pc.close(); } catch (_) {}
-            peers.delete(id);
+            if (peers.get(peerId)?.pc === peer.pc) peers.delete(peerId);
         } finally {
-            peer.offering = false;
+            peer.makingOffer = false;
         }
     }
 
-    async function flushIce(peer) {
-        const list = peer.ice.splice(0);
-        for (const candidate of list) {
+    async function addPendingIce(peer) {
+        const candidates = peer.pendingIce.splice(0);
+        for (const candidate of candidates) {
             try { await peer.pc.addIceCandidate(candidate); } catch (_) {}
         }
     }
 
-    async function signal(item) {
+    async function handleSignal(item) {
         const from = String(item?.from || "");
-        const signalData = item?.signal;
-        if (!from || from === deviceId || !signalData) return;
+        const signal = item?.signal;
+        if (!from || from === deviceId || !signal) return;
 
-        const peer = makePeer(from);
+        const peer = createPeer(from);
 
-        if (signalData.type === "ice") {
-            if (peer.remoteSet) {
-                try { await peer.pc.addIceCandidate(signalData.candidate); } catch (_) {}
+        if (signal.type === "ice") {
+            if (peer.remoteDescriptionSet) {
+                try { await peer.pc.addIceCandidate(signal.candidate); } catch (_) {}
             } else {
-                peer.ice.push(signalData.candidate);
+                peer.pendingIce.push(signal.candidate);
             }
             return;
         }
 
-        if (signalData.type === "offer") {
+        if (signal.type === "offer") {
             try {
-                await peer.pc.setRemoteDescription(signalData.sdp);
-                peer.remoteSet = true;
-                await flushIce(peer);
+                await peer.pc.setRemoteDescription(signal.sdp);
+                peer.remoteDescriptionSet = true;
+                await addPendingIce(peer);
 
                 const answer = await peer.pc.createAnswer();
                 await peer.pc.setLocalDescription(answer);
@@ -422,19 +438,20 @@
             return;
         }
 
-        if (signalData.type === "answer" && peer.pc.signalingState === "have-local-offer") {
+        if (signal.type === "answer") {
+            if (peer.pc.signalingState !== "have-local-offer") return;
             try {
-                await peer.pc.setRemoteDescription(signalData.sdp);
-                peer.remoteSet = true;
-                await flushIce(peer);
+                await peer.pc.setRemoteDescription(signal.sdp);
+                peer.remoteDescriptionSet = true;
+                await addPendingIce(peer);
             } catch (_) {}
         }
     }
 
     async function signalingTick() {
-        if (!loaded || signalingBusy || document.hidden) return;
+        if (!loaded || signalBusy || document.hidden) return;
+        signalBusy = true;
 
-        signalingBusy = true;
         try {
             await server("POST", {
                 action: "register_peer",
@@ -442,54 +459,65 @@
                 channel: CHANNEL
             });
 
-            const result = await server("GET", {}, {
+            const peersResult = await server("GET", {}, {
                 action: "get_peers",
                 channel: CHANNEL,
                 peer_id: deviceId
             });
 
-            for (const item of result.data?.peers || []) {
+            for (const item of peersResult.data?.peers || []) {
                 const id = String(item.peer_id || "");
-                if (id && id !== deviceId && deviceId < id && !peers.has(id)) {
-                    offer(id).catch(() => {});
-                }
+                if (!id || id === deviceId) continue;
+
+                const existing = peers.get(id);
+                const active = existing?.pc && !["closed", "failed"].includes(existing.pc.connectionState);
+
+                // Exactly one side creates the offer, preventing offer collisions.
+                if (deviceId < id && !active) makeOffer(id).catch(() => {});
             }
 
-            const signals = await server("GET", {}, {
+            const signalResult = await server("GET", {}, {
                 action: "signal_pull",
                 peer_id: deviceId
             });
 
-            for (const item of signals.data?.signals || []) {
-                signal(item).catch(() => {});
-            }
+            const signals = Array.isArray(signalResult.data?.signals)
+                ? signalResult.data.signals
+                : [];
+
+            // Preserve signaling order: offer/answer must be processed before ICE.
+            signals.sort((a, b) => {
+                const at = Number(a.timestamp || a.time || 0);
+                const bt = Number(b.timestamp || b.time || 0);
+                return at - bt;
+            });
+
+            for (const item of signals) await handleSignal(item);
         } catch (_) {
-            // P2P keeps retrying on the next tick.
+            // Keep trying on the next tick.
         } finally {
-            signalingBusy = false;
+            signalBusy = false;
         }
     }
 
     function startP2P() {
         if (!loaded) return;
         signalingTick();
-        if (peerTimer) clearInterval(peerTimer);
-        peerTimer = ORIGINAL_SET_INTERVAL(signalingTick, PEER_REFRESH_MS);
+        if (signalTimer) clearInterval(signalTimer);
+        signalTimer = ORIGINAL_SET_INTERVAL(signalingTick, SIGNAL_MS);
     }
 
-    // ------------------------------------------------------------
-    // GOOGLE SHEETS STARTUP HISTORY
-    // This always happens BEFORE P2P is started.
-    // Cache is only a fallback if the Sheet is temporarily unavailable.
-    // ------------------------------------------------------------
-    async function loadOld() {
+    // ============================================================
+    // STARTUP: SHEET FIRST, THEN P2P
+    // ============================================================
+
+    async function loadHistory() {
         if (loaded) return localMessages;
         if (loading) return loading;
 
         loading = (async () => {
-            let sheetLoaded = false;
+            let sheetWorked = false;
 
-            // First source of truth: Google Sheets.
             try {
                 const result = await server("GET", {}, {
                     channel: CHANNEL,
@@ -497,34 +525,30 @@
                 });
 
                 if (result.res.ok && result.data?.ok !== false && Array.isArray(result.data.messages)) {
-                    const sheetMessages = result.data.messages.map(normalize).filter(isUsableMessage);
+                    const history = result.data.messages.map(normalize).filter(usable);
 
-                    // Mark every message already in the Sheet so old history is never
-                    // treated as a brand-new message and re-saved by P2P sync.
-                    for (const m of sheetMessages) sheetKnownIds.add(idOf(m));
+                    // These IDs are permanent Sheet history. Never save them again.
+                    for (const message of history) sheetKnownIds.add(idOf(message));
 
                     localMessages = [];
-                    merge(sheetMessages);
-                    sheetLoaded = true;
+                    merge(history);
+                    sheetWorked = true;
                 }
             } catch (_) {}
 
-            // Only use local cache if the Sheet could not be read.
-            if (!sheetLoaded) {
+            if (!sheetWorked) {
+                // Cache is only an emergency display fallback. It does not replace Sheet history.
                 localMessages = cacheRead().slice(-MAX_MESSAGES);
             }
 
-            localMessages = localMessages
-                .sort((a, b) => timeOf(a) - timeOf(b))
-                .slice(-MAX_MESSAGES);
-
+            localMessages = localMessages.sort((a, b) => timeOf(a) - timeOf(b)).slice(-MAX_MESSAGES);
             cacheWrite();
             newestSheetId = idOf(localMessages[localMessages.length - 1]);
             loaded = true;
 
-            // Now P2P starts, after Sheet history has been loaded.
+            // P2P starts ONLY after the Sheet history is loaded.
             startP2P();
-            startSheetFallback();
+            startSheetWatch();
 
             return localMessages;
         })();
@@ -532,29 +556,21 @@
         return loading;
     }
 
-    async function sheetFallback() {
+    async function sheetWatch() {
         if (!loaded || sheetBusy || document.hidden) return;
-
         sheetBusy = true;
-        try {
-            const latest = await server("GET", {}, {
-                channel: CHANNEL,
-                limit: 1
-            });
 
+        try {
+            const latest = await server("GET", {}, { channel: CHANNEL, limit: 1 });
             const newest = latest.data?.messages?.[0];
             const newestId = idOf(newest);
 
             if (newestId && newestId !== newestSheetId) {
-                const full = await server("GET", {}, {
-                    channel: CHANNEL,
-                    limit: MAX_MESSAGES
-                });
-
-                if (full.res.ok && full.data?.ok !== false && Array.isArray(full.data.messages)) {
-                    const messages = full.data.messages.map(normalize).filter(isUsableMessage);
-                    for (const m of messages) sheetKnownIds.add(idOf(m));
-                    merge(messages);
+                const result = await server("GET", {}, { channel: CHANNEL, limit: MAX_MESSAGES });
+                if (result.res.ok && result.data?.ok !== false && Array.isArray(result.data.messages)) {
+                    const history = result.data.messages.map(normalize).filter(usable);
+                    for (const message of history) sheetKnownIds.add(idOf(message));
+                    merge(history);
                     newestSheetId = newestId;
                 }
             }
@@ -564,16 +580,17 @@
         }
     }
 
-    function startSheetFallback() {
+    function startSheetWatch() {
         if (sheetTimer) clearInterval(sheetTimer);
-        sheetTimer = ORIGINAL_SET_INTERVAL(sheetFallback, SHEET_FALLBACK_MS);
+        sheetTimer = ORIGINAL_SET_INTERVAL(sheetWatch, 1500);
     }
 
-    // ------------------------------------------------------------
-    // Existing Chat App API
-    // ------------------------------------------------------------
+    // ============================================================
+    // EXISTING CHAT APP API
+    // ============================================================
+
     async function getMessages() {
-        await loadOld();
+        await loadHistory();
         return {
             success: true,
             messages: localMessages.slice(-MAX_MESSAGES),
@@ -583,18 +600,14 @@
     }
 
     async function sendMessage(body) {
-        await loadOld();
+        await loadHistory();
 
-        const suppliedName = String(
-            body?.username || body?.name || body?.displayName || ""
-        ).trim();
-
-        const username = (suppliedName || localUsername()).substring(0, 24);
+        const username = String(body?.username || body?.name || body?.displayName || localUsername()).trim().substring(0, 24) || "Anonymous";
         const text = String(body?.message ?? "").trim().substring(0, 20000);
         const files = Array.isArray(body?.files) ? body.files : [];
         const image = body?.image || null;
 
-        const m = normalize({
+        const message = normalize({
             id: newId(),
             timestamp: new Date().toISOString(),
             username,
@@ -606,27 +619,22 @@
             type: body?.type || "message"
         });
 
-        if (!isUsableMessage(m)) {
-            return {
-                success: false,
-                error: "Message is empty.",
-                messages: localMessages.slice(-MAX_MESSAGES),
-                p2p: true
-            };
+        if (!usable(message)) {
+            return { success: false, error: "Message is empty.", messages: localMessages.slice(-MAX_MESSAGES), p2p: true };
         }
 
-        // Show immediately.
-        merge([m]);
+        // 1. Show locally immediately.
+        merge([message]);
 
-        // Live delivery is P2P and is NOT blocked by Google Sheets.
-        broadcast({ type: "message", from: deviceId, message: m });
+        // 2. Send LIVE through P2P. Never wait for Google Sheets.
+        broadcast({ type: "message", from: deviceId, message });
 
-        // Save in the background. The UI never waits for this request.
-        saveNow(m);
+        // 3. Save to Google Sheets in the background.
+        saveInBackground(message);
 
         return {
             success: true,
-            message: m,
+            message,
             messages: localMessages.slice(-MAX_MESSAGES),
             p2p: true,
             savedInBackground: true
@@ -634,22 +642,21 @@
     }
 
     async function messagesApi(method, options) {
-        const body = await bodyOf(options);
+        const body = await readBody(options);
 
-        if (method === "GET") {
-            return response(await getMessages());
-        }
+        if (method === "GET") return jsonResponse(await getMessages());
 
         if (method === "POST") {
+            // Game/edit/delete operations still use the Google Apps Script backend.
             if (body.game_server || body.game_action || body.action === "edit" || body.action === "delete") {
                 try {
                     const result = await server("POST", body);
-                    return response(result.data, result.res.status || 200);
+                    return jsonResponse(result.data, result.res.status || 200);
                 } catch (error) {
-                    return response({ ok: false, error: error?.message || "Server request failed." });
+                    return jsonResponse({ ok: false, error: error?.message || "Server request failed." });
                 }
             }
-            return response(await sendMessage(body));
+            return jsonResponse(await sendMessage(body));
         }
 
         if (method === "PATCH" || method === "DELETE") {
@@ -658,32 +665,29 @@
                     action: method === "PATCH" ? "edit" : "delete",
                     ...body
                 });
-                return response(result.data, result.res.status || 200);
+                return jsonResponse(result.data, result.res.status || 200);
             } catch (error) {
-                return response({ ok: false, error: error?.message || "Server request failed." });
+                return jsonResponse({ ok: false, error: error?.message || "Server request failed." });
             }
         }
 
-        return response({ ok: false, error: "Method not allowed." }, 405);
+        return jsonResponse({ ok: false, error: "Method not allowed." }, 405);
     }
 
     async function actionsApi(method, options) {
-        if (method !== "POST") return response({ error: "Method not allowed." }, 405);
+        if (method !== "POST") return jsonResponse({ error: "Method not allowed." }, 405);
         try {
-            const result = await server("POST", await bodyOf(options));
-            return response(result.data, result.res.status || 200);
+            const result = await server("POST", await readBody(options));
+            return jsonResponse(result.data, result.res.status || 200);
         } catch (error) {
-            return response({ ok: false, error: error?.message || "Server request failed." });
+            return jsonResponse({ ok: false, error: error?.message || "Server request failed." });
         }
     }
 
     window.fetch = async function(input, options = {}) {
         let url;
         try {
-            url = new URL(
-                typeof input === "string" ? input : input?.url || "",
-                window.location.href
-            );
+            url = new URL(typeof input === "string" ? input : input?.url || "", window.location.href);
         } catch (_) {
             return ORIGINAL_FETCH(input, options);
         }
@@ -701,6 +705,7 @@
     window.CHAT_APP_P2P_ENABLED = true;
     window.CHAT_APP_FAST_MODE = true;
     window.CHAT_APP_HISTORY_PERSISTENT = true;
+    window.CHAT_APP_P2P_DEVICE_ID = deviceId;
 
     window.addEventListener("beforeunload", () => {
         retrySaves();
@@ -711,6 +716,6 @@
         }).catch(() => {});
     });
 
-    // Load Google Sheets first. P2P starts automatically after that finishes.
-    loadOld().catch(() => {});
+    // Google Sheets history loads first. Only after that do we start P2P.
+    loadHistory().catch(() => {});
 })();
