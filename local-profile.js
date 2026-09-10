@@ -1,42 +1,68 @@
 (()=>{
 'use strict';
 
-const PROFILE_KEY='chat_local_profile_v1';
+const USERNAME_KEY='chat_username';
+const PROFILE_PICTURE_KEY='chat_profile_picture';
 const MAX_PFP_SIDE=256;
-const MAX_PFP_BYTES=450000;
+const MAX_PFP_LENGTH=600000;
 
-function readProfile(){
-    try{
-        const raw=localStorage.getItem(PROFILE_KEY);
-        if(!raw)return {username:'',profilePicture:''};
-        const data=JSON.parse(raw);
-        return {
-            username:typeof data.username==='string'?data.username.slice(0,24):'',
-            profilePicture:typeof data.profilePicture==='string'?data.profilePicture:''
-        };
-    }catch{
-        return {username:'',profilePicture:''};
-    }
-}
+const usernameInput=()=>document.getElementById('usernameInput');
+const pictureInput=()=>document.getElementById('profilePictureInput');
+const picturePreview=()=>document.getElementById('profilePicturePreview');
+const saveButton=()=>document.getElementById('saveSettings');
 
-function writeProfile(profile){
+function saveUsername(value){
     try{
-        localStorage.setItem(PROFILE_KEY,JSON.stringify({
-            username:String(profile.username||'').slice(0,24),
-            profilePicture:String(profile.profilePicture||'')
-        }));
+        localStorage.setItem(
+            USERNAME_KEY,
+            String(value||'').trim().slice(0,24)
+        );
         return true;
     }catch(error){
-        console.warn('Could not save local profile:',error);
+        console.warn('Could not save username:',error);
         return false;
     }
 }
 
-function setPreview(data){
-    const preview=document.getElementById('profilePicturePreview');
+function saveProfilePicture(dataUrl){
+    try{
+        localStorage.setItem(
+            PROFILE_PICTURE_KEY,
+            String(dataUrl||'')
+        );
+        return true;
+    }catch(error){
+        console.warn('Could not save profile picture:',error);
+        return false;
+    }
+}
+
+function loadUsername(){
+    try{
+        const saved=localStorage.getItem(USERNAME_KEY);
+        return saved===null?'':saved;
+    }catch(error){
+        console.warn('Could not load username:',error);
+        return '';
+    }
+}
+
+function loadProfilePicture(){
+    try{
+        const saved=localStorage.getItem(PROFILE_PICTURE_KEY);
+        return saved===null?'':saved;
+    }catch(error){
+        console.warn('Could not load profile picture:',error);
+        return '';
+    }
+}
+
+function showPicture(dataUrl){
+    const preview=picturePreview();
     if(!preview)return;
-    if(data){
-        preview.src=data;
+
+    if(dataUrl){
+        preview.src=dataUrl;
         preview.style.display='block';
     }else{
         preview.removeAttribute('src');
@@ -44,125 +70,205 @@ function setPreview(data){
     }
 }
 
-function dataUrlToFile(dataUrl,name='profile-picture.jpg'){
+function dataUrlToFile(dataUrl){
     const match=String(dataUrl||'').match(/^data:([^;,]+)?(;base64)?,(.*)$/);
     if(!match)return null;
+
     const type=match[1]||'image/jpeg';
-    const isBase64=!!match[2];
-    const raw=isBase64?atob(match[3]):decodeURIComponent(match[3]);
+    const raw=match[2]
+        ?atob(match[3])
+        :decodeURIComponent(match[3]);
+
     const bytes=new Uint8Array(raw.length);
     for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
-    return new File([bytes],name,{type});
+
+    return new File(
+        [bytes],
+        'profile-picture.jpg',
+        {type}
+    );
 }
 
-function putStoredPictureIntoInput(dataUrl){
-    const input=document.getElementById('profilePictureInput');
+function restorePictureInput(dataUrl){
+    const input=pictureInput();
     if(!input||!dataUrl||!window.DataTransfer)return;
+
     const file=dataUrlToFile(dataUrl);
     if(!file)return;
+
     try{
         const transfer=new DataTransfer();
         transfer.items.add(file);
         input.files=transfer.files;
-        input.dispatchEvent(new Event('change',{bubbles:true}));
+        input.dispatchEvent(
+            new Event('change',{bubbles:true})
+        );
     }catch(error){
-        console.warn('Could not restore local profile picture:',error);
+        console.warn('Could not restore profile picture input:',error);
     }
 }
 
-function compressImage(file){
+function compressPicture(file){
     return new Promise((resolve,reject)=>{
         const reader=new FileReader();
-        reader.onerror=()=>reject(reader.error||new Error('Could not read image.'));
+
+        reader.onerror=()=>reject(
+            reader.error||new Error('Could not read image.')
+        );
+
         reader.onload=()=>{
-            const img=new Image();
-            img.onerror=()=>reject(new Error('Could not load image.'));
-            img.onload=()=>{
-                const scale=Math.min(1,MAX_PFP_SIDE/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height));
-                const width=Math.max(1,Math.round((img.naturalWidth||img.width)*scale));
-                const height=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));
+            const image=new Image();
+
+            image.onerror=()=>reject(
+                new Error('Could not load image.')
+            );
+
+            image.onload=()=>{
+                const originalWidth=image.naturalWidth||image.width;
+                const originalHeight=image.naturalHeight||image.height;
+                const scale=Math.min(
+                    1,
+                    MAX_PFP_SIDE/Math.max(originalWidth,originalHeight)
+                );
+
                 const canvas=document.createElement('canvas');
-                canvas.width=width;
-                canvas.height=height;
-                const ctx=canvas.getContext('2d');
-                if(!ctx){reject(new Error('Canvas is not available.'));return;}
-                ctx.drawImage(img,0,0,width,height);
+                canvas.width=Math.max(1,Math.round(originalWidth*scale));
+                canvas.height=Math.max(1,Math.round(originalHeight*scale));
+
+                const context=canvas.getContext('2d');
+                if(!context){
+                    reject(new Error('Canvas is not available.'));
+                    return;
+                }
+
+                context.drawImage(
+                    image,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+
                 let quality=.82;
                 let result=canvas.toDataURL('image/jpeg',quality);
-                while(result.length>MAX_PFP_BYTES*1.37&&quality>.45){
-                    quality-=.07;
+
+                while(result.length>MAX_PFP_LENGTH&&quality>.4){
+                    quality-=.06;
                     result=canvas.toDataURL('image/jpeg',quality);
                 }
+
                 resolve(result);
             };
-            img.src=reader.result;
+
+            image.src=reader.result;
         };
+
         reader.readAsDataURL(file);
     });
 }
 
-function install(){
-    const usernameInput=document.getElementById('usernameInput');
-    const pictureInput=document.getElementById('profilePictureInput');
-    const saveButton=document.getElementById('saveSettings');
-    const profileBody=document.querySelector('#settingsOverlay .category:first-child .category-body');
-    if(!usernameInput||!pictureInput||!saveButton)return false;
+function loadProfile(){
+    const nameInput=usernameInput();
+    const imageInput=pictureInput();
 
-    const profile=readProfile();
+    if(!nameInput||!imageInput)return false;
 
-    if(profile.username){
-        usernameInput.value=profile.username;
-        localStorage.setItem('chat_username',profile.username);
+    const savedName=loadUsername();
+    const savedPicture=loadProfilePicture();
+
+    if(savedName){
+        nameInput.value=savedName;
     }
 
-    setPreview(profile.profilePicture);
-
-    if(profile.profilePicture){
-        setTimeout(()=>putStoredPictureIntoInput(profile.profilePicture),150);
+    if(savedPicture){
+        showPicture(savedPicture);
+        setTimeout(()=>restorePictureInput(savedPicture),150);
     }
 
-    if(!pictureInput.dataset.localProfileBound){
-        pictureInput.dataset.localProfileBound='1';
-        pictureInput.addEventListener('change',async()=>{
-            const file=pictureInput.files&&pictureInput.files[0];
-            if(!file)return;
-            if(!file.type.startsWith('image/')){
-                alert('Please choose an image for your profile picture.');
+    return true;
+}
+
+function saveProfile(){
+    const nameInput=usernameInput();
+    if(!nameInput)return;
+
+    const name=nameInput.value.trim().slice(0,24);
+
+    if(!saveUsername(name)){
+        alert('Could not save your username on this device.');
+        return;
+    }
+
+    const currentPicture=loadProfilePicture();
+    const imageInput=pictureInput();
+    const file=imageInput&&imageInput.files&&imageInput.files[0];
+
+    if(file){
+        compressPicture(file).then(dataUrl=>{
+            if(!saveProfilePicture(dataUrl)){
+                alert('Could not save your profile picture on this device.');
                 return;
             }
-            try{
-                const data=await compressImage(file);
-                const current=readProfile();
-                current.username=usernameInput.value.trim().slice(0,24);
-                current.profilePicture=data;
-                if(!writeProfile(current)){
-                    alert('Could not save your profile picture on this device.');
-                    return;
-                }
-                setPreview(data);
-            }catch(error){
-                console.error(error);
+
+            showPicture(dataUrl);
+        }).catch(error=>{
+            console.error(error);
+            if(!currentPicture){
                 alert('Could not save that profile picture.');
             }
-        },true);
+        });
+    }else if(currentPicture){
+        showPicture(currentPicture);
+    }
+}
+
+function clearLocalProfile(){
+    try{
+        localStorage.removeItem(USERNAME_KEY);
+        localStorage.removeItem(PROFILE_PICTURE_KEY);
+
+        const nameInput=usernameInput();
+        const imageInput=pictureInput();
+
+        if(nameInput)nameInput.value='';
+        if(imageInput)imageInput.value='';
+
+        showPicture('');
+    }catch(error){
+        console.warn('Could not clear local profile:',error);
+    }
+}
+
+function install(){
+    const nameInput=usernameInput();
+    const imageInput=pictureInput();
+    const save=saveButton();
+
+    if(!nameInput||!imageInput||!save)return false;
+
+    loadProfile();
+
+    if(!save.dataset.localProfileBound){
+        save.dataset.localProfileBound='1';
+        save.addEventListener('click',saveProfile,true);
     }
 
-    if(!saveButton.dataset.localProfileBound){
-        saveButton.dataset.localProfileBound='1';
-        saveButton.addEventListener('click',()=>{
-            const current=readProfile();
-            current.username=usernameInput.value.trim().slice(0,24);
-            writeProfile(current);
-            localStorage.setItem('chat_username',current.username);
-        },true);
-    }
+    if(!imageInput.dataset.localProfileBound){
+        imageInput.dataset.localProfileBound='1';
+        imageInput.addEventListener('change',()=>{
+            const file=imageInput.files&&imageInput.files[0];
+            if(!file)return;
 
-    if(profileBody&&!profileBody.querySelector('.local-profile-note')){
-        const note=document.createElement('div');
-        note.className='local-profile-note';
-        note.style.cssText='margin-top:10px;padding:10px 12px;border:1px solid #303640;border-radius:10px;background:#171a20;color:#9da5b0;font-size:12px;line-height:1.45';
-        note.innerHTML='💾 <strong style="color:#dfe4ea">Saved on this device</strong><br>Your name and profile picture are kept in this browser so you do not have to choose them again.';
-        profileBody.appendChild(note);
+            if(!file.type.startsWith('image/')){
+                alert('Please choose an image for your profile picture.');
+                imageInput.value='';
+                return;
+            }
+
+            const reader=new FileReader();
+            reader.onload=()=>showPicture(reader.result);
+            reader.readAsDataURL(file);
+        },true);
     }
 
     return true;
@@ -170,14 +276,22 @@ function install(){
 
 function start(){
     if(install())return;
+
     let tries=0;
     const timer=setInterval(()=>{
         tries++;
-        if(install()||tries>=30)clearInterval(timer);
+        if(install()||tries>=30){
+            clearInterval(timer);
+        }
     },100);
 }
 
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);
-else start();
+window.clearLocalProfile=clearLocalProfile;
+
+if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',start);
+}else{
+    start();
+}
 
 })();
