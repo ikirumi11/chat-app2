@@ -16,11 +16,7 @@ let bridgeSequence=0;
 const bridgeRequests=new Map();
 
 function hasLoaderBridge(){
-    return !!(
-        window.parent &&
-        window.parent!==window &&
-        typeof window.parent.postMessage==='function'
-    );
+    return !!(window.parent&&window.parent!==window&&typeof window.parent.postMessage==='function');
 }
 
 function bridgeRequest(action,key,value){
@@ -56,10 +52,7 @@ window.addEventListener('message',event=>{
     const request=bridgeRequests.get(data.id);
     if(!request)return;
 
-    request({
-        handled:data.ok===true,
-        value:data.value===undefined?null:data.value
-    });
+    request({handled:data.ok===true,value:data.value===undefined?null:data.value});
 });
 
 function saveLocal(key,value){
@@ -73,9 +66,7 @@ function saveLocal(key,value){
 }
 
 function loadLocal(key){
-    try{
-        return localStorage.getItem(key);
-    }catch(error){
+    try{return localStorage.getItem(key);}catch(error){
         console.warn('Could not load local value:',error);
         return null;
     }
@@ -93,25 +84,15 @@ function removeLocal(key){
 
 function saveUsername(value){
     const clean=String(value||'').trim().slice(0,24);
-
     saveLocal(USERNAME_KEY,clean);
-
-    if(hasLoaderBridge()){
-        bridgeRequest('save',USERNAME_KEY,clean).catch(()=>{});
-    }
-
+    if(hasLoaderBridge())bridgeRequest('save',USERNAME_KEY,clean).catch(()=>{});
     return true;
 }
 
 function saveProfilePicture(dataUrl){
     const value=String(dataUrl||'');
-
     if(!saveLocal(PROFILE_PICTURE_KEY,value))return false;
-
-    if(hasLoaderBridge()){
-        bridgeRequest('save',PROFILE_PICTURE_KEY,value).catch(()=>{});
-    }
-
+    if(hasLoaderBridge())bridgeRequest('save',PROFILE_PICTURE_KEY,value).catch(()=>{});
     return true;
 }
 
@@ -120,15 +101,13 @@ function loadUsername(){
 
     if(local!==null&&local!=='')return local;
 
-    if(hasLoaderBridge()){
-        bridgeRequest('get',USERNAME_KEY).then(result=>{
-            if(result.handled&&result.value!==null){
-                saveLocal(USERNAME_KEY,result.value);
-                const input=usernameInput();
-                if(input&&!input.value)input.value=String(result.value).slice(0,24);
-            }
-        }).catch(()=>{});
-    }
+    if(hasLoaderBridge())bridgeRequest('get',USERNAME_KEY).then(result=>{
+        if(result.handled&&result.value!==null){
+            saveLocal(USERNAME_KEY,result.value);
+            const input=usernameInput();
+            if(input&&!input.value)input.value=String(result.value).slice(0,24);
+        }
+    }).catch(()=>{});
 
     return local===null?'':local;
 }
@@ -138,15 +117,13 @@ function loadProfilePicture(){
 
     if(local!==null&&local!=='')return local;
 
-    if(hasLoaderBridge()){
-        bridgeRequest('get',PROFILE_PICTURE_KEY).then(result=>{
-            if(result.handled&&result.value){
-                saveLocal(PROFILE_PICTURE_KEY,result.value);
-                showPicture(result.value);
-                setTimeout(()=>restorePictureInput(result.value),50);
-            }
-        }).catch(()=>{});
-    }
+    if(hasLoaderBridge())bridgeRequest('get',PROFILE_PICTURE_KEY).then(result=>{
+        if(result.handled&&result.value){
+            saveLocal(PROFILE_PICTURE_KEY,result.value);
+            showPicture(result.value);
+            setTimeout(()=>restorePictureInput(result.value),50);
+        }
+    }).catch(()=>{});
 
     return local===null?'':local;
 }
@@ -169,18 +146,11 @@ function dataUrlToFile(dataUrl){
     if(!match)return null;
 
     const type=match[1]||'image/jpeg';
-    const raw=match[2]
-        ?atob(match[3])
-        :decodeURIComponent(match[3]);
-
+    const raw=match[2]?atob(match[3]):decodeURIComponent(match[3]);
     const bytes=new Uint8Array(raw.length);
     for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
 
-    return new File(
-        [bytes],
-        'profile-picture.jpg',
-        {type}
-    );
+    return new File([bytes],'profile-picture.jpg',{type});
 }
 
 function restorePictureInput(dataUrl){
@@ -203,45 +173,31 @@ function restorePictureInput(dataUrl){
 function compressPicture(file){
     return new Promise((resolve,reject)=>{
         const reader=new FileReader();
-
         reader.onerror=()=>reject(reader.error||new Error('Could not read image.'));
-
         reader.onload=()=>{
             const image=new Image();
-
             image.onerror=()=>reject(new Error('Could not load image.'));
-
             image.onload=()=>{
                 const originalWidth=image.naturalWidth||image.width;
                 const originalHeight=image.naturalHeight||image.height;
                 const scale=Math.min(1,MAX_PFP_SIDE/Math.max(originalWidth,originalHeight));
-
                 const canvas=document.createElement('canvas');
                 canvas.width=Math.max(1,Math.round(originalWidth*scale));
                 canvas.height=Math.max(1,Math.round(originalHeight*scale));
-
                 const context=canvas.getContext('2d');
-                if(!context){
-                    reject(new Error('Canvas is not available.'));
-                    return;
-                }
-
+                if(!context){reject(new Error('Canvas is not available.'));return;}
                 context.drawImage(image,0,0,canvas.width,canvas.height);
 
                 let quality=.82;
                 let result=canvas.toDataURL('image/jpeg',quality);
-
                 while(result.length>MAX_PFP_LENGTH&&quality>.4){
                     quality-=.06;
                     result=canvas.toDataURL('image/jpeg',quality);
                 }
-
                 resolve(result);
             };
-
             image.src=reader.result;
         };
-
         reader.readAsDataURL(file);
     });
 }
@@ -249,19 +205,16 @@ function compressPicture(file){
 function loadProfile(){
     const nameInput=usernameInput();
     const imageInput=pictureInput();
-
     if(!nameInput||!imageInput)return false;
 
     const savedName=loadUsername();
     const savedPicture=loadProfilePicture();
 
     if(savedName)nameInput.value=savedName;
-
     if(savedPicture){
         showPicture(savedPicture);
         setTimeout(()=>restorePictureInput(savedPicture),150);
     }
-
     return true;
 }
 
@@ -269,8 +222,7 @@ function saveProfile(){
     const nameInput=usernameInput();
     if(!nameInput)return;
 
-    const name=nameInput.value.trim().slice(0,24);
-    saveUsername(name);
+    saveUsername(nameInput.value.trim().slice(0,24));
 
     const currentPicture=loadProfilePicture();
     const imageInput=pictureInput();
@@ -303,10 +255,8 @@ function clearLocalProfile(){
 
     const nameInput=usernameInput();
     const imageInput=pictureInput();
-
     if(nameInput)nameInput.value='';
     if(imageInput)imageInput.value='';
-
     showPicture('');
 }
 
@@ -314,7 +264,6 @@ function install(){
     const nameInput=usernameInput();
     const imageInput=pictureInput();
     const save=saveButton();
-
     if(!nameInput||!imageInput||!save)return false;
 
     loadProfile();
@@ -329,13 +278,11 @@ function install(){
         imageInput.addEventListener('change',()=>{
             const file=imageInput.files&&imageInput.files[0];
             if(!file)return;
-
             if(!file.type.startsWith('image/')){
                 alert('Please choose an image for your profile picture.');
                 imageInput.value='';
                 return;
             }
-
             const reader=new FileReader();
             reader.onload=()=>showPicture(reader.result);
             reader.readAsDataURL(file);
@@ -347,7 +294,6 @@ function install(){
 
 function start(){
     if(install())return;
-
     let tries=0;
     const timer=setInterval(()=>{
         tries++;
@@ -357,10 +303,9 @@ function start(){
 
 window.clearLocalProfile=clearLocalProfile;
 
-if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',start);
-}else{
-    start();
-}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);
+else start();
 
 })();
+
+/* loader-storage-bridge protocol enabled */
