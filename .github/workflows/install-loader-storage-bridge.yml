@@ -1,0 +1,49 @@
+name: Install loader storage bridge
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  install-bridge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add storage bridge to loader
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('loader.html')
+          text = path.read_text(encoding='utf-8')
+          marker = '<!-- CHAT APP LOADER STORAGE BRIDGE -->'
+
+          if marker not in text:
+              insertion = (
+                  '\n' + marker + '\n'
+                  '<script src="loader-storage-bridge.js"></script>\n'
+              )
+
+              if '</body>' not in text:
+                  raise SystemExit('loader.html does not contain </body>')
+
+              text = text.replace('</body>', insertion + '</body>', 1)
+              path.write_text(text, encoding='utf-8')
+
+      - name: Commit loader change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add loader.html
+          if git diff --cached --quiet; then
+            echo "Loader already contains the storage bridge."
+            exit 0
+          fi
+          git commit -m "Add loader storage bridge"
+          git push
