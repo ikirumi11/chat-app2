@@ -1,44 +1,45 @@
-/* Chat App 2 - Google Sheets history + real live P2P chat */
+/* Chat App 2 - Supabase Realtime live chat + Supabase database history */
 (() => {
     "use strict";
 
-    const SERVER_URL = "https://script.google.com/macros/s/AKfycbzIQrF4QfSh6MVdSEFNMpINunLXIbOFtxFfbWm7_h8NwOWj-DYFqtKDMqwRuBEXHWZb/exec";
+    const SUPABASE_URL = "https://wlvbkdzcueqkknysisfw.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL";
+    const CHANNEL = "general";
+    const MAX_MESSAGES = 500;
+    const REQUEST_TIMEOUT_MS = 10000;
+    const SAVE_RETRY_MS = 1000;
+    const P2P_RETRY_MS = 1000;
+    const DEVICE_KEY = "chat_device_id";
+    const CACHE_KEY = "chat_messages_supabase_" + CHANNEL;
+
     const ORIGINAL_FETCH = window.fetch.bind(window);
     const ORIGINAL_SET_INTERVAL = window.setInterval.bind(window);
 
-    const CHANNEL = "general";
-    const MAX_MESSAGES = 500;
-    const SIGNAL_MS = 500;
-    const SAVE_RETRY_MS = 1000;
-    const PEER_RETRY_MS = 1000;
-    const PEER_RECREATE_MS = 4000;
-    const REQUEST_TIMEOUT_MS = 8000;
-    const CACHE_KEY = "chat_messages_persistent_v6_" + CHANNEL;
-    const DEVICE_KEY = "chat_device_id";
-
-    const peers = new Map();
-    const pendingSave = new Map();
-    const sheetKnownIds = new Set();
-
+    let supabase = null;
+    let realtimeChannel = null;
+    let realtimeReady = false;
+    let realtimeLoading = null;
     let localMessages = [];
     let loaded = false;
     let loading = null;
-    let signalBusy = false;
-    let sheetBusy = false;
-    let newestSheetId = "";
-    let signalTimer = null;
-    let sheetTimer = null;
+    let pendingLive = [];
+    let pendingSave = new Map();
+    let saveBusy = false;
+    let sheetLikeStatus = "Supabase: connecting…";
     let statusTimer = null;
-    let sheetReady = false;
-    let sheetLastError = false;
+    let retryTimer = null;
 
     let deviceId = localStorage.getItem(DEVICE_KEY);
     if (!deviceId) {
-        deviceId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+        deviceId = crypto.randomUUID
+            ? crypto.randomUUID()
+            : Date.now().toString(36) + Math.random().toString(36).slice(2);
         localStorage.setItem(DEVICE_KEY, deviceId);
     }
 
-    const newId = () => crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+    const newId = () => crypto.randomUUID
+        ? crypto.randomUUID()
+        : Date.now().toString(36) + Math.random().toString(36).slice(2);
 
     function jsonResponse(body, status = 200) {
         return new Response(JSON.stringify(body), {
@@ -52,56 +53,6 @@
         try { return JSON.parse(options.body); } catch (_) { return {}; }
     }
 
-    async function server(method, payload = {}, query = {}) {
-        const params = new URLSearchParams();
-        for (const [key, value] of Object.entries(query)) {
-            if (value !== undefined && value !== null) params.set(key, String(value));
-        }
-
-        const url = SERVER_URL + (params.toString() ? "?" + params.toString() : "");
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
-        try {
-            const options = {
-                method,
-                cache: "no-store",
-                redirect: "follow",
-                credentials: "omit",
-                signal: controller.signal
-            };
-
-            if (method !== "GET") {
-                options.headers = { "Content-Type": "text/plain;charset=utf-8" };
-                options.body = JSON.stringify(payload);
-            }
-
-            const res = await ORIGINAL_FETCH(url, options);
-            const text = await res.text();
-            let data = {};
-            try { data = text ? JSON.parse(text) : {}; }
-            catch (_) { data = { ok: false, error: text }; }
-            return { res, data };
-        } finally {
-            clearTimeout(timeout);
-        }
-    }
-
-    function localUsername() {
-        const keys = ["chat_username", "chat_name", "username", "chat_user"];
-        for (const key of keys) {
-            const value = String(localStorage.getItem(key) || "").trim();
-            if (value) return value.substring(0, 24);
-        }
-
-        const input = document.getElementById("usernameInput");
-        if (input && String(input.value || "").trim()) {
-            return String(input.value).trim().substring(0, 24);
-        }
-
-        return "Anonymous";
-    }
-
     function normalize(message) {
         if (!message || typeof message !== "object") return null;
 
@@ -110,21 +61,21 @@
             try { files = JSON.parse(files); } catch (_) { files = []; }
         }
 
-        const username = String(message.username || message.name || "").trim() || localUsername();
-
         return {
             ...message,
             id: String(message.id || message.messageId || newId()),
-            timestamp: message.timestamp || new Date().toISOString(),
-            channel: String(message.channel || CHANNEL),
-            username: username.substring(0, 24),
+            timestamp: message.timestamp || message.created_at || new Date().toISOString(),
+            username: String(message.username || message.name || localUsername()).trim().substring(0, 24),
             message: String(message.message ?? ""),
-            files: Array.isArray(files) ? files : []
+            image: message.image || null,
+            files: Array.isArray(files) ? files : [],
+            channel: String(message.channel || CHANNEL),
+            device_id: String(message.device_id || "")
         };
     }
 
-    const idOf = message => String(message?.id || message?.messageId || "");
-    const timeOf = message => new Date(message?.timestamp || message?.time || 0).getTime() || 0;
+    const idOf = m => String(m?.id || m?.messageId || "");
+    const timeOf = m => new Date(m?.timestamp || m?.created_at || 0).getTime() || 0;
 
     function usable(message) {
         if (!message || !idOf(message) || message.channel !== CHANNEL) return false;
@@ -136,113 +87,86 @@
         );
     }
 
+    function localUsername() {
+        for (const key of ["chat_username", "chat_name", "username", "chat_user"]) {
+            const value = String(localStorage.getItem(key) || "").trim();
+            if (value) return value.substring(0, 24);
+        }
+        const input = document.getElementById("usernameInput");
+        if (input?.value?.trim()) return input.value.trim().substring(0, 24);
+        return "Anonymous";
+    }
+
     function cacheWrite() {
-        try {
-            localStorage.setItem(CACHE_KEY, JSON.stringify(localMessages.slice(-MAX_MESSAGES)));
-        } catch (_) {}
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(localMessages.slice(-MAX_MESSAGES))); } catch (_) {}
     }
 
     function cacheRead() {
         try {
             const value = JSON.parse(localStorage.getItem(CACHE_KEY) || "[]");
             return Array.isArray(value) ? value.map(normalize).filter(usable) : [];
-        } catch (_) {
-            return [];
-        }
+        } catch (_) { return []; }
     }
 
     function merge(messages) {
-        const map = new Map(localMessages.map(message => [idOf(message), message]));
+        const map = new Map(localMessages.map(m => [idOf(m), m]));
         let changed = false;
-
         for (const raw of messages || []) {
             const message = normalize(raw);
             if (!usable(message)) continue;
             if (!map.has(idOf(message))) {
                 map.set(idOf(message), message);
                 changed = true;
+            } else {
+                map.set(idOf(message), { ...map.get(idOf(message)), ...message });
             }
         }
-
         if (changed) {
             localMessages = Array.from(map.values())
                 .sort((a, b) => timeOf(a) - timeOf(b))
                 .slice(-MAX_MESSAGES);
             cacheWrite();
         }
-
         return changed;
     }
 
-    // ============================================================
-    // STATUS INDICATORS
-    // ============================================================
+    // ------------------------------------------------------------
+    // STATUS
+    // ------------------------------------------------------------
 
-    function getStatusBox() {
+    function statusBox() {
         let box = document.getElementById("chat-connection-status");
         if (box) return box;
-
         box = document.createElement("div");
         box.id = "chat-connection-status";
-        box.style.cssText = [
-            "position:fixed",
-            "right:12px",
-            "bottom:12px",
-            "z-index:2147483647",
-            "display:flex",
-            "flex-direction:column",
-            "gap:6px",
-            "font:12px Arial,sans-serif",
-            "pointer-events:none"
-        ].join(";");
-
+        box.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:2147483647;display:flex;flex-direction:column;gap:6px;font:12px Arial,sans-serif;pointer-events:none";
         document.documentElement.appendChild(box);
         return box;
     }
 
-    function setBadge(id, text, state) {
-        const box = getStatusBox();
-        let badge = document.getElementById(id);
-        if (!badge) {
-            badge = document.createElement("div");
-            badge.id = id;
-            badge.style.cssText = [
-                "padding:7px 10px",
-                "border-radius:8px",
-                "background:rgba(20,20,20,.92)",
-                "border:1px solid rgba(255,255,255,.15)",
-                "color:#fff",
-                "box-shadow:0 3px 14px rgba(0,0,0,.25)",
-                "white-space:nowrap"
-            ].join(";");
-            box.appendChild(badge);
+    function badge(id, text) {
+        const box = statusBox();
+        let el = document.getElementById(id);
+        if (!el) {
+            el = document.createElement("div");
+            el.id = id;
+            el.style.cssText = "padding:7px 10px;border-radius:8px;background:rgba(20,20,20,.92);border:1px solid rgba(255,255,255,.15);color:#fff;box-shadow:0 3px 14px rgba(0,0,0,.25);white-space:nowrap";
+            box.appendChild(el);
         }
-
-        badge.textContent = text;
-        badge.dataset.state = state;
+        el.textContent = text;
     }
 
     function updateStatus() {
-        const connected = Array.from(peers.values()).filter(peer => peer.channel?.readyState === "open").length;
-        const connecting = Array.from(peers.values()).filter(peer => {
-            const state = peer.pc?.connectionState;
-            return !peer.channel || peer.channel.readyState !== "open" || state === "connecting" || state === "new";
-        }).length;
-
-        if (connected > 0) {
-            setBadge("chat-p2p-status", `P2P: connected (${connected})`, "connected");
-        } else if (connecting > 0) {
-            setBadge("chat-p2p-status", "P2P: connecting… retrying", "connecting");
+        if (realtimeReady) {
+            badge("chat-p2p-status", "P2P: connected");
         } else {
-            setBadge("chat-p2p-status", "P2P: not connected — retrying", "retrying");
+            badge("chat-p2p-status", "P2P: not connected — retrying…");
         }
 
         if (pendingSave.size > 0) {
-            setBadge("chat-sheet-status", `Google Sheets: saving (${pendingSave.size})…`, "saving");
-        } else if (sheetReady && !sheetLastError) {
-            setBadge("chat-sheet-status", "Google Sheets: saved", "saved");
+            badge("chat-sheet-status", `Database: saving (${pendingSave.size})…`);
         } else {
-            setBadge("chat-sheet-status", "Google Sheets: retrying…", "retrying");
+            badge("chat-sheet-status", sheetLikeStatus);
         }
     }
 
@@ -252,502 +176,266 @@
         statusTimer = ORIGINAL_SET_INTERVAL(updateStatus, 250);
     }
 
-    // ============================================================
-    // GOOGLE SHEETS = PERMANENT HISTORY + BACKGROUND SAVE ONLY
-    // ============================================================
+    // ------------------------------------------------------------
+    // SUPABASE LOADING
+    // ------------------------------------------------------------
 
-    async function saveInBackground(message) {
-        const item = normalize(message);
-        if (!usable(item)) return;
+    function loadSupabaseLibrary() {
+        if (window.supabase?.createClient) return Promise.resolve(window.supabase);
+        if (realtimeLoading) return realtimeLoading;
 
-        const id = idOf(item);
-        if (sheetKnownIds.has(id)) return;
-        pendingSave.set(id, item);
-        sheetLastError = false;
-        updateStatus();
-
-        try {
-            const result = await server("POST", {
-                action: "save_batch",
-                channel: CHANNEL,
-                device_id: deviceId,
-                messages: [item]
-            });
-
-            if (!result.res.ok || result.data?.ok === false) throw new Error("save failed");
-            pendingSave.delete(id);
-            sheetKnownIds.add(id);
-            sheetReady = true;
-            sheetLastError = false;
-        } catch (_) {
-            sheetLastError = true;
-            // Kept in pendingSave and retried automatically every second.
-        }
-        updateStatus();
-    }
-
-    async function retrySaves() {
-        if (!pendingSave.size) {
-            updateStatus();
-            return;
-        }
-
-        const batch = Array.from(pendingSave.values()).slice(0, 25);
-        try {
-            const result = await server("POST", {
-                action: "save_batch",
-                channel: CHANNEL,
-                device_id: deviceId,
-                messages: batch
-            });
-
-            if (!result.res.ok || result.data?.ok === false) throw new Error("save failed");
-
-            for (const item of batch) {
-                pendingSave.delete(idOf(item));
-                sheetKnownIds.add(idOf(item));
+        realtimeLoading = new Promise((resolve, reject) => {
+            const existing = document.querySelector('script[data-chat-supabase="1"]');
+            if (existing) {
+                existing.addEventListener("load", () => resolve(window.supabase));
+                existing.addEventListener("error", reject);
+                return;
             }
-            sheetReady = true;
-            sheetLastError = false;
-        } catch (_) {
-            sheetLastError = true;
-        }
-        updateStatus();
-    }
 
-    ORIGINAL_SET_INTERVAL(retrySaves, SAVE_RETRY_MS);
-
-    // ============================================================
-    // REAL P2P LIVE CHAT
-    // Google Sheets is ONLY history/signaling/persistence.
-    // Messages themselves travel over RTCDataChannel when connected.
-    // ============================================================
-
-    function sendPacket(peer, packet) {
-        if (!peer) return false;
-
-        const text = JSON.stringify(packet);
-        if (peer.channel?.readyState === "open") {
-            try {
-                peer.channel.send(text);
-                return true;
-            } catch (_) {}
-        }
-
-        peer.outbox.push(text);
-        if (peer.outbox.length > 100) peer.outbox.splice(0, peer.outbox.length - 100);
-        return false;
-    }
-
-    function flushOutbox(peer) {
-        if (!peer?.channel || peer.channel.readyState !== "open") return;
-        while (peer.outbox.length) {
-            try {
-                peer.channel.send(peer.outbox.shift());
-            } catch (_) {
-                break;
-            }
-        }
-    }
-
-    function broadcast(packet, exceptId = "") {
-        for (const [id, peer] of peers) {
-            if (id !== exceptId) sendPacket(peer, packet);
-        }
-    }
-
-    function receiveLiveMessage(peerId, rawMessage) {
-        const message = normalize(rawMessage);
-        if (!usable(message)) return;
-
-        const existed = localMessages.some(item => idOf(item) === idOf(message));
-        const changed = merge([message]);
-
-        if (!existed && changed) {
-            broadcast({
-                type: "message",
-                from: deviceId,
-                message
-            }, peerId);
-        }
-
-        if (!sheetKnownIds.has(idOf(message))) saveInBackground(message);
-    }
-
-    function attachChannel(peerId, channel) {
-        const peer = peers.get(peerId);
-        if (!peer) return;
-
-        peer.channel = channel;
-        peer.lastStateChange = Date.now();
-        channel.binaryType = "arraybuffer";
-
-        channel.onopen = () => {
-            peer.connectedAt = Date.now();
-            peer.lastStateChange = Date.now();
-            peer.retries = 0;
-            flushOutbox(peer);
-            window.dispatchEvent(new CustomEvent("chat-p2p-connected", { detail: { peerId } }));
-            updateStatus();
-        };
-
-        channel.onmessage = event => {
-            try {
-                const packet = JSON.parse(event.data);
-                if (packet?.type === "message") receiveLiveMessage(peerId, packet.message);
-            } catch (_) {}
-        };
-
-        channel.onerror = () => {
-            peer.lastStateChange = Date.now();
-            updateStatus();
-        };
-
-        channel.onclose = () => {
-            if (peer.channel === channel) peer.channel = null;
-            peer.lastStateChange = Date.now();
-            updateStatus();
-        };
-    }
-
-    function createPeer(peerId, force = false) {
-        let peer = peers.get(peerId);
-
-        if (!force && peer?.pc && !["closed", "failed"].includes(peer.pc.connectionState)) {
-            return peer;
-        }
-
-        if (peer?.pc) {
-            try { peer.pc.close(); } catch (_) {}
-        }
-
-        const pc = new RTCPeerConnection({
-            iceServers: [
-                { urls: "stun:stun.l.google.com:19302" },
-                { urls: "stun:stun1.l.google.com:19302" }
-            ]
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
+            script.async = true;
+            script.dataset.chatSupabase = "1";
+            script.onload = () => window.supabase?.createClient
+                ? resolve(window.supabase)
+                : reject(new Error("Supabase library did not load"));
+            script.onerror = () => reject(new Error("Could not load Supabase"));
+            document.head.appendChild(script);
         });
 
-        peer = {
-            id: peerId,
-            pc,
-            channel: null,
-            outbox: peer?.outbox || [],
-            remoteDescriptionSet: false,
-            pendingIce: [],
-            makingOffer: false,
-            lastStateChange: Date.now(),
-            retries: peer?.retries || 0
-        };
-
-        peers.set(peerId, peer);
-
-        pc.ondatachannel = event => attachChannel(peerId, event.channel);
-
-        pc.onicecandidate = event => {
-            if (!event.candidate) return;
-            server("POST", {
-                action: "signal_push",
-                to: peerId,
-                from: deviceId,
-                signal: { type: "ice", candidate: event.candidate }
-            }).catch(() => {});
-        };
-
-        pc.onicecandidateerror = () => {};
-
-        pc.onconnectionstatechange = () => {
-            const state = pc.connectionState;
-            peer.lastStateChange = Date.now();
-
-            if (state === "connected") {
-                peer.retries = 0;
-                window.dispatchEvent(new CustomEvent("chat-p2p-connected", { detail: { peerId } }));
-            }
-
-            if (state === "failed" || state === "closed") {
-                try { pc.close(); } catch (_) {}
-                if (peers.get(peerId)?.pc === pc) peers.delete(peerId);
-            }
-            updateStatus();
-        };
-
-        pc.oniceconnectionstatechange = () => {
-            peer.lastStateChange = Date.now();
-            if (pc.iceConnectionState === "failed") {
-                try { pc.restartIce(); } catch (_) {}
-            }
-        };
-
-        return peer;
+        return realtimeLoading;
     }
 
-    async function makeOffer(peerId, force = false) {
-        const peer = createPeer(peerId, force);
-        if (peer.channel?.readyState === "open" || peer.makingOffer) return;
+    async function initSupabase() {
+        if (supabase) return supabase;
 
-        peer.makingOffer = true;
-        peer.retries++;
-        try {
-            if (!peer.channel) {
-                attachChannel(peerId, peer.pc.createDataChannel("chat", { ordered: true }));
+        const lib = await loadSupabaseLibrary();
+        supabase = lib.createClient(SUPABASE_URL, SUPABASE_KEY, {
+            realtime: {
+                params: { eventsPerSecond: 10 },
+                reconnectAfterMs: tries => [1000, 2000, 5000, 10000][Math.min(tries, 3)]
             }
+        });
 
-            const offer = await peer.pc.createOffer();
-            await peer.pc.setLocalDescription(offer);
-
-            await server("POST", {
-                action: "signal_push",
-                to: peerId,
-                from: deviceId,
-                signal: { type: "offer", sdp: peer.pc.localDescription }
-            });
-        } catch (_) {
-            try { peer.pc.close(); } catch (_) {}
-            if (peers.get(peerId)?.pc === peer.pc) peers.delete(peerId);
-        } finally {
-            peer.makingOffer = false;
-        }
+        subscribeRealtime();
+        return supabase;
     }
 
-    async function addPendingIce(peer) {
-        const candidates = peer.pendingIce.splice(0);
-        for (const candidate of candidates) {
-            try { await peer.pc.addIceCandidate(candidate); } catch (_) {}
-        }
-    }
+    function subscribeRealtime() {
+        if (!supabase) return;
 
-    async function handleSignal(item) {
-        const from = String(item?.from || "");
-        const signal = item?.signal;
-        if (!from || from === deviceId || !signal) return;
-
-        const peer = createPeer(from);
-
-        if (signal.type === "ice") {
-            if (peer.remoteDescriptionSet) {
-                try { await peer.pc.addIceCandidate(signal.candidate); } catch (_) {}
-            } else {
-                peer.pendingIce.push(signal.candidate);
-            }
-            return;
+        if (realtimeChannel) {
+            try { supabase.removeChannel(realtimeChannel); } catch (_) {}
         }
 
-        if (signal.type === "offer") {
-            try {
-                await peer.pc.setRemoteDescription(signal.sdp);
-                peer.remoteDescriptionSet = true;
-                await addPendingIce(peer);
+        realtimeReady = false;
+        updateStatus();
 
-                const answer = await peer.pc.createAnswer();
-                await peer.pc.setLocalDescription(answer);
-
-                await server("POST", {
-                    action: "signal_push",
-                    to: from,
-                    from: deviceId,
-                    signal: { type: "answer", sdp: peer.pc.localDescription }
-                });
-            } catch (_) {
-                if (peers.get(from)?.pc === peer.pc) peers.delete(from);
-            }
-            return;
-        }
-
-        if (signal.type === "answer") {
-            if (peer.pc.signalingState !== "have-local-offer") return;
-            try {
-                await peer.pc.setRemoteDescription(signal.sdp);
-                peer.remoteDescriptionSet = true;
-                await addPendingIce(peer);
-            } catch (_) {}
-        }
-    }
-
-    async function ensurePeerConnections(peerList) {
-        const now = Date.now();
-
-        for (const item of peerList || []) {
-            const id = String(item.peer_id || "");
-            if (!id || id === deviceId) continue;
-
-            let peer = peers.get(id);
-            const state = peer?.pc?.connectionState || "none";
-            const channelOpen = peer?.channel?.readyState === "open";
-
-            if (channelOpen) continue;
-
-            // A connection that has been stuck/disconnected is destroyed and rebuilt.
-            if (peer && (state === "disconnected" || state === "connecting" || state === "new") && now - (peer.lastStateChange || now) > PEER_RECREATE_MS) {
-                peer = createPeer(id, true);
-            }
-
-            const active = peer?.pc && !["closed", "failed"].includes(peer.pc.connectionState);
-
-            // Deterministic offerer: only the lower device ID creates offers.
-            // It retries every second until the data channel actually opens.
-            if (deviceId < id && !active) {
-                makeOffer(id, true).catch(() => {});
-            } else if (deviceId < id && active && !peer.makingOffer) {
-                if (now - (peer.lastOfferAttempt || 0) >= PEER_RETRY_MS) {
-                    peer.lastOfferAttempt = now;
-                    makeOffer(id, true).catch(() => {});
+        realtimeChannel = supabase.channel("chat:" + CHANNEL, {
+            config: {
+                broadcast: {
+                    self: false,
+                    ack: true
                 }
             }
-        }
+        });
+
+        realtimeChannel.on(
+            "broadcast",
+            { event: "chat-message" },
+            payload => {
+                const message = normalize(payload?.payload?.message);
+                if (!usable(message)) return;
+                merge([message]);
+                window.dispatchEvent(new CustomEvent("chat-live-message", { detail: message }));
+            }
+        );
+
+        realtimeChannel.subscribe(status => {
+            if (status === "SUBSCRIBED") {
+                realtimeReady = true;
+                sheetLikeStatus = "Database: saved";
+                flushLiveQueue();
+            } else {
+                realtimeReady = false;
+                sheetLikeStatus = "Database: reconnecting…";
+            }
+            updateStatus();
+        });
     }
 
-    async function signalingTick() {
-        if (!loaded || signalBusy || document.hidden) return;
-        signalBusy = true;
+    // ------------------------------------------------------------
+    // SUPABASE DATABASE
+    // ------------------------------------------------------------
+
+    async function dbFetch(path, options = {}) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
         try {
-            const register = await server("POST", {
-                action: "register_peer",
-                peer_id: deviceId,
-                channel: CHANNEL
+            return await ORIGINAL_FETCH(SUPABASE_URL + path, {
+                ...options,
+                cache: "no-store",
+                signal: controller.signal,
+                headers: {
+                    apikey: SUPABASE_KEY,
+                    Authorization: "Bearer " + SUPABASE_KEY,
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    ...(options.headers || {})
+                }
             });
-
-            if (!register.res.ok || register.data?.ok === false) throw new Error("peer registration failed");
-
-            const peersResult = await server("GET", {}, {
-                action: "get_peers",
-                channel: CHANNEL,
-                peer_id: deviceId
-            });
-
-            const peerList = Array.isArray(peersResult.data?.peers) ? peersResult.data.peers : [];
-            await ensurePeerConnections(peerList);
-
-            const signalResult = await server("GET", {}, {
-                action: "signal_pull",
-                peer_id: deviceId
-            });
-
-            const signals = Array.isArray(signalResult.data?.signals)
-                ? signalResult.data.signals
-                : [];
-
-            signals.sort((a, b) => {
-                const at = Number(a.timestamp || a.time || 0);
-                const bt = Number(b.timestamp || b.time || 0);
-                return at - bt;
-            });
-
-            for (const item of signals) await handleSignal(item);
-        } catch (_) {
-            // Never stop. The next tick retries discovery, signaling and P2P connection.
         } finally {
-            signalBusy = false;
-            updateStatus();
+            clearTimeout(timer);
         }
     }
 
-    function startP2P() {
-        if (!loaded) return;
-        signalingTick();
-        if (signalTimer) clearInterval(signalTimer);
-        signalTimer = ORIGINAL_SET_INTERVAL(signalingTick, SIGNAL_MS);
+    async function readJsonResponse(response) {
+        const text = await response.text();
+        try { return text ? JSON.parse(text) : {}; } catch (_) { return { error: text }; }
     }
-
-    // ============================================================
-    // STARTUP: SHEET FIRST, THEN P2P
-    // ============================================================
 
     async function loadHistory() {
         if (loaded) return localMessages;
         if (loading) return loading;
 
         loading = (async () => {
-            let sheetWorked = false;
-            sheetLastError = false;
-
             try {
-                const result = await server("GET", {}, {
-                    channel: CHANNEL,
-                    limit: MAX_MESSAGES
-                });
+                await initSupabase();
+                const query = `/rest/v1/messages?select=id,username,channel,message,image,files,device_id,edited,created_at&channel=eq.${encodeURIComponent(CHANNEL)}&order=created_at.asc&limit=${MAX_MESSAGES}`;
+                const response = await dbFetch(query);
+                const data = await readJsonResponse(response);
 
-                if (result.res.ok && result.data?.ok !== false && Array.isArray(result.data.messages)) {
-                    const history = result.data.messages.map(normalize).filter(usable);
-
-                    for (const message of history) sheetKnownIds.add(idOf(message));
-
-                    localMessages = [];
-                    merge(history);
-                    sheetWorked = true;
-                    sheetReady = true;
-                }
+                if (!response.ok) throw new Error(data?.message || data?.error || "History load failed");
+                localMessages = [];
+                merge(Array.isArray(data) ? data : []);
+                sheetLikeStatus = "Database: saved";
             } catch (_) {
-                sheetLastError = true;
-            }
-
-            if (!sheetWorked) {
                 localMessages = cacheRead().slice(-MAX_MESSAGES);
+                sheetLikeStatus = "Database: retrying…";
+                initSupabase().catch(() => {});
             }
 
-            localMessages = localMessages.sort((a, b) => timeOf(a) - timeOf(b)).slice(-MAX_MESSAGES);
-            cacheWrite();
-            newestSheetId = idOf(localMessages[localMessages.length - 1]);
             loaded = true;
-
-            startP2P();
-            startSheetWatch();
+            cacheWrite();
             updateStatus();
-
             return localMessages;
         })();
 
         return loading;
     }
 
-    async function sheetWatch() {
-        if (!loaded || sheetBusy || document.hidden) return;
-        sheetBusy = true;
+    async function persistMessage(message) {
+        const item = normalize(message);
+        if (!usable(item)) return;
+        const id = idOf(item);
+        pendingSave.set(id, item);
+        sheetLikeStatus = "Database: saving…";
+        updateStatus();
 
         try {
-            const latest = await server("GET", {}, { channel: CHANNEL, limit: 1 });
-            const newest = latest.data?.messages?.[0];
-            const newestId = idOf(newest);
+            const response = await dbFetch("/rest/v1/messages", {
+                method: "POST",
+                headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+                body: JSON.stringify({
+                    id: item.id,
+                    username: item.username,
+                    channel: CHANNEL,
+                    message: item.message,
+                    image: item.image,
+                    files: item.files,
+                    device_id: item.device_id || deviceId,
+                    edited: Boolean(item.edited)
+                })
+            });
 
-            if (newestId && newestId !== newestSheetId) {
-                const result = await server("GET", {}, { channel: CHANNEL, limit: MAX_MESSAGES });
-                if (result.res.ok && result.data?.ok !== false && Array.isArray(result.data.messages)) {
-                    const history = result.data.messages.map(normalize).filter(usable);
-                    for (const message of history) sheetKnownIds.add(idOf(message));
-                    merge(history);
-                    newestSheetId = newestId;
-                    sheetReady = true;
-                    sheetLastError = false;
-                }
-            } else if (latest.res.ok) {
-                sheetReady = true;
-                sheetLastError = false;
-            }
+            const data = await readJsonResponse(response);
+            if (!response.ok) throw new Error(data?.message || data?.error || "Database save failed");
+
+            pendingSave.delete(id);
+            sheetLikeStatus = "Database: saved";
         } catch (_) {
-            sheetLastError = true;
+            sheetLikeStatus = "Database: retrying…";
+            // The message remains queued and is retried below.
+        }
+        updateStatus();
+    }
+
+    async function retrySaves() {
+        if (saveBusy || pendingSave.size === 0) return;
+        saveBusy = true;
+        try {
+            const batch = Array.from(pendingSave.values()).slice(0, 25);
+            for (const item of batch) await persistMessage(item);
         } finally {
-            sheetBusy = false;
+            saveBusy = false;
             updateStatus();
         }
     }
 
-    function startSheetWatch() {
-        if (sheetTimer) clearInterval(sheetTimer);
-        sheetTimer = ORIGINAL_SET_INTERVAL(sheetWatch, 1500);
+    ORIGINAL_SET_INTERVAL(retrySaves, SAVE_RETRY_MS);
+
+    // ------------------------------------------------------------
+    // REALTIME LIVE MESSAGE QUEUE
+    // ------------------------------------------------------------
+
+    async function broadcastMessage(message) {
+        const packet = {
+            type: "broadcast",
+            event: "chat-message",
+            payload: { message }
+        };
+
+        if (realtimeReady && realtimeChannel) {
+            try {
+                const result = await realtimeChannel.send(packet);
+                if (result === "ok") return true;
+            } catch (_) {}
+        }
+
+        pendingLive.push(message);
+        if (pendingLive.length > 100) pendingLive.splice(0, pendingLive.length - 100);
+        return false;
     }
 
-    // ============================================================
-    // EXISTING CHAT APP API
-    // ============================================================
+    async function flushLiveQueue() {
+        if (!realtimeReady || !realtimeChannel || pendingLive.length === 0) return;
+
+        while (pendingLive.length && realtimeReady) {
+            const message = pendingLive[0];
+            try {
+                const result = await realtimeChannel.send({
+                    type: "broadcast",
+                    event: "chat-message",
+                    payload: { message }
+                });
+                if (result !== "ok") throw new Error("broadcast failed");
+                pendingLive.shift();
+            } catch (_) {
+                break;
+            }
+        }
+        updateStatus();
+    }
+
+    if (retryTimer) clearInterval(retryTimer);
+    retryTimer = ORIGINAL_SET_INTERVAL(() => {
+        initSupabase().catch(() => {});
+        flushLiveQueue();
+        retrySaves();
+    }, P2P_RETRY_MS);
+
+    // ------------------------------------------------------------
+    // CHAT APP API
+    // ------------------------------------------------------------
 
     async function getMessages() {
         await loadHistory();
         return {
             success: true,
             messages: localMessages.slice(-MAX_MESSAGES),
-            p2p: true,
-            historySource: "google-sheets"
+            p2p: realtimeReady,
+            historySource: "supabase"
         };
     }
 
@@ -772,25 +460,59 @@
         });
 
         if (!usable(message)) {
-            return { success: false, error: "Message is empty.", messages: localMessages.slice(-MAX_MESSAGES), p2p: true };
+            return { success: false, error: "Message is empty.", messages: localMessages.slice(-MAX_MESSAGES) };
         }
 
-        // 1. Show locally immediately.
+        // Instant local display.
         merge([message]);
 
-        // 2. LIVE P2P first. Never wait for Google Sheets.
-        broadcast({ type: "message", from: deviceId, message });
+        // Live P2P-style Supabase Realtime delivery.
+        // If disconnected, the message stays queued until SUBSCRIBED again.
+        broadcastMessage(message);
 
-        // 3. Google Sheets persistence happens in the background.
-        saveInBackground(message);
+        // Permanent database save happens immediately in parallel.
+        persistMessage(message);
 
         return {
             success: true,
             message,
             messages: localMessages.slice(-MAX_MESSAGES),
-            p2p: true,
-            savedInBackground: true
+            p2p: realtimeReady,
+            saving: true
         };
+    }
+
+    async function databaseAction(method, body) {
+        const id = String(body?.id || "").trim();
+        if (!id) return { ok: false, error: "Message ID is required." };
+
+        if (method === "PATCH") {
+            const updates = {};
+            if (body.message !== undefined) updates.message = String(body.message).substring(0, 20000);
+            if (body.image !== undefined) updates.image = body.image;
+            if (body.files !== undefined) updates.files = Array.isArray(body.files) ? body.files : [];
+            updates.edited = true;
+
+            const response = await dbFetch(`/rest/v1/messages?id=eq.${encodeURIComponent(id)}&device_id=eq.${encodeURIComponent(deviceId)}`, {
+                method: "PATCH",
+                headers: { Prefer: "return=representation" },
+                body: JSON.stringify(updates)
+            });
+            const data = await readJsonResponse(response);
+            if (!response.ok) return { ok: false, error: data?.message || data?.error || "Edit failed." };
+            merge(data);
+            return { success: true, message: data?.[0] || null };
+        }
+
+        const response = await dbFetch(`/rest/v1/messages?id=eq.${encodeURIComponent(id)}&device_id=eq.${encodeURIComponent(deviceId)}`, {
+            method: "DELETE",
+            headers: { Prefer: "return=representation" }
+        });
+        const data = await readJsonResponse(response);
+        if (!response.ok) return { ok: false, error: data?.message || data?.error || "Delete failed." };
+        localMessages = localMessages.filter(m => idOf(m) !== id);
+        cacheWrite();
+        return { success: true, deleted: true };
     }
 
     async function messagesApi(method, options) {
@@ -800,39 +522,53 @@
 
         if (method === "POST") {
             if (body.game_server || body.game_action || body.action === "edit" || body.action === "delete") {
-                try {
-                    const result = await server("POST", body);
-                    return jsonResponse(result.data, result.res.status || 200);
-                } catch (error) {
-                    return jsonResponse({ ok: false, error: error?.message || "Server request failed." });
-                }
+                return jsonResponse(await gameOrAction(body));
             }
             return jsonResponse(await sendMessage(body));
         }
 
         if (method === "PATCH" || method === "DELETE") {
-            try {
-                const result = await server("POST", {
-                    action: method === "PATCH" ? "edit" : "delete",
-                    ...body
-                });
-                return jsonResponse(result.data, result.res.status || 200);
-            } catch (error) {
-                return jsonResponse({ ok: false, error: error?.message || "Server request failed." });
-            }
+            return jsonResponse(await databaseAction(method, body));
         }
 
         return jsonResponse({ ok: false, error: "Method not allowed." }, 405);
     }
 
+    async function gameOrAction(body) {
+        // Keep the existing game API compatible with the Supabase messages table.
+        if (body.action === "edit") return databaseAction("PATCH", body);
+        if (body.action === "delete") return databaseAction("DELETE", body);
+
+        const text = String(body.message || body.game_state || "").trim();
+        const channel = String(body.channel || CHANNEL).trim().substring(0, 32);
+        const gameDevice = String(body.device_id || deviceId).trim();
+
+        if (!text) return { ok: false, error: "Game state is required." };
+
+        const response = await dbFetch("/rest/v1/messages", {
+            method: "POST",
+            headers: { Prefer: "return=representation" },
+            body: JSON.stringify({
+                username: "__GAME_SERVER__",
+                channel,
+                message: text,
+                image: null,
+                files: [],
+                device_id: gameDevice,
+                edited: false
+            })
+        });
+        const data = await readJsonResponse(response);
+        if (!response.ok) return { ok: false, error: data?.message || data?.error || "Game request failed." };
+        return { success: true, game: Array.isArray(data) ? data[0] : data };
+    }
+
     async function actionsApi(method, options) {
         if (method !== "POST") return jsonResponse({ error: "Method not allowed." }, 405);
-        try {
-            const result = await server("POST", await readBody(options));
-            return jsonResponse(result.data, result.res.status || 200);
-        } catch (error) {
-            return jsonResponse({ ok: false, error: error?.message || "Server request failed." });
-        }
+        const body = await readBody(options);
+        if (body.action === "edit") return jsonResponse(await databaseAction("PATCH", body));
+        if (body.action === "delete") return jsonResponse(await databaseAction("DELETE", body));
+        return jsonResponse(await gameOrAction(body));
     }
 
     window.fetch = async function(input, options = {}) {
@@ -856,26 +592,19 @@
     window.CHAT_APP_HISTORY_PERSISTENT = true;
     window.CHAT_APP_P2P_DEVICE_ID = deviceId;
     window.CHAT_APP_P2P_GET_STATUS = () => ({
-        connectedPeers: Array.from(peers.values()).filter(p => p.channel?.readyState === "open").length,
-        totalPeers: peers.size,
-        pendingGoogleSheetSaves: pendingSave.size,
-        googleSheetReady: sheetReady
+        connected: realtimeReady,
+        queuedLiveMessages: pendingLive.length,
+        pendingDatabaseSaves: pendingSave.size
     });
 
     startStatus();
     loadHistory().catch(() => updateStatus());
 
     window.addEventListener("beforeunload", () => {
-        // Best-effort final persistence; normal saving already happens continuously.
+        // Saves are already continuously retried. Try one final background save pass.
         retrySaves();
-        for (const peer of peers.values()) {
-            try { peer.pc.close(); } catch (_) {}
+        if (supabase && realtimeChannel) {
+            try { supabase.removeChannel(realtimeChannel); } catch (_) {}
         }
-        try {
-            navigator.sendBeacon(
-                SERVER_URL,
-                JSON.stringify({ action: "unregister_peer", peer_id: deviceId, channel: CHANNEL })
-            );
-        } catch (_) {}
     });
 })();
