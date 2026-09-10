@@ -3,141 +3,4637 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat App 2 Loader</title>
+<title>Chat App 2 — Exact Local GitHub Copy</title>
+
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#05070c;color:#fff;font-family:Inter,Arial,sans-serif}
-#loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#05070c;z-index:10}
-.card{width:min(560px,calc(100vw - 32px));padding:28px;border:1px solid #242a36;border-radius:18px;background:#0b0f17;box-shadow:0 20px 60px rgba(0,0,0,.45)}
-h1{margin:0 0 10px;font-size:24px}
-#status{margin:0 0 18px;color:#aeb7c6;line-height:1.5}
-.device{padding:14px;border-radius:12px;background:#070a10;border:1px solid #1d2430;word-break:break-all}
-.device-label{display:block;color:#7f8a9b;font-size:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
-#deviceId{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:14px}
-#error{display:none;margin-top:14px;padding:12px;border-radius:10px;background:#211014;border:1px solid #5d2933;color:#ffb8c0;white-space:pre-wrap}
-#site{position:fixed;inset:0;width:100%;height:100%;border:0;display:none;background:#05070c;z-index:20}
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Inter, Arial, sans-serif;
+    background: #05070c;
+    color: #fff;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+/* =========================================================
+   LOADER
+========================================================= */
+
+#loader {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            #1c2c52 0%,
+            #0d1527 28%,
+            #070a11 58%,
+            #030509 100%
+        );
+    overflow: hidden;
+}
+
+#loader::before {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    pointer-events: none;
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(100,130,255,.13),
+            transparent 34%
+        );
+    animation:
+        backgroundDrift 8s ease-in-out infinite alternate;
+}
+
+#loader::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(
+            115deg,
+            transparent 0%,
+            rgba(255,255,255,.025) 48%,
+            transparent 52%
+        );
+    background-size: 250% 100%;
+    animation:
+        lightSweep 5s linear infinite;
+}
+
+@keyframes backgroundDrift {
+    0% {
+        transform:
+            translate3d(-3%, -2%, 0)
+            scale(1);
+    }
+
+    100% {
+        transform:
+            translate3d(3%, 3%, 0)
+            scale(1.15);
+    }
+}
+
+@keyframes lightSweep {
+    0% {
+        background-position: 140% 0;
+    }
+
+    100% {
+        background-position: -140% 0;
+    }
+}
+
+/* =========================================================
+   FULLSCREEN FILE TRANSFER INTRO
+========================================================= */
+
+#introAnimation {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(28,43,77,.22),
+            rgba(3,5,9,.92)
+        );
+    overflow: hidden;
+    pointer-events: none;
+
+    opacity: 1;
+    transform: scale(1);
+
+    transition:
+        opacity .9s cubic-bezier(.16,1,.3,1),
+        transform 1s cubic-bezier(.16,1,.3,1);
+}
+
+#introAnimation.hide {
+    opacity: 0;
+    transform: scale(1.045);
+}
+
+.introWorld {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* =========================================================
+   CENTER CORE
+========================================================= */
+
+.introCoreGlow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(50vw, 700px);
+    height: min(50vw, 700px);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(100,128,255,.18),
+            rgba(100,128,255,.06) 35%,
+            transparent 70%
+        );
+
+    filter: blur(15px);
+
+    animation:
+        corePulse 3s ease-in-out infinite;
+}
+
+@keyframes corePulse {
+    0%,100% {
+        transform:
+            translate(-50%, -50%)
+            scale(.88);
+        opacity: .6;
+    }
+
+    50% {
+        transform:
+            translate(-50%, -50%)
+            scale(1.13);
+        opacity: 1;
+    }
+}
+
+/* =========================================================
+   FULLSCREEN HEADER
+========================================================= */
+
+.transferHeader {
+    position: absolute;
+    top: 6vh;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: min(1000px, 92vw);
+
+    text-align: center;
+
+    animation:
+        headerIn 1s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes headerIn {
+    from {
+        opacity: 0;
+        transform:
+            translate(-50%, -20px)
+            scale(.97);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translate(-50%, 0)
+            scale(1);
+    }
+}
+
+.transferTitle {
+    font-size: clamp(25px, 4vw, 48px);
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    text-shadow:
+        0 10px 50px rgba(0,0,0,.6);
+}
+
+.transferSubtitle {
+    margin-top: 9px;
+    color: #8190ad;
+    font-family: monospace;
+    font-size: clamp(10px, 1.2vw, 13px);
+}
+
+/* =========================================================
+   DEVICE TARGET
+========================================================= */
+
+.deviceTarget {
+    position: absolute;
+
+    left: 50%;
+    bottom: 7vh;
+
+    transform: translateX(-50%);
+
+    width: min(560px, 82vw);
+    height: 72px;
+
+    border:
+        1px solid rgba(126,151,225,.35);
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(20,29,48,.96),
+            rgba(7,11,19,.96)
+        );
+
+    box-shadow:
+        0 20px 80px rgba(0,0,0,.5),
+        0 0 60px rgba(83,111,255,.08),
+        inset 0 1px 0 rgba(255,255,255,.06);
+    backdrop-filter: blur(20px);
+
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    padding: 12px 18px;
+
+    animation:
+        deviceIn 1.1s cubic-bezier(.16,1,.3,1) .2s both;
+}
+
+@keyframes deviceIn {
+    from {
+        opacity: 0;
+        transform:
+            translate(-50%, 35px)
+            scale(.94);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translate(-50%, 0)
+            scale(1);
+    }
+}
+
+.deviceIcon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: #1d2945;
+    color: #dce5ff;
+    font-size: 21px;
+
+    box-shadow:
+        0 0 30px rgba(102,130,255,.2);
+
+    animation:
+        deviceIconPulse 2s ease-in-out infinite;
+}
+
+@keyframes deviceIconPulse {
+    0%,100% {
+        box-shadow:
+            0 0 20px rgba(102,130,255,.12);
+    }
+
+    50% {
+        box-shadow:
+            0 0 45px rgba(102,130,255,.35);
+    }
+}
+.deviceInfo {
+    min-width: 0;
+    flex: 1;
+}
+
+.deviceTitle {
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.deviceStatus {
+    margin-top: 4px;
+    color: #7887a2;
+    font-family: monospace;
+    font-size: 10px;
+}
+
+.deviceProgress {
+    width: 130px;
+    height: 6px;
+    overflow: hidden;
+
+    border-radius: 20px;
+
+    background: #202839;
+}
+
+.deviceProgressBar {
+    width: 0%;
+    height: 100%;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #536dff,
+            #a4b3ff,
+            #536dff
+        );
+    background-size: 200% 100%;
+
+    animation:
+        progressShimmer 1.5s linear infinite;
+
+    transition:
+        width .3s cubic-bezier(.16,1,.3,1);
+}
+
+/* =========================================================
+   FULLSCREEN FILE WALL
+========================================================= */
+
+.fileTransferWall {
+    position: absolute;
+    inset: 18vh 4vw 19vh;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(170px, 1fr)
+        );
+
+    grid-auto-rows: minmax(42px, 1fr);
+
+    gap: 9px;
+
+    overflow: hidden;
+
+    opacity: .9;
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            transparent 0%,
+            black 8%,
+            black 90%,
+            transparent 100%
+        );
+}
+
+.transferFile {
+    position: relative;
+
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 8px 11px;
+
+    border:
+        1px solid rgba(90,110,160,.18);
+
+    border-radius: 10px;
+
+    background:
+        rgba(11,16,27,.58);
+    backdrop-filter: blur(8px);
+
+    color: #9aa8c0;
+
+    font-family: monospace;
+    font-size: 10px;
+
+    overflow: hidden;
+
+    opacity: 0;
+
+    transform:
+        translateY(25px)
+        scale(.97);
+
+    animation:
+        transferFileIn .7s cubic-bezier(.16,1,.3,1)
+        forwards;
+}
+
+.transferFile::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            100deg,
+            transparent,
+            rgba(115,140,255,.10),
+            transparent
+        );
+
+    transform:
+        translateX(-120%);
+
+    animation:
+        fileSweep 2.5s linear infinite;
+}
+
+@keyframes transferFileIn {
+    to {
+        opacity: 1;
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+@keyframes fileSweep {
+    to {
+        transform:
+            translateX(120%);
+    }
+}
+
+.transferFileIcon {
+    width: 23px;
+    height: 23px;
+
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background: #1c2740;
+    color: #9eafff;
+
+    font-size: 9px;
+}
+
+.transferFileName {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   TRANSFER BEAMS
+========================================================= */
+
+.beam {
+    position: absolute;
+
+    left: -15%;
+    width: 130%;
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(90,120,255,.04),
+            rgba(120,145,255,.7),
+            rgba(90,120,255,.04),
+            transparent
+        );
+
+    box-shadow:
+        0 0 16px rgba(90,120,255,.3);
+
+    opacity: .7;
+}
+
+.beam1 {
+    top: 30%;
+    animation:
+        beamMove 3.8s linear infinite;
+}
+
+.beam2 {
+    top: 52%;
+    animation:
+        beamMove 4.8s linear infinite 1s;
+}
+
+.beam3 {
+    top: 72%;
+    animation:
+        beamMove 4.2s linear infinite 1.8s;
+}
+
+@keyframes beamMove {
+    from {
+        transform: translateX(-10%);
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 1;
+    }
+
+    85% {
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(10%);
+        opacity: 0;
+    }
+}
+/* =========================================================
+   PARTICLES
+========================================================= */
+
+.particle {
+    position: absolute;
+
+    width: 3px;
+    height: 3px;
+
+    border-radius: 50%;
+
+    background: #b7c4ff;
+
+    box-shadow:
+        0 0 12px #7188ff,
+        0 0 25px rgba(113,136,255,.7);
+
+    animation:
+        particleFloat 3s ease-in-out infinite;
+}
+
+@keyframes particleFloat {
+    0%,100% {
+        opacity: .15;
+        transform:
+            translateY(0)
+            scale(.6);
+    }
+
+    50% {
+        opacity: 1;
+        transform:
+            translateY(-20px)
+            scale(1.3);
+    }
+}
+
+.p1 { left: 8%; top: 28%; animation-delay: .1s; }
+.p2 { left: 17%; top: 61%; animation-delay: .7s; }
+.p3 { left: 31%; top: 38%; animation-delay: 1.2s; }
+.p4 { left: 45%; top: 76%; animation-delay: 1.8s; }
+.p5 { left: 56%; top: 24%; animation-delay: .4s; }
+.p6 { left: 69%; top: 48%; animation-delay: 1.5s; }
+.p7 { left: 82%; top: 32%; animation-delay: 2s; }
+.p8 { left: 91%; top: 69%; animation-delay: .9s; }
+.p9 { left: 74%; top: 78%; animation-delay: 2.4s; }
+.p10 { left: 24%; top: 18%; animation-delay: 1.1s; }
+
+/* =========================================================
+   INTRO STATUS
+========================================================= */
+
+.introBottomStatus {
+    position: absolute;
+
+    left: 50%;
+    bottom: 2.2vh;
+
+    transform: translateX(-50%);
+
+    width: 90vw;
+    text-align: center;
+
+    color: #77859e;
+
+    font-family: monospace;
+    font-size: 10px;
+
+    transition:
+        opacity .2s ease;
+}
+
+/* =========================================================
+   MAIN TOP
+========================================================= */
+
+.top {
+    position: relative;
+    z-index: 5;
+
+    flex-shrink: 0;
+    width: 100%;
+
+    padding:
+        20px
+        24px
+        16px;
+
+    border-bottom:
+        1px solid #252d3c;
+
+    background:
+        rgba(7,9,14,.92);
+
+    backdrop-filter:
+        blur(20px);
+
+    opacity: 0;
+
+    transform:
+        translateY(-20px);
+    transition:
+        opacity .8s ease,
+        transform .8s cubic-bezier(.16,1,.3,1);
+}
+
+#loader.ready .top {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.topLine {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.title {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.repo {
+    margin-top: 5px;
+
+    color: #8995aa;
+
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.controls {
+    display: flex;
+    gap: 9px;
+    align-items: center;
+}
+
+.backend {
+    width: 280px;
+
+    padding:
+        10px
+        12px;
+
+    border:
+        1px solid #30394b;
+
+    border-radius: 10px;
+
+    outline: none;
+
+    color: white;
+
+    background:
+        #090c12;
+
+    transition:
+        border-color .25s ease,
+        box-shadow .25s ease;
+}
+
+.backend:focus {
+    border-color: #7187ff;
+
+    box-shadow:
+        0 0 0 3px rgba(113,135,255,.08);
+}
+
+button {
+    border: 0;
+    border-radius: 10px;
+
+    padding:
+        10px
+        15px;
+
+    color: white;
+
+    background:
+        #637cff;
+
+    font-weight: 700;
+    cursor: pointer;
+
+    transition:
+        transform .2s cubic-bezier(.16,1,.3,1),
+        filter .2s ease,
+        box-shadow .2s ease;
+}
+
+button:hover {
+    filter: brightness(1.1);
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 8px 25px rgba(99,124,255,.2);
+}
+
+button:active {
+    transform: scale(.97);
+}
+
+button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.secondary {
+    background: #252c3a;
+}
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+#summary {
+    position: relative;
+    z-index: 5;
+
+    flex-shrink: 0;
+    width: 100%;
+
+    padding:
+        12px
+        24px;
+
+    border-bottom:
+        1px solid #252d3c;
+
+    background:
+        rgba(10,13,20,.92);
+
+    opacity: 0;
+
+    transform:
+        translateY(-10px);
+
+    transition:
+        opacity .7s ease .12s,
+        transform .7s cubic-bezier(.16,1,.3,1) .12s;
+}
+
+#loader.ready #summary {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.summaryTop {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 15px;
+}
+
+#mainStatus {
+    color: #cbd3e2;
+    font-size: 13px;
+}
+
+#counts {
+    color: #8d99ad;
+
+    font-family: monospace;
+    font-size: 12px;
+
+    white-space: nowrap;
+}
+
+.overallBar {
+    height: 7px;
+
+    margin-top: 10px;
+
+    overflow: hidden;
+
+    border-radius: 20px;
+
+    background: #202735;
+}
+
+#overallProgress {
+    width: 0%;
+    height: 100%;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #536dff,
+            #8a9cff,
+            #536dff
+        );
+
+    background-size:
+        200% 100%;
+
+    animation:
+        progressShimmer 2s linear infinite;
+
+    transition:
+        width .45s cubic-bezier(.16,1,.3,1);
+}
+
+@keyframes progressShimmer {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 200% 0;
+    }
+}
+
+/* =========================================================
+   FULLSCREEN FILE LIST
+========================================================= */
+
+#fileList {
+    position: relative;
+    z-index: 5;
+
+    flex: 1;
+
+    width: 100%;
+    min-height: 0;
+
+    overflow-y: auto;
+
+    padding:
+        14px
+        20px
+        40px;
+
+    opacity: 0;
+
+    transform:
+        translateY(15px);
+
+    transition:
+        opacity .8s ease .2s,
+        transform .8s cubic-bezier(.16,1,.3,1) .2s;
+}
+#loader.ready #fileList {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.file {
+    position: relative;
+
+    width: 100%;
+
+    margin-bottom: 7px;
+
+    padding:
+        11px
+        13px;
+
+    border:
+        1px solid #252c39;
+
+    border-radius: 11px;
+    background:
+        rgba(12,16,24,.9);
+
+    transition:
+        border-color .25s ease,
+        background .25s ease,
+        transform .25s cubic-bezier(.16,1,.3,1),
+        box-shadow .25s ease;
+
+    animation:
+        fileReveal .55s cubic-bezier(.16,1,.3,1) both;
+}
+
+@keyframes fileReveal {
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(15px)
+            scale(.985);
+        filter: blur(3px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+
+        filter: blur(0);
+    }
+}
+
+.file:hover {
+    border-color: #394458;
+
+    transform:
+        translateX(3px);
+
+    box-shadow:
+        0 8px 30px rgba(0,0,0,.15);
+}
+
+.file.copying {
+    border-color: #3b4c77;
+
+    box-shadow:
+        0 0 25px rgba(71,96,170,.08);
+}
+
+.file.success {
+    border-color: #254c36;
+
+    background:
+        rgba(10,27,18,.82);
+}
+
+.file.error {
+    border-color: #7b3030;
+
+    background:
+        rgba(40,12,14,.9);
+}
+
+.fileHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.statusIcon {
+    width: 22px;
+    height: 22px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    background: #202735;
+    color: #9ba6ba;
+
+    font-size: 12px;
+
+    transition:
+        background .3s ease,
+        color .3s ease,
+        transform .35s cubic-bezier(.16,1,.3,1);
+}
+
+.file.success .statusIcon {
+    background: #1e633d;
+    color: #b9ffd7;
+
+    transform: scale(1.08);
+}
+
+.file.error .statusIcon {
+    background: #7c2727;
+    color: #ffd0d0;
+}
+
+.file.copying .statusIcon {
+    background: #304b8c;
+    color: #d7e1ff;
+
+    animation:
+        iconSpin 1.1s linear infinite;
+}
+
+@keyframes iconSpin {
+    from {
+        transform: rotate(0);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.fileInfo {
+    min-width: 0;
+    flex: 1;
+}
+
+.filePath {
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #eef2f8;
+
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.fileMeta {
+    margin-top: 3px;
+
+    color: #727e93;
+    font-size: 10px;
+}
+
+.fileAction {
+    flex-shrink: 0;
+}
+
+.fileAction button {
+    padding:
+        7px
+        10px;
+
+    font-size: 11px;
+}
+
+.copyErrorButton {
+    display: none;
+
+    background: #a73535;
+}
+.file.error .copyErrorButton {
+    display: block;
+}
+
+.fileProgressOuter {
+    height: 4px;
+
+    margin-top: 9px;
+
+    overflow: hidden;
+
+    border-radius: 20px;
+
+    background: #202632;
+}
+
+.fileProgress {
+    width: 0%;
+    height: 100%;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #536dff,
+            #8ca0ff
+        );
+
+    transition:
+        width .22s cubic-bezier(.16,1,.3,1);
+}
+
+.file.success .fileProgress {
+    width: 100% !important;
+    background: #35b96e;
+}
+
+.file.error .fileProgress {
+    background: #d34a4a;
+}
+.errorText {
+    display: none;
+
+    margin-top: 8px;
+
+    padding:
+        7px
+        9px;
+
+    border-radius: 7px;
+
+    background:
+        rgba(100,20,20,.35);
+
+    color: #ffb2b2;
+
+    font-family: monospace;
+    font-size: 10px;
+
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.file.error .errorText {
+    display: block;
+}
+
+.folder {
+    width: 100%;
+
+    margin:
+        12px
+        0
+        5px;
+
+    padding:
+        7px
+        8px;
+
+    color: #8290aa;
+
+    font-family: monospace;
+    font-size: 11px;
+    font-weight: 700;
+
+    opacity: 0;
+
+    animation:
+        folderReveal .5s ease both;
+}
+
+@keyframes folderReveal {
+    from {
+        opacity: 0;
+        transform:
+            translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translateX(0);
+    }
+}
+
+.folderIcon {
+    margin-right: 6px;
+}
+
+/* =========================================================
+   FINISH
+========================================================= */
+
+#finishOverlay {
+    position: fixed;
+    inset: 0;
+
+    z-index: 1000000;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+    background:
+        rgba(4,6,10,.84);
+
+    backdrop-filter:
+        blur(15px);
+
+    animation:
+        finishFade .6s ease both;
+}
+
+@keyframes finishFade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.finishBox {
+    width: min(450px,90vw);
+
+    padding: 30px;
+
+    text-align: center;
+
+    border:
+        1px solid #35415a;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #141b29,
+            #0c111a
+        );
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,.6),
+        0 0 70px rgba(92,116,255,.08);
+
+    animation:
+        finishBoxIn .75s cubic-bezier(.16,1,.3,1) both;
+}
+
+@keyframes finishBoxIn {
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(25px)
+            scale(.94);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+.finishTitle {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.finishText {
+    margin-top: 9px;
+
+    color: #909caf;
+
+    font-size: 13px;
+}
+
+.finishSpinner {
+    width: 34px;
+    height: 34px;
+
+    margin:
+        22px
+        auto
+        0;
+
+    border:
+        3px solid #283144;
+
+    border-top-color:
+        #7187ff;
+
+    border-radius: 50%;
+
+    animation:
+        spin .7s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+/* =========================================================
+   IFRAME
+========================================================= */
+
+#site {
+    position: fixed;
+    inset: 0;
+
+    z-index: 2000000;
+
+    display: none;
+
+    width: 100vw;
+    height: 100vh;
+
+    border: 0;
+
+    background: #05070c;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:700px) {
+
+    .transferHeader {
+        top: 4vh;
+    }
+
+    .fileTransferWall {
+        inset:
+            17vh
+            2vw
+            18vh;
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0,1fr)
+            );
+        grid-auto-rows:
+            minmax(38px,1fr);
+
+        gap: 6px;
+    }
+
+    .transferFile {
+        padding:
+            7px
+            8px;
+
+        font-size: 8px;
+    }
+
+    .transferFileIcon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .deviceTarget {
+        width: 92vw;
+        height: 64px;
+    }
+
+    .deviceProgress {
+        display: none;
+    }
+
+    .topLine {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .controls {
+        flex-wrap: wrap;
+    }
+
+    .backend {
+        width: 100%;
+    }
+
+    .summaryTop {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}
 </style>
 </head>
+
 <body>
+
 <div id="loader">
-  <div class="card">
-    <h1>Loading Chat App 2</h1>
-    <p id="status">Starting loader...</p>
-    <div class="device">
-      <span class="device-label">Device ID</span>
-      <span id="deviceId">Creating...</span>
+
+    <!-- =====================================================
+         FULLSCREEN FILE TRANSFER
+    ====================================================== -->
+
+    <div id="introAnimation">
+
+        <div class="introWorld">
+
+            <div class="introCoreGlow"></div>
+
+            <div class="transferHeader">
+
+                <div class="transferTitle">
+                    Preparing Chat App 2
+                </div>
+
+                <div class="transferSubtitle">
+                    EVERY FILE → LOCAL DEVICE
+                </div>
+
+            </div>
+
+
+            <div class="fileTransferWall"
+                 id="transferFileWall">
+            </div>
+
+
+            <div class="beam beam1"></div>
+            <div class="beam beam2"></div>
+            <div class="beam beam3"></div>
+
+
+            <div class="particle p1"></div>
+            <div class="particle p2"></div>
+            <div class="particle p3"></div>
+            <div class="particle p4"></div>
+            <div class="particle p5"></div>
+            <div class="particle p6"></div>
+            <div class="particle p7"></div>
+            <div class="particle p8"></div>
+            <div class="particle p9"></div>
+            <div class="particle p10"></div>
+
+
+            <div class="deviceTarget">
+
+                <div class="deviceIcon">
+                    ▣
+                </div>
+                <div class="deviceInfo">
+
+                    <div class="deviceTitle">
+                        LOCAL DEVICE
+                    </div>
+
+                    <div
+                        class="deviceStatus"
+                        id="deviceStatus"
+                    >
+                        Preparing local storage...
+                    </div>
+
+                </div>
+
+                <div class="deviceProgress">
+
+                    <div
+                        class="deviceProgressBar"
+                        id="deviceProgressBar"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="introBottomStatus"
+                id="introStatus"
+            >
+                Connecting to GitHub...
+            </div>
+
+        </div>
+
     </div>
-    <div id="error"></div>
-  </div>
+
+
+    <!-- =====================================================
+         MAIN HEADER
+    ====================================================== -->
+
+    <div class="top">
+
+        <div class="topLine">
+
+            <div>
+
+                <div class="title">
+                    Chat App 2 — Local Copy
+                </div>
+
+                <div class="repo">
+                    github.com/ikirumi11/chat-app2
+                    / tree / main
+                </div>
+
+            </div>
+
+
+            <div class="controls">
+                <input
+                    class="backend"
+                    id="backendInput"
+                    placeholder="Optional Vercel backend URL"
+                >
+
+                <button
+                    id="startButton"
+                    onclick="startSync()"
+                >
+                    Copy & Verify
+                </button>
+
+                <button
+                    class="secondary"
+                    onclick="clearCopy()"
+                >
+                    Clear
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUMMARY
+    ====================================================== -->
+
+    <div id="summary">
+
+        <div class="summaryTop">
+
+            <div id="mainStatus">
+                Preparing...
+            </div>
+
+            <div id="counts">
+                0 / 0
+            </div>
+
+        </div>
+
+        <div class="overallBar">
+
+            <div id="overallProgress"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FULLSCREEN FILE LIST
+    ====================================================== -->
+
+    <div id="fileList"></div>
+
 </div>
 
-<iframe id="site" title="Chat App 2"></iframe>
+<!-- =========================================================
+     FINISH OVERLAY
+========================================================= -->
+
+<div id="finishOverlay">
+
+    <div class="finishBox">
+
+        <div class="finishTitle">
+            Copy Verified
+        </div>
+
+        <div class="finishText">
+            Every GitHub file matches the local device copy.
+            Starting the local site...
+        </div>
+
+        <div class="finishSpinner"></div>
+
+    </div>
+</div>
+
+
+<iframe id="site"></iframe>
+
 
 <script>
-(() => {
-  const OWNER = "ikirumi11";
-  const REPO = "chat-app2";
-  const BRANCH = "main";
-  const RAW = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/`;
-  const INDEX_URL = RAW + "index.html";
-  const DEVICE_KEY = "chat_device_id";
+"use strict";
 
-  const loader = document.getElementById("loader");
-  const site = document.getElementById("site");
-  const status = document.getElementById("status");
-  const deviceIdElement = document.getElementById("deviceId");
-  const errorElement = document.getElementById("error");
+/* =========================================================
+   CONFIG
+========================================================= */
 
-  function createDeviceId(){
-    if(window.crypto && typeof window.crypto.randomUUID === "function"){
-      return window.crypto.randomUUID();
+const OWNER = "ikirumi11";
+const REPO = "chat-app2";
+const BRANCH = "main";
+
+const API =
+    `https://api.github.com/repos/${OWNER}/${REPO}`;
+
+const RAW =
+    `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/`;
+
+const DB_NAME =
+    "chat-app2-exact-device-copy";
+
+const DB_VERSION = 1;
+
+const STORE = "files";
+
+const CONCURRENCY = 5;
+
+
+/*
+    IMPORTANT:
+
+    The animation must exist for at least
+    one full second.
+
+    If copying finishes before one second,
+    the program waits before starting
+    final verification.
+*/
+
+const MINIMUM_INTRO_TIME = 1000;
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const loader =
+    document.getElementById("loader");
+
+const introAnimation =
+    document.getElementById("introAnimation");
+
+const introStatus =
+    document.getElementById("introStatus");
+
+const transferFileWall =
+    document.getElementById("transferFileWall");
+const deviceStatus =
+    document.getElementById("deviceStatus");
+
+const deviceProgressBar =
+    document.getElementById("deviceProgressBar");
+
+const fileList =
+    document.getElementById("fileList");
+
+const mainStatus =
+    document.getElementById("mainStatus");
+
+const counts =
+    document.getElementById("counts");
+
+const overallProgress =
+    document.getElementById("overallProgress");
+
+const startButton =
+    document.getElementById("startButton");
+const backendInput =
+    document.getElementById("backendInput");
+
+const finishOverlay =
+    document.getElementById("finishOverlay");
+
+const site =
+    document.getElementById("site");
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let githubFiles = [];
+
+let localFiles =
+    new Map();
+
+let fileElements =
+    new Map();
+
+let blobURLs =
+    new Map();
+
+let introStartedAt =
+    performance.now();
+
+let introFinished =
+    false;
+
+let introMessageTimer = null;
+
+
+/* =========================================================
+   INTRO MESSAGES
+========================================================= */
+
+const introMessages = [
+
+    "Connecting to GitHub...",
+    "Reading repository structure...",
+
+    "Finding every repository file...",
+
+    "Preparing local device storage...",
+
+    "Comparing existing device files...",
+
+    "Preparing exact byte verification...",
+
+    "Building the local environment..."
+
+];
+
+
+let introMessageIndex = 0;
+
+
+function rotateIntroMessage(){
+
+    if(introFinished)
+        return;
+
+    introMessageIndex =
+        (
+            introMessageIndex + 1
+        ) %
+        introMessages.length;
+
+    introStatus.style.opacity =
+        "0";
+
+    setTimeout(
+        () => {
+
+            if(introFinished)
+                return;
+
+            introStatus.textContent =
+                introMessages[
+                    introMessageIndex
+                ];
+
+            introStatus.style.opacity =
+                "1";
+
+        },
+        150
+    );
+
+}
+
+
+/* =========================================================
+   START INTRO TIMER
+========================================================= */
+
+function startIntroTimer(){
+
+    introStartedAt =
+        performance.now();
+
+    introFinished =
+        false;
+
+    introAnimation.classList.remove(
+        "hide"
+    );
+
+    loader.classList.remove(
+        "ready"
+    );
+
+    introMessageIndex = 0;
+
+    introStatus.textContent =
+        "Connecting to GitHub...";
+
+    clearInterval(
+        introMessageTimer
+    );
+
+    introMessageTimer =
+        setInterval(
+            rotateIntroMessage,
+            600
+        );
+
+}
+
+
+/* =========================================================
+   MINIMUM INTRO WAIT
+========================================================= */
+
+async function waitForMinimumIntro(){
+
+    const elapsed =
+        performance.now() -
+        introStartedAt;
+
+    const remaining =
+        Math.max(
+            0,
+            MINIMUM_INTRO_TIME -
+            elapsed
+        );
+
+    /*
+        This is the important part:
+
+        If everything finished extremely quickly,
+        final verification does NOT start yet.
+
+        It waits until at least one second has
+        passed since the cinematic intro began.
+    */
+
+    if(remaining > 0){
+
+        await new Promise(
+            resolve =>
+                setTimeout(
+                    resolve,
+                    remaining
+                )
+        );
+
     }
-    return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2) + "-" + Math.random().toString(36).slice(2);
-  }
 
-  function getDeviceId(){
-    try{
-      const saved = localStorage.getItem(DEVICE_KEY);
-      if(saved && saved.trim()) return saved.trim();
-    }catch(error){}
+}
 
-    const id = createDeviceId();
 
-    try{
-      localStorage.setItem(DEVICE_KEY, id);
-    }catch(error){}
+/* =========================================================
+   DATABASE
+========================================================= */
 
-    return id;
-  }
+function openDB(){
 
-  const deviceId = getDeviceId();
-  deviceIdElement.textContent = deviceId;
+    return new Promise(
+        (resolve,reject)=>{
 
-  // The iframe browsing-context name is the bridge used by Chat App 2.
-  // The GitHub app can read window.name before it initializes its own storage.
-  site.name = deviceId;
+            const request =
+                indexedDB.open(
+                    DB_NAME,
+                    DB_VERSION
+                );
 
-  function showError(error){
-    console.error(error);
-    status.textContent = "The app could not be loaded.";
-    errorElement.style.display = "block";
-    errorElement.textContent = error && error.message ? error.message : String(error);
-  }
+            request.onupgradeneeded =
+                () => {
 
-  function injectBase(html){
-    if(/<base\s/i.test(html)) return html;
-    return html.replace(/<head([^>]*)>/i, `<head$1>\n<base href="${RAW}">`);
-  }
+                    const db =
+                        request.result;
 
-  function injectDeviceBridge(html){
-    // Keep the device ID available even before app.js is updated to read window.name.
-    // This bridge only establishes the value; it does not replace Chat App 2 code.
-    const bridge = `<script>(function(){try{var id=String(window.name||"").trim();if(id){try{localStorage.setItem("chat_device_id",id)}catch(e){}window.__CHAT_APP_DEVICE_ID__=id;}}catch(e){}})();<\\/script>`;
-    if(/<head([^>]*)>/i.test(html)){
-      return html.replace(/<head([^>]*)>/i, `<head$1>\n${bridge}`);
-    }
-    return bridge + html;
-  }
+                    if(
+                        !db.objectStoreNames.contains(
+                            STORE
+                        )
+                    ){
 
-  async function load(){
-    try{
-      status.textContent = "Downloading the latest GitHub index...";
+                        db.createObjectStore(
+                            STORE,
+                            {
+                                keyPath:"path"
+                            }
+                        );
 
-      const response = await fetch(INDEX_URL, {cache:"no-store"});
-      if(!response.ok){
-        throw new Error(`GitHub returned HTTP ${response.status} while loading index.html.`);
-      }
+                    }
 
-      let html = await response.text();
-      html = injectBase(html);
-      html = injectDeviceBridge(html);
+                };
 
-      status.textContent = "Starting Chat App 2...";
+            request.onsuccess =
+                () =>
+                    resolve(
+                        request.result
+                    );
 
-      site.name = deviceId;
-      site.srcdoc = html;
+            request.onerror =
+                () =>
+                    reject(
+                        request.error
+                    );
 
-      site.addEventListener("load", () => {
-        setTimeout(() => {
-          loader.style.display = "none";
-          site.style.display = "block";
-        }, 100);
-      }, {once:true});
-
-      // Prevent a blank page if the load event is delayed.
-      setTimeout(() => {
-        if(site.srcdoc && loader.style.display !== "none"){
-          loader.style.display = "none";
-          site.style.display = "block";
         }
-      }, 5000);
-    }catch(error){
-      showError(error);
-    }
-  }
+    );
 
-  load();
-})();
+}
+
+async function getAllFiles(){
+
+    const db =
+        await openDB();
+
+    return new Promise(
+        (resolve,reject)=>{
+
+            const transaction =
+                db.transaction(
+                    STORE,
+                    "readonly"
+                );
+
+            const request =
+                transaction
+                    .objectStore(STORE)
+                    .getAll();
+
+            request.onsuccess =
+                () => {
+
+                    const map =
+                        new Map();
+
+                    for(
+                        const file
+                        of request.result
+                    ){
+
+                        map.set(
+                            file.path,
+                            file
+                        );
+
+                    }
+
+                    resolve(map);
+
+                };
+
+            request.onerror =
+                () =>
+                    reject(
+                        request.error
+                    );
+
+        }
+    );
+
+}
+
+
+async function putFile(file){
+
+    const db =
+        await openDB();
+
+    return new Promise(
+        (resolve,reject)=>{
+
+            const transaction =
+                db.transaction(
+                    STORE,
+                    "readwrite"
+                );
+
+            transaction
+                .objectStore(STORE)
+                .put(file);
+
+            transaction.oncomplete =
+                () => resolve();
+
+            transaction.onerror =
+                () =>
+                    reject(
+                        transaction.error
+                    );
+
+        }
+    );
+
+}
+
+
+async function deleteFile(path){
+
+    const db =
+        await openDB();
+
+    return new Promise(
+        (resolve,reject)=>{
+
+            const transaction =
+                db.transaction(
+                    STORE,
+                    "readwrite"
+                );
+
+            transaction
+                .objectStore(STORE)
+                .delete(path);
+
+            transaction.oncomplete =
+                () => resolve();
+
+            transaction.onerror =
+                () =>
+                    reject(
+                        transaction.error
+                    );
+
+        }
+    );
+
+}
+
+
+async function clearDatabase(){
+
+    const db =
+        await openDB();
+
+    return new Promise(
+        (resolve,reject)=>{
+
+            const transaction =
+                db.transaction(
+                    STORE,
+                    "readwrite"
+                );
+
+            transaction
+                .objectStore(STORE)
+                .clear();
+
+            transaction.oncomplete =
+                () => resolve();
+
+            transaction.onerror =
+                () =>
+                    reject(
+                        transaction.error
+                    );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CLEAR
+========================================================= */
+
+async function clearCopy(){
+
+    if(
+        !confirm(
+            "Delete the complete Chat App 2 copy from this device?"
+        )
+    ){
+
+        return;
+
+    }
+    await clearDatabase();
+
+    location.reload();
+
+}
+
+
+/* =========================================================
+   GITHUB TREE
+========================================================= */
+
+async function getTree(){
+
+    const response =
+        await fetch(
+            `${API}/git/trees/${BRANCH}?recursive=1`,
+            {
+                cache:"no-store",
+                headers:{
+                    "Accept":
+                        "application/vnd.github+json"
+                }
+            }
+        );
+
+    if(!response.ok){
+
+        throw new Error(
+            `GitHub returned HTTP ${response.status}`
+        );
+
+    }
+
+    const data =
+        await response.json();
+
+    if(data.truncated){
+
+        throw new Error(
+            "GitHub reported that the repository tree is truncated."
+        );
+    }
+
+    return (
+        data.tree || []
+    ).filter(
+        item =>
+            item.type === "blob"
+    );
+
+}
+
+
+/* =========================================================
+   FULLSCREEN INTRO FILE WALL
+========================================================= */
+
+function renderTransferFiles(){
+
+    transferFileWall.innerHTML =
+        "";
+    if(!githubFiles.length)
+        return;
+
+
+    const maxFiles =
+        Math.min(
+            githubFiles.length,
+            80
+        );
+
+
+    const files =
+        [...githubFiles]
+            .sort(
+                () =>
+                    Math.random() - .5
+            )
+            .slice(
+                0,
+                maxFiles
+            );
+
+
+    files.forEach(
+        (file,index)=>{
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+            item.className =
+                "transferFile";
+
+
+            const icon =
+                document.createElement(
+                    "div"
+                );
+
+            icon.className =
+                "transferFileIcon";
+
+            icon.textContent =
+                getFileIcon(
+                    file.path
+                );
+
+
+            const name =
+                document.createElement(
+                    "div"
+                );
+
+            name.className =
+                "transferFileName";
+
+            name.textContent =
+                file.path;
+
+
+            item.appendChild(
+                icon
+            );
+
+            item.appendChild(
+                name
+            );
+
+
+            item.style.animationDelay =
+                `${Math.min(index * 12,700)}ms`;
+
+
+            transferFileWall.appendChild(
+                item
+            );
+
+        }
+    );
+
+}
+
+function getFileIcon(path){
+
+    const p =
+        path.toLowerCase();
+
+    if(p.endsWith(".html"))
+        return "HTML";
+
+    if(p.endsWith(".css"))
+        return "CSS";
+
+    if(p.endsWith(".js"))
+        return "JS";
+
+    if(p.endsWith(".json"))
+        return "{}";
+
+    if(
+        p.endsWith(".png") ||
+        p.endsWith(".jpg") ||
+        p.endsWith(".jpeg") ||
+        p.endsWith(".webp") ||
+        p.endsWith(".gif")
+    )
+        return "IMG";
+
+    if(
+        p.endsWith(".mp3") ||
+        p.endsWith(".wav") ||
+        p.endsWith(".ogg")
+    )
+        return "AUD";
+
+    if(
+        p.endsWith(".mp4") ||
+        p.endsWith(".webm")
+    )
+        return "VID";
+
+    return "FILE";
+
+}
+
+
+/* =========================================================
+   SHA
+========================================================= */
+
+async function githubBlobSHA(buffer){
+
+    const bytes =
+        new Uint8Array(buffer);
+
+    const header =
+        new TextEncoder().encode(
+            `blob ${bytes.length}\0`
+        );
+
+    const combined =
+        new Uint8Array(
+            header.length +
+            bytes.length
+        );
+
+    combined.set(
+        header,
+        0
+    );
+
+    combined.set(
+        bytes,
+        header.length
+    );
+
+    const digest =
+        await crypto.subtle.digest(
+            "SHA-1",
+            combined
+        );
+
+    return Array
+        .from(
+            new Uint8Array(digest)
+        )
+        .map(
+            value =>
+                value
+                    .toString(16)
+                    .padStart(
+                        2,
+                        "0"
+                    )
+        )
+        .join("");
+
+}
+
+
+/* =========================================================
+   RAW URL
+========================================================= */
+
+function rawURL(path){
+
+    return RAW +
+        path
+            .split("/")
+            .map(
+                encodeURIComponent
+            )
+            .join("/");
+
+}
+
+
+/* =========================================================
+   FORMAT SIZE
+========================================================= */
+
+function formatSize(bytes){
+
+    if(bytes < 1024)
+        return bytes + " B";
+
+    if(bytes < 1024 * 1024){
+        return (
+            (bytes / 1024)
+                .toFixed(1)
+            +
+            " KB"
+        );
+
+    }
+
+    return (
+        (bytes / 1024 / 1024)
+            .toFixed(2)
+        +
+        " MB"
+    );
+
+}
+
+
+/* =========================================================
+   FILE UI
+========================================================= */
+
+function createFileElement(file){
+
+    const row =
+        document.createElement(
+            "div"
+        );
+
+    row.className =
+        "file";
+
+    row.dataset.path =
+        file.path;
+
+
+    const header =
+        document.createElement(
+            "div"
+        );
+    header.className =
+        "fileHeader";
+
+
+    const icon =
+        document.createElement(
+            "div"
+        );
+
+    icon.className =
+        "statusIcon";
+
+    icon.textContent =
+        "•";
+
+
+    const info =
+        document.createElement(
+            "div"
+        );
+    info.className =
+        "fileInfo";
+
+
+    const path =
+        document.createElement(
+            "div"
+        );
+
+    path.className =
+        "filePath";
+
+    path.textContent =
+        file.path;
+
+
+    const meta =
+        document.createElement(
+            "div"
+        );
+    meta.className =
+        "fileMeta";
+
+    meta.textContent =
+        file.size
+            ? formatSize(file.size)
+            : "Size unavailable";
+
+
+    info.appendChild(path);
+    info.appendChild(meta);
+
+
+    const action =
+        document.createElement(
+            "div"
+        );
+
+    action.className =
+        "fileAction";
+
+    const retry =
+        document.createElement(
+            "button"
+        );
+
+    retry.className =
+        "copyErrorButton";
+
+    retry.textContent =
+        "Copy Error";
+
+    retry.onclick =
+        () =>
+            retryFile(
+                file.path
+            );
+
+
+    action.appendChild(
+        retry
+    );
+
+
+    header.appendChild(icon);
+    header.appendChild(info);
+    header.appendChild(action);
+
+
+    const progressOuter =
+        document.createElement(
+            "div"
+        );
+
+    progressOuter.className =
+        "fileProgressOuter";
+
+
+    const progress =
+        document.createElement(
+            "div"
+        );
+
+    progress.className =
+        "fileProgress";
+
+
+    progressOuter.appendChild(
+        progress
+    );
+
+
+    const error =
+        document.createElement(
+            "div"
+        );
+
+    error.className =
+        "errorText";
+
+
+    row.appendChild(header);
+    row.appendChild(progressOuter);
+    row.appendChild(error);
+
+
+    fileList.appendChild(row);
+
+
+    fileElements.set(
+        file.path,
+        {
+            row,
+            icon,
+            progress,
+            error
+        }
+    );
+
+}
+
+
+/* =========================================================
+   FOLDERS
+========================================================= */
+
+function renderTree(){
+
+    fileList.innerHTML =
+        "";
+
+    fileElements.clear();
+
+
+    const sorted =
+        [...githubFiles].sort(
+            (a,b) =>
+                a.path.localeCompare(
+                    b.path
+                )
+        );
+
+
+    let lastFolder =
+        null;
+
+    let animationIndex =
+        0;
+
+
+    for(
+        const file
+        of sorted
+    ){
+
+        const slash =
+            file.path.lastIndexOf("/");
+
+
+        const folder =
+            slash >= 0
+                ? file.path.substring(
+                    0,
+                    slash
+                )
+                : "";
+
+
+        if(folder !== lastFolder){
+
+            const folderElement =
+                document.createElement(
+                    "div"
+                );
+
+            folderElement.className =
+                "folder";
+
+
+            const folderIcon =
+                document.createElement(
+                    "span"
+                );
+
+            folderIcon.className =
+                "folderIcon";
+            folderIcon.textContent =
+                "📁";
+
+
+            folderElement.appendChild(
+                folderIcon
+            );
+
+            folderElement.appendChild(
+                document.createTextNode(
+                    folder ||
+                    "ROOT"
+                )
+            );
+
+
+            folderElement.style.animationDelay =
+                `${animationIndex * 12}ms`;
+
+
+            fileList.appendChild(
+                folderElement
+            );
+
+
+            lastFolder =
+                folder;
+
+        }
+
+
+        createFileElement(file);
+
+
+        const element =
+            fileElements.get(
+                file.path
+            );
+
+
+        if(element){
+            element.row.style.animationDelay =
+                `${animationIndex * 12}ms`;
+
+        }
+
+
+        animationIndex++;
+
+    }
+
+}
+
+
+/* =========================================================
+   FILE UI STATE
+========================================================= */
+
+function setFileState(
+    path,
+    state,
+    progress = null,
+    errorText = ""
+){
+
+    const element =
+        fileElements.get(path);
+
+    if(!element)
+        return;
+
+
+    element.row.classList.remove(
+        "copying",
+        "success",
+        "error"
+    );
+
+
+    if(state === "copying"){
+
+        element.row.classList.add(
+            "copying"
+        );
+
+        element.icon.textContent =
+            "↻";
+
+    }
+
+
+    else if(state === "success"){
+
+        element.row.classList.add(
+            "success"
+        );
+
+        element.icon.textContent =
+            "✓";
+
+        element.progress.style.width =
+            "100%";
+
+        element.error.textContent =
+            "";
+
+    }
+
+
+    else if(state === "error"){
+
+        element.row.classList.add(
+            "error"
+        );
+
+        element.icon.textContent =
+            "×";
+
+        element.error.textContent =
+            errorText ||
+            "Unknown copy error.";
+
+    }
+
+    else{
+
+        element.icon.textContent =
+            "•";
+
+    }
+
+
+    if(progress !== null){
+
+        element.progress.style.width =
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    progress
+                )
+            ) +
+            "%";
+
+    }
+
+}
+
+
+/* =========================================================
+   INTRO PROGRESS
+========================================================= */
+
+function updateIntroProgress(){
+
+    if(!githubFiles.length){
+
+        deviceProgressBar.style.width =
+            "0%";
+
+        return;
+
+    }
+
+
+    let success =
+        0;
+
+
+    for(
+        const file
+        of githubFiles
+    ){
+
+        const element =
+            fileElements.get(
+                file.path
+            );
+
+
+        if(
+            element &&
+            element.row.classList.contains(
+                "success"
+            )
+        ){
+            success++;
+
+        }
+
+    }
+
+
+    const percentage =
+        success /
+        githubFiles.length *
+        100;
+
+
+    deviceProgressBar.style.width =
+        percentage +
+        "%";
+
+
+    deviceStatus.textContent =
+        `${success} / ${githubFiles.length} files on device`;
+}
+
+
+/* =========================================================
+   DOWNLOAD ONE FILE
+========================================================= */
+
+async function copyOne(
+    githubFile,
+    showProgress = true
+){
+
+    const path =
+        githubFile.path;
+
+
+    setFileState(
+        path,
+        "copying",
+        0
+    );
+
+
+    const existing =
+        localFiles.get(path);
+
+
+    if(
+        existing &&
+        existing.sha ===
+        githubFile.sha
+    ){
+
+        setFileState(
+            path,
+            "success",
+            100
+        );
+
+        updateIntroProgress();
+
+        return true;
+
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                rawURL(path),
+                {
+                    cache:"no-store"
+                }
+            );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+        }
+
+
+        const contentLength =
+            Number(
+                response.headers.get(
+                    "content-length"
+                )
+            );
+
+
+        let buffer;
+
+
+        if(
+            response.body &&
+            contentLength > 0
+        ){
+
+            const reader =
+                response.body.getReader();
+
+            const chunks = [];
+
+            let received = 0;
+
+
+            while(true){
+
+                const {
+                    done,
+                    value
+                } =
+                    await reader.read();
+
+
+                if(done)
+                    break;
+
+
+                chunks.push(value);
+                received +=
+                    value.byteLength;
+
+
+                if(showProgress){
+
+                    setFileState(
+                        path,
+                        "copying",
+                        received /
+                        contentLength *
+                        100
+                    );
+
+                }
+
+            }
+
+
+            const combined =
+                new Uint8Array(
+                    received
+                );
+
+
+            let offset =
+                0;
+
+
+            for(
+                const chunk
+                of chunks
+            ){
+
+                combined.set(
+                    chunk,
+                    offset
+                );
+
+                offset +=
+                    chunk.length;
+            }
+
+
+            buffer =
+                combined.buffer;
+
+        }
+
+
+        else{
+
+            buffer =
+                await response.arrayBuffer();
+
+            setFileState(
+                path,
+                "copying",
+                80
+            );
+
+        }
+
+
+        /*
+            Verify exact Git blob SHA before
+            anything gets saved.
+        */
+
+        const actualSHA =
+            await githubBlobSHA(
+                buffer
+            );
+
+
+        if(
+            actualSHA !==
+            githubFile.sha
+        ){
+
+            throw new Error(
+                "SHA-1 mismatch.\n" +
+                "GitHub: " +
+                githubFile.sha +
+                "\n" +
+                "Downloaded: " +
+                actualSHA
+            );
+
+        }
+
+
+        const localFile = {
+
+            path:
+                githubFile.path,
+
+            sha:
+                actualSHA,
+
+            githubSha:
+                githubFile.sha,
+
+            size:
+                buffer.byteLength,
+
+            bytes:
+                buffer,
+
+            savedAt:
+                Date.now()
+
+        };
+
+
+        /*
+            Only verified bytes are stored.
+        */
+
+        await putFile(
+            localFile
+        );
+
+
+        localFiles.set(
+            path,
+            localFile
+        );
+
+
+        setFileState(
+            path,
+            "success",
+            100
+        );
+
+
+        updateIntroProgress();
+
+
+        return true;
+
+    }
+
+
+    catch(error){
+
+        await deleteFile(
+            path
+        ).catch(
+            () => {}
+        );
+
+
+        localFiles.delete(
+            path
+        );
+
+
+        setFileState(
+            path,
+            "error",
+            0,
+            error.message
+        );
+
+        updateIntroProgress();
+
+
+        return false;
+
+    }
+
+}
+
+
+/* =========================================================
+   RETRY
+========================================================= */
+
+async function retryFile(path){
+
+    const githubFile =
+        githubFiles.find(
+            file =>
+                file.path === path
+        );
+
+
+    if(!githubFile)
+        return;
+
+
+    const button =
+        fileElements
+            .get(path)
+            ?.row
+            .querySelector(
+                ".copyErrorButton"
+            );
+
+
+    if(button)
+        button.disabled = true;
+
+
+    const success =
+        await copyOne(
+            githubFile,
+            true
+        );
+
+
+    if(button)
+        button.disabled = false;
+
+
+    await updateCounts();
+
+
+    if(success){
+
+        const allGood =
+            await checkAllQuick();
+
+
+        if(allGood){
+
+            /*
+                Wait for the minimum cinematic
+                time BEFORE final verification.
+            */
+
+            await waitForMinimumIntro();
+
+
+            await finalVerificationAndStart();
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   COUNTS
+========================================================= */
+
+async function updateCounts(){
+
+    let success =
+        0;
+
+    let errors =
+        0;
+
+
+    for(
+        const file
+        of githubFiles
+    ){
+
+        const element =
+            fileElements.get(
+                file.path
+            );
+
+
+        if(
+            element?.row.classList.contains(
+                "success"
+            )
+        ){
+
+            success++;
+
+        }
+
+
+        if(
+            element?.row.classList.contains(
+                "error"
+            )
+        ){
+
+            errors++;
+
+        }
+
+    }
+
+    counts.textContent =
+        `${success} / ${githubFiles.length} copied` +
+        (
+            errors
+                ? ` · ${errors} errors`
+                : ""
+        );
+
+
+    const percentage =
+        githubFiles.length
+            ? success /
+              githubFiles.length *
+              100
+            : 0;
+
+
+    overallProgress.style.width =
+        percentage +
+        "%";
+
+
+    updateIntroProgress();
+
+}
+
+
+/* =========================================================
+   QUICK CHECK
+========================================================= */
+
+async function checkAllQuick(){
+
+    for(
+        const file
+        of githubFiles
+    ){
+
+        const local =
+            localFiles.get(
+                file.path
+            );
+
+
+        if(
+            !local ||
+            local.sha !==
+            file.sha
+        ){
+
+            return false;
+
+        }
+
+    }
+
+
+    return true;
+
+}
+
+/* =========================================================
+   FINAL VERIFICATION
+========================================================= */
+
+async function finalVerificationAndStart(){
+
+    /*
+        This function is deliberately only called
+        AFTER waitForMinimumIntro().
+    */
+
+    mainStatus.textContent =
+        "Final verification: checking every file again...";
+
+
+    introStatus.textContent =
+        "Final verification: checking every local file...";
+
+
+    deviceStatus.textContent =
+        "Final byte verification...";
+
+
+    overallProgress.style.width =
+        "100%";
+
+
+    const fresh =
+        await getAllFiles();
+
+
+    if(
+        fresh.size !==
+        githubFiles.length
+    ){
+
+        mainStatus.textContent =
+            "Verification failed: file count mismatch.";
+
+        overallProgress.style.width =
+            "0%";
+        return;
+
+    }
+
+
+    let checked =
+        0;
+
+
+    for(
+        const githubFile
+        of githubFiles
+    ){
+
+        const local =
+            fresh.get(
+                githubFile.path
+            );
+
+
+        if(!local){
+
+            setFileState(
+                githubFile.path,
+                "error",
+                0,
+                "File disappeared from device storage."
+            );
+
+
+            mainStatus.textContent =
+                "Verification failed.";
+
+            return;
+
+        }
+
+
+        if(
+            local.sha !==
+            githubFile.sha
+        ){
+
+            setFileState(
+                githubFile.path,
+                "error",
+                0,
+                "Stored SHA does not match GitHub."
+            );
+
+
+            mainStatus.textContent =
+                "Verification failed.";
+
+            return;
+
+        }
+
+
+        const actual =
+            await githubBlobSHA(
+                local.bytes
+            );
+
+
+        if(
+            actual !==
+            githubFile.sha
+        ){
+
+            setFileState(
+                githubFile.path,
+                "error",
+                0,
+                "Stored bytes failed SHA verification."
+            );
+
+
+            mainStatus.textContent =
+                "Verification failed.";
+
+            return;
+
+        }
+
+
+        checked++;
+
+
+        mainStatus.textContent =
+            `Final verification: ${checked} / ` +
+            `${githubFiles.length} files checked`;
+
+
+        introStatus.textContent =
+            `Final verification: ${checked} / ` +
+            `${githubFiles.length} files`;
+
+    }
+
+
+    /*
+        Remove old local files that no longer
+        exist in GitHub.
+    */
+
+    const githubPaths =
+        new Set(
+            githubFiles.map(
+                file =>
+                    file.path
+            )
+        );
+
+
+    for(
+        const [path]
+        of fresh
+    ){
+
+        if(
+            !githubPaths.has(path)
+        ){
+
+            await deleteFile(
+                path
+            );
+
+        }
+
+    }
+
+
+    mainStatus.textContent =
+        "✓ Exact GitHub copy verified.";
+
+    introStatus.textContent =
+        "✓ Every file verified on the device.";
+
+    deviceStatus.textContent =
+        "✓ Local copy verified.";
+
+
+    deviceProgressBar.style.width =
+        "100%";
+
+    finishOverlay.style.display =
+        "flex";
+
+
+    await new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                700
+            )
+    );
+
+
+    await launchLocalSite(
+        fresh
+    );
+
+}
+
+
+/* =========================================================
+   MIME
+========================================================= */
+
+function mime(path){
+
+    const p =
+        path.toLowerCase();
+
+
+    if(p.endsWith(".html"))
+        return "text/html";
+
+    if(p.endsWith(".css"))
+        return "text/css";
+
+    if(p.endsWith(".js"))
+        return "text/javascript";
+
+    if(p.endsWith(".json"))
+        return "application/json";
+    if(p.endsWith(".svg"))
+        return "image/svg+xml";
+
+    if(p.endsWith(".png"))
+        return "image/png";
+
+    if(
+        p.endsWith(".jpg") ||
+        p.endsWith(".jpeg")
+    )
+        return "image/jpeg";
+
+    if(p.endsWith(".gif"))
+        return "image/gif";
+
+    if(p.endsWith(".webp"))
+        return "image/webp";
+
+    if(p.endsWith(".ico"))
+        return "image/x-icon";
+    if(p.endsWith(".mp3"))
+        return "audio/mpeg";
+
+    if(p.endsWith(".wav"))
+        return "audio/wav";
+
+    if(p.endsWith(".ogg"))
+        return "audio/ogg";
+
+    if(p.endsWith(".mp4"))
+        return "video/mp4";
+
+    if(p.endsWith(".webm"))
+        return "video/webm";
+
+    if(p.endsWith(".txt"))
+        return "text/plain";
+
+    if(p.endsWith(".wasm"))
+        return "application/wasm";
+
+    return "application/octet-stream";
+
+}
+
+
+/* =========================================================
+   BLOB URL
+========================================================= */
+
+function localURL(path){
+
+    if(blobURLs.has(path))
+        return blobURLs.get(path);
+
+
+    const file =
+        localFiles.get(path);
+
+
+    if(!file)
+        return null;
+
+
+    const blob =
+        new Blob(
+            [file.bytes],
+            {
+                type:
+                    mime(path)
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    blobURLs.set(
+        path,
+        url
+    );
+
+
+    return url;
+
+}
+
+
+/* =========================================================
+   PATH HELPERS
+========================================================= */
+
+function normalizePath(path){
+
+    const parts = [];
+
+
+    for(
+        const part
+        of path.split("/")
+    ){
+
+        if(
+            !part ||
+            part === "."
+        )
+            continue;
+
+
+        if(part === ".."){
+
+            parts.pop();
+
+        }
+
+        else{
+
+            parts.push(part);
+
+        }
+    }
+
+
+    return parts.join("/");
+
+}
+
+
+function resolvePath(
+    base,
+    target
+){
+
+    if(!target)
+        return target;
+
+
+    if(
+        target.startsWith("http://") ||
+        target.startsWith("https://") ||
+        target.startsWith("//") ||
+        target.startsWith("data:") ||
+        target.startsWith("blob:") ||
+        target.startsWith("#") ||
+        target.startsWith("mailto:")
+    ){
+
+        return target;
+
+    }
+
+
+    target =
+        target
+            .split("?")[0]
+            .split("#")[0];
+
+
+    if(
+        target.startsWith("/")
+    ){
+        target =
+            target.substring(1);
+
+    }
+
+
+    const slash =
+        base.lastIndexOf("/");
+
+
+    const directory =
+        slash >= 0
+            ? base.substring(
+                0,
+                slash + 1
+            )
+            : "";
+
+
+    return normalizePath(
+        directory +
+        target
+    );
+
+}
+
+
+/* =========================================================
+   CSS REWRITE
+========================================================= */
+
+function rewriteCSS(
+    css,
+    cssPath
+){
+
+    return css.replace(
+        /url\(\s*(['"]?)(.*?)\1\s*\)/gi,
+        (
+            full,
+            quote,
+            target
+        ) => {
+
+            if(
+                !target ||
+                target.startsWith("data:") ||
+                target.startsWith("http://") ||
+                target.startsWith("https://") ||
+                target.startsWith("//")
+            ){
+
+                return full;
+
+            }
+
+
+            const clean =
+                target
+                    .split("?")[0]
+                    .split("#")[0];
+
+            const resolved =
+                resolvePath(
+                    cssPath,
+                    clean
+                );
+
+
+            if(
+                localFiles.has(
+                    resolved
+                )
+            ){
+
+                return (
+                    `url("${localURL(resolved)}")`
+                );
+
+            }
+
+
+            return full;
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   JAVASCRIPT REWRITE
+========================================================= */
+
+function rewriteJS(
+    source,
+    jsPath
+){
+
+    let code =
+        source;
+
+
+    code =
+        code.replace(
+            /(\bfrom\s*)(["'])([^"']+)\2/g,
+            (
+                full,
+                prefix,
+                quote,
+                target
+            ) => {
+
+                if(
+                    !target.startsWith(".") &&
+                    !target.startsWith("/")
+                ){
+
+                    return full;
+
+                }
+
+
+                const resolved =
+                    resolvePath(
+                        jsPath,
+                        target
+                    );
+
+
+                if(
+                    localFiles.has(
+                        resolved
+                    )
+                ){
+
+                    return (
+                        prefix +
+                        quote +
+                        localURL(resolved) +
+                        quote
+                    );
+
+                }
+
+                return full;
+
+            }
+        );
+
+
+    code =
+        code.replace(
+            /import\s*\(\s*(["'])([^"']+)\1\s*\)/g,
+            (
+                full,
+                quote,
+                target
+            ) => {
+
+                const resolved =
+                    resolvePath(
+                        jsPath,
+                        target
+                    );
+
+                if(
+                    localFiles.has(
+                        resolved
+                    )
+                ){
+
+                    return (
+                        `import(${quote}` +
+                        localURL(resolved) +
+                        `${quote})`
+                    );
+
+                }
+
+
+                return full;
+
+            }
+        );
+
+    const backend =
+        backendInput.value
+            .trim()
+            .replace(
+                /\/+$/,
+                ""
+            );
+
+
+    if(backend){
+
+        const api =
+            backend +
+            "/api/messages";
+
+
+        code =
+            code.replace(
+                /const\s+API_URL\s*=\s*["']\/api\/messages["']\s*;/g,
+                `const API_URL = ${JSON.stringify(api)};`
+            );
+
+
+        code =
+            code.replace(
+                /let\s+API_URL\s*=\s*["']\/api\/messages["']\s*;/g,
+                `let API_URL = ${JSON.stringify(api)};`
+            );
+
+
+        code =
+            code.replace(
+                /var\s+API_URL\s*=\s*["']\/api\/messages["']\s*;/g,
+                `var API_URL = ${JSON.stringify(api)};`
+            );
+
+    }
+
+
+    return code;
+}
+
+
+/* =========================================================
+   BUILD LOCAL INDEX
+========================================================= */
+
+function buildIndexHTML(
+    source
+){
+
+    const parser =
+        new DOMParser();
+
+
+    const doc =
+        parser.parseFromString(
+            source,
+            "text/html"
+        );
+
+    doc
+        .querySelectorAll(
+            'link[rel="stylesheet"][href]'
+        )
+        .forEach(
+            element => {
+
+                const href =
+                    element.getAttribute(
+                        "href"
+                    );
+
+
+                const resolved =
+                    resolvePath(
+                        "index.html",
+                        href
+                    );
+
+                if(
+                    localFiles.has(
+                        resolved
+                    )
+                ){
+
+                    const cssFile =
+                        localFiles.get(
+                            resolved
+                        );
+
+
+                    const css =
+                        new TextDecoder()
+                            .decode(
+                                cssFile.bytes
+                            );
+
+
+                    const style =
+                        doc.createElement(
+                            "style"
+                        );
+
+
+                    style.textContent =
+                        rewriteCSS(
+                            css,
+                            resolved
+                        );
+
+
+                    element.replaceWith(
+                        style
+                    );
+
+                }
+
+            }
+        );
+
+    doc
+        .querySelectorAll(
+            "[src]"
+        )
+        .forEach(
+            element => {
+
+                const src =
+                    element.getAttribute(
+                        "src"
+                    );
+
+
+                if(!src)
+                    return;
+
+
+                const resolved =
+                    resolvePath(
+                        "index.html",
+                        src
+                    );
+
+
+                if(
+                    localFiles.has(
+                        resolved
+                    )
+                ){
+
+                    element.setAttribute(
+                        "src",
+                        localURL(
+                            resolved
+                        )
+                    );
+
+                }
+
+            }
+        );
+
+    doc
+        .querySelectorAll(
+            "[poster]"
+        )
+        .forEach(
+            element => {
+
+                const poster =
+                    element.getAttribute(
+                        "poster"
+                    );
+
+
+                const resolved =
+                    resolvePath(
+                        "index.html",
+                        poster
+                    );
+
+                if(
+                    localFiles.has(
+                        resolved
+                    )
+                ){
+
+                    element.setAttribute(
+                        "poster",
+                        localURL(
+                            resolved
+                        )
+                    );
+
+                }
+
+            }
+        );
+
+
+    doc
+        .querySelectorAll(
+            "[style]"
+        )
+        .forEach(
+            element => {
+
+                element.setAttribute(
+                    "style",
+                    rewriteCSS(
+                        element.getAttribute(
+                            "style"
+                        ),
+                        "index.html"
+                    )
+                );
+
+            }
+        );
+
+
+    doc
+        .querySelectorAll(
+            "style"
+        )
+        .forEach(
+            element => {
+
+                element.textContent =
+                    rewriteCSS(
+                        element.textContent,
+                        "index.html"
+                    );
+
+            }
+        );
+
+
+    doc
+        .querySelectorAll(
+            "script[src]"
+        )
+        .forEach(
+            element => {
+
+                const src =
+                    element.getAttribute(
+                        "src"
+                    );
+
+
+                const resolved =
+                    resolvePath(
+                        "index.html",
+                        src
+                    );
+
+
+                if(
+                    !localFiles.has(
+                        resolved
+                    )
+                ){
+
+                    element.setAttribute(
+                        "data-local-error",
+                        "missing"
+                    );
+
+                    return;
+
+                }
+
+
+                const jsFile =
+                    localFiles.get(
+                        resolved
+                    );
+
+
+                const source =
+                    new TextDecoder()
+                        .decode(
+                            jsFile.bytes
+                        );
+
+                const rewritten =
+                    rewriteJS(
+                        source,
+                        resolved
+                    );
+
+
+                const blob =
+                    new Blob(
+                        [rewritten],
+                        {
+                            type:
+                                "text/javascript"
+                        }
+                    );
+
+
+                const url =
+                    URL.createObjectURL(
+                        blob
+                    );
+
+
+                element.setAttribute(
+                    "src",
+                    url
+                );
+
+
+                element.removeAttribute(
+                    "integrity"
+                );
+
+
+                element.removeAttribute(
+                    "crossorigin"
+                );
+
+            }
+        );
+
+    return (
+        "<!DOCTYPE html>\n" +
+        doc.documentElement.outerHTML
+    );
+
+}
+
+
+/* =========================================================
+   LAUNCH LOCAL SITE
+========================================================= */
+
+async function launchLocalSite(
+    freshFiles
+){
+
+    localFiles =
+        freshFiles;
+
+    if(
+        !localFiles.has(
+            "index.html"
+        )
+    ){
+
+        throw new Error(
+            "Verified copy does not contain index.html."
+        );
+
+    }
+
+
+    const indexFile =
+        localFiles.get(
+            "index.html"
+        );
+
+
+    const source =
+        new TextDecoder()
+            .decode(
+                indexFile.bytes
+            );
+
+
+    const html =
+        buildIndexHTML(
+            source
+        );
+
+
+    const documentObject =
+        site.contentDocument ||
+        site.contentWindow.document;
+
+
+    documentObject.open();
+
+
+    documentObject.write(
+        html
+    );
+
+
+    documentObject.close();
+
+
+    await new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                100
+            )
+    );
+
+
+    finishOverlay.style.display =
+        "none";
+
+
+    loader.style.display =
+        "none";
+
+
+    site.style.display =
+        "block";
+
+}
+
+
+/* =========================================================
+   FINISH INTRO
+========================================================= */
+
+async function finishIntro(){
+
+    if(introFinished)
+        return;
+
+
+    /*
+        Guarantee the full 1 second minimum.
+    */
+
+    await waitForMinimumIntro();
+
+
+    introFinished =
+        true;
+
+
+    clearInterval(
+        introMessageTimer
+    );
+
+
+    introStatus.textContent =
+        "Local environment ready.";
+
+
+    deviceStatus.textContent =
+        "✓ Device copy ready.";
+
+    deviceProgressBar.style.width =
+        "100%";
+
+
+    introAnimation.classList.add(
+        "hide"
+    );
+
+
+    loader.classList.add(
+        "ready"
+    );
+
+
+    /*
+        Let the fade finish smoothly.
+    */
+
+    await new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                850
+            )
+    );
+
+}
+
+
+/* =========================================================
+   MAIN SYNC
+========================================================= */
+
+async function startSync(){
+
+    startButton.disabled =
+        true;
+
+
+    fileList.innerHTML =
+        "";
+    fileElements.clear();
+
+
+    startIntroTimer();
+
+
+    try{
+
+        /*
+          STEP 1
+        */
+
+        mainStatus.textContent =
+            "Getting exact GitHub file tree...";
+
+
+        introStatus.textContent =
+            "Connecting to GitHub...";
+
+
+        githubFiles =
+            await getTree();
+
+
+        if(
+            !githubFiles.length
+        ){
+
+            throw new Error(
+                "No files were found in the repository."
+            );
+
+        }
+
+
+        counts.textContent =
+            `0 / ${githubFiles.length}`;
+
+
+        /*
+          Show EVERY discovered GitHub file
+          across the fullscreen cinematic.
+        */
+
+        renderTransferFiles();
+
+
+        renderTree();
+
+
+        /*
+          STEP 2
+        */
+
+        mainStatus.textContent =
+            `Found ${githubFiles.length} files. Reading device copy...`;
+
+
+        introStatus.textContent =
+            "Checking existing device files...";
+
+
+        deviceStatus.textContent =
+            "Reading device storage...";
+
+
+        localFiles =
+            await getAllFiles();
+
+
+        updateIntroProgress();
+
+
+        /*
+          STEP 3
+        */
+
+        mainStatus.textContent =
+            "Copying and verifying files...";
+
+
+        introStatus.textContent =
+            "Sending every file to the local device...";
+
+        let next =
+            0;
+
+
+        async function worker(){
+
+            while(true){
+
+                const index =
+                    next++;
+
+
+                if(
+                    index >=
+                    githubFiles.length
+                ){
+
+                    return;
+
+                }
+
+
+                const file =
+                    githubFiles[index];
+
+
+                await copyOne(
+                    file,
+                    true
+                );
+
+
+                await updateCounts();
+
+            }
+
+        }
+
+
+        const workers =
+            [];
+
+
+        for(
+            let i = 0;
+            i <
+            Math.min(
+                CONCURRENCY,
+                githubFiles.length
+            );
+            i++
+        ){
+
+            workers.push(
+                worker()
+            );
+
+        }
+
+
+        await Promise.all(
+            workers
+        );
+
+
+        /*
+          STEP 4
+        */
+
+        await updateCounts();
+
+
+        const quick =
+            await checkAllQuick();
+
+
+        if(!quick){
+
+            const failed =
+                githubFiles.filter(
+                    file => {
+
+                        const element =
+                            fileElements.get(
+                                file.path
+                            );
+
+
+                        return (
+                            element &&
+                            element.row.classList.contains(
+                                "error"
+                            )
+                        );
+
+                    }
+                );
+
+
+            /*
+                Even on failure, the cinematic
+                minimum still applies.
+            */
+            await finishIntro();
+
+
+            mainStatus.textContent =
+                `${failed.length} file(s) failed. ` +
+                `Fix the red files using "Copy Error".`;
+
+
+            startButton.disabled =
+                false;
+
+
+            return;
+
+        }
+
+
+        /*
+          STEP 5
+
+          IMPORTANT:
+
+          If the copy finished in less than
+          one second, WAIT HERE.
+
+          Final checks do not begin until
+          the minimum cinematic time is done.
+        */
+
+        introStatus.textContent =
+            "Files copied. Preparing final verification...";
+
+
+        deviceStatus.textContent =
+            "Waiting for final verification...";
+
+
+        await waitForMinimumIntro();
+
+
+        /*
+          Now final verification begins.
+        */
+
+        await finalVerificationAndStart();
+
+
+        /*
+          Reveal the actual full-screen file UI
+          only after the intro is complete.
+        */
+
+        await finishIntro();
+
+    }
+
+
+    catch(error){
+
+        console.error(error);
+
+
+        await finishIntro();
+
+
+        mainStatus.textContent =
+            "ERROR: " +
+            error.message;
+
+
+        startButton.disabled =
+            false;
+
+    }
+
+}
+
+
+/* =========================================================
+   AUTO START
+========================================================= */
+
+window.addEventListener(
+    "load",
+    () => {
+
+        startSync();
+
+    }
+);
+
 </script>
+
 </body>
 </html>
