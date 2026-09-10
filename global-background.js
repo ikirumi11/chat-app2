@@ -3,7 +3,7 @@
   'use strict';
 
   const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxYU_En6P2Ltdatm0wt3ZKcXvifQB6SBk9W_4QZ8sdYCM7XV4HSzroyMIlbgo5xQIJK/exec';
-  const CACHE_KEY = 'chatGlobalBackground.cache.v4';
+  const CACHE_KEY = 'chatGlobalBackground.cache.v5';
   const MAX_DIM = 750;
   const MAX_BASE64_CHARS = 1_500_000;
   const DATA_PREFIX = 'data:image/jpeg;base64,';
@@ -20,20 +20,33 @@
     return style;
   }
 
+  function cleanRawBase64(value) {
+    if (!value) return '';
+
+    let text = String(value);
+
+    // Never send or store the old marker strings.
+    text = text.split('BACKGROUND_BASE64_START').join('');
+    text = text.split('BACKGROUND_BASE64_END').join('');
+
+    // Remove a data-image prefix if one exists.
+    const comma = text.indexOf(',');
+    if (text.trim().startsWith('data:image/') && comma !== -1) {
+      text = text.slice(comma + 1);
+    }
+
+    // Base64 itself must be the only content.
+    return text.trim();
+  }
+
   function toDataUrl(rawBase64) {
-    if (!rawBase64) return '';
-    const value = String(rawBase64).trim();
-    if (value.startsWith('data:image/')) return value;
+    const value = cleanRawBase64(rawBase64);
+    if (!value) return '';
     return DATA_PREFIX + value;
   }
 
   function toRawBase64(dataUrl) {
-    if (!dataUrl) return '';
-    const value = String(dataUrl).trim();
-    const comma = value.indexOf(',');
-    return value.startsWith('data:image/') && comma !== -1
-      ? value.slice(comma + 1)
-      : value;
+    return cleanRawBase64(dataUrl);
   }
 
   function applyBackground(rawBase64) {
@@ -51,14 +64,15 @@
 
   function cacheBackground(rawBase64) {
     try {
-      if (rawBase64) localStorage.setItem(CACHE_KEY, rawBase64);
+      const clean = cleanRawBase64(rawBase64);
+      if (clean) localStorage.setItem(CACHE_KEY, clean);
       else localStorage.removeItem(CACHE_KEY);
     } catch (_) {}
   }
 
   function getCachedBackground() {
     try {
-      return localStorage.getItem(CACHE_KEY) || '';
+      return cleanRawBase64(localStorage.getItem(CACHE_KEY) || '');
     } catch (_) {
       return '';
     }
@@ -78,7 +92,7 @@
     } catch (_) {
       const preview = trimmed.replace(/\s+/g, ' ').slice(0, 180);
       if (/^<!doctype html/i.test(trimmed) || /^<html/i.test(trimmed) || trimmed.includes('<!DOCTYPE')) {
-        throw new Error(`The Apps Script deployment returned HTML instead of JSON. Check the Web App deployment settings. Response: ${preview}`);
+        throw new Error(`The Apps Script deployment returned HTML instead of JSON. Response: ${preview}`);
       }
       throw new Error(`The background server returned invalid JSON. Response: ${preview}`);
     }
@@ -160,7 +174,7 @@
       }
 
       const result = await readServerResponse(response, 'load the background');
-      const background = result.background || '';
+      const background = cleanRawBase64(result.background || '');
 
       cacheBackground(background);
       applyBackground(background);
@@ -182,7 +196,8 @@
   }
 
   async function saveGlobalBackground(rawBase64, statusElement) {
-    if (!rawBase64) return false;
+    const cleanBase64 = cleanRawBase64(rawBase64);
+    if (!cleanBase64) return false;
 
     try {
       if (statusElement) statusElement.textContent = 'Sender global bakgrunn…';
@@ -193,8 +208,10 @@
           'Content-Type': 'text/plain;charset=utf-8'
         },
         body: JSON.stringify({
-          action: 'saveBackground',
-          background: toRawBase64(rawBase64)
+          // The Apps Script uses only "save".
+          action: 'save',
+          // This value is raw Base64 and NOTHING else.
+          background: cleanBase64
         }),
         redirect: 'follow'
       });
@@ -205,9 +222,9 @@
 
       await readServerResponse(response, 'save the background');
 
-      cacheBackground(toRawBase64(rawBase64));
-      applyBackground(toRawBase64(rawBase64));
-      updatePreview(toRawBase64(rawBase64));
+      cacheBackground(cleanBase64);
+      applyBackground(cleanBase64);
+      updatePreview(cleanBase64);
 
       if (statusElement) statusElement.textContent = '✓ Global bakgrunn lagret og aktivert.';
       return true;
@@ -226,7 +243,10 @@
         headers: {
           'Content-Type': 'text/plain;charset=utf-8'
         },
-        body: JSON.stringify({ action: 'clearBackground' }),
+        body: JSON.stringify({
+          // The Apps Script uses only "clear".
+          action: 'clear'
+        }),
         redirect: 'follow'
       });
 
