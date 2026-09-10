@@ -1,45 +1,22 @@
-/* Chat App 2 - Supabase Realtime live chat + Supabase database history */
+/*
+ * Chat App 2 - browser Supabase API adapter
+ * This file does not use Vercel, Node, Express, or serverless functions.
+ * It runs in the browser and translates the existing /api/messages and
+ * /api/message-actions calls into direct Supabase REST requests.
+ */
 (() => {
     "use strict";
-
-    const SUPABASE_URL = "https://wlvbkdzcueqkknysisfw.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_mIC-G8R_uNChoa27DJj1Vg_aekYL2KL";
-    const CHANNEL = "general";
-    const MAX_MESSAGES = 500;
-    const REQUEST_TIMEOUT_MS = 10000;
-    const SAVE_RETRY_MS = 1000;
-    const P2P_RETRY_MS = 1000;
-    const DEVICE_KEY = "chat_device_id";
-    const CACHE_KEY = "chat_messages_supabase_" + CHANNEL;
-
+    const SUPABASE_URL = "https://iecpzrqvvuyghybchpva.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_Vess5sv1LAkxmZuxXZHa5Q_Vf6Qs-Se";
+    const REST_URL = SUPABASE_URL.replace(/\/+$/, "") + "/rest/v1";
     const ORIGINAL_FETCH = window.fetch.bind(window);
-    const ORIGINAL_SET_INTERVAL = window.setInterval.bind(window);
 
-    let supabase = null;
-    let realtimeChannel = null;
-    let realtimeReady = false;
-    let realtimeLoading = null;
-    let localMessages = [];
-    let loaded = false;
-    let loading = null;
-    let pendingLive = [];
-    let pendingSave = new Map();
-    let saveBusy = false;
-    let sheetLikeStatus = "Supabase: connecting…";
-    let statusTimer = null;
-    let retryTimer = null;
-
-    let deviceId = localStorage.getItem(DEVICE_KEY);
-    if (!deviceId) {
-        deviceId = crypto.randomUUID
-            ? crypto.randomUUID()
-            : Date.now().toString(36) + Math.random().toString(36).slice(2);
-        localStorage.setItem(DEVICE_KEY, deviceId);
-    }
-
-    const newId = () => crypto.randomUUID
-        ? crypto.randomUUID()
-        : Date.now().toString(36) + Math.random().toString(36).slice(2);
+    const baseHeaders = () => ({
+        apikey: SUPABASE_KEY,
+        Authorization: "Bearer " + SUPABASE_KEY,
+        "Content-Type": "application/json",
+        Accept: "application/json"
+    });
 
     function jsonResponse(body, status = 200) {
         return new Response(JSON.stringify(body), {
@@ -50,561 +27,264 @@
 
     async function readBody(options) {
         if (!options?.body || typeof options.body !== "string") return {};
-        try { return JSON.parse(options.body); } catch (_) { return {}; }
+        try { return JSON.parse(options.body); } catch { return {}; }
     }
 
-    function normalize(message) {
-        if (!message || typeof message !== "object") return null;
-
-        let files = message.files;
-        if (typeof files === "string") {
-            try { files = JSON.parse(files); } catch (_) { files = []; }
-        }
-
-        return {
-            ...message,
-            id: String(message.id || message.messageId || newId()),
-            timestamp: message.timestamp || message.created_at || new Date().toISOString(),
-            username: String(message.username || message.name || localUsername()).trim().substring(0, 24),
-            message: String(message.message ?? ""),
-            image: message.image || null,
-            files: Array.isArray(files) ? files : [],
-            channel: String(message.channel || CHANNEL),
-            device_id: String(message.device_id || "")
-        };
-    }
-
-    const idOf = m => String(m?.id || m?.messageId || "");
-    const timeOf = m => new Date(m?.timestamp || m?.created_at || 0).getTime() || 0;
-
-    function usable(message) {
-        if (!message || !idOf(message) || message.channel !== CHANNEL) return false;
-        return Boolean(
-            String(message.message || "").trim() ||
-            message.image ||
-            (Array.isArray(message.files) && message.files.length) ||
-            message.type === "game"
-        );
-    }
-
-    function localUsername() {
-        for (const key of ["chat_username", "chat_name", "username", "chat_user"]) {
-            const value = String(localStorage.getItem(key) || "").trim();
-            if (value) return value.substring(0, 24);
-        }
-        const input = document.getElementById("usernameInput");
-        if (input?.value?.trim()) return input.value.trim().substring(0, 24);
-        return "Anonymous";
-    }
-
-    function cacheWrite() {
-        try { localStorage.setItem(CACHE_KEY, JSON.stringify(localMessages.slice(-MAX_MESSAGES))); } catch (_) {}
-    }
-
-    function cacheRead() {
-        try {
-            const value = JSON.parse(localStorage.getItem(CACHE_KEY) || "[]");
-            return Array.isArray(value) ? value.map(normalize).filter(usable) : [];
-        } catch (_) { return []; }
-    }
-
-    function merge(messages) {
-        const map = new Map(localMessages.map(m => [idOf(m), m]));
-        let changed = false;
-        for (const raw of messages || []) {
-            const message = normalize(raw);
-            if (!usable(message)) continue;
-            if (!map.has(idOf(message))) {
-                map.set(idOf(message), message);
-                changed = true;
-            } else {
-                map.set(idOf(message), { ...map.get(idOf(message)), ...message });
-            }
-        }
-        if (changed) {
-            localMessages = Array.from(map.values())
-                .sort((a, b) => timeOf(a) - timeOf(b))
-                .slice(-MAX_MESSAGES);
-            cacheWrite();
-        }
-        return changed;
-    }
-
-    // ------------------------------------------------------------
-    // STATUS
-    // ------------------------------------------------------------
-
-    function statusBox() {
-        let box = document.getElementById("chat-connection-status");
-        if (box) return box;
-        box = document.createElement("div");
-        box.id = "chat-connection-status";
-        box.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:2147483647;display:flex;flex-direction:column;gap:6px;font:12px Arial,sans-serif;pointer-events:none";
-        document.documentElement.appendChild(box);
-        return box;
-    }
-
-    function badge(id, text) {
-        const box = statusBox();
-        let el = document.getElementById(id);
-        if (!el) {
-            el = document.createElement("div");
-            el.id = id;
-            el.style.cssText = "padding:7px 10px;border-radius:8px;background:rgba(20,20,20,.92);border:1px solid rgba(255,255,255,.15);color:#fff;box-shadow:0 3px 14px rgba(0,0,0,.25);white-space:nowrap";
-            box.appendChild(el);
-        }
-        el.textContent = text;
-    }
-
-    function updateStatus() {
-        if (realtimeReady) {
-            badge("chat-p2p-status", "P2P: connected");
-        } else {
-            badge("chat-p2p-status", "P2P: not connected — retrying…");
-        }
-
-        if (pendingSave.size > 0) {
-            badge("chat-sheet-status", `Database: saving (${pendingSave.size})…`);
-        } else {
-            badge("chat-sheet-status", sheetLikeStatus);
-        }
-    }
-
-    function startStatus() {
-        updateStatus();
-        if (statusTimer) clearInterval(statusTimer);
-        statusTimer = ORIGINAL_SET_INTERVAL(updateStatus, 250);
-    }
-
-    // ------------------------------------------------------------
-    // SUPABASE LOADING
-    // ------------------------------------------------------------
-
-    function loadSupabaseLibrary() {
-        if (window.supabase?.createClient) return Promise.resolve(window.supabase);
-        if (realtimeLoading) return realtimeLoading;
-
-        realtimeLoading = new Promise((resolve, reject) => {
-            const existing = document.querySelector('script[data-chat-supabase="1"]');
-            if (existing) {
-                existing.addEventListener("load", () => resolve(window.supabase));
-                existing.addEventListener("error", reject);
-                return;
-            }
-
-            const script = document.createElement("script");
-            script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
-            script.async = true;
-            script.dataset.chatSupabase = "1";
-            script.onload = () => window.supabase?.createClient
-                ? resolve(window.supabase)
-                : reject(new Error("Supabase library did not load"));
-            script.onerror = () => reject(new Error("Could not load Supabase"));
-            document.head.appendChild(script);
-        });
-
-        return realtimeLoading;
-    }
-
-    async function initSupabase() {
-        if (supabase) return supabase;
-
-        const lib = await loadSupabaseLibrary();
-        supabase = lib.createClient(SUPABASE_URL, SUPABASE_KEY, {
-            realtime: {
-                params: { eventsPerSecond: 10 },
-                reconnectAfterMs: tries => [1000, 2000, 5000, 10000][Math.min(tries, 3)]
-            }
-        });
-
-        subscribeRealtime();
-        return supabase;
-    }
-
-    function subscribeRealtime() {
-        if (!supabase) return;
-
-        if (realtimeChannel) {
-            try { supabase.removeChannel(realtimeChannel); } catch (_) {}
-        }
-
-        realtimeReady = false;
-        updateStatus();
-
-        realtimeChannel = supabase.channel("chat:" + CHANNEL, {
-            config: {
-                broadcast: {
-                    self: false,
-                    ack: true
-                }
-            }
-        });
-
-        realtimeChannel.on(
-            "broadcast",
-            { event: "chat-message" },
-            payload => {
-                const message = normalize(payload?.payload?.message);
-                if (!usable(message)) return;
-                merge([message]);
-                window.dispatchEvent(new CustomEvent("chat-live-message", { detail: message }));
-            }
-        );
-
-        realtimeChannel.subscribe(status => {
-            if (status === "SUBSCRIBED") {
-                realtimeReady = true;
-                sheetLikeStatus = "Database: saved";
-                flushLiveQueue();
-            } else {
-                realtimeReady = false;
-                sheetLikeStatus = "Database: reconnecting…";
-            }
-            updateStatus();
-        });
-    }
-
-    // ------------------------------------------------------------
-    // SUPABASE DATABASE
-    // ------------------------------------------------------------
-
-    async function dbFetch(path, options = {}) {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
-        try {
-            return await ORIGINAL_FETCH(SUPABASE_URL + path, {
-                ...options,
-                cache: "no-store",
-                signal: controller.signal,
-                headers: {
-                    apikey: SUPABASE_KEY,
-                    Authorization: "Bearer " + SUPABASE_KEY,
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                    ...(options.headers || {})
-                }
-            });
-        } finally {
-            clearTimeout(timer);
-        }
-    }
-
-    async function readJsonResponse(response) {
+    async function readSupabase(response) {
         const text = await response.text();
-        try { return text ? JSON.parse(text) : {}; } catch (_) { return { error: text }; }
+        if (!text) return {};
+        try { return JSON.parse(text); } catch { return { message: text }; }
     }
 
-    async function loadHistory() {
-        if (loaded) return localMessages;
-        if (loading) return loading;
-
-        loading = (async () => {
-            try {
-                await initSupabase();
-                const query = `/rest/v1/messages?select=id,username,channel,message,image,files,device_id,edited,created_at&channel=eq.${encodeURIComponent(CHANNEL)}&order=created_at.asc&limit=${MAX_MESSAGES}`;
-                const response = await dbFetch(query);
-                const data = await readJsonResponse(response);
-
-                if (!response.ok) throw new Error(data?.message || data?.error || "History load failed");
-                localMessages = [];
-                merge(Array.isArray(data) ? data : []);
-                sheetLikeStatus = "Database: saved";
-            } catch (_) {
-                localMessages = cacheRead().slice(-MAX_MESSAGES);
-                sheetLikeStatus = "Database: retrying…";
-                initSupabase().catch(() => {});
-            }
-
-            loaded = true;
-            cacheWrite();
-            updateStatus();
-            return localMessages;
-        })();
-
-        return loading;
+    function errorFrom(data, fallback) {
+        return data?.message || data?.error || data?.hint || fallback;
     }
 
-    async function persistMessage(message) {
-        const item = normalize(message);
-        if (!usable(item)) return;
-        const id = idOf(item);
-        pendingSave.set(id, item);
-        sheetLikeStatus = "Database: saving…";
-        updateStatus();
-
-        try {
-            const response = await dbFetch("/rest/v1/messages", {
-                method: "POST",
-                headers: { Prefer: "resolution=merge-duplicates,return=representation" },
-                body: JSON.stringify({
-                    id: item.id,
-                    username: item.username,
-                    channel: CHANNEL,
-                    message: item.message,
-                    image: item.image,
-                    files: item.files,
-                    device_id: item.device_id || deviceId,
-                    edited: Boolean(item.edited)
-                })
-            });
-
-            const data = await readJsonResponse(response);
-            if (!response.ok) throw new Error(data?.message || data?.error || "Database save failed");
-
-            pendingSave.delete(id);
-            sheetLikeStatus = "Database: saved";
-        } catch (_) {
-            sheetLikeStatus = "Database: retrying…";
-            // The message remains queued and is retried below.
-        }
-        updateStatus();
-    }
-
-    async function retrySaves() {
-        if (saveBusy || pendingSave.size === 0) return;
-        saveBusy = true;
-        try {
-            const batch = Array.from(pendingSave.values()).slice(0, 25);
-            for (const item of batch) await persistMessage(item);
-        } finally {
-            saveBusy = false;
-            updateStatus();
-        }
-    }
-
-    ORIGINAL_SET_INTERVAL(retrySaves, SAVE_RETRY_MS);
-
-    // ------------------------------------------------------------
-    // REALTIME LIVE MESSAGE QUEUE
-    // ------------------------------------------------------------
-
-    async function broadcastMessage(message) {
-        const packet = {
-            type: "broadcast",
-            event: "chat-message",
-            payload: { message }
+    async function supabase(method, path, body, extraHeaders = {}) {
+        const options = {
+            method,
+            headers: { ...baseHeaders(), ...extraHeaders },
+            cache: "no-store"
         };
-
-        if (realtimeReady && realtimeChannel) {
-            try {
-                const result = await realtimeChannel.send(packet);
-                if (result === "ok") return true;
-            } catch (_) {}
-        }
-
-        pendingLive.push(message);
-        if (pendingLive.length > 100) pendingLive.splice(0, pendingLive.length - 100);
-        return false;
+        if (body !== undefined) options.body = JSON.stringify(body);
+        const response = await ORIGINAL_FETCH(REST_URL + path, options);
+        const data = await readSupabase(response);
+        return { response, data };
     }
 
-    async function flushLiveQueue() {
-        if (!realtimeReady || !realtimeChannel || pendingLive.length === 0) return;
-
-        while (pendingLive.length && realtimeReady) {
-            const message = pendingLive[0];
-            try {
-                const result = await realtimeChannel.send({
-                    type: "broadcast",
-                    event: "chat-message",
-                    payload: { message }
-                });
-                if (result !== "ok") throw new Error("broadcast failed");
-                pendingLive.shift();
-            } catch (_) {
-                break;
-            }
-        }
-        updateStatus();
+    async function getGameMessages(channel, gameId) {
+        const path = "/messages?select=id,username,channel,message,image,files,device_id,edited,created_at" +
+            "&channel=eq." + encodeURIComponent(channel) +
+            "&username=eq.__GAME_SERVER__" +
+            "&message=like.*" + encodeURIComponent(gameId) + "*" +
+            "&order=created_at.desc";
+        const { response, data } = await supabase("GET", path);
+        if (!response.ok) throw new Error(errorFrom(data, "Could not find game messages."));
+        return Array.isArray(data) ? data : [];
     }
 
-    if (retryTimer) clearInterval(retryTimer);
-    retryTimer = ORIGINAL_SET_INTERVAL(() => {
-        initSupabase().catch(() => {});
-        flushLiveQueue();
-        retrySaves();
-    }, P2P_RETRY_MS);
+    async function deleteGameMessages(messages) {
+        let removed = 0;
+        for (const message of messages) {
+            if (!message?.id) continue;
+            const path = "/messages?id=eq." + encodeURIComponent(message.id) +
+                "&username=eq.__GAME_SERVER__&device_id=eq." + encodeURIComponent(message.device_id || "");
+            const { response, data } = await supabase("DELETE", path, undefined, { Prefer: "return=representation" });
+            if (!response.ok) throw new Error(errorFrom(data, "Could not delete game message."));
+            if (Array.isArray(data)) removed += data.length;
+        }
+        return removed;
+    }
 
-    // ------------------------------------------------------------
-    // CHAT APP API
-    // ------------------------------------------------------------
+    function parseGameState(message) {
+        const prefix = "__CHAT_GAME_STATE__:";
+        if (typeof message !== "string" || !message.startsWith(prefix)) return null;
+        try { return JSON.parse(message.substring(prefix.length)); } catch { return null; }
+    }
 
-    async function getMessages() {
-        await loadHistory();
-        return {
-            success: true,
-            messages: localMessages.slice(-MAX_MESSAGES),
-            p2p: realtimeReady,
-            historySource: "supabase"
+    async function insertGameState(channel, state) {
+        const row = {
+            username: "__GAME_SERVER__",
+            channel,
+            message: "__CHAT_GAME_STATE__:" + JSON.stringify(state),
+            image: null,
+            files: [],
+            device_id: state.hostDeviceId,
+            edited: false
         };
+        const { response, data } = await supabase("POST", "/messages", row, { Prefer: "return=representation" });
+        if (!response.ok) throw new Error(errorFrom(data, "Could not write game state."));
+        return Array.isArray(data) ? data[0] : data;
     }
 
-    async function sendMessage(body) {
-        await loadHistory();
-
-        const username = String(body?.username || body?.name || body?.displayName || localUsername()).trim().substring(0, 24) || "Anonymous";
-        const text = String(body?.message ?? "").trim().substring(0, 20000);
-        const files = Array.isArray(body?.files) ? body.files : [];
-        const image = body?.image || null;
-
-        const message = normalize({
-            id: newId(),
-            timestamp: new Date().toISOString(),
-            username,
-            message: text,
-            image,
-            files,
-            channel: CHANNEL,
-            device_id: deviceId,
-            type: body?.type || "message"
-        });
-
-        if (!usable(message)) {
-            return { success: false, error: "Message is empty.", messages: localMessages.slice(-MAX_MESSAGES) };
-        }
-
-        // Instant local display.
-        merge([message]);
-
-        // Live P2P-style Supabase Realtime delivery.
-        // If disconnected, the message stays queued until SUBSCRIBED again.
-        broadcastMessage(message);
-
-        // Permanent database save happens immediately in parallel.
-        persistMessage(message);
-
-        return {
-            success: true,
-            message,
-            messages: localMessages.slice(-MAX_MESSAGES),
-            p2p: realtimeReady,
-            saving: true
-        };
-    }
-
-    async function databaseAction(method, body) {
-        const id = String(body?.id || "").trim();
-        if (!id) return { ok: false, error: "Message ID is required." };
-
-        if (method === "PATCH") {
-            const updates = {};
-            if (body.message !== undefined) updates.message = String(body.message).substring(0, 20000);
-            if (body.image !== undefined) updates.image = body.image;
-            if (body.files !== undefined) updates.files = Array.isArray(body.files) ? body.files : [];
-            updates.edited = true;
-
-            const response = await dbFetch(`/rest/v1/messages?id=eq.${encodeURIComponent(id)}&device_id=eq.${encodeURIComponent(deviceId)}`, {
-                method: "PATCH",
-                headers: { Prefer: "return=representation" },
-                body: JSON.stringify(updates)
-            });
-            const data = await readJsonResponse(response);
-            if (!response.ok) return { ok: false, error: data?.message || data?.error || "Edit failed." };
-            merge(data);
-            return { success: true, message: data?.[0] || null };
-        }
-
-        const response = await dbFetch(`/rest/v1/messages?id=eq.${encodeURIComponent(id)}&device_id=eq.${encodeURIComponent(deviceId)}`, {
-            method: "DELETE",
-            headers: { Prefer: "return=representation" }
-        });
-        const data = await readJsonResponse(response);
-        if (!response.ok) return { ok: false, error: data?.message || data?.error || "Delete failed." };
-        localMessages = localMessages.filter(m => idOf(m) !== id);
-        cacheWrite();
-        return { success: true, deleted: true };
-    }
-
-    async function messagesApi(method, options) {
+    async function handleMessages(method, options, url) {
         const body = await readBody(options);
 
-        if (method === "GET") return jsonResponse(await getMessages());
+        if (method === "GET") {
+            const channel = String(url.searchParams.get("channel") || "general").trim().substring(0, 32);
+            const path = "/messages?select=id,username,channel,message,image,files,device_id,edited,created_at" +
+                "&channel=eq." + encodeURIComponent(channel) + "&order=created_at.asc";
+            const { response, data } = await supabase("GET", path);
+            if (!response.ok) return jsonResponse({ error: errorFrom(data, "Supabase request failed."), details: data }, response.status);
+            return jsonResponse({ success: true, messages: Array.isArray(data) ? data : [] });
+        }
 
         if (method === "POST") {
-            if (body.game_server || body.game_action || body.action === "edit" || body.action === "delete") {
-                return jsonResponse(await gameOrAction(body));
+            const username = String(body.username || "").trim().substring(0, 24);
+            const channel = String(body.channel || "general").trim().substring(0, 32);
+            const message = String(body.message || "").trim().substring(0, 20000);
+            const deviceId = String(body.device_id || "").trim().substring(0, 100);
+
+            if (body.game_server === true) {
+                if (!deviceId) return jsonResponse({ error: "Device ID is required for a game server." }, 400);
+
+                if (body.game_action === "stop") {
+                    const gameId = String(body.game_id || "").trim().substring(0, 120);
+                    if (!gameId) return jsonResponse({ error: "Game ID is required." }, 400);
+                    const messages = await getGameMessages(channel, gameId);
+                    const removed = await deleteGameMessages(messages);
+                    return jsonResponse({ success: true, stopped: true, removed });
+                }
+
+                if (body.game_action === "leave") {
+                    const gameId = String(body.game_id || "").trim().substring(0, 120);
+                    if (!gameId) return jsonResponse({ error: "Game ID is required." }, 400);
+                    const messages = await getGameMessages(channel, gameId);
+                    if (!messages.length) return jsonResponse({ success: true, stopped: true, removed: 0 });
+                    const state = parseGameState(messages[0].message);
+                    if (!state) {
+                        const removed = await deleteGameMessages(messages);
+                        return jsonResponse({ success: true, stopped: true, removed });
+                    }
+                    if (state.hostDeviceId === deviceId) {
+                        const removed = await deleteGameMessages(messages);
+                        return jsonResponse({ success: true, stopped: true, hostLeft: true, removed });
+                    }
+                    state.players = Array.isArray(state.players)
+                        ? state.players.filter(player => player && player.deviceId !== deviceId)
+                        : [];
+                    if (!state.players.length) {
+                        const removed = await deleteGameMessages(messages);
+                        return jsonResponse({ success: true, stopped: true, removed });
+                    }
+                    await deleteGameMessages(messages);
+                    const inserted = await insertGameState(channel, state);
+                    return jsonResponse({ success: true, stopped: false, left: true, game: inserted });
+                }
+
+                if (!message) return jsonResponse({ error: "Game state is required." }, 400);
+                const row = { username: "__GAME_SERVER__", channel, message, image: null, files: [], device_id: deviceId, edited: false };
+                const { response, data } = await supabase("POST", "/messages", row, { Prefer: "return=representation" });
+                if (!response.ok) return jsonResponse({ error: errorFrom(data, "Supabase request failed."), details: data }, response.status);
+                return jsonResponse({ success: true, game: Array.isArray(data) ? data[0] : data });
             }
-            return jsonResponse(await sendMessage(body));
+
+            let image = null;
+            if (body.image && typeof body.image === "string") image = body.image;
+            const files = [];
+            if (Array.isArray(body.files)) {
+                const MAX_FILES = 5;
+                const MAX_FILE_SIZE = 5 * 1024 * 1024;
+                for (const file of body.files) {
+                    if (files.length >= MAX_FILES) break;
+                    if (!file?.data || typeof file.data !== "string" || !file.name || typeof file.name !== "string") continue;
+                    const base64Data = file.data.split(",")[1] || "";
+                    const sizeInBytes = Math.ceil((base64Data.length * 3) / 4);
+                    if (sizeInBytes > MAX_FILE_SIZE || file.data.length > 5000000) continue;
+                    files.push({ name: file.name.substring(0, 255), data: file.data, size: file.size || sizeInBytes, type: file.type || "application/octet-stream" });
+                }
+            }
+            if (!username) return jsonResponse({ error: "Username is required." }, 400);
+            if (!message && !image && files.length === 0) return jsonResponse({ error: "Message, image, or files are required." }, 400);
+            if (image && image.length > 5000000) return jsonResponse({ error: "Image is too large." }, 413);
+            if (image && !image.startsWith("data:image/")) return jsonResponse({ error: "Invalid image data." }, 400);
+
+            const row = { username, channel, message, image, files, device_id: deviceId, edited: false };
+            const { response, data } = await supabase("POST", "/messages", row, { Prefer: "return=representation" });
+            if (!response.ok) return jsonResponse({ error: errorFrom(data, "Supabase request failed."), details: data }, response.status);
+            return jsonResponse({ success: true, message: Array.isArray(data) ? data[0] : data });
         }
 
-        if (method === "PATCH" || method === "DELETE") {
-            return jsonResponse(await databaseAction(method, body));
+        if (method === "PATCH") {
+            const id = String(body.id || "").trim();
+            const deviceId = String(body.device_id || "").trim();
+            if (!id || !deviceId) return jsonResponse({ error: "Message ID and device ID are required." }, 400);
+
+            if (body.game_server === true) {
+                const gameState = String(body.game_state || "").trim().substring(0, 20000);
+                if (!gameState) return jsonResponse({ error: "Game state is required." }, 400);
+                const path = "/messages?id=eq." + encodeURIComponent(id) + "&username=eq.__GAME_SERVER__&device_id=eq." + encodeURIComponent(deviceId);
+                const { response, data } = await supabase("PATCH", path, { message: gameState, edited: true }, { Prefer: "return=representation" });
+                if (!response.ok) return jsonResponse({ error: errorFrom(data, "Supabase request failed."), details: data }, response.status);
+                if (!Array.isArray(data) || !data.length) return jsonResponse({ error: "You are not the game host." }, 403);
+                return jsonResponse({ success: true, game: data[0] });
+            }
+
+            const message = String(body.message || "").trim().substring(0, 2000);
+            const path = "/messages?id=eq." + encodeURIComponent(id) + "&device_id=eq." + encodeURIComponent(deviceId) + "&username=neq.__GAME_SERVER__";
+            const { response, data } = await supabase("PATCH", path, { message, edited: true }, { Prefer: "return=representation" });
+            if (!response.ok) return jsonResponse({ error: errorFrom(data, "Supabase request failed."), details: data }, response.status);
+            if (!Array.isArray(data) || !data.length) return jsonResponse({ error: "You cannot edit this message." }, 403);
+            return jsonResponse({ success: true, message: data[0] });
         }
 
-        return jsonResponse({ ok: false, error: "Method not allowed." }, 405);
+        if (method === "DELETE") {
+            if (body.delete_all === true) {
+                const { response, data } = await supabase("DELETE", "/messages?id=not.is.null", undefined, { Prefer: "return=minimal" });
+                if (!response.ok) return jsonResponse({ error: errorFrom(data, "Supabase request failed."), details: data }, response.status);
+                return jsonResponse({ success: true, message: "Everything was deleted." });
+            }
+
+            if (body.game_server === true) {
+                const deviceId = String(body.device_id || "").trim();
+                const id = String(body.id || "").trim();
+                const gameId = String(body.game_id || "").trim().substring(0, 120);
+                if (!deviceId) return jsonResponse({ error: "Device ID is required." }, 400);
+                if (gameId) {
+                    const channel = String(body.channel || "general").trim().substring(0, 32);
+                    const messages = await getGameMessages(channel, gameId);
+                    const removed = await deleteGameMessages(messages);
+                    return jsonResponse({ success: true, message: "Game server messages removed.", removed });
+                }
+                if (!id) return jsonResponse({ error: "Game ID/message ID is required." }, 400);
+                const path = "/messages?id=eq." + encodeURIComponent(id) + "&username=eq.__GAME_SERVER__&device_id=eq." + encodeURIComponent(deviceId);
+                const { response, data } = await supabase("DELETE", path, undefined, { Prefer: "return=representation" });
+                if (!response.ok) return jsonResponse({ error: errorFrom(data, "Supabase request failed."), details: data }, response.status);
+                return jsonResponse({ success: true, message: "Game server removed." });
+            }
+
+            const id = String(body.id || "").trim();
+            const deviceId = String(body.device_id || "").trim();
+            if (!id || !deviceId) return jsonResponse({ error: "Message ID and device ID are required." }, 400);
+            const path = "/messages?id=eq." + encodeURIComponent(id) + "&device_id=eq." + encodeURIComponent(deviceId) + "&username=neq.__GAME_SERVER__";
+            const { response, data } = await supabase("DELETE", path, undefined, { Prefer: "return=representation" });
+            if (!response.ok) return jsonResponse({ error: errorFrom(data, "Supabase request failed."), details: data }, response.status);
+            if (!Array.isArray(data) || !data.length) return jsonResponse({ error: "You cannot delete this message." }, 403);
+            return jsonResponse({ success: true, message: "Message deleted." });
+        }
+
+        return jsonResponse({ error: "Method not allowed." }, 405);
     }
 
-    async function gameOrAction(body) {
-        // Keep the existing game API compatible with the Supabase messages table.
-        if (body.action === "edit") return databaseAction("PATCH", body);
-        if (body.action === "delete") return databaseAction("DELETE", body);
-
-        const text = String(body.message || body.game_state || "").trim();
-        const channel = String(body.channel || CHANNEL).trim().substring(0, 32);
-        const gameDevice = String(body.device_id || deviceId).trim();
-
-        if (!text) return { ok: false, error: "Game state is required." };
-
-        const response = await dbFetch("/rest/v1/messages", {
-            method: "POST",
-            headers: { Prefer: "return=representation" },
-            body: JSON.stringify({
-                username: "__GAME_SERVER__",
-                channel,
-                message: text,
-                image: null,
-                files: [],
-                device_id: gameDevice,
-                edited: false
-            })
-        });
-        const data = await readJsonResponse(response);
-        if (!response.ok) return { ok: false, error: data?.message || data?.error || "Game request failed." };
-        return { success: true, game: Array.isArray(data) ? data[0] : data };
-    }
-
-    async function actionsApi(method, options) {
+    async function handleMessageActions(method, options) {
         if (method !== "POST") return jsonResponse({ error: "Method not allowed." }, 405);
         const body = await readBody(options);
-        if (body.action === "edit") return jsonResponse(await databaseAction("PATCH", body));
-        if (body.action === "delete") return jsonResponse(await databaseAction("DELETE", body));
-        return jsonResponse(await gameOrAction(body));
+        const deviceId = String(body.device_id || localStorage.getItem("chat_device_id") || "").trim();
+        const id = String(body.id || "").trim();
+        const action = String(body.action || "").trim().toLowerCase();
+        if (!id || !deviceId) return jsonResponse({ error: "Message ID and device ID are required." }, 400);
+
+        const path = "/messages?id=eq." + encodeURIComponent(id) + "&device_id=eq." + encodeURIComponent(deviceId) + "&username=neq.__GAME_SERVER__";
+        if (action === "edit") {
+            const message = String(body.message || "").trim().substring(0, 2000);
+            if (!message) return jsonResponse({ error: "Message cannot be empty." }, 400);
+            const { response, data } = await supabase("PATCH", path, { message, edited: true }, { Prefer: "return=representation" });
+            if (!response.ok) return jsonResponse({ error: errorFrom(data, "Could not edit message."), details: data }, response.status);
+            if (!Array.isArray(data) || !data.length) return jsonResponse({ error: "You cannot edit this message." }, 403);
+            return jsonResponse({ success: true, message: data[0] });
+        }
+        if (action === "delete") {
+            const { response, data } = await supabase("DELETE", path, undefined, { Prefer: "return=representation" });
+            if (!response.ok) return jsonResponse({ error: errorFrom(data, "Could not delete message."), details: data }, response.status);
+            if (!Array.isArray(data) || !data.length) return jsonResponse({ error: "You cannot delete this message." }, 403);
+            return jsonResponse({ success: true, message: "Message deleted." });
+        }
+        return jsonResponse({ error: "Unknown action." }, 400);
     }
 
     window.fetch = async function(input, options = {}) {
-        let url;
         try {
-            url = new URL(typeof input === "string" ? input : input?.url || "", window.location.href);
-        } catch (_) {
-            return ORIGINAL_FETCH(input, options);
+            const rawUrl = typeof input === "string" ? input : input?.url || "";
+            const url = new URL(rawUrl, window.location.href);
+            const path = url.pathname.replace(/\/+$/, "") || "/";
+            const method = String(options?.method || (typeof input !== "string" ? input?.method : "GET") || "GET").toUpperCase();
+            if (path === "/api/messages") return await handleMessages(method, options, url);
+            if (path === "/api/message-actions") return await handleMessageActions(method, options);
+        } catch (error) {
+            return jsonResponse({ error: error?.message || "Chat API error." }, 500);
         }
-
-        const method = String(options.method || input?.method || "GET").toUpperCase();
-        const path = url.pathname.replace(/\/+$/, "") || "/";
-
-        if (path === "/api/messages") return messagesApi(method, options);
-        if (path === "/api/message-actions") return actionsApi(method, options);
         return ORIGINAL_FETCH(input, options);
     };
 
-    window.CHAT_APP_P2P_ENABLED = true;
-    window.CHAT_APP_FAST_MODE = true;
-    window.CHAT_APP_HISTORY_PERSISTENT = true;
-    window.CHAT_APP_P2P_DEVICE_ID = deviceId;
-    window.CHAT_APP_P2P_GET_STATUS = () => ({
-        connected: realtimeReady,
-        queuedLiveMessages: pendingLive.length,
-        pendingDatabaseSaves: pendingSave.size
-    });
-
-    startStatus();
-    loadHistory().catch(() => updateStatus());
-
-    window.addEventListener("beforeunload", () => {
-        // Saves are already continuously retried. Try one final background save pass.
-        retrySaves();
-        if (supabase && realtimeChannel) {
-            try { supabase.removeChannel(realtimeChannel); } catch (_) {}
-        }
-    });
+    window.ChatSupabaseAPI = { url: SUPABASE_URL, restUrl: REST_URL };
 })();
