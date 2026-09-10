@@ -3,9 +3,10 @@
   'use strict';
 
   const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxYU_En6P2Ltdatm0wt3ZKcXvifQB6SBk9W_4QZ8sdYCM7XV4HSzroyMIlbgo5xQIJK/exec';
-  const CACHE_KEY = 'chatGlobalBackground.cache.v3';
-  const MAX_DIM = 1600;
+  const CACHE_KEY = 'chatGlobalBackground.cache.v4';
+  const MAX_DIM = 750;
   const MAX_BASE64_CHARS = 1_500_000;
+  const DATA_PREFIX = 'data:image/jpeg;base64,';
 
   let selectedBackground = '';
 
@@ -19,9 +20,26 @@
     return style;
   }
 
-  function applyBackground(data) {
+  function toDataUrl(rawBase64) {
+    if (!rawBase64) return '';
+    const value = String(rawBase64).trim();
+    if (value.startsWith('data:image/')) return value;
+    return DATA_PREFIX + value;
+  }
+
+  function toRawBase64(dataUrl) {
+    if (!dataUrl) return '';
+    const value = String(dataUrl).trim();
+    const comma = value.indexOf(',');
+    return value.startsWith('data:image/') && comma !== -1
+      ? value.slice(comma + 1)
+      : value;
+  }
+
+  function applyBackground(rawBase64) {
     const style = getStyleElement();
-    const safe = String(data || '')
+    const dataUrl = toDataUrl(rawBase64);
+    const safe = dataUrl
       .replace(/\\/g, '\\\\')
       .replace(/"/g, '\\"')
       .replace(/</g, '%3C');
@@ -31,9 +49,9 @@
       : '.messages{background-image:none !important;}';
   }
 
-  function cacheBackground(data) {
+  function cacheBackground(rawBase64) {
     try {
-      if (data) localStorage.setItem(CACHE_KEY, data);
+      if (rawBase64) localStorage.setItem(CACHE_KEY, rawBase64);
       else localStorage.removeItem(CACHE_KEY);
     } catch (_) {}
   }
@@ -101,18 +119,20 @@
 
           let quality = 0.82;
           let data = canvas.toDataURL('image/jpeg', quality);
+          let rawBase64 = toRawBase64(data);
 
-          while (data.length > MAX_BASE64_CHARS && quality > 0.42) {
+          while (rawBase64.length > MAX_BASE64_CHARS && quality > 0.42) {
             quality -= 0.06;
             data = canvas.toDataURL('image/jpeg', quality);
+            rawBase64 = toRawBase64(data);
           }
 
-          if (data.length > MAX_BASE64_CHARS) {
+          if (rawBase64.length > MAX_BASE64_CHARS) {
             reject(new Error('Image is still too large after compression. Choose a smaller image.'));
             return;
           }
 
-          resolve(data);
+          resolve(rawBase64);
         };
 
         img.src = reader.result;
@@ -161,14 +181,12 @@
     }
   }
 
-  async function saveGlobalBackground(data, statusElement) {
-    if (!data) return false;
+  async function saveGlobalBackground(rawBase64, statusElement) {
+    if (!rawBase64) return false;
 
     try {
       if (statusElement) statusElement.textContent = 'Sender global bakgrunn…';
 
-      // text/plain keeps this as a simple CORS request and Apps Script can read it
-      // through e.postData.contents without requiring a preflight request.
       const response = await fetch(BACKEND_URL, {
         method: 'POST',
         headers: {
@@ -176,7 +194,7 @@
         },
         body: JSON.stringify({
           action: 'saveBackground',
-          background: data
+          background: toRawBase64(rawBase64)
         }),
         redirect: 'follow'
       });
@@ -187,9 +205,9 @@
 
       await readServerResponse(response, 'save the background');
 
-      cacheBackground(data);
-      applyBackground(data);
-      updatePreview(data);
+      cacheBackground(toRawBase64(rawBase64));
+      applyBackground(toRawBase64(rawBase64));
+      updatePreview(toRawBase64(rawBase64));
 
       if (statusElement) statusElement.textContent = '✓ Global bakgrunn lagret og aktivert.';
       return true;
@@ -231,12 +249,14 @@
     }
   }
 
-  function updatePreview(data) {
+  function updatePreview(rawBase64) {
     const preview = document.getElementById('globalBackgroundPreview');
     if (!preview) return;
 
-    if (data) {
-      preview.src = data;
+    const dataUrl = toDataUrl(rawBase64);
+
+    if (dataUrl) {
+      preview.src = dataUrl;
       preview.style.display = 'block';
     } else {
       preview.removeAttribute('src');
@@ -266,7 +286,7 @@
         <div class="setting">
           <label>Choose a new background</label>
           <input id="globalBackgroundFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
-          <small style="color:#89919d;display:block;margin-top:6px">Bildet komprimeres før det sendes til Google Docs-serveren.</small>
+          <small style="color:#89919d;display:block;margin-top:6px">Bakgrunnen skaleres ned til maks 750px og lagres som ren Base64.</small>
         </div>
 
         <div class="setting">
@@ -311,7 +331,7 @@
         selectedBackground = await resizeImage(file);
         updatePreview(selectedBackground);
         send.disabled = false;
-        status.textContent = '✓ Klar til å sende.';
+        status.textContent = '✓ Klar til å sende. Maks 750px.';
       } catch (error) {
         selectedBackground = '';
         send.disabled = true;
