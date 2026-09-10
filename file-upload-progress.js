@@ -16,12 +16,7 @@
     }
 
     function escapeHtml(value){
-        return String(value)
-            .replaceAll('&','&amp;')
-            .replaceAll('<','&lt;')
-            .replaceAll('>','&gt;')
-            .replaceAll('"','&quot;')
-            .replaceAll("'",'&#039;');
+        return String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
     }
 
     function addStyle(){
@@ -52,15 +47,7 @@
         const el=document.createElement('div');
         el.className='fup-item';
         el.dataset.index=index;
-        el.innerHTML=`
-            <div class="fup-top">
-                <span class="fup-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</span>
-                <span class="fup-size">${formatSize(file.size)}</span>
-                <button class="fup-remove" type="button" aria-label="Remove ${escapeHtml(file.name)}">×</button>
-            </div>
-            <div class="fup-bar"><div class="fup-fill"></div></div>
-            <div class="fup-status">Preparing 0%</div>
-        `;
+        el.innerHTML=`<div class="fup-top"><span class="fup-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</span><span class="fup-size">${formatSize(file.size)}</span><button class="fup-remove" type="button" aria-label="Remove ${escapeHtml(file.name)}">×</button></div><div class="fup-bar"><div class="fup-fill"></div></div><div class="fup-status">Preparing 0%</div>`;
         el.querySelector('.fup-remove').addEventListener('click',()=>{
             window.__chatUploadFiles.splice(index,1);
             pendingFiles.splice(index,1);
@@ -74,18 +61,13 @@
         ensureState();
         preview.innerHTML='';
         window.__chatUploadFiles.forEach((file,index)=>preview.appendChild(row(file,index)));
-        if(typeof renderFilePreview==='function'){
-            try{ renderFilePreview(); }catch{}
-        }
     }
 
     function setProgress(index,percent,status){
         const item=preview.querySelector(`.fup-item[data-index="${index}"]`);
         if(!item) return;
-        const fill=item.querySelector('.fup-fill');
-        const text=item.querySelector('.fup-status');
-        fill.style.width=`${percent}%`;
-        text.textContent=status||`Preparing ${percent}%`;
+        item.querySelector('.fup-fill').style.width=`${percent}%`;
+        item.querySelector('.fup-status').textContent=status||`Preparing ${percent}%`;
     }
 
     function readFile(file,index){
@@ -99,14 +81,7 @@
             });
             reader.addEventListener('load',()=>{
                 setProgress(index,100,'Ready to send');
-                resolve({
-                    name:file.name,
-                    data:String(reader.result),
-                    size:file.size,
-                    type:file.type||'application/octet-stream',
-                    audio:false,
-                    base64:true
-                });
+                resolve({name:file.name,data:String(reader.result),size:file.size,type:file.type||'application/octet-stream',audio:false,base64:true});
             });
             reader.addEventListener('error',()=>reject(new Error(`Could not read ${file.name}`)));
             reader.readAsDataURL(file);
@@ -121,9 +96,7 @@
         if(!selected.length) return;
 
         const available=MAX_FILES-pendingFiles.length;
-        if(selected.length>available){
-            alert(`You can attach up to ${MAX_FILES} files.`);
-        }
+        if(selected.length>available) alert(`You can attach up to ${MAX_FILES} files.`);
 
         const files=selected.slice(0,Math.max(0,available));
         for(const file of files){
@@ -137,19 +110,14 @@
         renderRows();
         const startIndex=pendingFiles.length;
         const added=window.__chatUploadFiles.slice(startIndex);
-
         if(send) send.disabled=true;
 
         try{
-            for(let i=0;i<added.length;i++){
-                const result=await readFile(added[i],startIndex+i);
-                pendingFiles.push(result);
-            }
+            for(let i=0;i<added.length;i++) pendingFiles.push(await readFile(added[i],startIndex+i));
         }catch(error){
             alert(error.message||'Could not prepare the file.');
         }finally{
             if(send) send.disabled=false;
-            renderRows();
             input.value='';
         }
     }
