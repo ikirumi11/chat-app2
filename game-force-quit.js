@@ -1,24 +1,132 @@
 (()=>{'use strict';
-const PREFIX='__CHAT_GAME_STATE__:',POLL=900,missLimit=3;
-let deviceId=localStorage.getItem('chat_device_id')||'',lastStateId=null,misses=0,button=null,currentState=null;
-function dev(){if(!deviceId){deviceId=crypto.randomUUID?crypto.randomUUID():'game-'+Date.now()+'-'+Math.random();localStorage.setItem('chat_device_id',deviceId)}return deviceId}
-function channel(){return window.CHANNEL||'general'}
-async function getMessages(){try{const r=await fetch(`/api/messages?channel=${encodeURIComponent(channel())}&_game_force_quit=${Date.now()}`,{cache:'no-store'});if(!r.ok)return[];const d=await r.json();return Array.isArray(d.messages)?d.messages:[]}catch{return[]}}
-function parse(row){if(!row||row.username!=='__GAME_SERVER__'||typeof row.message!=='string'||!row.message.startsWith(PREFIX))return null;try{return JSON.parse(row.message.slice(PREFIX.length))}catch{return null}}
-function stateId(s,row){return String(s?.id||s?.gameId||s?.gameID||s?.game_id||row?.id||'').trim()}
-function isHost(s){const h=String(s?.hostDeviceId||s?.hostDeviceID||s?.host_device_id||'');return !!h&&h===dev()}
-function closeGameUI(){
-  document.querySelectorAll('.game-play-overlay,.game-overlay,.game-modal,[data-game-overlay]').forEach(el=>{try{el.remove()}catch{}});
-  document.querySelectorAll('.game-actions button,.game-toolbar button').forEach(b=>{const t=(b.textContent||'').toLowerCase();if(/leave|close|exit|stop|cancel/.test(t)){try{b.click()}catch{}}});
-  window.dispatchEvent(new CustomEvent('chat-game-force-quit'));
+const POLL=700;
+let deviceId=localStorage.getItem('chat_device_id')||'';
+let stopping=new Set();
+
+function dev(){
+    if(!deviceId){
+        deviceId=crypto.randomUUID?crypto.randomUUID():'game-'+Date.now()+'-'+Math.random();
+        localStorage.setItem('chat_device_id',deviceId);
+    }
+    return deviceId;
 }
-function ensureStyle(){if(document.getElementById('game-force-quit-style'))return;const s=document.createElement('style');s.id='game-force-quit-style';s.textContent='.game-force-quit{position:fixed;right:18px;bottom:18px;z-index:25000;border:1px solid #8e3947;background:#a63f4b;color:#fff;border-radius:10px;padding:11px 15px;font-weight:800;cursor:pointer;box-shadow:0 12px 35px rgba(0,0,0,.35)}.game-force-quit:hover{filter:brightness(1.08)}';document.head.appendChild(s)}
-function removeButton(){if(button){button.remove();button=null}}
-async function forceQuit(){if(!currentState)return;const id=stateId(currentState,currentState.__row);if(!id)return;button&&(button.disabled=true,button.textContent='Stopping…');try{const r=await fetch('/api/messages',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({game_server:true,game_action:'stop',channel:channel(),device_id:dev(),game_id:id})});if(!r.ok){let d={};try{d=await r.json()}catch{}throw Error(d.error||'Could not stop the game.')}closeGameUI();removeButton();}catch(e){if(button){button.disabled=false;button.textContent='⏹ Force quit for everyone'}alert(e.message||'Could not stop the game.')}}
-function showButton(s,row){if(isHost(s)){removeButton();return}ensureStyle();if(!button){button=document.createElement('button');button.type='button';button.className='game-force-quit';button.textContent='⏹ Force quit for everyone';button.onclick=forceQuit;document.body.appendChild(button)}currentState=s;s.__row=row;button.disabled=false;button.title=`Stop ${s.name||s.gameType||'this game'} for everyone`}
-function tick(){getMessages().then(ms=>{let found=null;for(let i=ms.length-1;i>=0;i--){const s=parse(ms[i]);if(s){found={s,row:ms[i]};break}}
- if(found){misses=0;const id=stateId(found.s,found.row);currentState=found.s;currentState.__row=found.row;if(id!==lastStateId){lastStateId=id}showButton(found.s,found.row);return}
- if(lastStateId){misses++;if(misses>=missLimit){lastStateId=null;currentState=null;removeButton();closeGameUI();misses=0}}
- }).catch(()=>{});}
-ensureStyle();dev();tick();setInterval(tick,POLL);
+
+function channel(){
+    return window.CHANNEL||'general';
+}
+
+function ensureStyle(){
+    if(document.getElementById('game-force-quit-style'))return;
+    const s=document.createElement('style');
+    s.id='game-force-quit-style';
+    s.textContent=`
+        .game-force-quit-row{display:flex;justify-content:center;margin-top:12px;}
+        .game-force-quit-btn{border:1px solid #8e3947;background:#a63f4b;color:#fff;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;}
+        .game-force-quit-btn:hover{filter:brightness(1.08);}
+        .game-force-quit-btn:disabled{opacity:.65;cursor:wait;}
+    `;
+    document.head.appendChild(s);
+}
+
+async function forceQuit(game,button){
+    if(!game?.id||stopping.has(game.id))return;
+    stopping.add(game.id);
+    if(button){
+        button.disabled=true;
+        button.textContent='Stopping…';
+    }
+
+    try{
+        const response=await fetch('/api/messages',{
+            method:'POST',
+            cache:'no-store',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                game_server:true,
+                game_action:'stop',
+                channel:channel(),
+                device_id:dev(),
+                game_id:game.id
+            })
+        });
+
+        let data={};
+        try{data=await response.json();}catch{}
+        if(!response.ok)throw new Error(data.error||'Could not stop the game.');
+
+        if(Array.isArray(window.games)){
+            window.games=window.games.filter(g=>g&&g.id!==game.id);
+        }
+        if(window.stoppedGames&&typeof window.stoppedGames.add==='function'){
+            window.stoppedGames.add(game.id);
+        }
+        if(typeof window.renderMessages==='function')window.renderMessages(false);
+    }catch(error){
+        stopping.delete(game.id);
+        if(button){
+            button.disabled=false;
+            button.textContent='⏹ Force quit for everyone';
+        }
+        alert(error.message||'Could not stop the game.');
+        return;
+    }
+
+    stopping.delete(game.id);
+}
+
+function addButtons(){
+    ensureStyle();
+    const list=Array.isArray(window.games)?window.games:[];
+    const active=new Map(list.filter(g=>g&&g.id&&g.status!=='finished'&&g.status!=='forcequit').map(g=>[g.id,g]));
+
+    document.querySelectorAll('.game-message').forEach(wrapper=>{
+        const raw=wrapper.dataset.id||'';
+        const id=raw.startsWith('game_')?raw.slice(5):raw;
+        const game=active.get(id);
+        if(!game)return;
+
+        const actions=wrapper.querySelector('.game-actions');
+        if(!actions)return;
+
+        actions.querySelectorAll('.game-btn.danger').forEach(btn=>{
+            if((btn.textContent||'').toLowerCase().includes('force quit'))btn.remove();
+        });
+
+        let row=actions.querySelector('.game-force-quit-row');
+        let button=row?.querySelector('.game-force-quit-btn');
+        if(!row){
+            row=document.createElement('div');
+            row.className='game-force-quit-row';
+            button=document.createElement('button');
+            button.type='button';
+            button.className='game-btn danger game-force-quit-btn';
+            button.textContent='⏹ Force quit for everyone';
+            row.appendChild(button);
+            actions.appendChild(row);
+        }
+
+        button.disabled=stopping.has(game.id);
+        if(!stopping.has(game.id))button.textContent='⏹ Force quit for everyone';
+        button.onclick=()=>{
+            if(typeof window.openConfirm==='function'){
+                window.openConfirm(
+                    'Force quit game for everyone?',
+                    'This will stop the game for every player, including the host.',
+                    ()=>forceQuit(game,button)
+                );
+            }else if(confirm('Force quit this game for everyone?')){
+                forceQuit(game,button);
+            }
+        };
+    });
+}
+
+function tick(){
+    addButtons();
+}
+
+ensureStyle();
+dev();
+tick();
+setInterval(tick,POLL);
 })();
