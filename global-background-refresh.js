@@ -1,6 +1,11 @@
 (() => {
   'use strict';
 
+  const p2pScript=document.createElement('script');
+  p2pScript.src='./p2p-backup.js?v=1';
+  p2pScript.async=false;
+  document.head.appendChild(p2pScript);
+
   const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxr1kygpsBA_ksVaCPblX-8i0yIVlrW6AxNwrm1tKRfDfF9xFtBN1wz4cUm0MhTOhRO/exec';
   const CACHE_KEY = 'chatGlobalBackground.cache.v8';
   const CHECK_INTERVAL = 10000;
