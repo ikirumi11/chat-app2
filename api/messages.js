@@ -1,7 +1,7 @@
 (() => {
 "use strict";
 
-const GOOGLE_APPS_SCRIPT_URL = window.CHAT_GOOGLE_APPS_SCRIPT_URL || localStorage.getItem("chat_google_apps_script_url") || "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+const GOOGLE_APPS_SCRIPT_URL = window.CHAT_GOOGLE_APPS_SCRIPT_URL || localStorage.getItem("chat_google_apps_script_url") || "https://script.google.com/macros/s/AKfycbygvXPJ1c1qAcTTCfakM7LHK1DnCYUxP7f73DF6mk04GjvQtvP4_iSL2u1x2pzgAyh8/exec";
 const API_URL = GOOGLE_APPS_SCRIPT_URL;
 const ORIGINAL_FETCH = window.fetch.bind(window);
 
