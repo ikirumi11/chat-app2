@@ -100,6 +100,13 @@
 
         const files=selected.slice(0,Math.max(0,available));
         for(const file of files){
+            const type=(file.type||'').toLowerCase();
+            const isImage=type.startsWith('image/');
+            const isVideo=type.startsWith('video/');
+            if(!isImage&&!isVideo){
+                alert('Only images and videos can be sent.');
+                continue;
+            }
             if(file.size>MAX_SIZE){
                 alert(`${file.name} is too large. Maximum size is 5 MB.`);
                 continue;
