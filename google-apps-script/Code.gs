@@ -235,13 +235,24 @@ function post_(body) {
   const files = Array.isArray(body.files) ? body.files.slice(0,5) : [];
 
   if (!username) throw new Error("Username is required.");
-  if (!message && !image && !files.length) throw new Error("Message, image, or files are required.");
-  if (image && image.length > 45000) throw new Error("Images are too large for Google Sheets storage.");
+  if (!message && !image && !files.length) throw new Error("Message, image, or video is required.");
+
+  if (image) {
+    if (!image.startsWith("data:image/")) throw new Error("Images must be sent as Base64 data URLs.");
+    if (image.length > 45000) throw new Error("Images are too large for Google Sheets storage.");
+  }
 
   for (const file of files) {
-    if (file && typeof file.data === "string" && file.data.length > 45000) {
-      throw new Error("Files over about 32 KB cannot be stored directly in Google Sheets.");
+    if (!file || typeof file !== "object") throw new Error("Invalid media.");
+    const type = String(file.type || "").toLowerCase();
+    const data = typeof file.data === "string" ? file.data : "";
+    const isImage = file.image === true || type.startsWith("image/") || data.startsWith("data:image/");
+    const isVideo = file.video === true || type.startsWith("video/") || data.startsWith("data:video/");
+    if (!isImage && !isVideo) throw new Error("Only images and videos can be sent.");
+    if (!data.startsWith("data:image/") && !data.startsWith("data:video/")) {
+      throw new Error("Media must be sent as Base64 data URLs.");
     }
+    if (data.length > 45000) throw new Error("Media is too large for Google Sheets storage.");
   }
 
   const row = makeRow_({
