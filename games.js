@@ -474,35 +474,31 @@ fileInput.onchange = async () => {
         const isImage = type.startsWith('image/');
         const isVideo = type.startsWith('video/');
 
-        // Images and videos have their own processing rules.
-        if (!isImage && !isVideo && file.size > MAX_FILE_SIZE) {
-            alert(
-                `File "${file.name}" is too large ` +
-                `(${formatFileSize(file.size)}). ` +
-                `Max ${formatFileSize(MAX_FILE_SIZE)}.`
-            );
+        if (!isImage && !isVideo) {
+            alert("Only images and videos can be sent.");
             continue;
         }
 
-        try {
-            let processed;
+        if (isImage && file.size > MAX_FILE_SIZE) {
+            alert(`Image "${file.name}" is too large. Maximum size is ${formatFileSize(MAX_FILE_SIZE)}.`);
+            continue;
+        }
 
-            if (isImage) {
-                processed = await imageToBase64(file);
-            } else if (isVideo) {
-                processed = await compressVideoToBase64(file);
-            } else {
-                processed = {
-                    name: file.name,
-                    data: await readFileAsDataURL(file),
-                    size: file.size,
-                    type: file.type || 'application/octet-stream',
-                    base64: true,
-                    image: false,
-                    video: false
-                };
+        if (isVideo && file.size > MAX_VIDEO_BYTES) {
+            try {
+                const processed = await compressVideoToBase64(file);
+                pendingFiles.push(processed);
+                continue;
+            } catch (error) {
+                alert(`Could not process "${file.name}":\n\n${error.message}`);
+                continue;
             }
+        }
 
+        try {
+            const processed = isImage
+                ? await imageToBase64(file)
+                : await compressVideoToBase64(file);
             pendingFiles.push(processed);
         } catch (error) {
             alert(`Could not process "${file.name}":\n\n${error.message}`);
@@ -1656,24 +1652,6 @@ function createMessageElement(message) {
                 return;
             }
 
-            const isAudio =
-                file.audio === true ||
-                type.startsWith('audio/') ||
-                (typeof file.data === 'string' && file.data.startsWith('data:audio/'));
-
-            if (isAudio && file.data) {
-                const audioWrap=document.createElement("div");
-                audioWrap.className="message-audio";
-                const audio=document.createElement("audio");
-                audio.src=file.data;
-                audio.controls=true;
-                audio.preload="metadata";
-                audioWrap.appendChild(audio);
-                content.appendChild(audioWrap);
-                return;
-            }
-
-            // Videos are shown as previews with controls. They never autoplay.
             const isVideo =
                 file.video === true ||
                 type.startsWith('video/') ||
@@ -1692,7 +1670,8 @@ function createMessageElement(message) {
                 return;
             }
 
-            // Non-image files remain downloadable Base64 data URLs.
+            return;
+
             const fileEl = document.createElement("div");
             fileEl.className = "message-file";
 
