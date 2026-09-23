@@ -8,6 +8,7 @@
 
     const MAX_FILES=5;
     const MAX_SIZE=5*1024*1024;
+    const IMAGE_MAX_SIZE=450;
 
     function formatSize(bytes){
         if(bytes<1024) return `${bytes} B`;
@@ -16,7 +17,7 @@
     }
 
     function escapeHtml(value){
-        return String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
+        return String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");
     }
 
     function addStyle(){
@@ -88,6 +89,86 @@
         });
     }
 
+    function loadImage(file){
+        return new Promise((resolve,reject)=>{
+            const url=URL.createObjectURL(file);
+            const img=new Image();
+            img.onload=()=>{
+                URL.revokeObjectURL(url);
+                resolve(img);
+            };
+            img.onerror=()=>{
+                URL.revokeObjectURL(url);
+                reject(new Error(`Could not read ${file.name} as an image.`));
+            };
+            img.src=url;
+        });
+    }
+
+    function canvasToDataURL(canvas,type,quality){
+        return new Promise((resolve,reject)=>{
+            canvas.toBlob(blob=>{
+                if(!blob){
+                    reject(new Error('Could not convert image.'));
+                    return;
+                }
+                const reader=new FileReader();
+                reader.onload=()=>resolve(reader.result);
+                reader.onerror=()=>reject(new Error('Could not encode image.'));
+                reader.readAsDataURL(blob);
+            },type,quality);
+        });
+    }
+
+    async function imageTo450p(file,index){
+        setProgress(index,10,'Resizing image to 450p');
+        const img=await loadImage(file);
+        const originalWidth=img.naturalWidth||img.width;
+        const originalHeight=img.naturalHeight||img.height;
+
+        const scale=Math.min(1,IMAGE_MAX_SIZE/Math.max(originalWidth,originalHeight));
+        const width=Math.max(1,Math.round(originalWidth*scale));
+        const height=Math.max(1,Math.round(originalHeight*scale));
+
+        const canvas=document.createElement('canvas');
+        canvas.width=width;
+        canvas.height=height;
+
+        const ctx=canvas.getContext('2d',{alpha:true});
+        if(!ctx) throw new Error('Your browser does not support image conversion.');
+
+        const inputType=(file.type||'').toLowerCase();
+        const outputType=inputType==='image/png'?'image/png':'image/jpeg';
+
+        if(outputType==='image/jpeg'){
+            ctx.fillStyle='#ffffff';
+            ctx.fillRect(0,0,width,height);
+        }
+
+        ctx.drawImage(img,0,0,width,height);
+        setProgress(index,70,'Converting to Base64');
+
+        const data=await canvasToDataURL(
+            canvas,
+            outputType,
+            outputType==='image/png'?undefined:0.86
+        );
+
+        setProgress(index,100,'Ready to send');
+
+        return {
+            name:file.name.replace(/\\.[^.]+$/,'')+(outputType==='image/png'?'.png':'.jpg'),
+            data,
+            size:Math.round((data.length-data.indexOf(',')-1)*0.75),
+            type:outputType,
+            base64:true,
+            image:true,
+            width,
+            height,
+            originalSize:file.size
+        };
+    }
+
     async function handleSelection(event){
         event.stopImmediatePropagation();
         ensureState();
@@ -111,6 +192,7 @@
                 alert(`${file.name} is too large. Maximum size is 5 MB.`);
                 continue;
             }
+
             window.__chatUploadFiles.push(file);
         }
 
@@ -120,7 +202,17 @@
         if(send) send.disabled=true;
 
         try{
-            for(let i=0;i<added.length;i++) pendingFiles.push(await readFile(added[i],startIndex+i));
+            for(let i=0;i<added.length;i++){
+                const file=added[i];
+                const index=startIndex+i;
+                const type=(file.type||'').toLowerCase();
+
+                if(type.startsWith('image/')){
+                    pendingFiles.push(await imageTo450p(file,index));
+                }else{
+                    pendingFiles.push(await readFile(file,index));
+                }
+            }
         }catch(error){
             alert(error.message||'Could not prepare the file.');
         }finally{
