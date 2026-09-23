@@ -7,14 +7,14 @@ function handleFastP2PMessage(event) {
     if (message.username === "__GAME_SERVER__" || message.username === "__SYSTEM__") return;
     if (typeof CHANNEL !== "undefined" && message.channel !== CHANNEL) return;
 
-    if (Array.isArray(window.currentMessages)) {
-        const existing = window.currentMessages.findIndex(item => item.id === message.id);
+    if (typeof currentMessages !== "undefined" && Array.isArray(currentMessages)) {
+        const existing = currentMessages.findIndex(item => item.id === message.id);
         if (existing >= 0) {
-            window.currentMessages[existing] = message;
+            currentMessages[existing] = message;
         } else {
-            window.currentMessages.push(message);
+            currentMessages.push(message);
         }
-        window.currentMessages.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+        currentMessages.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
     }
 
     if (typeof renderMessages === "function") {
