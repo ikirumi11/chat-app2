@@ -402,18 +402,28 @@ async function sendToSheets(body) {
 
     const directSent = payload.game_server !== true && broadcastP2P(optimistic.message);
 
-    try {
-        await ORIGINAL_FETCH(API_URL,{
-            method:"POST",
-            mode:"no-cors",
-            headers:{"Content-Type":"text/plain;charset=utf-8"},
-            body:JSON.stringify(payload),
-            keepalive:true
-        });
-    } catch (error) {
-        if (!directSent) throw new Error(error?.message || "Could not send to Google Sheets.");
+    const persistToGoogle = async () => {
+        try {
+            await ORIGINAL_FETCH(API_URL,{
+                method:"POST",
+                mode:"no-cors",
+                headers:{"Content-Type":"text/plain;charset=utf-8"},
+                body:JSON.stringify(payload),
+                keepalive:true
+            });
+            return true;
+        } catch (error) {
+            if (!directSent) throw new Error(error?.message || "Could not send to Google Sheets.");
+            return false;
+        }
+    };
+
+    if (directSent) {
+        persistToGoogle().catch(() => {});
+        return optimistic;
     }
 
+    await persistToGoogle();
     return optimistic;
 }
 
