@@ -448,6 +448,7 @@ function bindConnection(conn,outgoing){
       return;
     }
     conn.send({kind:"hello",from:state.peerId,profile:state.profile,room:state.room});
+    if(state.screenStream)setTimeout(function(){sendScreenToPeer(remoteId)},300);
     if(state.isHost){
       sendRosterTo(conn);
     }else{
@@ -537,8 +538,8 @@ function handleData(data,from,conn){
   if(data.kind==="screen-state"){
     const p=state.members.get(from);
     if(p){p.screening=!!data.active;state.members.set(from,p);renderMembers()}
-    if(data.active)requestScreen(from);
-    else stopRemoteScreen(from);
+    if(data.active && state.screenStream)sendScreenToPeer(from);
+    else if(!data.active)stopRemoteScreen(from);
     relayOnce(data,from);
     return;
   }
@@ -667,7 +668,6 @@ function applyRoster(list){
     if(!p||!p.peerId||p.peerId===state.peerId)return;
     if(p.peerId===state.hostId && !state.isHost)makeConnection(p.peerId);
     else if(p.peerId!==state.hostId && state.peerId<p.peerId)makeConnection(p.peerId);
-    if(p.screening)requestScreen(p.peerId);
   });
   renderMembers();
 }
@@ -822,22 +822,21 @@ async function startScreen(){
     sendAll(event);
     setScreenButton(true);
     addSystem(state.profile.name+" is sharing a screen.");
-    requestAllScreens();
+    state.connections.forEach(function(c,peerId){
+      if(c.open)sendScreenToPeer(peerId);
+    });
   }catch(err){
     if(err && err.name!=="AbortError")toast("Screen sharing was blocked or unavailable.");
   }
 }
 
-function requestAllScreens(){
-  state.members.forEach(function(p){
-    if(p.peerId!==state.peerId && p.screening)requestScreen(p.peerId);
-  });
-}
-
-function requestScreen(peerId){
-  if(!peerId||peerId===state.peerId||state.screenCalls.has(peerId))return;
+function sendScreenToPeer(peerId){
+  if(!state.screenStream||!peerId||peerId===state.peerId)return;
+  const existing=state.screenCalls.get(peerId);
+  if(existing && existing.open)return;
   try{
-    const call=state.peer.call(peerId,undefined,{metadata:{type:"screen-request"}});
+    const call=state.peer.call(peerId,state.screenStream,{metadata:{type:"screen-share",room:state.room}});
+    if(!call)return;
     state.screenCalls.set(peerId,call);
     bindScreenCall(call,peerId);
   }catch(e){}
@@ -847,18 +846,17 @@ function bindScreenCall(call,peerId){
   call.on("stream",function(stream){
     showRemoteScreen(peerId,stream);
   });
-  call.on("close",function(){stopRemoteScreen(peerId)});
+  call.on("close",function(){
+    if(!state.screenStream)stopRemoteScreen(peerId);
+    state.screenCalls.delete(peerId);
+  });
   call.on("error",function(){state.screenCalls.delete(peerId)});
 }
 
 function handleIncomingCall(call){
   const meta=call.metadata||{};
-  if(meta.type==="screen-request"){
-    if(state.screenStream){
-      try{call.answer(state.screenStream)}catch(e){}
-    }else{
-      try{call.answer()}catch(e){}
-    }
+  if(meta.type==="screen-share"){
+    try{call.answer()}catch(e){}
     bindScreenCall(call,call.peer);
     return;
   }
