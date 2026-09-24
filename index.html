@@ -478,6 +478,10 @@ function bindConnection(conn,outgoing){
 
 function handleData(data,from,conn){
   if(!data || typeof data!=="object")return;
+  if(data.id && data.kind!=="file-chunk" && data.kind!=="roster" && data.kind!=="hello"){
+    if(state.seen.has(data.id))return;
+    state.seen.add(data.id);
+  }
   if(data.kind==="hello"){
     if(data.room!==state.room)return;
     const profile=Object.assign({},data.profile,{peerId:from});
@@ -547,11 +551,6 @@ function handleData(data,from,conn){
 }
 
 function relayOnce(data,from){
-  const id=data.id||("");
-  if(id){
-    if(state.seen.has(id))return;
-    state.seen.add(id);
-  }
   state.connections.forEach(function(c,pid){
     if(pid!==from && c.open){
       try{c.send(data)}catch(e){}
@@ -586,8 +585,7 @@ function sendMessageText(text){
 }
 
 function receiveMessage(message,from){
-  if(!message||state.seen.has(message.id))return;
-  state.seen.add(message.id);
+  if(!message)return;
   state.messages.push(message);
   renderMessages();
 }
@@ -749,7 +747,7 @@ async function sendImage(file){
       $("modalProgress").style.width=pct+"%";
       await new Promise(function(r){setTimeout(r,0)});
     }
-    const doneMsg={kind:"file-end",id:id};
+    const doneMsg={kind:"file-end",id:crypto.randomUUID(),transferId:id};
     sendAll(doneMsg);
     const ownDataUrl=dataUrl;
     state.messages.push({id:id+"-chat",type:"image",senderId:state.peerId,sender:state.profile.name,avatar:state.profile.avatar,avatarIndex:state.profile.avatarIndex,fileName:file.name||"image.jpg",dataUrl:ownDataUrl,time:meta.time});
@@ -774,7 +772,8 @@ function appendIncomingChunk(data,from){
 }
 
 async function finishIncomingFile(data,from){
-  const f=state.incomingFiles.get(data.id);
+  const transferId=data.transferId;
+  const f=state.incomingFiles.get(transferId);
   if(!f||f.from!==from)return;
   state.incomingFiles.delete(data.id);
   const buffer=new Uint8Array(f.received);
@@ -1013,6 +1012,15 @@ function loadImage(src){
 }
 
 $("savePdf").addEventListener("click",savePdf);
+
+window.addEventListener("beforeunload",function(){
+  try{
+    if(state.screenStream)state.screenStream.getTracks().forEach(function(t){t.stop()});
+    const leave={kind:"leave",id:crypto.randomUUID()};
+    sendAll(leave);
+    if(state.peer)state.peer.destroy();
+  }catch(e){}
+});
 
 $("copyRoom").addEventListener("click",async function(){
   try{await navigator.clipboard.writeText(state.room);toast("Room code copied.");}
