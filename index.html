@@ -775,7 +775,7 @@ async function finishIncomingFile(data,from){
   const transferId=data.transferId;
   const f=state.incomingFiles.get(transferId);
   if(!f||f.from!==from)return;
-  state.incomingFiles.delete(data.id);
+  state.incomingFiles.delete(transferId);
   const buffer=new Uint8Array(f.received);
   let pos=0;
   f.chunks.forEach(function(c){buffer.set(c,pos);pos+=c.length});
@@ -910,7 +910,7 @@ function setScreenButton(active){
 }
 
 function maybeRequestScreen(peerId,profile){
-  if(profile&&profile.screening)setTimeout(function(){requestScreen(peerId)},500);
+  if(profile&&profile.screening && state.screenStream)setTimeout(function(){sendScreenToPeer(peerId)},500);
 }
 
 $("sendBtn").addEventListener("click",function(){
