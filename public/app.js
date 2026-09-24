@@ -15,8 +15,8 @@ const state={
   peers:new Map(),messages:[],seen:new Set(),incoming:new Map(),screen:null,screenPeers:new Map(),pendingIce:new Map(),reconnectTimer:null
 };
 
-function esc(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",""":"&quot;","'":"&#039;"}[c]))}
-function initials(n){const p=String(n||"?").trim().split(/\\s+/).slice(0,2);return p.map(x=>x[0]).join("").toUpperCase()||"?"}
+function esc(v){return String(v).replace(/[&<>"]/g,c=>c==="&"?"&amp;":c==="<"?"&lt;":c===">"?"&gt;":c.charCodeAt(0)===34?"&quot;":"").replace(/'/g,"&#039;")}
+function initials(n){const p=String(n||"?").trim().split(/\s+/).slice(0,2);return p.map(x=>x[0]).join("").toUpperCase()||"?"}
 function avatarHtml(p,extra){p=p||{};extra=extra||"";if(p.avatar)return '<div class="avatar '+extra+'"><img src="'+p.avatar+'" alt=""></div>';const g=AVATARS[(Number(p.avatarIndex)||1)-1]||AVATARS[0];return '<div class="avatar '+extra+'" style="background:linear-gradient(135deg,'+g[0]+','+g[1]+')">'+esc(initials(p.name))+"</div>"}
 function toast(text){const e=$("toast");e.textContent=text;e.classList.add("show");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("show"),2400)}
 function setConnect(text,kind){$("connectText").textContent=text;$("connectDot").className="state-dot "+(kind||"")}
@@ -331,9 +331,9 @@ async function savePdf(){
 $("avatarFileBtn").onclick=()=>$("avatarFile").click();
 $("avatarFile").onchange=async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(f.size>6*1024*1024)return toast("Choose a PFP under 6 MB.");try{state.profile.avatar=await fileToDataUrl(f,320);updateAvatarPreview()}catch{toast("Could not use that image.")}};
 $("randomAvatar").onclick=()=>{state.profile.avatar="";state.profile.avatarIndex=Math.floor(Math.random()*AVATARS.length)+1;updateAvatarPreview()};
-$("name").oninput=()=>{state.profile.name=$("name").value.trim().replace(/\\s+/g," ").slice(0,28);updateAvatarPreview()};
+$("name").oninput=()=>{state.profile.name=$("name").value.trim().replace(/\s+/g," ").slice(0,28);updateAvatarPreview()};
 function updateAvatarPreview(){const p={name:$("name").value||"?",avatar:state.profile.avatar,avatarIndex:state.profile.avatarIndex};$("avatarPreview").outerHTML='<div id="avatarPreview" class="avatar xl">'+(p.avatar?'<img src="'+p.avatar+'" alt="">':'<span>'+esc(initials(p.name))+'</span>')+"</div>"}
-$("enterBtn").onclick=()=>{state.profile.name=$("name").value.trim().replace(/\\s+/g," ").slice(0,28);if(!state.profile.name)return toast("Enter a username.");state.entered=true;$("setup").classList.add("hidden");$("app").classList.remove("hidden");connectSignaling();setTop("Connecting peers...",false)};
+$("enterBtn").onclick=()=>{state.profile.name=$("name").value.trim().replace(/\s+/g," ").slice(0,28);if(!state.profile.name)return toast("Enter a username.");state.entered=true;$("setup").classList.add("hidden");$("app").classList.remove("hidden");connectSignaling();setTop("Connecting peers...",false)};
 $("sendBtn").onclick=()=>{sendMessage($("messageInput").value);$("messageInput").value="";resizeInput()};
 $("messageInput").onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("sendBtn").click()}resizeInput()};
 function resizeInput(){const e=$("messageInput");e.style.height="auto";e.style.height=Math.min(150,Math.max(42,e.scrollHeight))+"px"}
