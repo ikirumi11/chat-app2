@@ -490,7 +490,7 @@ function handleData(data,from,conn){
     if(state.isHost){
       broadcastRoster();
     }
-    maybeRequestScreen(from,profile);
+    if(profile.screening && state.screenStream)setTimeout(function(){sendScreenToPeer(from)},300);
     renderMembers();
     return;
   }
@@ -505,8 +505,8 @@ function handleData(data,from,conn){
       const p=Object.assign({},data.profile,{peerId:from});
       state.members.set(from,p);
       renderMembers();
-      if(p.screening)requestScreen(from);
-      else stopRemoteScreen(from);
+      if(p.screening && state.screenStream)setTimeout(function(){sendScreenToPeer(from)},300);
+      else if(!p.screening)stopRemoteScreen(from);
     }
     relayOnce(data,from);
     return;
@@ -907,10 +907,6 @@ function stopScreen(){
 function setScreenButton(active){
   $("screenBtn").innerHTML=active?"■ <span>Stop sharing</span>":"▣ <span>Share screen</span>";
   $("shareScreenTool").textContent=active?"■ Stop sharing":"▣ Share screen";
-}
-
-function maybeRequestScreen(peerId,profile){
-  if(profile&&profile.screening && state.screenStream)setTimeout(function(){sendScreenToPeer(peerId)},500);
 }
 
 $("sendBtn").addEventListener("click",function(){
