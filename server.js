@@ -10,7 +10,7 @@ const peers=new Map();
 const mime={".html":"text/html; charset=utf-8",".js":"text/javascript; charset=utf-8",".css":"text/css; charset=utf-8",".json":"application/json; charset=utf-8",".svg":"image/svg+xml",".png":"image/png",".jpg":"image/jpeg",".jpeg":"image/jpeg",".ico":"image/x-icon"};
 
 function cleanProfile(p){
-  const name=String(p&&p.name||"Guest").replace(/s+/g," ").trim().slice(0,28)||"Guest";
+  const name=String(p&&p.name||"Guest").replace(/\s+/g," ").trim().slice(0,28)||"Guest";
   const avatar=typeof(p&&p.avatar)==="string"&&p.avatar.length<900000?p.avatar:"";
   const avatarIndex=Math.max(1,Math.min(8,Number(p&&p.avatarIndex)||1));
   return {name,avatar,avatarIndex,sharing:!!(p&&p.sharing)};
