@@ -223,8 +223,7 @@ async function sendFileBuffer(buffer,meta){
   const chunkSize=32*1024,total=Math.ceil(buffer.byteLength/chunkSize);
   for(let i=0;i<total;i++){
     const part=buffer.slice(i*chunkSize,Math.min(buffer.byteLength,(i+1)*chunkSize));
-    const head=new TextEncoder().encode(JSON.stringify({t:"chunk",id:id})+"
-");
+    const head=new TextEncoder().encode(JSON.stringify({t:"chunk",id:id})+"\\n");
     const merged=new Uint8Array(head.byteLength+part.byteLength);merged.set(head);merged.set(new Uint8Array(part),head.byteLength);broadcastBytes(merged.buffer);
     await new Promise(r=>setTimeout(r,0))
   }
@@ -316,8 +315,7 @@ async function savePdf(){
   for(const item of state.messages){
     const time=new Date(item.time).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
     if(item.type==="text"){
-      const lines=doc.splitTextToSize(item.sender+" · "+time+"
-"+item.text,w-m*2-20),bh=19+lines.length*13;
+      const lines=doc.splitTextToSize(item.sender+" · "+time+"\\n"+item.text,w-m*2-20),bh=19+lines.length*13;
       if(y+bh>h-42){doc.addPage();y=48}
       doc.setFillColor(244,246,249);doc.roundedRect(m,y,w-m*2,bh,8,8,"F");doc.setFont("helvetica","normal");doc.setFontSize(9);doc.setTextColor(70,80,96);doc.text(lines,m+10,y+15,{lineHeightFactor:1.25});doc.setTextColor(18,22,28);y+=bh+8
     }else if(item.type==="image"&&item.dataUrl){
