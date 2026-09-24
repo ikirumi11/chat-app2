@@ -2,7 +2,8 @@
 "use strict";
 
 const $=id=>document.getElementById(id);
-const WS_URL=(location.protocol==="https:"?"wss://":"ws://")+location.host+"/signal";
+const configuredSignal=(window.DROPLINK_SIGNAL_SERVER||"").trim().replace(/\/$/,"");
+const WS_URL=configuredSignal?(configuredSignal.replace(/^http:/,"ws:").replace(/^https:/,"wss:")+"/signal"):(location.protocol==="https:"?"wss://":"ws://")+location.host+"/signal";
 const ICE_SERVERS=[
   {urls:"stun:stun.cloudflare.com:3478"},
   {urls:"stun:stun.l.google.com:19302"},
