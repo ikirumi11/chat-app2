@@ -1,1 +1,0 @@
-window.DROPLINK_SIGNAL_SERVER="";
