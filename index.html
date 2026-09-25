@@ -26,13 +26,13 @@ input{border:1px solid var(--line);background:#0d0f15;color:white;border-radius:
 </head>
 <body>
 <div id="join" class="panel"><div class="card"><div class="heroLogo">✦</div><h1>Chat App 2</h1><p>Fast browser-to-browser chat with text, images, videos and files. Media is sent through the connected WebRTC peers.</p><input id="name" maxlength="30" placeholder="Your name"><div class="row"><input id="room" maxlength="40" placeholder="Room code"><button id="joinBtn">Join room</button></div><div class="small">Use the same room code on each browser. Signaling only helps peers find each other.</div></div></div>
-<div id="app" class="app hidden"><header class="top"><div class="brand"><div class="logo">✦</div><div><div class="title">Chat App 2</div><div id="status" class="status">Connecting…</div></div></div><div class="topActions"><button id="copyBtn" class="ghost">Copy room</button><button id="leaveBtn" class="ghost">Leave</button></div></header><div class="room"><input id="roomDisplay" readonly><button id="copyRoomBtn">Copy</button></div><main id="messages" class="messages"><div class="empty"><div><div class="emptyIcon">✦</div><div>Join the room from another browser to start chatting.</div></div></div></main><form id="send" class="send"><input id="fileInput" type="file" multiple accept="image/*,video/*,*/*" class="hidden"><button type="button" id="attachBtn" class="attach" title="Send files">＋</button><input id="message" autocomplete="off" placeholder="Write a message…"><button class="sendBtn">Send</button></form></div><div id="toast" class="toast"></div>
+<div id="app" class="app hidden"><header class="top"><div class="brand"><div class="logo">✦</div><div><div class="title">Chat App 2</div><div id="status" class="status">Connecting…</div></div></div><div class="topActions"><button id="copyBtn" class="ghost">Copy room</button><button id="leaveBtn" class="ghost">Leave</button></div></header><div class="room"><input id="roomDisplay" readonly><span id="peerCount" style="display:flex;align-items:center;padding:0 10px;color:#9da3b2;font-size:13px;white-space:nowrap">0/11 peers</span><button id="copyRoomBtn">Copy</button></div><main id="messages" class="messages"><div class="empty"><div><div class="emptyIcon">✦</div><div>Join the room from another browser to start chatting.</div></div></div></main><form id="send" class="send"><input id="fileInput" type="file" multiple accept="image/*,video/*,*/*" class="hidden"><button type="button" id="attachBtn" class="attach" title="Add files">＋</button><input id="message" autocomplete="off" placeholder="Write a message…"><button class="sendBtn">Send</button></form></div><div id="toast" class="toast"></div>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
-const $=id=>document.getElementById(id);let peer=null,room="",name="",connections=new Map(),transfers=new Map();const CHUNK=48*1024;
+const $=id=>document.getElementById(id);let peer=null,room="",name="",connections=new Map(),transfers=new Map(),pendingFiles=[],seen=new Set();const CHUNK=48*1024;
 const clean=s=>String(s||"").trim().replace(/[^a-zA-Z0-9_-]/g,"-").slice(0,40),formatSize=n=>n<1024?n+" B":n<1048576?(n/1024).toFixed(1)+" KB":n<1073741824?(n/1048576).toFixed(1)+" MB":(n/1073741824).toFixed(1)+" GB";
 function toast(t){$("toast").textContent=t;$("toast").classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>$("toast").classList.remove("show"),1800)}
-function setStatus(){let n=connections.size;$("status").textContent=n?n+" peer"+(n===1?"":"s")+" connected":"Waiting for peers"}
+function setStatus(){let n=connections.size;$("status").textContent=n?n+" peer"+(n===1?"":"s")+" connected":"Waiting for peers";$("peerCount").textContent=n+"/11 peers"}
 function scroll(){let b=$("messages");b.scrollTop=b.scrollHeight}
 function renderFile(f){
  let card=document.createElement("div");card.className="fileCard",url=URL.createObjectURL(f.blob);
@@ -46,7 +46,7 @@ function addMessage(d,mine=false){
 function broadcast(d,except){for(let [id,c] of connections)if(id!==except&&c.open)try{c.send(d)}catch(e){}}
 function receiveChunk(d,from){
  let t=transfers.get(d.id);if(!t){t={name:d.name,size:d.size,type:d.mime,chunks:[],received:0,total:d.total};transfers.set(d.id,t)}
- t.chunks[d.index]=d.chunk;t.received++;broadcast(d,from);
+ let key=d.id+":"+d.index;if(seen.has(key))return;seen.add(key);t.chunks[d.index]=d.chunk;t.received++;broadcast(d,from);
  if(d.end){let blob=new Blob(t.chunks,{type:t.type||"application/octet-stream"});transfers.delete(d.id);addMessage({name:d.sender||"Guest",file:{name:t.name,size:t.size,type:t.type,blob}},false)}
 }
 async function sendFile(file){
@@ -55,8 +55,10 @@ async function sendFile(file){
  let msg=$("messages").lastElementChild,bar=document.createElement("div");bar.className="progress";let i=document.createElement("i");bar.append(i);msg.querySelector(".fileCard").append(bar);
  for(let n=0;n<total;n++){let chunk=await file.slice(n*CHUNK,(n+1)*CHUNK).arrayBuffer();broadcast({type:"file",id,name:file.name,size:file.size,mime:file.type,total,index:n,chunk,sender:name,end:n===total-1});i.style.width=((n+1)/total*100)+"%";await new Promise(r=>setTimeout(r,0))}setTimeout(()=>bar.remove(),500)
 }
+function sendPendingFiles(){let files=pendingFiles.splice(0);files.forEach(sendFile)}
+function addPeerPing(){broadcast({type:"ping",id:name+"-"+Date.now()})}
 function attach(c){
- connections.set(c.peer,c);setStatus();c.on("open",()=>{setStatus();try{c.send({type:"hello",name})}catch(e){}});c.on("data",d=>{if(d.type==="hello"){if(d.name)addMessage({name:d.name,text:"joined the room"});return}if(d.type==="chat"){addMessage(d);broadcast(d,c.peer);return}if(d.type==="file"){receiveChunk(d,c.peer)}});c.on("close",()=>{connections.delete(c.peer);setStatus()});c.on("error",()=>{connections.delete(c.peer);setStatus()})
+ connections.set(c.peer,c);setStatus();c.on("open",()=>{setStatus();try{c.send({type:"hello",name})}catch(e){}});c.on("data",d=>{if(d.type==="hello"){if(d.name)addMessage({name:d.name,text:"joined the room"});try{c.send({type:"pong",name})}catch(e){}return}if(d.type==="ping"){try{c.send({type:"pong",name})}catch(e){}return}if(d.type==="pong"){return}if(d.type==="chat"){let key="chat:"+d.id;if(seen.has(key))return;seen.add(key);addMessage(d);broadcast(d,c.peer);return}if(d.type==="file"){receiveChunk(d,c.peer)}});c.on("close",()=>{connections.delete(c.peer);setStatus()});c.on("error",()=>{connections.delete(c.peer);setStatus()})
 }
 function connectTo(id){if(!peer||id===peer.id||connections.has(id))return;attach(peer.connect(id,{reliable:true}))}
 function start(){
@@ -68,14 +70,17 @@ function start(){
   const available=slots.filter(x=>!tried.has(x));if(!available.length){toast("Room is full");return}
   const id=available[Math.floor(Math.random()*available.length)];tried.add(id);
   peer=new Peer(id,{host:"0.peerjs.com",port:443,path:"/",secure:true});
-  peer.on("open",myId=>{setStatus();slots.filter(x=>x!==myId).forEach(connectTo);localStorage.setItem("p2p-last-room",room)});
+  peer.on("open",myId=>{setStatus();slots.filter(x=>x!==myId).forEach(connectTo);localStorage.setItem("p2p-last-room",room);setInterval(()=>{slots.filter(x=>x!==peer.id).forEach(connectTo)},1000)});
   peer.on("connection",attach);
   peer.on("error",e=>{if(e.type==="unavailable-id"){trySlot();return}toast("Connection error: "+e.type);$("status").textContent="Connection error"});
  }
  trySlot();
 }
 $("joinBtn").onclick=start;$("room").addEventListener("keydown",e=>{if(e.key==="Enter")start()});
-$("send").onsubmit=e=>{e.preventDefault();let text=$("message").value.trim();if(!text)return;let d={type:"chat",name,text,time:Date.now()};addMessage(d,true);broadcast(d);$("message").value="";$("message").focus()};
-$("attachBtn").onclick=()=>$("fileInput").click();$("fileInput").onchange=e=>{[...e.target.files].forEach(sendFile);e.target.value=""};
+$("send").onsubmit=e=>{e.preventDefault();let text=$("message").value.trim();if(!text)return;let d={type:"chat",id:name+"-"+Date.now()+"-"+Math.random().toString(36).slice(2),name,text,time:Date.now()};seen.add("chat:"+d.id);addMessage(d,true);broadcast(d);$("message").value="";$("message").focus()};
+$("attachBtn").onclick=()=>$("fileInput").click();$("fileInput").onchange=e=>{pendingFiles.push(...e.target.files);$("message").placeholder=pendingFiles.length?pendingFiles.length+" file"+(pendingFiles.length===1?"":"s")+" ready — add a message or press Send":"Write a message…";e.target.value=""};
+$("send").addEventListener("submit",()=>setTimeout(sendPendingFiles,0));
+setInterval(()=>{if(peer&&peer.open){slotsForRoom().forEach(connectTo)}},1000);
+function slotsForRoom(){return Array.from({length:12},(_,i)=>"p2p-chat-"+room+"-"+i)}
 async function copyRoom(){try{await navigator.clipboard.writeText(room);toast("Room code copied")}catch(e){toast(room)}}$("copyBtn").onclick=copyRoom;$("copyRoomBtn").onclick=copyRoom;$("leaveBtn").onclick=()=>location.reload();
 </script></body></html>
