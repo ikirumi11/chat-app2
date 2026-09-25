@@ -2,7 +2,7 @@ import React,{useEffect,useRef,useState}from"react";
 import{createRoot}from"react-dom/client";
 import*as Y from"yjs";
 import{WebrtcProvider}from"y-webrtc";
-import Message from"./Message.js";
+import Message from"./Message.jsx";
 
 const defaults={showTyping:true,chatSize:"normal",ttsEnabled:true,ttsVoice:"",ttsRate:1,ttsPitch:1,sttLanguage:"en-US",showScreens:true};
 const themes={light:{bgColor:"#f4f5fa",chatBg:"#fff",textColor:"#20243a",headerBg:"#5548cf",headerText:"#fff",messageBg:"#f1f2f8",messageOwnBg:"#5548cf",messageOwnText:"#fff",borderColor:"#e4e6ef",inputBg:"#fff",linkColor:"#5548cf"},dark:{bgColor:"#171923",chatBg:"#222532",textColor:"#e8eaf2",headerBg:"#2b2e3b",headerText:"#fff",messageBg:"#303443",messageOwnBg:"#665bd7",messageOwnText:"#fff",borderColor:"#393d4d",inputBg:"#2a2e3c",linkColor:"#b9b2ff"},full:{bgColor:"#0a0b10",chatBg:"#15161d",textColor:"#f1f1f5",headerBg:"#1e1f28",headerText:"#fff",messageBg:"#24252e",messageOwnBg:"#4941aa",messageOwnText:"#fff",borderColor:"#2d2e38",inputBg:"#1b1c24",linkColor:"#c4beff"}};
