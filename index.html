@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P2P Browser Chat</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#101116;color:#f4f4f6;font-family:system-ui,-apple-system,Segoe UI,sans-serif;height:100vh}button,input{font:inherit}button{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;background:#635bff;color:white}button:hover{filter:brightness(1.1)}input{width:100%;padding:12px;border:1px solid #30323b;border-radius:10px;background:#181a21;color:white;outline:0}input:focus{border-color:#635bff}.app{height:100%;display:flex;flex-direction:column;max-width:900px;margin:auto}.top{padding:16px;border-bottom:1px solid #292b33;display:flex;align-items:center;justify-content:space-between;gap:12px}.title{font-size:19px;font-weight:700}.status{font-size:12px;color:#9da1ad}.room{padding:14px;border-bottom:1px solid #292b33;display:flex;gap:10px}.room input{max-width:260px}.messages{flex:1;overflow:auto;padding:18px}.msg{margin:0 0 12px;max-width:75%;padding:10px 13px;border-radius:14px;background:#1b1d25}.msg.mine{margin-left:auto;background:#5148d9}.name{font-size:11px;opacity:.65;margin-bottom:3px}.text{white-space:pre-wrap;word-break:break-word}.empty{height:100%;display:grid;place-items:center;color:#777b87;text-align:center}.send{padding:14px;border-top:1px solid #292b33;display:flex;gap:10px}.send input{flex:1}.panel{position:fixed;inset:0;background:#101116;display:grid;place-items:center;padding:20px}.card{width:min(430px,100%);background:#181a21;border:1px solid #2c2f39;border-radius:18px;padding:24px}.card h1{margin:0 0 8px}.card p{color:#a5a8b3;line-height:1.5}.row{display:flex;gap:10px;margin-top:14px}.row>*{flex:1}.small{margin-top:12px;font-size:12px;color:#777b87}.hidden{display:none}
+</style>
+</head>
+<body>
+<div id="join" class="panel">
+<div class="card">
+<h1>Browser P2P Chat</h1>
+<p>Your messages are sent directly between connected browsers using WebRTC. A small PeerJS signaling service is used only to help browsers find each other and establish the connection.</p>
+<input id="name" maxlength="30" placeholder="Your name">
+<div class="row"><input id="room" maxlength="40" placeholder="Room code"><button id="joinBtn">Join</button></div>
+<div class="small">Use the same room code on every browser.</div>
+</div>
+</div>
+<div id="app" class="app hidden">
+<div class="top"><div><div class="title">P2P Browser Chat</div><div id="status" class="status">Connecting…</div></div><button id="copyBtn">Copy room</button></div>
+<div class="room"><input id="roomDisplay" readonly><button id="leaveBtn">Leave</button></div>
+<div id="messages" class="messages"><div class="empty">Connecting to the room…</div></div>
+<form id="send" class="send"><input id="message" autocomplete="off" placeholder="Message…"><button>Send</button></form>
+</div>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+let peer=null,room="",name="",connections=new Map(),connected=false;
+const clean=s=>String(s||"").trim().replace(/[^a-zA-Z0-9_-]/g,"-").slice(0,40);
+function addMessage(data,mine=false){const box=$("messages");const empty=box.querySelector(".empty");if(empty)empty.remove();const el=document.createElement("div");el.className="msg"+(mine?" mine":"");const n=document.createElement("div");n.className="name";n.textContent=mine?"You":(data.name||"Guest");const t=document.createElement("div");t.className="text";t.textContent=data.text||"";el.append(n,t);box.appendChild(el);box.scrollTop=box.scrollHeight}
+function broadcast(data,except){for(const [id,c] of connections){if(id!==except&&c.open)c.send(data)}}
+function attach(c){connections.set(c.peer,c);c.on("open",()=>{connected=true;$("status").textContent=connections.size+" peer"+(connections.size===1?"":"s")+" connected";c.send({type:"hello",name});});c.on("data",data=>{if(data.type==="hello"){if(data.name)addMessage({name:data.name,text:"joined the room"});return}if(data.type==="chat"){addMessage(data,false);broadcast(data,c.peer)}});c.on("close",()=>{connections.delete(c.peer);$("status").textContent=connections.size+" peer"+(connections.size===1?"":"s")+" connected"});c.on("error",()=>connections.delete(c.peer))}
+function connectTo(id){if(id===peer.id||connections.has(id))return;const c=peer.connect(id,{reliable:true});attach(c)}
+function start(){room=clean($("room").value)||Math.random().toString(36).slice(2,8);name=($("name").value.trim()||"Guest").slice(0,30);$("roomDisplay").value=room;$("join").classList.add("hidden");$("app").classList.remove("hidden");const prefix="p2p-chat-"+room+"-";peer=new Peer(prefix+Math.random().toString(36).slice(2,8),{host:"0.peerjs.com",port:443,path:"/",secure:true});peer.on("open",id=>{connected=true;$("status").textContent="Room ready — waiting for peers";const known=JSON.parse(localStorage.getItem("p2p-known-"+room)||"[]");known.filter(x=>x!==id).forEach(connectTo);known.push(id);localStorage.setItem("p2p-known-"+room,JSON.stringify([...new Set(known)].slice(-30)));});peer.on("connection",attach);peer.on("error",e=>{$("status").textContent="Connection error: "+e.type});}
+$("joinBtn").onclick=start;
+$("room").addEventListener("keydown",e=>{if(e.key==="Enter")start()});
+$("send").onsubmit=e=>{e.preventDefault();const text=$("message").value.trim();if(!text)return;const data={type:"chat",name,text,time:Date.now()};addMessage(data,true);broadcast(data);$("message").value=""};
+$("copyBtn").onclick=async()=>{await navigator.clipboard.writeText(room);$("copyBtn").textContent="Copied";setTimeout(()=>$("copyBtn").textContent="Copy room",1000)};
+$("leaveBtn").onclick=()=>location.reload();
+</script>
+</body>
+</html>
