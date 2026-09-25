@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#5548cf">
 <title>Chat</title>
-<link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="https://raw.githubusercontent.com/ikirumi11/chat-app2/main/style.css">
 <script type="importmap">
 {"imports":{"react":"https://esm.sh/react@18.3.1","react-dom/client":"https://esm.sh/react-dom@18.3.1/client","yjs":"https://esm.sh/yjs@13.6.18","y-webrtc":"https://esm.sh/y-webrtc@10.2.3?deps=yjs@13.6.18"}}
 </script>
@@ -20,7 +20,11 @@ app.innerHTML="<div style=\"min-height:100vh;display:grid;place-items:center;pad
 };
 (async()=>{
 try{
-const [appSource,messageSource]=await Promise.all([fetch("./app.jsx").then(r=>{if(!r.ok)throw Error("Could not load app.jsx");return r.text()}),fetch("./Message.jsx").then(r=>{if(!r.ok)throw Error("Could not load Message.jsx");return r.text()})]);
+const base="https://raw.githubusercontent.com/ikirumi11/chat-app2/main/";
+const [appSource,messageSource]=await Promise.all([
+fetch(base+"app.jsx").then(r=>{if(!r.ok)throw Error("Could not load app.jsx: "+r.status);return r.text()}),
+fetch(base+"Message.jsx").then(r=>{if(!r.ok)throw Error("Could not load Message.jsx: "+r.status);return r.text()})
+]);
 const messageCode=Babel.transform(messageSource,{presets:["react"]}).code;
 const messageUrl=URL.createObjectURL(new Blob([messageCode],{type:"text/javascript"}));
 const appCode=Babel.transform(appSource.replace('from"./Message.jsx"','from"'+messageUrl+'"'),{presets:["react"]}).code;
