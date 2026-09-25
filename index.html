@@ -32,7 +32,7 @@ input{border:1px solid var(--line);background:#0d0f15;color:white;border-radius:
 const $=id=>document.getElementById(id);let peer=null,room="",name="",connections=new Map(),transfers=new Map();const CHUNK=48*1024;
 const clean=s=>String(s||"").trim().replace(/[^a-zA-Z0-9_-]/g,"-").slice(0,40),formatSize=n=>n<1024?n+" B":n<1048576?(n/1024).toFixed(1)+" KB":n<1073741824?(n/1048576).toFixed(1)+" MB":(n/1073741824).toFixed(1)+" GB";
 function toast(t){$("toast").textContent=t;$("toast").classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>$("toast").classList.remove("show"),1800)}
-function setStatus(){let n=connections.size;$("status").textContent=n?n+" peer"+(n===1?"":"s")+" connected":"Waiting for peers"}
+function setStatus(){let n=connections.size;$("status").textContent=n?"Connected":"Waiting for peers"}
 function scroll(){let b=$("messages");b.scrollTop=b.scrollHeight}
 function renderFile(f){
  let card=document.createElement("div");card.className="fileCard",url=URL.createObjectURL(f.blob);
